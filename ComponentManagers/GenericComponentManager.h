@@ -18,9 +18,9 @@
 */
 
 namespace Smasher {
-	template <class T>
-	concept HasStaticUpdateComponent = requires() {
-		T::StaticUpdateComponent;
+	template <typename T>
+	concept HasStaticUpdateComponent = requires(T& self, Smasher::Millisecond delta) {
+		{ T::StaticUpdateComponent(self, delta) } -> std::same_as<void>;
 	};
 
 	template <class T>
@@ -31,8 +31,8 @@ namespace Smasher {
 
 		void Update(Millisecond delta) {
 			if constexpr (HasStaticUpdateComponent<T>) {
-				for (auto itr : m_Components) {
-					T::StaticUpdateComponent(itr, delta);
+				for (auto& itr : m_Components) {
+					T::StaticUpdateComponent(static_cast<T&>(*itr), delta);
 				}
 			}
 		}
