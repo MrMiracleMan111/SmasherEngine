@@ -25,27 +25,27 @@ python ManifestHeaderGenerator.py --files Mainfest.json
 `Manifest.h`
 ```C++
 #pragma once
-#include"UUID.h"
+#include"ResourceUtils.h"
 
 namespace Resources {
 	namespace Textures {
 		namespace player_sprite {
-			UUID player_sprite = hash_str("assets/textures/player.png");
-			PATH player_sprite = "assets/textures/player.png";
+			constexpr ResourceID player_sprite_ID = hash_str("assets/textures/player.png");
+			ResourcePath player_sprite_PATH { "assets/textures/player.png" };
 		}
 		namespace enemy_sprite {
-			UUID enemy_sprite = hash_str("assets/textures/enemy.png");
-			PATH enemy_sprite = "assets/textures/enemy.png";
+			constexpr ResourceID enemy_sprite_ID = hash_str("assets/textures/enemy.png");
+			ResourcePath enemy_sprite_PATH { "assets/textures/enemy.png" };
 		}
 	}
 	namespace Sounds {
 		namespace gunshot {
-			UUID gunshot = hash_str("assets/audio/gunshot.wav");
-			PATH gunshot = "assets/audio/gunshot.wav";
+			constexpr ResourceID gunshot_ID = hash_str("assets/audio/gunshot.wav");
+			ResourcePath gunshot_PATH { "assets/audio/gunshot.wav" };
 		}
 		namespace bg_music_1 {
-			UUID bg_music_1 = hash_str("assets/songs/bg1.wav");
-			PATH bg_music_1 = "assets/songs/bg1.wav";
+			constexpr ResourceID bg_music_1_ID = hash_str("assets/songs/bg1.wav");
+			ResourcePath bg_music_1_PATH { "assets/songs/bg1.wav" };
 		}
 	}
 }
