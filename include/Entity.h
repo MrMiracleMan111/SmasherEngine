@@ -22,7 +22,8 @@ namespace Smasher {
 
 		template<class T>
 		bool HasComponent() {
-			return m_ComponentsByType.find(std::type_index(typeid(T))) != m_ComponentsByType.end();
+			const std::type_index index = std::type_index(typeid(T));
+			return m_ComponentsByType.find(index) != m_ComponentsByType.end();
 		}
 
 		template<class T, typename... Args>
@@ -32,7 +33,7 @@ namespace Smasher {
 		void RemoveComponent();
 
 		template<class T>
-		T& GetComponent();
+		T& GetComponent() const;
 
 	private:
 		const UUID m_UUID;
