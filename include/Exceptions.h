@@ -17,7 +17,7 @@ namespace Smasher {
 	namespace Exceptions {
 		// ==== GAME STATE EXCEPTIONS ====
 		SMASHER_EXCEPTION(GameStateNotFound)
-		SMASHER_EXCEPTION(GameStateDuplicateUUID)
+		SMASHER_EXCEPTION(GameStateDuplicate)
 		SMASHER_EXCEPTION(GameStateEntityNotFound)
 
 		// ==== COMPONENT EXCEPTIONS ====
