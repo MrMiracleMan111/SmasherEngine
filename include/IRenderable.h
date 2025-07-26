@@ -5,6 +5,7 @@
 
 namespace Smasher {
 	class IRenderable {
+	public:
 		virtual void Render(sf::RenderWindow& window) = 0;
 	};
 }
