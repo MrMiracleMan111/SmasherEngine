@@ -57,8 +57,8 @@ def RecursiveParse(data, name, out_file, depth):
 
     elif isinstance(data, list):
         out_file.write((depth * "\t") + f"namespace {FormatName(name)}" + " {\n")
-        out_file.write(((depth + 1) * "\t") + f'UUID {FormatName(name)} = hash_str("{name}");\n')
-        out_file.write(((depth + 1) * "\t") + f'PATHS {FormatName(name)} = ' + '{')
+        out_file.write(((depth + 1) * "\t") + f'constexpr UUID {FormatName(name)} = hash_str("{name}");\n')
+        out_file.write(((depth + 1) * "\t") + f'constexpr PATHS {FormatName(name)} = ' + '{')
         first = True
         for item in data:
             if not isinstance(item, dict) and not isinstance(item, list):
@@ -71,8 +71,8 @@ def RecursiveParse(data, name, out_file, depth):
         out_file.write((depth * "\t") + "}\n")
     else:
         out_file.write((depth * "\t") + f"namespace {FormatName(name)}" + " {\n")
-        out_file.write(((depth + 1) * "\t") + f'UUID {FormatName(name)} = hash_str("{data}");\n')
-        out_file.write(((depth + 1) * "\t") + f'PATH {FormatName(name)} = "{data}";\n')
+        out_file.write(((depth + 1) * "\t") + f'constexpr UUID {FormatName(name)} = hash_str("{data}");\n')
+        out_file.write(((depth + 1) * "\t") + f'constexpr PATH {FormatName(name)} = "{data}";\n')
         out_file.write((depth * "\t") + "}\n")
 
 def GenerateHeaders(data, out_filename):
