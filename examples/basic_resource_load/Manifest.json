@@ -1,0 +1,10 @@
+{
+  "Textures": {
+    "texture_1": "assets/textures/pexels-steve-texture-1.jpg",
+    "texture_2": "assets/textures/pexels-steve-texture-2.jpg"
+  },
+  "Sounds": {
+    "bg_music_1": "assets/songs/bg1.wav",
+    "bg_music_2": "assets/songs/bg2.wav"
+  }
+}

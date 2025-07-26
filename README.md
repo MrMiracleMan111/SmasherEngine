@@ -1,5 +1,55 @@
 # SmasherEngine
 
+## Manifest Tool
+The Resource Manager will use a "Resource.h" header file to store resource
+paths and UUIDs. The `ManifestHeaderGenerator.py` script is used to generate these headers.
+
+```bash
+python ManifestHeaderGenerator.py --files Mainfest.json
+```
+
+`Manifest.json`
+```json
+{
+    "Textures":  {
+          "player_sprite": "assets/textures/player.png",
+          "enemy_sprite": "assets/textures/enemy.png",
+    },
+    "Sounds": {
+          "gunshot": "assets/audio/gunshot.wav",
+          "bg_music_1": "assets/songs/bg1.wav",
+    }
+}
+```
+
+`Manifest.h`
+```C++
+#pragma once
+#include"UUID.h"
+
+namespace Resources {
+	namespace Textures {
+		namespace player_sprite {
+			UUID player_sprite = hash_str("assets/textures/player.png");
+			PATH player_sprite = "assets/textures/player.png";
+		}
+		namespace enemy_sprite {
+			UUID enemy_sprite = hash_str("assets/textures/enemy.png");
+			PATH enemy_sprite = "assets/textures/enemy.png";
+		}
+	}
+	namespace Sounds {
+		namespace gunshot {
+			UUID gunshot = hash_str("assets/audio/gunshot.wav");
+			PATH gunshot = "assets/audio/gunshot.wav";
+		}
+		namespace bg_music_1 {
+			UUID bg_music_1 = hash_str("assets/songs/bg1.wav");
+			PATH bg_music_1 = "assets/songs/bg1.wav";
+		}
+	}
+}
+```
 
 ### Core
 The Core header includes all necessary managers
