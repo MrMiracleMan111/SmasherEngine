@@ -12,16 +12,20 @@ namespace Smasher {
 
 	EventManager& GameState::GetEventManager() { return m_EventManager; }
 
-
-	void GameState::Render(sf::RenderWindow& window) {
-
+	void GameState::RenderComponents(sf::RenderWindow& window) {
+		for (auto pRenderable : m_ComponentRenderableManagers) {
+			pRenderable->Render(window);
+		}
 	}
 
-	void GameState::Update(Millisecond delta) {
-
+	void GameState::UpdateComponents(Millisecond delta) {
+		for (auto& [type, pManager] : m_ComponentManagers) {
+			pManager->Update(delta);
+			pManager->RemoveMarkedComponents();
+		}
 	}
 
-	Entity& GameState::GetEntity(UUID uuid) {
+	Entity& GameState::GetEntity(UUID uuid) const {
 
 		auto itr = m_EntityMap.find(uuid);
 		if (itr == m_EntityMap.end()) {
@@ -30,7 +34,7 @@ namespace Smasher {
 		return *itr->second;
 	}
 
-	bool GameState::HasEntity(UUID uuid) {
+	bool GameState::HasEntity(UUID uuid) const {
 		return (m_EntityMap.find(uuid) != m_EntityMap.end());
 	}
 }

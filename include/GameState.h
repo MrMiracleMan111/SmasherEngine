@@ -24,35 +24,25 @@ namespace Smasher {
 		PAUSED
 	};
 
-	// Retrieves and lazily loads managers
-	template <class T>
-	concept HasStaticInstantiateManager = requires() {
-		T::StaticInstantiateManager;
-	};
-
-	template <class T>
-	concept HasStaticRenderComponent = requires() {
-		T::StaticRenderComponent;
-	};
-
 	class SMASHER_API GameState {
 	public:
-		GameState(Engine& engine);
 		virtual ~GameState();
 		GameState() = delete;
 		GameState(const GameState&) = delete;
 		GameState& operator=(const GameState&) = delete;
 		GameState& operator=(const GameState&&) noexcept = delete;
 
-		virtual void Reset() = 0;
-		virtual void Render(sf::RenderWindow& window);
+		virtual void Reset() {};
+		virtual void Render(sf::RenderWindow& window) {};
+		virtual void Update(Millisecond delta) {};
 
-		void Update(Millisecond delta);
+		void RenderComponents(sf::RenderWindow& window);
+		void UpdateComponents(Millisecond delta);
 		void Activate() { m_Status = GameStateStatus::ACTIVE; };
 		void Pause() { m_Status = GameStateStatus::PAUSED; };
 		bool GetStatus() { return m_Status; };
-		Entity& GetEntity(UUID uuid);
-		bool HasEntity(UUID uuid);
+		Entity& GetEntity(UUID uuid) const;
+		bool HasEntity(UUID uuid) const;
 
 		EventManager& GetEventManager();
 
@@ -65,12 +55,15 @@ namespace Smasher {
 		template <class T>
 		ComponentManager& GetComponentManager();
 
+	protected:
+		GameState(Engine& engine);
+		Engine& m_Engine;
+
 	private:
 		std::unordered_map<UUID, std::unique_ptr<Entity>> m_EntityMap;
 		std::unordered_map<std::type_index, std::unique_ptr<ComponentManager>> m_ComponentManagers;
 		std::vector<IRenderable*> m_ComponentRenderableManagers; // Subset of component managers with rendering capabilities
 		GameStateStatus m_Status = GameStateStatus::PAUSED;
-		Engine& m_Engine;
 		EventManager m_EventManager;
 	};
 }

@@ -6,6 +6,16 @@
 
 namespace Smasher {
 
+	template <typename T>
+	concept HasStaticInstantiateManager = requires(Smasher::GameState& arg) {
+		T::StaticInstantiateManager(arg);
+	};
+
+	template <typename T>
+	concept HasStaticRenderComponent = requires(sf::RenderWindow& arg) {
+		{ T::HasStaticRenderComponent(arg) } -> std::same_as<void>;
+	};
+
 	template <class T>
 	void GameState::LoadComponentManager()
 	{
