@@ -1,17 +1,20 @@
 #include <gtest/gtest.h>
-//#include "Engine.h"
-//#include "Entity.h"
-//#include "ComponentManager.h"
-//#include "GenericComponentManager.h"
 #include "Core.h"
 
 
 class DummyGameState : public Smasher::GameState {
 public:
 	DummyGameState(Smasher::Engine& engine) : Smasher::GameState(engine) {}
-	void Reset() {};
-	void Render(sf::RenderWindow& window) override {};
 };
+
+class ShutdownEngineGameState : public Smasher::GameState {
+public:
+	ShutdownEngineGameState(Smasher::Engine& engine) : Smasher::GameState(engine) {}
+	void Update(Smasher::Millisecond delta) override {
+		m_Engine.Shutdown();
+	};
+};
+
 
 
 struct TestComponent : public Smasher::Component {
@@ -23,26 +26,79 @@ public:
 	int GetValue() { return m_Value; }
 
 protected:
-	static void StaticUpdateComponent(Smasher::Millisecond delta) {};
+	static void StaticUpdateComponent(TestComponent& self, Smasher::Millisecond delta) {};
 	int m_Value;
+};
+
+class CustomComponentManager : public Smasher::ComponentManager {
+public:
+	CustomComponentManager(Smasher::GameState& state) : Smasher::ComponentManager(state) {}
+	void Update(Smasher::Millisecond delta) {};
+};
+
+struct CustomComponent : public Smasher::Component {
+public:
+	SMASHER_USE_COMPONENT_MANAGER(CustomComponentManager)
+	CustomComponent(Smasher::Entity& entity, int value) :
+		Smasher::Component(entity),
+		m_Value(value) {
+	};
+	CustomComponent& operator=(CustomComponent&&) = default; // So that parent move assignment is called
+	int GetValue() { return m_Value; }
+
+protected:
+	static void StaticUpdateComponent(CustomComponent& self, Smasher::Millisecond delta) {};
+	int m_Value;
+};
+
+
+// Component that deletes itself during update
+struct DeleteTestComponent : public Smasher::Component {
+public:
+	DeleteTestComponent(Smasher::Entity& entity) : Smasher::Component(entity){};
+	DeleteTestComponent& operator=(DeleteTestComponent&&) = default; // So that parent move assignment is called
+	static void StaticUpdateComponent(DeleteTestComponent& self, Smasher::Millisecond delta) {
+		self.GetEntity().RemoveComponent<DeleteTestComponent>();
+	};
+};
+
+// Component that deletes itself during update
+struct SpicyDeleteTestComponent : public Smasher::Component {
+public:
+	SpicyDeleteTestComponent(Smasher::Entity& entity) : Smasher::Component(entity) {};
+	SpicyDeleteTestComponent& operator=(SpicyDeleteTestComponent&&) = default; // So that parent move assignment is called
+	static void StaticUpdateComponent(SpicyDeleteTestComponent& self, Smasher::Millisecond delta) {
+		self.m_Count++;
+		switch (self.m_Count) {
+		case 1:
+			self.GetEntity().RemoveComponent<SpicyDeleteTestComponent>();
+			break;
+		case 2:
+			throw std::runtime_error("This should never have been reached!");
+			break;
+		}
+	};
+
+protected:
+	unsigned int m_Count = 0;
 };
 
 TEST(EntityTest, AddEnttiy) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState state(engine);
+	DummyGameState& state = engine.AddState<DummyGameState>();
 	EXPECT_NO_THROW({ Smasher::Entity & entity = state.AddEntity<Smasher::Entity>(); });
 }
 
 TEST(EntityTest, GetEntity) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState state(engine);
+	DummyGameState& state = engine.AddState<DummyGameState>();
 	Smasher::Entity& entity = state.AddEntity<Smasher::Entity>();
 	EXPECT_NO_THROW({ state.GetEntity(entity.GetUUID()); });
 }
 
 TEST(EntityTest, MissingEntity) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState state(engine);
+	DummyGameState& state = engine.AddState<DummyGameState>();
 	EXPECT_THROW({ state.GetEntity(Smasher::UUID{10}); }, Smasher::Exceptions::GameStateEntityNotFound);
 	Smasher::Entity& entity = state.AddEntity<Smasher::Entity>();
 	EXPECT_THROW({ state.GetEntity(Smasher::UUID{entity.GetUUID() + 1});}, Smasher::Exceptions::GameStateEntityNotFound);
@@ -50,14 +106,14 @@ TEST(EntityTest, MissingEntity) {
 
 TEST(ComponentsTest, CreateComponent) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState state(engine);
+	DummyGameState& state = engine.AddState<DummyGameState>();
 	TestComponent& test = state.AddEntity<Smasher::Entity>().AddComponent<TestComponent>(10);
 	EXPECT_EQ(10, test.GetValue());
 }
 
 TEST(ComponentsTest, DuplicateComponent) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState state(engine);
+	DummyGameState& state = engine.AddState<DummyGameState>();
 	Smasher::Entity entity = state.AddEntity<Smasher::Entity>();
 	entity.AddComponent<TestComponent>(10);
 	EXPECT_THROW({
@@ -68,16 +124,17 @@ TEST(ComponentsTest, DuplicateComponent) {
 
 TEST(ComponentsTest, MissingComponent) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState state(engine);
+	DummyGameState& state = engine.AddState<DummyGameState>();
 	Smasher::Entity entity = state.AddEntity<Smasher::Entity>();
+	entity.AddComponent<TestComponent>(10);
 	EXPECT_THROW({
-			entity.GetComponent<TestComponent>();
-		}, Smasher::Exceptions::EntityComponentNotFound);
+			entity.GetComponent<CustomComponent>();
+	}, Smasher::Exceptions::EntityComponentNotFound);
 }
 
 TEST(ComponentsTest, RemoveComponent) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState state(engine);
+	DummyGameState& state = engine.AddState<DummyGameState>();
 	Smasher::Entity entity = state.AddEntity<Smasher::Entity>();
 	entity.AddComponent<TestComponent>(10);
 	ASSERT_TRUE(entity.HasComponent<TestComponent>());
@@ -90,11 +147,35 @@ TEST(ComponentsTest, RemoveComponent) {
 	}, Smasher::Exceptions::EntityComponentNotFound);
 }
 
+TEST(ComponentsTest, RemoveComponentDataChange) {
+	Smasher::Engine engine(640, 420);
+	DummyGameState& state = engine.AddState<DummyGameState>();
+	state.Activate();
+	Smasher::Entity entity = state.AddEntity<Smasher::Entity>();
+	entity.AddComponent<DeleteTestComponent>();
+	ASSERT_TRUE(entity.HasComponent<DeleteTestComponent>());
+	ASSERT_NO_THROW({ engine.Update(Smasher::Millisecond{10}); });
+	ASSERT_FALSE(entity.HasComponent<DeleteTestComponent>());
+	ASSERT_THROW({
+		entity.RemoveComponent<TestComponent>();
+	}, Smasher::Exceptions::EntityComponentNotFound);
+}
+
+TEST(ComponentsTest, ExceptionRemoveComponentDataChange) {
+	Smasher::Engine engine(640, 420);
+	engine.AddState<DummyGameState>().Activate();
+	Smasher::Entity entity = engine.GetState<DummyGameState>().AddEntity<Smasher::Entity>();
+	entity.AddComponent<SpicyDeleteTestComponent>();
+	ASSERT_TRUE(entity.HasComponent<SpicyDeleteTestComponent>());
+	ASSERT_NO_THROW({ engine.Update(Smasher::Millisecond{10}); });
+	ASSERT_NO_THROW({ engine.Update(Smasher::Millisecond{10}); });
+}
+
 void TestCallback(Smasher::DummyEvent *e) {};
 
 TEST(EventsTest, InvalidEventHandle) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState state(engine);
+	DummyGameState& state = engine.AddState<DummyGameState>();
 
 
 	Smasher::EventManager& manager = state.GetEventManager();
@@ -113,14 +194,14 @@ TEST(EventsTest, InvalidEventHandle) {
 
 TEST(EventsTest, SubscribeEvent) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState state(engine);
+	DummyGameState& state = engine.AddState<DummyGameState>();
 	Smasher::EventManager& manager = state.GetEventManager();
 	Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::DummyEvent>(TestCallback);
 }
 
 TEST(EventsTest, SinglePublishEvent) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState state(engine);
+	DummyGameState& state = engine.AddState<DummyGameState>();
 	Smasher::EventManager& manager = state.GetEventManager();
 
 	int triggered_count = 0;
@@ -137,7 +218,7 @@ TEST(EventsTest, SinglePublishEvent) {
 
 TEST(EventsTest, MultiplePublishEvent) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState state(engine);
+	DummyGameState& state = engine.AddState<DummyGameState>();
 	Smasher::EventManager& manager = state.GetEventManager();
 
 	int triggered_count = 0;
@@ -158,7 +239,7 @@ TEST(EventsTest, MultiplePublishEvent) {
 
 TEST(EventsTest, SinglePublishUnsubscribeEvent) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState state(engine);
+	DummyGameState& state = engine.AddState<DummyGameState>();
 	Smasher::EventManager& manager = state.GetEventManager();
 
 	int triggered_count = 0;
@@ -180,7 +261,7 @@ TEST(EventsTest, SinglePublishUnsubscribeEvent) {
 
 TEST(EventsTest, MultiplePublishMultipleSubscribeEvent) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState state(engine);
+	DummyGameState& state = engine.AddState<DummyGameState>();
 	Smasher::EventManager& manager = state.GetEventManager();
 
 	int triggered_count_1 = 0;
@@ -209,13 +290,47 @@ TEST(EventsTest, MultiplePublishMultipleSubscribeEvent) {
 	ASSERT_EQ(triggered_count_2, 2);
 }
 
-TEST(EngineTest, InitializeEngine) {
-	Smasher::Exceptions::GameStateDuplicateUUID e;
-	EXPECT_THROW({
-		Smasher::Engine engine(640, 420);
-		DummyGameState state(engine);
-		engine.AddState(1, state);
-		engine.Run();
-		engine.Shutdown();
-		}, Smasher::Exceptions::GameStateDuplicateUUID);
+TEST(EngineTest, ShutdownEngine) {
+	bool failed = false;
+	Smasher::Engine engine(640, 420);
+
+	ShutdownEngineGameState& state = engine.AddState<ShutdownEngineGameState>();
+	state.Activate();
+
+	engine.GetWindow().setActive(false);
+	std::thread worker([&engine]() {
+		engine.GetWindow().setActive(true);
+		engine.Run(); // Engine should shutdown after first update
+	});
+
+	std::this_thread::sleep_for(std::chrono::seconds(3));
+	failed = engine.IsRunning();
+	engine.Shutdown();
+	worker.join();
+
+	if (failed) {
+		FAIL() << "Engine should have shutdown";
+	}
+}
+
+TEST(EngineTest, ExplicitDoubleShutdownEngine) {
+	bool failed = false;
+	Smasher::Engine engine(640, 420);
+	ShutdownEngineGameState& state = engine.AddState<ShutdownEngineGameState>();
+	state.Activate();
+	engine.GetWindow().setActive(false);
+	std::thread worker([&engine]() {
+		engine.GetWindow().setActive(true);
+		engine.Run(); // Engine should shutdown after first update
+	});
+
+	std::this_thread::sleep_for(std::chrono::seconds(3));
+	failed = engine.IsRunning();
+	EXPECT_NO_THROW({ engine.Shutdown(); });
+	EXPECT_NO_THROW({ engine.Shutdown(); }); // Explicit second shutdown
+	worker.join();
+
+	if (failed) {
+		FAIL() << "Engine should have shutdown";
+	}
 }
