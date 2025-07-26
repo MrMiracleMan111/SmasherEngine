@@ -22,6 +22,16 @@ namespace Smasher {
 		friend class Entity;
 	public:
 		ComponentManager(GameState& state) : m_GameState(state) {};
+
+		// Avoiding Circular dependency by leaving this in header and forgoing CPP file
+		void RemoveMarkedComponents() {
+			while (m_ComponentsToRemove.size() != 0) {
+				auto& rComponentPtr = m_ComponentsToRemove.back();
+				RemoveComponent(rComponentPtr.get());
+				m_ComponentsToRemove.pop_back();
+			}
+		}
+
 		virtual void Update(Millisecond delta) = 0;
 		virtual ~ComponentManager() = default;
 		ComponentManager() = delete;
@@ -32,8 +42,11 @@ namespace Smasher {
 
 	protected:
 		virtual void RemoveComponent(std::unique_ptr<Component>& component) {
-			if (!component->IsValid()) {
-				throw Exceptions::ComponentInvalid("Component was probably already destroyed");
+			if (component->GetStatus() == ComponentStatus::REMOVED) {
+				throw Exceptions::ComponentInvalid("Component was already destroyed");
+			}
+			else if (component->GetStatus() != ComponentStatus::INVALID) {
+				throw std::logic_error("Component Status is wrong, it should be marked INVALID");
 			}
 
 			// Need to do the empty() check to avoid size_t overflow from 
@@ -49,13 +62,24 @@ namespace Smasher {
 		}
 
 		virtual std::unique_ptr<Component>& AddComponent(std::unique_ptr<Component> component) {
-			component->MakeValid();
+			component->SetStatus(ComponentStatus::VALID);
 			m_Components.push_back(std::move(component));
 			return m_Components.back();
 		}
 
+		void MarkComponentForRemoval(std::unique_ptr<Component>& rComponentPtr) {
+			if (rComponentPtr->GetStatus() != ComponentStatus::VALID) {
+				return;
+			}
+
+			rComponentPtr->SetStatus(ComponentStatus::INVALID);
+			m_ComponentsToRemove.push_back(rComponentPtr);
+		}
+
+	protected:
+		std::vector<std::unique_ptr<Component>> m_Components;
+		std::vector<std::reference_wrapper<std::unique_ptr<Component>>> m_ComponentsToRemove; // Components to be removed
 	private:
 		const GameState& m_GameState;
-		std::vector<std::unique_ptr<Component>> m_Components;
 	};
 }
