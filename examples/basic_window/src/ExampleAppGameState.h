@@ -3,7 +3,7 @@
 
 class ExampleAppGameState : public Smasher::GameState {
 public:
-	using Smasher::GameState::GameState;
+	ExampleAppGameState(Smasher::Engine& engine) : Smasher::GameState(engine) {};
 	void Reset() override;
 	void Render(sf::RenderWindow& window) override;
 };
