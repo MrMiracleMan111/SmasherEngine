@@ -61,38 +61,50 @@ endif()
 
 add_custom_target(copy_sfml_shared_libs ALL)
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(SFML_DYNAMIC_LIB_SUFFIX "-d")
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(SFML_DYNAMIC_LIB_SUFFIX "")
+else()
+    message(WARNING "Unknown Build Type assuming Debug")
+    set(SFML_DYNAMIC_LIB_SUFFIX "-d")
+endif()
+
 if(WIN32)
-    set(SFML_DLL_LIST
-        "${SFML_LIB_TARGET_DIR}/sfml-audio-d-2.dll"
-        "${SFML_LIB_TARGET_DIR}/sfml-graphics-d-2.dll"
-        "${SFML_LIB_TARGET_DIR}/sfml-network-d-2.dll"
-        "${SFML_LIB_TARGET_DIR}/sfml-system-d-2.dll"
-        "${SFML_LIB_TARGET_DIR}/sfml-window-d-2.dll"
-    )
+    set(SFML_DYNAMIC_LIB_FILE_EXTENSION ".dll")
 elseif(UNIX)
-    set(SFML_DLL_LIST
-        "${SFML_LIB_TARGET_DIR}/sfml-audio-d-2.so"
-        "${SFML_LIB_TARGET_DIR}/sfml-graphics-d-2.so"
-        "${SFML_LIB_TARGET_DIR}/sfml-network-d-2.so"
-        "${SFML_LIB_TARGET_DIR}/sfml-system-d-2.so"
-        "${SFML_LIB_TARGET_DIR}/sfml-window-d-2.so"
-    )
+    set(SFML_DYNAMIC_LIB_FILE_EXTENSION ".so")
 else()
     message(SEND_ERROR "Delete this CMake line and copy over the SFML shared libraries manually")
 endif()
 
-foreach(DLL ${SFML_DLL_LIST})
-    message(STATUS "Copying ${DLL} into ${CMAKE_BINARY_DIR}")
-    file(COPY "${DLL}" DESTINATION "${CMAKE_BINARY_DIR}/")
+set(SFML_DYNAMIC_LIB_LIST
+    "${SFML_LIB_TARGET_DIR}/sfml-audio${SFML_DYNAMIC_LIB_SUFFIX}-2${SFML_DYNAMIC_LIB_FILE_EXTENSION}"
+    "${SFML_LIB_TARGET_DIR}/sfml-graphics${SFML_DYNAMIC_LIB_SUFFIX}-2${SFML_DYNAMIC_LIB_FILE_EXTENSION}"
+    "${SFML_LIB_TARGET_DIR}/sfml-network${SFML_DYNAMIC_LIB_SUFFIX}-2${SFML_DYNAMIC_LIB_FILE_EXTENSION}"
+    "${SFML_LIB_TARGET_DIR}/sfml-system${SFML_DYNAMIC_LIB_SUFFIX}-2${SFML_DYNAMIC_LIB_FILE_EXTENSION}"
+    "${SFML_LIB_TARGET_DIR}/sfml-window${SFML_DYNAMIC_LIB_SUFFIX}-2${SFML_DYNAMIC_LIB_FILE_EXTENSION}"
+)
+
+foreach(DYNAMIC_LIB ${SFML_DYNAMIC_LIB_LIST})
+    message(STATUS "Copying ${DYNAMIC_LIB} into ${CMAKE_BINARY_DIR}")
+    file(COPY "${DYNAMIC_LIB}" DESTINATION "${CMAKE_BINARY_DIR}/")
 endforeach()
 
 # Compile Engine
-add_library(SmasherEngine SHARED "Core.cpp" "Core.h" "include/GameState.h" "include/UUID.h" "src/UUID.cpp" "include/Base.h" "src/GameState.cpp" "include/Engine.h" "src/Engine.cpp" "include/Exceptions.h" "include/EventManager.h" "src/EventManager.cpp" "include/Events.h" "include/ComponentManager.h" "ComponentManagers/GenericComponentManager.h" "include/Component.h"  "include/Entity.h" "src/Entity.cpp" "include/IRenderable.h" "ComponentManagers/GenericRenderableComponentManager.h" "Components/Transform2DComponent.h")
+add_library(SmasherEngine SHARED "Core.cpp" "Core.h" "include/GameState.h" "include/UUID.h" "src/UUID.cpp" "include/Base.h" "src/GameState.cpp" "include/Engine.h" "src/Engine.cpp" "include/Exceptions.h" "include/EventManager.h" "src/EventManager.cpp" "include/Events.h" "include/ComponentManager.h" "ComponentManagers/GenericComponentManager.h" "include/Component.h"  "include/Entity.h" "src/Entity.cpp" "include/IRenderable.h" "ComponentManagers/GenericRenderableComponentManager.h" "Components/Transform2DComponent.h" "include/EngineConfig.h" )
 add_dependencies(SmasherEngine copy_sfml_shared_libs)
 generate_export_header(SmasherEngine EXPORT_FILE_NAME "${CMAKE_BINARY_DIR}/exports/Smasher_export.h")
 target_include_directories(SmasherEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/ComponentManagers" "${SFML_INCLUDE_DIR}" "${CMAKE_BINARY_DIR}/exports")
 target_link_directories(SmasherEngine PUBLIC "${SFML_LIB_TARGET_DIR}")
-target_link_libraries(SmasherEngine PUBLIC "sfml-audio-d" "sfml-window-d" "sfml-graphics-d" "sfml-network-d" "sfml-system-d")
+
+target_link_libraries(SmasherEngine PUBLIC
+"sfml-audio${SFML_DYNAMIC_LIB_SUFFIX}"
+"sfml-window${SFML_DYNAMIC_LIB_SUFFIX}"
+"sfml-graphics${SFML_DYNAMIC_LIB_SUFFIX}"
+"sfml-network${SFML_DYNAMIC_LIB_SUFFIX}"
+"sfml-system${SFML_DYNAMIC_LIB_SUFFIX}")
+
 target_compile_features(SmasherEngine PUBLIC cxx_std_20)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
