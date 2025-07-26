@@ -57,28 +57,28 @@ def RecursiveParse(data, name, out_file, depth):
 
     elif isinstance(data, list):
         out_file.write((depth * "\t") + f"namespace {FormatName(name)}" + " {\n")
-        out_file.write(((depth + 1) * "\t") + f'constexpr UUID {FormatName(name)} = hash_str("{name}");\n')
-        out_file.write(((depth + 1) * "\t") + f'constexpr PATHS {FormatName(name)} = ' + '{')
+        out_file.write(((depth + 1) * "\t") + f'constexpr ResourceID {FormatName(name)}_ID = hash_str("{name}");\n')
+        out_file.write(((depth + 1) * "\t") + f'PATHS({FormatName(name)}) = ' + '{')
         first = True
         for item in data:
             if not isinstance(item, dict) and not isinstance(item, list):
                 if first:
-                    out_file.write(f'hash_str("{item}")')
+                    out_file.write(f'ResourcePath {{ "{item}" }}')
                     first = False
                 else:
-                    out_file.write(f', hash_str("{item}")')
-        out_file.write("}\n")
+                    out_file.write(f', ResourcePath {{ "{item}" }}')
+        out_file.write("};\n")
         out_file.write((depth * "\t") + "}\n")
     else:
         out_file.write((depth * "\t") + f"namespace {FormatName(name)}" + " {\n")
-        out_file.write(((depth + 1) * "\t") + f'constexpr UUID {FormatName(name)} = hash_str("{data}");\n')
-        out_file.write(((depth + 1) * "\t") + f'constexpr PATH {FormatName(name)} = "{data}";\n')
+        out_file.write(((depth + 1) * "\t") + f'constexpr ResourceID {FormatName(name)}_ID = hash_str("{data}");\n')
+        out_file.write(((depth + 1) * "\t") + f'ResourcePath {FormatName(name)}_PATH {{ "{data}" }};\n')
         out_file.write((depth * "\t") + "}\n")
 
 def GenerateHeaders(data, out_filename):
     with open(out_filename + ".h", "w") as out:
         out.write("#pragma once\n")
-        out.write('#include"UUID.h"\n\n')
+        out.write('#include"ResourceUtils.h"\n\n')
         RecursiveParse(data, "Resources", out, 0)
         out.close()
 def ParseHeadersManifestJSON(path):
