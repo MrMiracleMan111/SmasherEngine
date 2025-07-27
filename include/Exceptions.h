@@ -29,5 +29,10 @@ namespace Smasher {
 
 		// ==== EVENT EXCEPTIONS ====
 		SMASHER_EXCEPTION(EventHandleInvalid)
+
+		// ==== RESOURCE EXCEPTIONS ====
+		SMASHER_EXCEPTION(ResourceFailedToLoad)
+		SMASHER_EXCEPTION(ResourceNotLoaded)
+		SMASHER_EXCEPTION(ResourceAlreadyExists)
 	}
 }

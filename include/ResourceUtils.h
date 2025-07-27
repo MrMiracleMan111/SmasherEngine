@@ -1,9 +1,9 @@
 #pragma once
 #include <filesystem>
+#include <cstdint>
 
 typedef uint64_t ResourceID;
 typedef std::filesystem::path ResourcePath;
-#define PATHS(name) ResourcePath name_PATH []
 
 // using fnv1a_hash 
 constexpr uint64_t hash_str(const char* str) {
