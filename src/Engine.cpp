@@ -1,4 +1,6 @@
 #include <format>
+#include <exception>
+#include <stdexcept>
 #include "Engine.h"
 #include "Exceptions.h"
 #include "EngineConfig.h"
@@ -12,17 +14,26 @@ namespace Smasher {
 	}
 
 	void Engine::Run() {
-		while (m_Window.isOpen() and m_RunningAtomic) {
-			sf::Event event;
-			while (m_Window.pollEvent(event)) {
-				if (event.type == sf::Event::Closed) {
-					m_Window.close();
+		#ifdef NDEBUG
+		try {
+		#endif
+			while (m_Window.isOpen() and m_RunningAtomic) {
+				sf::Event event;
+				while (m_Window.pollEvent(event)) {
+					if (event.type == sf::Event::Closed) {
+						m_Window.close();
+					}
 				}
+				Update(Millisecond{ 10 });
+				Render(m_Window);
 			}
-			Update(Millisecond{ 10 });
-			Render(m_Window);
+			Shutdown();
+		#ifdef NDEBUG
 		}
-		Shutdown();
+		catch (const std::exception& e) {
+			std::cerr << "Exception Thrown: " << e.what() << std::endl;
+		}
+		#endif
 	}
 
 	void Engine::Update(Millisecond delta) {
