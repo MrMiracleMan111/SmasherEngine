@@ -56,9 +56,9 @@ def RecursiveParse(data, name, out_file, depth):
         out_file.write((depth * "\t") + "}\n")
 
     elif isinstance(data, list):
-        out_file.write((depth * "\t") + f"namespace {FormatName(name)}" + " {\n")
-        out_file.write(((depth + 1) * "\t") + f'constexpr ResourceID {FormatName(name)}_ID = hash_str("{name}");\n')
-        out_file.write(((depth + 1) * "\t") + f'PATHS({FormatName(name)}) = ' + '{')
+        out_file.write((depth * "\t") + f"struct {FormatName(name)}" + " {\n")
+        out_file.write(((depth + 1) * "\t") + f'static constexpr ResourceID ID = hash_str("{name}");\n')
+        out_file.write(((depth + 1) * "\t") + f'static inline const ResourcePath PATHS[] = ' + '{')
         first = True
         for item in data:
             if not isinstance(item, dict) and not isinstance(item, list):
@@ -68,12 +68,12 @@ def RecursiveParse(data, name, out_file, depth):
                 else:
                     out_file.write(f', ResourcePath {{ "{item}" }}')
         out_file.write("};\n")
-        out_file.write((depth * "\t") + "}\n")
+        out_file.write((depth * "\t") + "};\n")
     else:
-        out_file.write((depth * "\t") + f"namespace {FormatName(name)}" + " {\n")
-        out_file.write(((depth + 1) * "\t") + f'constexpr ResourceID {FormatName(name)}_ID = hash_str("{data}");\n')
-        out_file.write(((depth + 1) * "\t") + f'ResourcePath {FormatName(name)}_PATH {{ "{data}" }};\n')
-        out_file.write((depth * "\t") + "}\n")
+        out_file.write((depth * "\t") + f"struct {FormatName(name)}" + " {\n")
+        out_file.write(((depth + 1) * "\t") + f'static constexpr ResourceID ID = hash_str("{data}");\n')
+        out_file.write(((depth + 1) * "\t") + f'static inline const ResourcePath PATH {{ "{data}" }};\n')
+        out_file.write((depth * "\t") + "};\n")
 
 def GenerateHeaders(data, out_filename):
     with open(out_filename + ".h", "w") as out:
