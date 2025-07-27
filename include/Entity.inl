@@ -2,20 +2,21 @@
 #include "Entity.h"
 #include "GameState.h"
 namespace Smasher {
-	template<class T, typename... Args>
+	template<IComponentType T, typename... Args>
 	T& Entity::AddComponent(Args&&... componentArgs) {
-		static_assert(std::is_base_of<Component, T>::value, "T must inherit from Component");
 
 		if (HasComponent<T>()) {
 			std::string exceptionMessage = std::format("Entity already has component of type {}", typeid(T).name());
 			throw Exceptions::EntityDuplicateComponent(exceptionMessage);
 		}
 
-		auto& manager = m_GameState.template GetComponentManager<T>();
-		auto pComponent = std::make_unique<T>(*this, std::forward<Args>(componentArgs)...);
-		std::reference_wrapper<std::unique_ptr<Component>> rComponentPtr(manager.AddComponent(std::move(pComponent)));
-		m_ComponentsByType.insert({ std::type_index(typeid(T)), rComponentPtr });
-		return static_cast<T&>(*(rComponentPtr.get().get()));
+		auto& rManager = m_GameState.template GetComponentManager<T>();
+		T component = T(*this, std::forward<Args>(componentArgs)...);
+
+		std::reference_wrapper<IComponent> rComponent(rManager.AddComponent(std::move(component)));
+		m_ComponentsByType.insert({ std::type_index(typeid(T)), rComponent });
+
+		return static_cast<T&>(rComponent.get());
 	}
 
 	template<class T>
@@ -24,10 +25,10 @@ namespace Smasher {
 			throw Exceptions::EntityComponentNotFound(std::format("Could not find component for entity {}", (uint64_t)(m_UUID)));
 		}
 		const std::type_index index = std::type_index(typeid(T));
-		std::reference_wrapper<std::unique_ptr<Component>>& rComponentPtr = m_ComponentsByType.at(index);
+		std::reference_wrapper<IComponent>& rComponentPtr = m_ComponentsByType.at(index);
 
-		auto& manager = m_GameState.template GetComponentManager<T>();
-		manager.MarkComponentForRemoval(rComponentPtr.get());
+		IComponentManager& manager = m_GameState.template GetComponentManager<T>();
+		manager.RemoveComponent(rComponentPtr.get());
 		m_ComponentsByType.erase(index);
 	}
 
@@ -40,6 +41,6 @@ namespace Smasher {
 			std::string exceptionMessage = std::format("Entity has no component of type {}", typeid(T).name());
 			throw Exceptions::EntityComponentNotFound(exceptionMessage);
 		}
-		return static_cast<T&>(*itr->second.get());
+		return static_cast<T&>(itr->second.get());
 	}
 }

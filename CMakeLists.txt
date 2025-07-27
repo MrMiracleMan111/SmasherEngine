@@ -93,7 +93,7 @@ foreach(DYNAMIC_LIB ${SFML_DYNAMIC_LIB_LIST})
 endforeach()
 
 # Compile Engine
-add_library(SmasherEngine SHARED "Core.cpp" "Core.h" "include/GameState.h" "include/UUID.h" "src/UUID.cpp" "include/Base.h" "src/GameState.cpp" "include/Engine.h" "src/Engine.cpp" "include/Exceptions.h" "include/EventManager.h" "src/EventManager.cpp" "include/Events.h" "include/ComponentManager.h" "ComponentManagers/GenericComponentManager.h" "include/Component.h"  "include/Entity.h" "src/Entity.cpp" "include/IRenderable.h" "ComponentManagers/GenericRenderableComponentManager.h" "Components/Transform2DComponent.h" "include/EngineConfig.h"  "include/ResourceUtils.h" "include/ResourceManager.h")
+add_library(SmasherEngine SHARED "Core.cpp" "Core.h" "include/GameState.h" "include/UUID.h" "src/UUID.cpp" "include/Base.h" "src/GameState.cpp" "include/Engine.h" "src/Engine.cpp" "include/Exceptions.h" "include/EventManager.h" "src/EventManager.cpp" "include/Events.h"  "ComponentManagers/GenericComponentManager.h" "include/IComponent.h"  "include/Entity.h" "src/Entity.cpp"   "Components/Transform2DComponent.h" "include/EngineConfig.h"  "include/ResourceUtils.h" "include/ResourceManager.h" "include/IComponentManager.h" "ComponentManagers/BaseComponentManager.h" )
 add_dependencies(SmasherEngine copy_sfml_shared_libs)
 generate_export_header(SmasherEngine EXPORT_FILE_NAME "${CMAKE_BINARY_DIR}/exports/Smasher_export.h")
 target_include_directories(SmasherEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/ComponentManagers" "${SFML_INCLUDE_DIR}" "${CMAKE_BINARY_DIR}/exports")
@@ -117,7 +117,7 @@ endif()
 # Compile Examples
 
 if(DEFINED SMASHER_EXAMPLES)
-    add_executable (BasicWindowExample "examples/basic_window/main.cpp" "examples/basic_window/src/ExampleAppGameState.cpp" "ComponentManagers/GenericRenderableComponentManager.h")
+    add_executable (BasicWindowExample "examples/basic_window/main.cpp" "examples/basic_window/src/ExampleAppGameState.cpp" )
     target_compile_features(BasicWindowExample PUBLIC cxx_std_20)
     target_include_directories (BasicWindowExample PUBLIC "examples/basic_window/src")
     target_link_libraries( BasicWindowExample PRIVATE SmasherEngine )

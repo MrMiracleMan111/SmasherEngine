@@ -6,7 +6,19 @@
 #pragma once
 #define SMASHER_API SMASHERENGINE_EXPORT
 
+#define SMASHER_ADD_CAPABILITIES(args) \
+virtual static constexpr uint32_t GetStaticCapabilities() { \
+	return (args); \
+}
+
+
 namespace Smasher {
+	enum SmasherCapability {
+		RENDER = 1 << 0,
+		UPDATE = 1 << 1
+	};
+
+
 	struct SMASHER_API Millisecond {
 		double m_Milliseconds;
 

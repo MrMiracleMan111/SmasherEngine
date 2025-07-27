@@ -1,15 +1,18 @@
 #pragma once
 #include <SFML/System.hpp>
 #include "Base.h"
-#include "Component.h"
+#include "IComponent.h"
 
 namespace Smasher {
-	class Transform2DComponent : public Component {
+	class Transform2DComponent : public IComponent {
+		Transform2DComponent() = delete;
+
 		Transform2DComponent(Smasher::Entity& entity) :
-			Smasher::Component(entity) {
+			Smasher::IComponent(entity) {
 		};
+
 		Transform2DComponent(Smasher::Entity& entity, sf::Transform transform) :
-			Smasher::Component(entity), m_Transform(transform) {
+			Smasher::IComponent(entity), m_Transform(transform) {
 		};
 		Transform2DComponent& operator=(Transform2DComponent&&) = default; // So that parent move assignment is called
 
