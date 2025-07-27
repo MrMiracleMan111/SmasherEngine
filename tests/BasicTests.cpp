@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include "Core.h"
-
+#include "BaseComponentManager.h"
 
 class DummyGameState : public Smasher::GameState {
 public:
@@ -11,39 +11,45 @@ class ShutdownEngineGameState : public Smasher::GameState {
 public:
 	ShutdownEngineGameState(Smasher::Engine& engine) : Smasher::GameState(engine) {}
 	void Update(Smasher::Millisecond delta) override {
-		m_Engine.Shutdown();
+		ShutdownEngine();
 	};
 };
 
 
 
-struct TestComponent : public Smasher::Component {
+struct TestComponent : public Smasher::IComponent {
 public:
 	TestComponent(Smasher::Entity& entity, int value) :
-		Smasher::Component(entity),
+		Smasher::IComponent(entity),
 		m_Value(value) {};
-	TestComponent& operator=(TestComponent&&) = default; // So that parent move assignment is called
 	int GetValue() { return m_Value; }
+	static void StaticUpdateComponent(TestComponent& self, Smasher::Millisecond delta) {};
 
 protected:
-	static void StaticUpdateComponent(TestComponent& self, Smasher::Millisecond delta) {};
 	int m_Value;
 };
 
-class CustomComponentManager : public Smasher::ComponentManager {
+struct CustomComponent;
+
+class CustomComponentManager : public Smasher::BaseComponentManager<CustomComponent> {
 public:
-	CustomComponentManager(Smasher::GameState& state) : Smasher::ComponentManager(state) {}
-	void Update(Smasher::Millisecond delta) {};
+	CustomComponentManager(Smasher::GameState& state) : Smasher::BaseComponentManager<CustomComponent>(state) {}
+	CustomComponentManager(const CustomComponentManager&) = default;
+	~CustomComponentManager() = default;
+
+	void Update(Smasher::Millisecond delta) override {};
+	void Render(sf::RenderWindow& rWindow) override {};
 };
 
-struct CustomComponent : public Smasher::Component {
+struct CustomComponent : public Smasher::IComponent {
 public:
 	SMASHER_USE_COMPONENT_MANAGER(CustomComponentManager)
 	CustomComponent(Smasher::Entity& entity, int value) :
-		Smasher::Component(entity),
+		Smasher::IComponent(entity),
 		m_Value(value) {
 	};
-	CustomComponent& operator=(CustomComponent&&) = default; // So that parent move assignment is called
+	~CustomComponent() = default;
+
 	int GetValue() { return m_Value; }
 
 protected:
@@ -53,20 +59,18 @@ protected:
 
 
 // Component that deletes itself during update
-struct DeleteTestComponent : public Smasher::Component {
+struct DeleteTestComponent : public Smasher::IComponent {
 public:
-	DeleteTestComponent(Smasher::Entity& entity) : Smasher::Component(entity){};
-	DeleteTestComponent& operator=(DeleteTestComponent&&) = default; // So that parent move assignment is called
+	DeleteTestComponent(Smasher::Entity& entity) : Smasher::IComponent(entity){};
 	static void StaticUpdateComponent(DeleteTestComponent& self, Smasher::Millisecond delta) {
 		self.GetEntity().RemoveComponent<DeleteTestComponent>();
 	};
 };
 
 // Component that deletes itself during update
-struct SpicyDeleteTestComponent : public Smasher::Component {
+struct SpicyDeleteTestComponent : public Smasher::IComponent {
 public:
-	SpicyDeleteTestComponent(Smasher::Entity& entity) : Smasher::Component(entity) {};
-	SpicyDeleteTestComponent& operator=(SpicyDeleteTestComponent&&) = default; // So that parent move assignment is called
+	SpicyDeleteTestComponent(Smasher::Entity& entity) : Smasher::IComponent(entity) {};
 	static void StaticUpdateComponent(SpicyDeleteTestComponent& self, Smasher::Millisecond delta) {
 		self.m_Count++;
 		switch (self.m_Count) {
@@ -74,6 +78,8 @@ public:
 			self.GetEntity().RemoveComponent<SpicyDeleteTestComponent>();
 			break;
 		case 2:
+			// Component should have been removed last update
+			// so this case should never be hit
 			throw std::runtime_error("This should never have been reached!");
 			break;
 		}

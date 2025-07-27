@@ -1,7 +1,7 @@
 #pragma once
 #include "Base.h"
-#include "ComponentManager.h"
-#include "Component.h"
+#include "IComponentManager.h"
+#include "IComponent.h"
 
 
 /**
@@ -18,23 +18,80 @@
 */
 
 namespace Smasher {
-	template <typename T>
-	concept HasStaticUpdateComponent = requires(T& self, Smasher::Millisecond delta) {
-		{ T::StaticUpdateComponent(self, delta) } -> std::same_as<void>;
-	};
-
 	template <class T>
-	class GenericComponentManager : public ComponentManager {
+	class GenericComponentManager final : public IComponentManager {
+		friend class Entity;
 	public:
-		GenericComponentManager(GameState& state) : ComponentManager(state) {};
+		GenericComponentManager(GameState& state) : IComponentManager(state) {};
+		GenericComponentManager() = delete;
+		GenericComponentManager(const GenericComponentManager&) = delete;
+		GenericComponentManager(GenericComponentManager&&) = delete;
+		GenericComponentManager& operator=(const GenericComponentManager&) = delete;
 		GenericComponentManager& operator= (GenericComponentManager&&) = default;
+		virtual ~GenericComponentManager() = default;
 
-		void Update(Millisecond delta) {
-			if constexpr (HasStaticUpdateComponent<T>) {
-				for (auto& itr : m_Components) {
-					T::StaticUpdateComponent(static_cast<T&>(*itr), delta);
-				}
+		void PreUpdate(Millisecond delta) override {
+			RemoveMarkedComponents();
+		}
+
+		void Update(Millisecond delta) override {
+			for (T& itr : m_Components) {
+				T::StaticUpdateComponent(itr, delta);
 			}
 		}
+
+		void Render(sf::RenderWindow rWindow) {
+			for (T& itr : m_Components) {
+				T::StaticRenderComponent(itr, rWindow);
+			}
+		}
+
+	protected:
+		void RemoveComponent(IComponent& rComponent) override {
+			if (rComponent.GetStatus() != ComponentStatus::VALID) {
+				return;
+			}
+
+			SetComponentStatus(rComponent, ComponentStatus::INVALID);
+			m_ComponentsToRemove.emplace_back(rComponent);
+		}
+
+		IComponent& AddComponent(IComponent&& xComponent) override {
+			T* pComponent = dynamic_cast<T*>(&xComponent);
+			if (pComponent == nullptr) {
+				throw Exceptions::ComponentDowncastFailed(std::format("Component not of type {}", typeid(T).name()));
+			}
+			SetComponentStatus(*pComponent, ComponentStatus::VALID);
+			m_Components.emplace_back(std::move(*pComponent));
+			return m_Components.back();
+		}
+
+	private:
+		void RemoveMarkedComponents() {
+			for (IComponent& rComponent : m_ComponentsToRemove) {
+				if (rComponent.GetStatus() == ComponentStatus::REMOVED) {
+					throw Exceptions::ComponentInvalid("Component was already destroyed");
+				}
+				else if (rComponent.GetStatus() != ComponentStatus::INVALID) {
+					throw std::logic_error("Component Status is wrong, it should be marked INVALID");
+				}
+
+				// Need to do the empty() check to avoid size_t overflow from 
+				// the expression m_Components.size() - 1
+				if (!m_Components.empty() && (rComponent.GetIndex() < (m_Components.size() - 1))) {
+					// Move last element into this index and pop off last element
+					size_t index = rComponent.GetIndex();
+					rComponent = std::move(m_Components.back());
+					//std::swap(rComponent, m_Components.back());
+					SetComponentIndex(rComponent, index);
+				}
+
+				m_Components.pop_back();
+			}
+			m_ComponentsToRemove.clear();
+		}
+
+		std::vector<T> m_Components;
+		std::vector<std::reference_wrapper<IComponent>> m_ComponentsToRemove; // Components to be removed
 	};
 }
