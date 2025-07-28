@@ -8,11 +8,16 @@ import sys
 import os
 import json
 import re
+from pathlib import Path
 
 parser = argparse.ArgumentParser(description ='Generate Resource Manifest Header file from JSON manifest.')
 parser.add_argument('--files',
                     type = str, nargs ='+',
                     help ='Space separated list of files to generate Manifest Headers for')
+
+parser.add_argument('--out',
+                    type = str, nargs ='+',
+                    help ='Space separated list of paths to generate Manifest Headers at')
 
 # Check that filws were provided
 args = parser.parse_args()
@@ -24,6 +29,11 @@ if args.files:
 else:
     print("No JSON files were provided", file=sys.stderr)
     exit(1)
+
+if args.out:
+    if len(args.files) != len(args.out):
+        print("Number of outputs doesn't match number of inputs", file=sys.stderr)
+        exit(1)
 
 # Check that files exist and are JSON files
 invalid_path = False
@@ -75,19 +85,26 @@ def RecursiveParse(data, name, out_file, depth):
         out_file.write(((depth + 1) * "\t") + f'static inline const ResourcePath PATH {{ "{data}" }};\n')
         out_file.write((depth * "\t") + "};\n")
 
-def GenerateHeaders(data, out_filename):
-    with open(out_filename + ".h", "w") as out:
-        out.write("#pragma once\n")
-        out.write('#include"ResourceUtils.h"\n\n')
-        RecursiveParse(data, "Resources", out, 0)
-        out.close()
-def ParseHeadersManifestJSON(path):
+def GenerateHeaders(data, out_path):
     try:
-        with open(path, 'r') as out:
-            filename_with_extension = os.path.basename(path)
-            filename_without_extension = os.path.splitext(filename_with_extension)[0]
+        with open(out_path, "w") as out:
+            out.write("#pragma once\n")
+            out.write('#include"ResourceUtils.h"\n\n')
+            RecursiveParse(data, "Resources", out, 0)
+            out.close()
+    except Exception as e:
+        print(f"An unexpected error occurred when opening output file: {e}")
+        exit(8)
+def ParseHeadersManifestJSON(json_path, out_path=None):
+    try:
+        with open(json_path, 'r') as out:
+            if out_path == None:
+                (dir, filename) = os.path.split(json_path)
+                filename_without_extension = os.path.splitext(filename)[0]
+                out_path = os.path.join(dir, filename_without_extension + ".h")
+            print(f"Using out path {out_path}")
             data = json.load(out)
-            GenerateHeaders(data, filename_without_extension)
+            GenerateHeaders(data, out_path)
     except FileNotFoundError:
         print(f"Error: File not found at {path}")
         exit(5)
@@ -101,5 +118,9 @@ def ParseHeadersManifestJSON(path):
 
 
 # Generate each manifest
-for path in args.files:
-    ParseHeadersManifestJSON(path)
+for index in range(len(args.files)):
+    path = args.files[index]
+    if args.out:
+        ParseHeadersManifestJSON(path, args.out[index])
+    else:
+        ParseHeadersManifestJSON(path)
