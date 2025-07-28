@@ -7,6 +7,12 @@
 #pragma once
 #define SMASHER_API SMASHERENGINE_EXPORT
 
+#define SMASHER_ADD_CAPABILITIES(args) \
+virtual static constexpr uint32_t GetStaticCapabilities() { \
+	return (args); \
+}
+
+
 namespace Smasher {
 	using Millisecond = std::chrono::milliseconds;
 	//struct SMASHER_API Millisecond {

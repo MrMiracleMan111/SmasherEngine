@@ -1,6 +1,7 @@
 #include <optional>
 #include "GameState.h"
 #include "Entity.h"
+#include "Engine.h"
 
 namespace Smasher {
 	GameState::GameState(Engine& engine) : m_Engine(engine) {
@@ -12,17 +13,26 @@ namespace Smasher {
 
 	EventManager& GameState::GetEventManager() { return m_EventManager; }
 
-	void GameState::RenderComponents(sf::RenderWindow& window) {
-		for (auto pRenderable : m_ComponentRenderableManagers) {
-			pRenderable->Render(window);
+	void GameState::RenderComponentManagers(sf::RenderWindow& window) {
+		for (auto pManager : m_ComponentManagersWithRender) {
+			pManager->Render(window);
 		}
 	}
 
-	void GameState::UpdateComponents(Millisecond delta) {
-		for (auto& [type, pManager] : m_ComponentManagers) {
-			pManager->Update(delta);
-			pManager->RemoveMarkedComponents();
+	void GameState::PreUpdateComponentManagers(Millisecond delta) {
+		for (auto& [key, pManager] : m_ComponentManagers) {
+			pManager->PreUpdate(delta);
 		}
+	}
+
+	void GameState::UpdateComponentManagers(Millisecond delta) {
+		for (auto pManager : m_ComponentManagersWithUpdate) {
+			pManager->Update(delta);
+		}
+	}
+
+	void GameState::ShutdownEngine() {
+		m_Engine.Shutdown();
 	}
 
 	Entity& GameState::GetEntity(UUID uuid) const {

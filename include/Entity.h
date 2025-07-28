@@ -11,11 +11,19 @@
 
 namespace Smasher {
 	class GameState;
-	class Component;
+	class IComponent;
+
+	template<typename T>
+	concept IComponentType = std::is_base_of_v<IComponent, T>;
+
 	class SMASHER_API Entity {
 
 	public:
 		Entity(GameState& state, UUID uuid) : m_GameState(state), m_UUID(uuid) {};
+		Entity(const Entity&) = default;
+		Entity(Entity&&) = default;
+		Entity& operator =(const Entity&) = default;
+		Entity& operator =(Entity&&) = default;
 		~Entity();
 
 		UUID GetUUID() { return m_UUID; }
@@ -26,7 +34,7 @@ namespace Smasher {
 			return m_ComponentsByType.find(index) != m_ComponentsByType.end();
 		}
 
-		template<class T, typename... Args>
+		template<IComponentType T, typename... Args>
 		T& AddComponent(Args&&... componentArgs);
 
 		template<class T>
@@ -38,7 +46,7 @@ namespace Smasher {
 	private:
 		const UUID m_UUID;
 		GameState& m_GameState;
-		std::unordered_map<std::type_index, std::reference_wrapper<std::unique_ptr<Component>>> m_ComponentsByType;
+		std::unordered_map<std::type_index, std::reference_wrapper<IComponent>> m_ComponentsByType;
 	};
 }
 
