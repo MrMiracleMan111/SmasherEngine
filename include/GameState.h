@@ -7,6 +7,7 @@
 #include "Base.h"
 #include "UUID.h"
 #include "EventManager.h"
+#include "ResourceManager.h"
 
 
 namespace Smasher {
@@ -16,7 +17,6 @@ namespace Smasher {
 
 	template <class T>
 	class GenericComponentManager;
-	class IRenderable;
 
 
 	enum GameStateStatus {
@@ -45,7 +45,8 @@ namespace Smasher {
 		Entity& GetEntity(UUID uuid) const;
 		bool HasEntity(UUID uuid) const;
 
-		EventManager& GetEventManager();
+		EventManager& GetEventManager() const { return m_EventManager; }
+		Engine& GetEngine() const { return m_Engine; }
 
 		template <class T, typename... Args>
 		T& AddEntity(Args&&... componentArgs);
@@ -56,7 +57,11 @@ namespace Smasher {
 		IComponentManager& GetComponentManager();
 
 	protected:
-		GameState(Engine& engine);
+		GameState(Engine& engine) :
+			m_Engine(engine),
+			m_EventManager(engine.GetEventManager()),
+			m_ResourceManager(engine.GetResourceManager()) {}
+
 		void RenderComponentManagers(sf::RenderWindow& window);
 		void UpdateComponentManagers(Millisecond delta);
 		void PreUpdateComponentManagers(Millisecond delta);
@@ -72,7 +77,8 @@ namespace Smasher {
 		std::vector<IComponentManager*> m_ComponentManagersWithRender; // Subset of component managers with Render(sf::Window&) capability
 		std::vector<IComponentManager*> m_ComponentManagersWithUpdate; // Subset of component managers with Update(Millisecond) capability
 		GameStateStatus m_Status = GameStateStatus::PAUSED;
-		EventManager m_EventManager;
+		EventManager& m_EventManager;
+		ResourceManager& m_ResourceManager;
 		Engine& m_Engine;
 	};
 }
