@@ -4,17 +4,12 @@
 #include "Engine.h"
 
 namespace Smasher {
-	GameState::GameState(Engine& engine) : m_Engine(engine) {
-	}
-
 	GameState::~GameState() {
 		m_ComponentManagersWithRender.clear();
 		m_ComponentManagersWithUpdate.clear();
 		m_EntityMap.clear();
 		m_ComponentManagers.clear();
 	}
-
-	EventManager& GameState::GetEventManager() { return m_EventManager; }
 
 	void GameState::RenderComponentManagers(sf::RenderWindow& window) {
 		for (auto pManager : m_ComponentManagersWithRender) {
