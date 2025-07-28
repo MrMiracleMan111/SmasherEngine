@@ -53,7 +53,7 @@ namespace Smasher {
 		bool m_Valid = false;
 	};
 
-	class SMASHER_API EventManager {
+	class SMASHER_API EventManager final {
 	public:
 		EventManager();
 		~EventManager();

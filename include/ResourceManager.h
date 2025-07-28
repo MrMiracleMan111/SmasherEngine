@@ -85,7 +85,7 @@ namespace Smasher {
 		const ResourcePath& Path;
 	};
 
-	class ResourceManager {
+	class ResourceManager final {
 	public:
 		template <class T>
 		ResourceHandle GetResourceHandle() {

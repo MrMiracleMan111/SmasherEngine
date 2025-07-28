@@ -11,7 +11,7 @@
 #include "GameState.h"
 
 namespace Smasher {
-	class SMASHER_API Engine {
+	class SMASHER_API Engine final {
 	public:
 		Engine();
 		Engine(int width, int height);
