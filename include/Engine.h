@@ -9,6 +9,7 @@
 #include "Base.h"
 #include "EngineConfig.h"
 #include "GameState.h"
+#include "ResourceManager.h"
 
 namespace Smasher {
 	class SMASHER_API Engine final {
@@ -54,6 +55,9 @@ namespace Smasher {
 			return m_GameStateByType.find(std::type_index(typeid(T))) != m_GameStateByType.end();
 		}
 
+		EventManager& GetEventManager() { return m_EventManager; }
+		ResourceManager& GetResourceManager() { return m_ResourceManager; }
+
 		bool IsRunning() const { return m_RunningAtomic; }
 
 		void SetUpdateInterval(Millisecond interval) { m_UpdateInterval = interval; }
@@ -65,7 +69,8 @@ namespace Smasher {
 		std::atomic_bool m_RunningAtomic = true;
 		bool m_IsWindowOpen = false; // Needed to prevent double delete on Window Context
 		std::mutex m_WindowMutex; // Prevent double delete on Window Context
-
+		EventManager m_EventManager;
+		ResourceManager m_ResourceManager;
 		Millisecond m_UpdateInterval = EngineConfig::UPDATE_INTERVAL;
 		Millisecond m_RenderInterval = EngineConfig::RENDER_INTERVAL;
 	};
