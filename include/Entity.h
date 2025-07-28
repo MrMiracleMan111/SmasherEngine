@@ -19,7 +19,7 @@ namespace Smasher {
 	class SMASHER_API Entity {
 
 	public:
-		Entity(GameState& state, UUID uuid) : m_GameState(state), m_UUID(uuid) {};
+		Entity(GameState& state, UUID uuid) : m_GameState(state), m_UUID(uuid), m_Engine(state.GetEngine()) {};
 		Entity(const Entity&) = default;
 		Entity(Entity&&) = default;
 		Entity& operator =(const Entity&) = default;
@@ -27,6 +27,7 @@ namespace Smasher {
 		virtual ~Entity();
 
 		GameState& GetGameState() const { return m_GameState; }
+		Engine& GetEngine() const { return m_Engine; }
 		UUID GetUUID() const { return m_UUID; }
 
 		virtual void Init() {}
@@ -49,6 +50,7 @@ namespace Smasher {
 	private:
 		const UUID m_UUID;
 		GameState& m_GameState;
+		Engine& m_Engine;
 		std::unordered_map<std::type_index, std::reference_wrapper<IComponent>> m_ComponentsByType;
 	};
 }
