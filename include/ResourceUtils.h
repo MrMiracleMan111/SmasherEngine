@@ -2,8 +2,6 @@
 #include <filesystem>
 #include <cstdint>
 
-typedef uint64_t ResourceID;
-typedef std::filesystem::path ResourcePath;
 
 // using fnv1a_hash 
 constexpr uint64_t hash_str(const char* str) {
@@ -13,4 +11,18 @@ constexpr uint64_t hash_str(const char* str) {
         hash *= 1099511628211ULL; // FNV prime
     }
     return hash;
+}
+
+namespace Smasher {
+	using ResourceID = uint64_t;
+	using ResourcePath = std::filesystem::path;
+
+
+	enum class ResourceType {
+		TEXTURE,
+		FONT,
+		AUDIO,
+		SHADER,
+		INVALID
+	};
 }
