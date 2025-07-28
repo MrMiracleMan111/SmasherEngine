@@ -16,7 +16,7 @@ namespace Smasher {
 	template<typename T>
 	concept IComponentType = std::is_base_of_v<IComponent, T>;
 
-	class SMASHER_API Entity {
+	class SMASHER_API Entity final {
 
 	public:
 		Entity(GameState& state, UUID uuid) : m_GameState(state), m_UUID(uuid) {};
