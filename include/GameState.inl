@@ -1,37 +1,47 @@
 #pragma once
 #include "GameState.h"
-#include "ComponentManager.h"
+#include "IComponentManager.h"
 #include "GenericComponentManager.h"
-#include "IRenderable.h"
 
 namespace Smasher {
-
-	template <typename T>
-	concept HasStaticInstantiateManager = requires(Smasher::GameState& arg) {
-		T::StaticInstantiateManager(arg);
-	};
-
-	template <typename T>
-	concept HasStaticRenderComponent = requires(sf::RenderWindow& arg) {
-		{ T::HasStaticRenderComponent(arg) } -> std::same_as<void>;
-	};
-
+	/*
+		Instantiates a Component Manager to handle the provided component type. Components
+		may handle manager instantion through their StaticInstatiateManager<T>() method.
+	
+		If Component type T doesn't specify a Component Manager type, the GenericComponentManager
+	*/
 	template <class T>
 	void GameState::LoadComponentManager()
 	{
+		// Component specifies a manager to use
 		if constexpr (HasStaticInstantiateManager<T>) {
 			m_ComponentManagers.emplace(std::type_index(typeid(T)), T::StaticInstantiateManager(*this));
-			if constexpr (std::is_base_of_v<IRenderable, T>) {
-				auto pManager = m_ComponentManagers[std::type_index(typeid(T))];
-				m_ComponentRenderableManagers.push_back(pManager.get());
+			auto& rManagerPtr = m_ComponentManagers[std::type_index(typeid(T))];
+			using ManagerType = decltype(T::StaticInstantiateManager(*this));
+
+			static_assert(std::derived_from<ManagerType, IComponentManager>, "StaticInstantiateManager return type must derive from IComponentManager");
+
+			// Was Update method overriden?
+			if constexpr (!std::same_as<ManagerType::Update, decltype(&IComponentManager::Update)>) {
+				m_ComponentManagersWithUpdate.push_back(rManagerPtr.get());
 			}
+
+			// Was Render method overriden?
+			//if constexpr (!std::same_as<ManagerType::Render, decltype(&IComponentManager::Render)>) {
+			//	m_ComponentManagersWithRender.push_back(rManagerPtr.get());
+			//}
 		}
-		// Default of Component doesn't specify a Manager Type
+		// Use a GenericComponentManager<T> if Component doesn't specify a manager to use
 		else {
 			m_ComponentManagers.emplace(std::type_index(typeid(T)), std::make_unique<GenericComponentManager<T>>(*this));
+			auto& rManagerPtr = m_ComponentManagers[std::type_index(typeid(T))];
+
 			if constexpr (HasStaticRenderComponent<T>) {
-				auto pManager = m_ComponentManagers[std::type_index(typeid(T))];
-				m_ComponentRenderableManagers.push_back(pManager.get());
+				m_ComponentManagersWithRender.push_back(rManagerPtr.get());
+			}
+
+			if constexpr (HasStaticUpdateComponent<T>) {
+				m_ComponentManagersWithUpdate.push_back(rManagerPtr.get());
 			}
 		}
 	}
@@ -47,7 +57,7 @@ namespace Smasher {
 	};
 
 	template <class T>
-	ComponentManager& GameState::GetComponentManager() {
+	IComponentManager& GameState::GetComponentManager() {
 		if (m_ComponentManagers.find(std::type_index(typeid(T))) == m_ComponentManagers.end()) {
 			// Lazy Load the manager
 			LoadComponentManager<T>();

@@ -64,8 +64,10 @@ namespace Smasher {
 	void Engine::Update(Millisecond delta) {
 		for (auto& [_, pGameState] : m_GameStateByType) {
 			if (pGameState->GetStatus() == GameStateStatus::ACTIVE) {
+				pGameState->PreUpdate(delta);
+				pGameState->PreUpdateComponentManagers(delta);
 				pGameState->Update(delta);
-				pGameState->UpdateComponents(delta);
+				pGameState->UpdateComponentManagers(delta);
 			}
 		}
 	}
@@ -75,7 +77,7 @@ namespace Smasher {
 		for (const auto& [_, pGameState] : m_GameStateByType) {
 			if (pGameState->GetStatus() == GameStateStatus::ACTIVE) {
 				pGameState->Render(window);
-				pGameState->RenderComponents(window);
+				pGameState->RenderComponentManagers(window);
 			}
 		}
 		m_Window.display();
