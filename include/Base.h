@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <chrono>
 #include "Exceptions.h"
 #include "Smasher_export.h"
 // EngineAPI.hpp
@@ -7,15 +8,16 @@
 #define SMASHER_API SMASHERENGINE_EXPORT
 
 namespace Smasher {
-	struct SMASHER_API Millisecond {
-		double m_Milliseconds;
+	using Millisecond = std::chrono::milliseconds;
+	//struct SMASHER_API Millisecond {
+	//	double m_Milliseconds;
 
-		Millisecond(double milliseconds) : m_Milliseconds(milliseconds) {};
+	//	Millisecond(double milliseconds) : m_Milliseconds(milliseconds) {};
 
-		operator double() {
-			return m_Milliseconds;
-		}
-	};
+	//	operator double() {
+	//		return m_Milliseconds;
+	//	}
+	//};
 
 	struct Keyboard {
 	public:

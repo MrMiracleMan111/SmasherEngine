@@ -1,6 +1,7 @@
 #include <format>
 #include <exception>
 #include <stdexcept>
+#include <iostream>
 #include "Engine.h"
 #include "Exceptions.h"
 #include "EngineConfig.h"
@@ -14,18 +15,42 @@ namespace Smasher {
 	}
 
 	void Engine::Run() {
-		#ifdef NDEBUG
+#ifdef NDEBUG
 		try {
-		#endif
+#endif
+
+			std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
+			Millisecond updateTimer{ 0 };
+			Millisecond renderTimer{ 0 };
+
 			while (m_Window.isOpen() and m_RunningAtomic) {
+				std::chrono::time_point<std::chrono::system_clock> tmp = std::chrono::system_clock::now();
+				Millisecond diff = std::chrono::duration_cast<std::chrono::milliseconds>(tmp - now);
+				now = tmp;
+
 				sf::Event event;
 				while (m_Window.pollEvent(event)) {
 					if (event.type == sf::Event::Closed) {
 						m_Window.close();
 					}
 				}
-				Update(Millisecond{ 10 });
-				Render(m_Window);
+
+				updateTimer += diff;
+				renderTimer += diff;
+
+				if (updateTimer >= m_UpdateInterval) {
+					Update(Millisecond{ updateTimer });
+					updateTimer = Millisecond{ 0 };
+				}
+				if (renderTimer >= m_RenderInterval) {
+					Render(m_Window);
+					renderTimer = Millisecond{ 0 };
+				}
+
+				Millisecond minInterval = std::min(m_UpdateInterval, m_RenderInterval);
+				std::chrono::milliseconds loopTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - now);
+				Millisecond sleepTime = std::max(minInterval - loopTime, std::chrono::milliseconds::zero());
+				std::this_thread::sleep_for(sleepTime);
 			}
 			Shutdown();
 		#ifdef NDEBUG

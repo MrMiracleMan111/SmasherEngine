@@ -7,6 +7,7 @@
 #include <SFML/Window.hpp>
 #include <atomic>
 #include "Base.h"
+#include "EngineConfig.h"
 #include "GameState.h"
 
 namespace Smasher {
@@ -54,11 +55,17 @@ namespace Smasher {
 
 		bool IsRunning() const { return m_RunningAtomic; }
 
+		void SetUpdateInterval(Millisecond interval) { m_UpdateInterval = interval; }
+		void SetRenderInterval(Millisecond interval) { m_RenderInterval = interval; }
+
 	private:
 		std::unordered_map<std::type_index, std::unique_ptr<GameState>> m_GameStateByType;
 		sf::RenderWindow m_Window;
 		std::atomic_bool m_RunningAtomic = true;
 		bool m_IsWindowOpen = false; // Needed to prevent double delete on Window Context
 		std::mutex m_WindowMutex; // Prevent double delete on Window Context
+
+		Millisecond m_UpdateInterval = EngineConfig::UPDATE_INTERVAL;
+		Millisecond m_RenderInterval = EngineConfig::RENDER_INTERVAL;
 	};
 }

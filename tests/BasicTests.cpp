@@ -290,6 +290,29 @@ TEST(EventsTest, MultiplePublishMultipleSubscribeEvent) {
 	ASSERT_EQ(triggered_count_2, 2);
 }
 
+TEST(EngineTest, NoShutdownEngine) {
+	bool passed = false;
+	Smasher::Engine engine(640, 420);
+
+	DummyGameState& state = engine.AddState<DummyGameState>();
+	state.Activate();
+
+	engine.GetWindow().setActive(false);
+	std::thread worker([&engine]() {
+		engine.GetWindow().setActive(true);
+		engine.Run(); // Engine should shutdown after first update
+	});
+
+	std::this_thread::sleep_for(std::chrono::seconds(3));
+	passed = engine.IsRunning();
+	engine.Shutdown();
+	worker.join();
+
+	if (!passed) {
+		FAIL() << "Engine should not have shutdown";
+	}
+}
+
 TEST(EngineTest, ShutdownEngine) {
 	bool failed = false;
 	Smasher::Engine engine(640, 420);
