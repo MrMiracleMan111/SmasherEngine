@@ -7,6 +7,19 @@ public:
 	DummyGameState(Smasher::Engine& engine) : Smasher::GameState(engine) {}
 };
 
+class InitTestGameState : public Smasher::GameState {
+public:
+	InitTestGameState(Smasher::Engine& engine) : Smasher::GameState(engine) {}
+
+	void Init() override {
+		++m_Value;
+	};
+
+	int GetValue() const { return m_Value; }
+private:
+	int m_Value = 0;
+};
+
 class ShutdownEngineGameState : public Smasher::GameState {
 public:
 	ShutdownEngineGameState(Smasher::Engine& engine) : Smasher::GameState(engine) {}
@@ -340,6 +353,17 @@ TEST(EngineTest, ShutdownEngine) {
 	if (failed) {
 		FAIL() << "Engine should have shutdown";
 	}
+}
+
+TEST(GameStateTest, InitGameState) {
+	Smasher::Engine engine(640, 420);
+	InitTestGameState& state = engine.AddState<InitTestGameState>();
+	EXPECT_EQ(state.GetValue(), 1);
+	state.Activate();
+	engine.Update(Smasher::Millisecond{ 10 });
+	engine.Update(Smasher::Millisecond{ 10 });
+	engine.Render(engine.GetWindow());
+	EXPECT_EQ(state.GetValue(), 1);
 }
 
 TEST(EngineTest, ExplicitDoubleShutdownEngine) {

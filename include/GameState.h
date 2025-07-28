@@ -33,6 +33,7 @@ namespace Smasher {
 		GameState& operator=(const GameState&) = delete;
 		GameState& operator=(const GameState&&) noexcept = delete;
 
+		virtual void Init() {};
 		virtual void Reset() {};
 		virtual void Render(sf::RenderWindow& window) {};
 		virtual void PreUpdate(Millisecond delta) {};

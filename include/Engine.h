@@ -32,6 +32,7 @@ namespace Smasher {
 			auto pState = std::make_unique<T>(*this, std::forward<Args>(componentArgs)...);
 			T& rState = *pState;
 			m_GameStateByType.insert({ index, std::move(pState) });
+			rState.Init();
 			return rState;
 		}
 
