@@ -53,6 +53,7 @@ namespace Smasher {
 		T* pEntityObserver = pEntity.get();
 		UUID uuid = pEntity->GetUUID(); // To avoid possible invalidation during std::move(pEntity)
 		m_EntityMap.insert({ uuid, std::move(pEntity) });
+		pEntityObserver->Init();
 		return *pEntityObserver;
 	};
 

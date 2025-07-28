@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "Core.h"
 #include "BaseComponentManager.h"
+#include "Entity.h"
 
 class DummyGameState : public Smasher::GameState {
 public:
@@ -32,9 +33,7 @@ public:
 
 struct TestComponent : public Smasher::IComponent {
 public:
-	TestComponent(Smasher::Entity& entity, int value) :
-		Smasher::IComponent(entity),
-		m_Value(value) {};
+	TestComponent(int value) : m_Value(value) {};
 	int GetValue() { return m_Value; }
 	static void StaticUpdateComponent(TestComponent& self, Smasher::Millisecond delta) {};
 
@@ -57,9 +56,7 @@ public:
 struct CustomComponent : public Smasher::IComponent {
 public:
 	SMASHER_USE_COMPONENT_MANAGER(CustomComponentManager)
-	CustomComponent(Smasher::Entity& entity, int value) :
-		Smasher::IComponent(entity),
-		m_Value(value) {
+	CustomComponent(int value) : m_Value(value) {
 	};
 	~CustomComponent() = default;
 
@@ -74,7 +71,6 @@ protected:
 // Component that deletes itself during update
 struct DeleteTestComponent : public Smasher::IComponent {
 public:
-	DeleteTestComponent(Smasher::Entity& entity) : Smasher::IComponent(entity){};
 	static void StaticUpdateComponent(DeleteTestComponent& self, Smasher::Millisecond delta) {
 		self.GetEntity().RemoveComponent<DeleteTestComponent>();
 	};
@@ -83,7 +79,6 @@ public:
 // Component that deletes itself during update
 struct SpicyDeleteTestComponent : public Smasher::IComponent {
 public:
-	SpicyDeleteTestComponent(Smasher::Entity& entity) : Smasher::IComponent(entity) {};
 	static void StaticUpdateComponent(SpicyDeleteTestComponent& self, Smasher::Millisecond delta) {
 		self.m_Count++;
 		switch (self.m_Count) {
@@ -102,6 +97,35 @@ protected:
 	unsigned int m_Count = 0;
 };
 
+class InitEntityTest : public Smasher::Entity {
+public:
+	InitEntityTest() = delete;
+	InitEntityTest(Smasher::GameState& state, Smasher::UUID uuid) : Smasher::Entity(state, uuid) {}
+
+	void Init() {
+		++m_Value;
+	}
+
+	int GetValue() const{ return m_Value; }
+private:
+	int m_Value = 0;
+};
+
+class InitRemoveEntityTest : public Smasher::Entity {
+public:
+	InitRemoveEntityTest() = delete;
+	InitRemoveEntityTest(Smasher::GameState& state, Smasher::UUID uuid) : Smasher::Entity(state, uuid) {}
+
+	void Init() {
+		++m_Value;
+		GetGameState().RemoveEntity(GetUUID());
+	}
+
+	int GetValue() const { return m_Value; }
+private:
+	int m_Value = 0;
+};
+
 TEST(EntityTest, AddEnttiy) {
 	Smasher::Engine engine(640, 420);
 	DummyGameState& state = engine.AddState<DummyGameState>();
@@ -113,6 +137,20 @@ TEST(EntityTest, GetEntity) {
 	DummyGameState& state = engine.AddState<DummyGameState>();
 	Smasher::Entity& entity = state.AddEntity<Smasher::Entity>();
 	EXPECT_NO_THROW({ state.GetEntity(entity.GetUUID()); });
+}
+
+TEST(EntityTest, InitEntity) {
+	Smasher::Engine engine(640, 420);
+	DummyGameState& state = engine.AddState<DummyGameState>();
+	InitEntityTest& entity = state.AddEntity<InitEntityTest>();
+	EXPECT_EQ(entity.GetValue(), 1);
+}
+
+TEST(EntityTest, InitRemoveEntity) {
+	Smasher::Engine engine(640, 420);
+	DummyGameState& state = engine.AddState<DummyGameState>();
+	InitRemoveEntityTest& entity = state.AddEntity<InitRemoveEntityTest>();
+	EXPECT_FALSE(state.HasEntity(entity.GetUUID()));
 }
 
 TEST(EntityTest, MissingEntity) {

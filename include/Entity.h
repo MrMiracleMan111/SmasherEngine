@@ -16,7 +16,7 @@ namespace Smasher {
 	template<typename T>
 	concept IComponentType = std::is_base_of_v<IComponent, T>;
 
-	class SMASHER_API Entity final {
+	class SMASHER_API Entity {
 
 	public:
 		Entity(GameState& state, UUID uuid) : m_GameState(state), m_UUID(uuid) {};
@@ -24,9 +24,12 @@ namespace Smasher {
 		Entity(Entity&&) = default;
 		Entity& operator =(const Entity&) = default;
 		Entity& operator =(Entity&&) = default;
-		~Entity();
+		virtual ~Entity();
 
-		UUID GetUUID() { return m_UUID; }
+		GameState& GetGameState() const { return m_GameState; }
+		UUID GetUUID() const { return m_UUID; }
+
+		virtual void Init() {}
 
 		template<class T>
 		bool HasComponent() {

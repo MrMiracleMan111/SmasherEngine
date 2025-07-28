@@ -8,7 +8,10 @@ namespace Smasher {
 	}
 
 	GameState::~GameState() {
-
+		m_ComponentManagersWithRender.clear();
+		m_ComponentManagersWithUpdate.clear();
+		m_EntityMap.clear();
+		m_ComponentManagers.clear();
 	}
 
 	EventManager& GameState::GetEventManager() { return m_EventManager; }
@@ -36,7 +39,6 @@ namespace Smasher {
 	}
 
 	Entity& GameState::GetEntity(UUID uuid) const {
-
 		auto itr = m_EntityMap.find(uuid);
 		if (itr == m_EntityMap.end()) {
 			throw Exceptions::GameStateEntityNotFound(std::format("Could not find entity with UUID: {}", (uint64_t)uuid));
@@ -46,5 +48,12 @@ namespace Smasher {
 
 	bool GameState::HasEntity(UUID uuid) const {
 		return (m_EntityMap.find(uuid) != m_EntityMap.end());
+	}
+
+	void GameState::RemoveEntity(UUID uuid) {
+		if (!HasEntity(uuid)) {
+			throw Exceptions::GameStateEntityNotFound(std::format("Could not find entity with UUID: {}", (uint64_t)uuid));
+		}
+		m_EntityMap.erase(uuid);
 	}
 }

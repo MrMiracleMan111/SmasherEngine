@@ -25,6 +25,12 @@ namespace Smasher {
 	//	}
 	//};
 
+	enum class ComponentStatus {
+		VALID,   // Component is active within a manager (not removed)
+		INVALID, // Ready to be removed or just created (not assigned to manager yet)
+		REMOVED  // Component was removed 
+	};
+
 	struct Keyboard {
 	public:
 		enum class KeyboardEventType : int {

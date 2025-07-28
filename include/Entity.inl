@@ -11,7 +11,9 @@ namespace Smasher {
 		}
 
 		auto& rManager = m_GameState.template GetComponentManager<T>();
-		T component = T(*this, std::forward<Args>(componentArgs)...);
+		T component = T(std::forward<Args>(componentArgs)...);
+		component.SetEntity(this);
+		component.SetManager(&rManager);
 
 		std::reference_wrapper<IComponent> rComponent(rManager.AddComponent(std::move(component)));
 		m_ComponentsByType.insert({ std::type_index(typeid(T)), rComponent });
