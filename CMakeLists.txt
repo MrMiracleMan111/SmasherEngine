@@ -117,7 +117,7 @@ endif()
 # Compile Examples
 
 if(DEFINED SMASHER_EXAMPLES)
-    add_executable (BasicWindowExample "examples/basic_window/main.cpp" "examples/basic_window/src/ExampleAppGameState.cpp" )
+    add_executable (BasicWindowExample "examples/basic_window/main.cpp" "examples/basic_window/src/ExampleWindowGameState.cpp" )
     target_compile_features(BasicWindowExample PUBLIC cxx_std_20)
     target_include_directories (BasicWindowExample PUBLIC "examples/basic_window/src")
     target_link_libraries( BasicWindowExample PRIVATE SmasherEngine )
