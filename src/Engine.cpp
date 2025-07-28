@@ -27,14 +27,12 @@ namespace Smasher {
 				std::chrono::time_point<std::chrono::system_clock> tmp = std::chrono::system_clock::now();
 				Millisecond diff = std::chrono::duration_cast<std::chrono::milliseconds>(tmp - now);
 				now = tmp;
-
 				sf::Event event;
 				while (m_Window.pollEvent(event)) {
 					if (event.type == sf::Event::Closed) {
 						m_Window.close();
 					}
 				}
-
 				updateTimer += diff;
 				renderTimer += diff;
 

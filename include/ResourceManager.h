@@ -29,7 +29,6 @@ namespace Smasher {
 		friend class ResourceManager;
 	public:
 		Resource() = delete;
-
 		virtual const ResourceType& GetType() = 0;
 	protected:
 		Resource(ResourceID id, ResourcePath path) : m_ID(id), m_Path(path) {}
