@@ -5,7 +5,7 @@
 #include "IComponent.h"
 
 namespace Smasher {
-	class Transform2DComponent : public IComponent, public sf::Transformable {
+	class SMASHER_API Transform2DComponent : public IComponent, public sf::Transformable {
 	public:
 		Transform2DComponent() : IComponent(), sf::Transformable() {}
 	};

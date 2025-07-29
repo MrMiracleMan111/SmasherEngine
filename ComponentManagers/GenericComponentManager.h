@@ -35,14 +35,18 @@ namespace Smasher {
 		}
 
 		void Update(Millisecond delta) override {
-			for (T& itr : m_Components) {
-				T::StaticUpdateComponent(itr, delta);
+			if constexpr (HasStaticUpdateComponent<T>) {
+				for (T& itr : m_Components) {
+					T::StaticUpdateComponent(itr, delta);
+				}
 			}
 		}
 
-		void Render(sf::RenderWindow rWindow) {
-			for (T& itr : m_Components) {
-				T::StaticRenderComponent(itr, rWindow);
+		void Render(sf::RenderWindow& rWindow) override {
+			if constexpr (HasStaticRenderComponent<T>) {
+				for (T& itr : m_Components) {
+					T::StaticRenderComponent(itr, rWindow);
+				}
 			}
 		}
 

@@ -8,12 +8,12 @@
 #include "UUID.h"
 #include "EventManager.h"
 #include "ResourceManager.h"
+#include "Engine.h"
 
 
 namespace Smasher {
-	class Engine;
-	class Entity;
 	class IComponentManager;
+	class Entity;
 
 	template <class T>
 	class GenericComponentManager;
@@ -42,11 +42,11 @@ namespace Smasher {
 		void Activate() { m_Status = GameStateStatus::ACTIVE; };
 		void Pause() { m_Status = GameStateStatus::PAUSED; };
 		bool GetStatus() const { return m_Status; };
-		Entity& GetEntity(UUID uuid) const;
+		Entity& GetEntity(UUID uuid);
 		bool HasEntity(UUID uuid) const;
 
-		EventManager& GetEventManager() const { return m_EventManager; }
-		Engine& GetEngine() const { return m_Engine; }
+		EventManager& GetEventManager() { return m_EventManager; }
+		Engine& GetEngine() { return m_Engine; }
 
 		template <class T, typename... Args>
 		T& AddEntity(Args&&... componentArgs);

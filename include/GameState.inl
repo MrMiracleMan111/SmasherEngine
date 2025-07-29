@@ -2,6 +2,7 @@
 #include "GameState.h"
 #include "IComponentManager.h"
 #include "GenericComponentManager.h"
+#include "Entity.h"
 
 namespace Smasher {
 	/*
@@ -27,9 +28,9 @@ namespace Smasher {
 			}
 
 			// Was Render method overriden?
-			//if constexpr (!std::same_as<ManagerType::Render, decltype(&IComponentManager::Render)>) {
-			//	m_ComponentManagersWithRender.push_back(rManagerPtr.get());
-			//}
+			if constexpr (!std::same_as<ManagerType::Render, decltype(&IComponentManager::Render)>) {
+				m_ComponentManagersWithRender.push_back(rManagerPtr.get());
+			}
 		}
 		// Use a GenericComponentManager<T> if Component doesn't specify a manager to use
 		else {
@@ -41,7 +42,7 @@ namespace Smasher {
 			}
 
 			if constexpr (HasStaticUpdateComponent<T>) {
-				m_ComponentManagersWithUpdate.push_back(rManagerPtr.get());
+				 m_ComponentManagersWithUpdate.push_back(rManagerPtr.get());
 			}
 		}
 	}

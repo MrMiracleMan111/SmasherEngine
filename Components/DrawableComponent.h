@@ -5,7 +5,7 @@
 #include "ResourceManager.h"
 
 namespace Smasher {
-	class DrawableComponent : public IComponent
+	class SMASHER_API DrawableComponent : public IComponent
 	{
 	public:
 		DrawableComponent() : IComponent() {}
@@ -13,9 +13,9 @@ namespace Smasher {
 		template <class T>
 		void SetTextureAsset() {
 			auto& rResourceManager = GetEntity().GetEngine().GetResourceManager();
-			m_ResourceHandle = rResourceManager.GetResourceHandle<T>();
-			TextureResource& rResource = rResourceManager.GetResource<TextureResource>(m_ResourceHandle);
-			m_Sprite.setTexture(rResource.GetTexture());
+			m_ResourceHandle = rResourceManager.GetResourceHandle<T>(ResourceType::TEXTURE);
+			m_Texture = rResourceManager.GetResource<TextureResource>(m_ResourceHandle);
+			m_Sprite.setTexture(m_Texture->GetTexture());
 			m_TextureLoaded = true;
 		}
 

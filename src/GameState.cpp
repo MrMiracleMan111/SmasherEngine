@@ -12,7 +12,7 @@ namespace Smasher {
 	}
 
 	void GameState::RenderComponentManagers(sf::RenderWindow& window) {
-		for (auto pManager : m_ComponentManagersWithRender) {
+		for (IComponentManager* pManager : m_ComponentManagersWithRender) {
 			pManager->Render(window);
 		}
 	}
@@ -33,7 +33,7 @@ namespace Smasher {
 		m_Engine.Shutdown();
 	}
 
-	Entity& GameState::GetEntity(UUID uuid) const {
+	Entity& GameState::GetEntity(UUID uuid) {
 		auto itr = m_EntityMap.find(uuid);
 		if (itr == m_EntityMap.end()) {
 			throw Exceptions::GameStateEntityNotFound(std::format("Could not find entity with UUID: {}", (uint64_t)uuid));

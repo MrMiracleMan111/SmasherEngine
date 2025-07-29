@@ -1,6 +1,9 @@
 #pragma once
 #include <cstdint>
 #include <chrono>
+#include <filesystem>
+#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
 #include "Exceptions.h"
 #include "Smasher_export.h"
 // EngineAPI.hpp
@@ -12,18 +15,65 @@ virtual static constexpr uint32_t GetStaticCapabilities() { \
 	return (args); \
 }
 
+// using fnv1a_hash 
+constexpr uint64_t hash_str(const char* str) {
+	uint64_t hash = 14695981039346656037ULL; // FNV offset basis
+	while (*str) {
+		hash ^= static_cast<uint64_t>(*str++);
+		hash *= 1099511628211ULL; // FNV prime
+	}
+	return hash;
+}
 
 namespace Smasher {
+	class GameState;
 	using Millisecond = std::chrono::milliseconds;
-	//struct SMASHER_API Millisecond {
-	//	double m_Milliseconds;
+	using ResourceID = uint64_t;
+	using ResourcePath = std::filesystem::path;
 
-	//	Millisecond(double milliseconds) : m_Milliseconds(milliseconds) {};
+	template <typename T>
+	concept ManifestItemHasResourceID = requires(T) {
+		T::ID; // Checks if 'member_name' is a valid member access
+	};
 
-	//	operator double() {
-	//		return m_Milliseconds;
-	//	}
-	//};
+	template <typename T>
+	concept ManifestItemHasResourcePath = requires(T) {
+		T::PATH; // Checks if 'member_name' is a valid member access
+	};
+
+	template <typename T>
+	concept HasStaticInstantiateManager = requires(Smasher::GameState & arg) {
+		T::StaticInstantiateManager(arg);
+	};
+
+	template <typename T>
+	concept HasStaticRenderComponent = requires(T & comp, sf::RenderWindow & arg) {
+		{ T::StaticRenderComponent(comp, arg) } -> std::same_as<void>;
+	};
+
+	template <typename T>
+	concept HasStaticUpdateComponent = requires(T & comp, Smasher::Millisecond arg) {
+		{ T::StaticUpdateComponent(comp, arg) } -> std::same_as<void>;
+	};
+
+
+	template <typename T>
+	concept HasRenderCapability = requires(sf::RenderWindow & arg) {
+		T::Render(arg);
+	};
+
+	template <typename T>
+	concept HasUpdateCapability = requires(Millisecond & arg) {
+		T::Update(arg);
+	};
+
+	enum class ResourceType {
+		TEXTURE,
+		FONT,
+		AUDIO,
+		SHADER,
+		INVALID
+	};
 
 	enum class ComponentStatus {
 		VALID,   // Component is active within a manager (not removed)

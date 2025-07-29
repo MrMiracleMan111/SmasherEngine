@@ -8,10 +8,12 @@
 #include <SFML/Graphics.hpp>
 #include "Base.h"
 #include "UUID.h"
+#include "GameState.h"
 
 namespace Smasher {
-	class GameState;
+
 	class IComponent;
+	class Engine;
 
 	template<typename T>
 	concept IComponentType = std::is_base_of_v<IComponent, T>;
@@ -19,16 +21,17 @@ namespace Smasher {
 	class SMASHER_API Entity {
 
 	public:
+		Entity() = delete;
 		Entity(GameState& state, UUID uuid) : m_GameState(state), m_UUID(uuid), m_Engine(state.GetEngine()) {};
-		Entity(const Entity&) = default;
-		Entity(Entity&&) = default;
-		Entity& operator =(const Entity&) = default;
-		Entity& operator =(Entity&&) = default;
+		Entity(const Entity& other) : m_GameState(other.m_GameState), m_UUID(other.m_UUID), m_Engine(other.m_Engine) {};
+		Entity(Entity&& other) : m_GameState(other.m_GameState), m_UUID(other.m_UUID), m_Engine(other.m_Engine) {};
+		Entity& operator =(const Entity& other) = delete;
+		Entity& operator =(Entity&&) = delete;
 		virtual ~Entity();
 
-		GameState& GetGameState() const { return m_GameState; }
-		Engine& GetEngine() const { return m_Engine; }
-		UUID GetUUID() const { return m_UUID; }
+		GameState& GetGameState() { return m_GameState; };
+		Engine& GetEngine() { return m_Engine; };
+		UUID GetUUID() const { return m_UUID; };
 
 		virtual void Init() {}
 

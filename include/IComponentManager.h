@@ -6,35 +6,6 @@
 
 namespace Smasher {
 	class GameState;
-	template <typename T>
-	concept HasStaticInstantiateManager = requires(Smasher::GameState & arg) {
-		T::StaticInstantiateManager(arg);
-	};
-
-	template <typename T>
-	concept HasStaticRenderComponent = requires(T& comp, sf::RenderWindow& arg) {
-		{ T::StaticRenderComponent(comp, arg) } -> std::same_as<void>;
-	};
-
-	template <typename T>
-	concept HasStaticUpdateComponent = requires(T& comp, Smasher::Millisecond arg) {
-		{ T::StaticUpdateComponent(comp, arg) } -> std::same_as<void>;
-	};
-
-	enum class ComponentManagerCapability {
-
-	};
-
-
-	template <typename T>
-	concept HasRenderCapability = requires(sf::RenderWindow & arg) {
-		T::Render(arg);
-	};
-
-	template <typename T>
-	concept HasUpdateCapability = requires(Millisecond & arg) {
-		T::Update(arg);
-	};
 
 	class IComponentManager {
 	public:

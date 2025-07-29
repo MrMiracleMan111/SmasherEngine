@@ -1,9 +1,8 @@
 #pragma once
 #include "Base.h"
-#include "Resources.h"
 
-#define SMASHER_RESOURCE_TYPE(type) const ResourceType& GetType() const { return GetStaticResourceType();} \
-static ResourceType GetStaticResourceType() { return type; } \
+#define SMASHER_RESOURCE_TYPE(type) ResourceType GetType() const { return GetStaticType();} \
+static constexpr ResourceType GetStaticType() { return type; } \
 
 
 namespace Smasher {
@@ -12,14 +11,17 @@ namespace Smasher {
 	public:
 		Resource() = delete;
 		virtual ~Resource() {};
-		virtual const ResourceType& GetType() = 0;
+		virtual ResourceType GetType() const = 0;
 	protected:
-		Resource(ResourceID id, ResourcePath path) : m_ID(id), m_Path(path) {}
+		Resource(ResourceID id, const ResourcePath& relativePath, const std::filesystem::path& resourcesDirectory) :
+			m_ID(id), m_Path(resourcesDirectory) {
+			m_Path += relativePath;
+		}
 
-	private:
+	protected:
 		bool m_Loaded = false;
 		ResourceID m_ID;
-		ResourcePath& m_Path;
+		ResourcePath m_Path;
 	};
 
 
@@ -27,9 +29,10 @@ namespace Smasher {
 	public:
 		SMASHER_RESOURCE_TYPE(ResourceType::TEXTURE)
 		TextureResource() = delete;
-		TextureResource(ResourceID id, ResourcePath path) : Resource(id, path) {
-			if (!m_Texture.loadFromFile(path.string())) {
-				throw Exceptions::ResourceFailedToLoad(std::format("Failed to load file {}", path.string()));
+		TextureResource(ResourceID id, const ResourcePath& relativePath, const std::filesystem::path& resourcesDirectory) :
+			Resource(id, relativePath, resourcesDirectory) {
+			if (!m_Texture.loadFromFile(m_Path.string())) {
+				throw Exceptions::ResourceFailedToLoad(std::format("Failed to load file {}", m_Path.string()));
 			}
 		}
 		sf::Texture& GetTexture() { return m_Texture; }
@@ -39,12 +42,15 @@ namespace Smasher {
 	class SMASHER_API FontResource : public Resource {
 	public:
 		SMASHER_RESOURCE_TYPE(ResourceType::FONT)
-			FontResource() = delete;
-		FontResource(ResourceID id, ResourcePath path) : Resource(id, path) {
-			if (!m_Font.loadFromFile(path.string())) {
-				throw Exceptions::ResourceFailedToLoad(std::format("Failed to load file {}", path.string()));
+		FontResource() = delete;
+		FontResource(ResourceID id, const ResourcePath& relativePath, const std::filesystem::path& resourcesDirectory) :
+			Resource(id, relativePath, resourcesDirectory) {
+			if (!m_Font.loadFromFile(m_Path.string())) {
+				throw Exceptions::ResourceFailedToLoad(std::format("Failed to load file {}", m_Path.string()));
 			}
 		}
+
+		sf::Font& GetFont() { return m_Font; }
 	private:
 		sf::Font m_Font;
 	};
@@ -52,9 +58,10 @@ namespace Smasher {
 	public:
 		SMASHER_RESOURCE_TYPE(ResourceType::AUDIO)
 			AudioResource() = delete;
-		AudioResource(ResourceID id, ResourcePath path) : Resource(id, path) {
-			if (!m_Music.openFromFile(path.string())) {
-				throw Exceptions::ResourceFailedToLoad(std::format("Failed to load file {}", path.string()));
+		AudioResource(ResourceID id, const ResourcePath& relativePath, const std::filesystem::path& resourcesDirectory) :
+			Resource(id, relativePath, resourcesDirectory) {
+			if (!m_Music.openFromFile(m_Path.string())) {
+				throw Exceptions::ResourceFailedToLoad(std::format("Failed to load file {}", m_Path.string()));
 			}
 		}
 	private:
@@ -63,6 +70,9 @@ namespace Smasher {
 	class SMASHER_API ShaderResource : public Resource {
 	public:
 		SMASHER_RESOURCE_TYPE(ResourceType::SHADER)
+			ShaderResource() = delete;
+		ShaderResource(ResourceID id, const ResourcePath& relativePath, const std::filesystem::path& resourcesDirectory) :
+			Resource(id, relativePath, resourcesDirectory) {}
 	};
 
 }

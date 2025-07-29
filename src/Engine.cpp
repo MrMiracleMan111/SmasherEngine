@@ -90,4 +90,9 @@ namespace Smasher {
 			m_IsWindowOpen = false;
 		}
 	}
+
+	sf::RenderWindow& Engine::GetWindow() { return m_Window; }
+	EventManager& Engine::GetEventManager() { return m_EventManager; };
+	ResourceManager& Engine::GetResourceManager() { return m_ResourceManager; };
+
 }

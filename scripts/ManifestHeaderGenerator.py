@@ -19,6 +19,11 @@ parser.add_argument('--out',
                     type = str, nargs ='+',
                     help ='Space separated list of paths to generate Manifest Headers at')
 
+parser.add_argument('--resources',
+                    type = str, nargs ='+',
+                    help ='Path to Resource Directory')
+
+
 # Check that filws were provided
 args = parser.parse_args()
 if args.files:
@@ -33,6 +38,11 @@ else:
 if args.out:
     if len(args.files) != len(args.out):
         print("Number of outputs doesn't match number of inputs", file=sys.stderr)
+        exit(1)
+
+if args.resources:
+    if len(args.files) != len(args.resources):
+        print("Number of Resource Paths doesn't match number of inputs", file=sys.stderr)
         exit(1)
 
 # Check that files exist and are JSON files
@@ -58,9 +68,19 @@ pattern = r"[\-\+]"
 def FormatName(name):
     return re.sub(pattern, "_", name)
 
-def RecursiveParse(data, name, out_file, depth):
+def RecursiveParse(data, name, out_file, depth, resource_dir=None):
     if isinstance(data, dict):
         out_file.write((depth * "\t") + f"namespace {FormatName(name)}" + " {\n")
+        
+        # Write metadata
+        if depth == 0:
+            out_file.write(
+            """
+    namespace Metadata {
+        static const inline ResourcePath RESOURCES_DIRECTORY {"WORKING_PATH"};
+    }
+""".replace("WORKING_PATH", resource_dir).replace("\\","/"))
+
         for key, value in data.items():
             RecursiveParse(value, key, out_file, depth + 1) # Recursive call for nested dictionaries/lists
         out_file.write((depth * "\t") + "}\n")
@@ -85,17 +105,22 @@ def RecursiveParse(data, name, out_file, depth):
         out_file.write(((depth + 1) * "\t") + f'static inline const ResourcePath PATH {{ "{data}" }};\n')
         out_file.write((depth * "\t") + "};\n")
 
-def GenerateHeaders(data, out_path):
+def GenerateHeaders(data, out_path, resource_dir=None):
     try:
         with open(out_path, "w") as out:
-            out.write("#pragma once\n")
-            out.write('#include"ResourceUtils.h"\n\n')
-            RecursiveParse(data, "Resources", out, 0)
+            out.write(
+"""
+#pragma once
+#include "Base.h"
+
+using namespace Smasher;
+""")
+            RecursiveParse(data, "Resources", out, 0, resource_dir)
             out.close()
     except Exception as e:
         print(f"An unexpected error occurred when opening output file: {e}")
         exit(8)
-def ParseHeadersManifestJSON(json_path, out_path=None):
+def ParseHeadersManifestJSON(json_path, out_path=None, resource_dir=None):
     try:
         with open(json_path, 'r') as out:
             if out_path == None:
@@ -104,7 +129,7 @@ def ParseHeadersManifestJSON(json_path, out_path=None):
                 out_path = os.path.join(dir, filename_without_extension + ".h")
             print(f"Using out path {out_path}")
             data = json.load(out)
-            GenerateHeaders(data, out_path)
+            GenerateHeaders(data, out_path, resource_dir)
     except FileNotFoundError:
         print(f"Error: File not found at {path}")
         exit(5)
@@ -120,7 +145,12 @@ def ParseHeadersManifestJSON(json_path, out_path=None):
 # Generate each manifest
 for index in range(len(args.files)):
     path = args.files[index]
+    resource_dir = ""
+    if args.resources:
+        resource_dir = args.resources[index]
+        if not resource_dir.endswith('/'):
+            resource_dir = resource_dir + '/'
     if args.out:
-        ParseHeadersManifestJSON(path, args.out[index])
+        ParseHeadersManifestJSON(path, args.out[index], resource_dir)
     else:
-        ParseHeadersManifestJSON(path)
+        ParseHeadersManifestJSON(path, None, resource_dir)
