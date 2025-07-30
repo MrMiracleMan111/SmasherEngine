@@ -10,12 +10,16 @@ int main() {
 	Smasher::Engine engine(640, 420);
 	engine.GetResourceManager().SetResourceDirectory(Resources::Metadata::RESOURCES_DIRECTORY);
 	ExampleResourcesGameState& state = engine.AddState<ExampleResourcesGameState>();
-	Entity& texture1 = state.AddEntity<Smasher::Entity>();
 	Entity& message = state.AddEntity<Smasher::Entity>();
 
-	texture1.AddComponent<Transform2DComponent>();
-	texture1.AddComponent<DrawableComponent>().SetTextureAsset<Resources::Textures::small_art>();
-
+	for (size_t i = 0; i < 10; ++i) {
+		Entity& image = state.AddEntity<Smasher::Entity>();
+		image.AddComponent<Transform2DComponent>().SetPosition(sf::Vector2f(i * 10, i * 10));
+		image.AddComponent<DrawableComponent>()
+			.SetTextureAsset<Resources::Textures::small_art>()
+			.SetDepth(i / 10); // Render in reverse with i=0 being on top
+	}
+	
 	message.AddComponent<Transform2DComponent>();
 	message.AddComponent<TextComponent>()
 		.SetString("Hello World")

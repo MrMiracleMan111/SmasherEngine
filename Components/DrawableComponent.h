@@ -18,11 +18,18 @@ namespace Smasher {
 			return *this;
 		}
 
+		// Depth bassed to depth buffer shader [0 - 1] with [0] being top and [1] being bottom
+		DrawableComponent& SetDepth(float depth) {
+			m_Depth = depth;
+			return *this;
+		}
+
 		static void StaticRenderComponent(DrawableComponent& self, sf::RenderWindow& rWindow);
 
 	private:
 		std::shared_ptr<TextureResource> m_Texture;
 		sf::Sprite m_Sprite;
 		bool m_TextureLoaded = false;
+		float m_Depth = 0.0f;
 	};
 }
