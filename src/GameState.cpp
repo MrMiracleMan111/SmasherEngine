@@ -5,9 +5,9 @@
 
 namespace Smasher {
 	GameState::~GameState() {
+		m_EntityMap.clear();
 		m_ComponentManagersWithRender.clear();
 		m_ComponentManagersWithUpdate.clear();
-		m_EntityMap.clear();
 		m_ComponentManagers.clear();
 	}
 
