@@ -10,11 +10,12 @@ namespace Smasher {
 		DrawableComponent() : IComponent() {}
 
 		template <class T>
-		void SetTextureAsset() {
+		DrawableComponent& SetTextureAsset() {
 			auto& rResourceManager = GetEntity().GetEngine().GetResourceManager();
 			m_Texture = rResourceManager.GetOrLoadResource<T, TextureResource>();
 			m_Sprite.setTexture(m_Texture->GetTexture());
 			m_TextureLoaded = true;
+			return *this;
 		}
 
 		static void StaticRenderComponent(DrawableComponent& self, sf::RenderWindow& rWindow);
