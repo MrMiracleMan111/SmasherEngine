@@ -45,14 +45,14 @@ namespace Smasher {
 		void SetEntity(Entity& pEntity) { m_Entity = &pEntity; }
 		void SetManager(IComponentManager& pManager) { m_Manager = &pManager; }
 		template<class T>
+		void SetIterator(typename plf::colony<T>::iterator* itrPtr) {
+			m_ItrPtr = itrPtr;
+		}
+		template<class T>
 		typename plf::colony<T>::iterator* GetIterator() {
 			return static_cast<typename plf::colony<T>::iterator*>(m_ItrPtr);
 		}
 
-		template<class T>
-		void SetIterator(typename plf::colony<T>::iterator* itrPtr) {
-			m_ItrPtr = itrPtr;
-		}
 	private:
 		void* m_ItrPtr; // Taboo but necessary
 		Entity* m_Entity;
