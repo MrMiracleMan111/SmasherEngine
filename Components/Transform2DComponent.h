@@ -12,11 +12,6 @@ namespace Smasher {
 			return *this;
 		}
 
-		Transform2DComponent& SetPosition(sf::Vector2f position) {
-			setPosition(position);
-			return *this;
-		}
-
 		Transform2DComponent& SetScale(sf::Vector2f factors) {
 			setScale(factors);
 			return *this;
