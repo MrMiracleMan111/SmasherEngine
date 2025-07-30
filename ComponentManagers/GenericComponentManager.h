@@ -1,8 +1,9 @@
 #pragma once
+#include <iostream>
 #include "Base.h"
 #include "IComponentManager.h"
 #include "IComponent.h"
-
+#include "plf_colony.h"
 
 /**
 	Instead of component logic being handled in the manager, this manager expects
@@ -20,9 +21,13 @@
 namespace Smasher {
 	template <class T>
 	class GenericComponentManager final : public IComponentManager {
+		static_assert(std::is_base_of_v<IComponent, T>, "T should be derived from IComponent");
+
 		friend class Entity;
 	public:
-		GenericComponentManager(GameState& state) : IComponentManager(state) {};
+		GenericComponentManager(GameState& state) : IComponentManager(state) {
+			m_ComponentsToRemove.reserve(64); // Arbitrary can be improved upon later
+		};
 		GenericComponentManager() = delete;
 		GenericComponentManager(const GenericComponentManager&) = delete;
 		GenericComponentManager(GenericComponentManager&&) = delete;
@@ -50,52 +55,40 @@ namespace Smasher {
 			}
 		}
 
-	protected:
-		void RemoveComponent(IComponent& rComponent) override {
+		template<typename... Args>
+		T& AddComponent(Entity& rEntity, Args&&... args) {
+			size_t index = m_Components.size();
+			auto itr = m_Components.emplace(std::forward<Args>(args)...);
+			T& rComponent = *itr;
+			SetComponentStatus(rComponent, ComponentStatus::VALID);
+			SetComponentEntity(rComponent, rEntity);
+			SetComponentManager(rComponent, *this);
+			SetComponentIterator<T>(rComponent, new typename plf::colony<T>::iterator(itr));
+
+			return rComponent;
+		}
+
+		void RemoveComponent(IComponent& rComponentInterface) {
+			T& rComponent = static_cast<T&>(rComponentInterface);
 			if (rComponent.GetStatus() != ComponentStatus::VALID) {
 				return;
 			}
-
+			typename plf::colony<T>::iterator* pItr = GetComponentIterator<T>(rComponent);
 			SetComponentStatus(rComponent, ComponentStatus::INVALID);
-			m_ComponentsToRemove.emplace_back(rComponent);
-		}
-
-		IComponent& AddComponent(IComponent&& xComponent) override {
-			T* pComponent = dynamic_cast<T*>(&xComponent);
-			if (pComponent == nullptr) {
-				throw Exceptions::ComponentDowncastFailed(std::format("Component not of type {}", typeid(T).name()));
-			}
-			SetComponentStatus(*pComponent, ComponentStatus::VALID);
-			m_Components.emplace_back(std::move(*pComponent));
-			return m_Components.back();
+			m_ComponentsToRemove.emplace_back(pItr);
 		}
 
 	private:
 		void RemoveMarkedComponents() {
-			for (IComponent& rComponent : m_ComponentsToRemove) {
-				if (rComponent.GetStatus() == ComponentStatus::REMOVED) {
-					throw Exceptions::ComponentInvalid("Component was already destroyed");
-				}
-				else if (rComponent.GetStatus() != ComponentStatus::INVALID) {
-					throw std::logic_error("Component Status is wrong, it should be marked INVALID");
-				}
-
-				// Need to do the empty() check to avoid size_t overflow from 
-				// the expression m_Components.size() - 1
-				if (!m_Components.empty() && (rComponent.GetIndex() < (m_Components.size() - 1))) {
-					// Move last element into this index and pop off last element
-					size_t index = rComponent.GetIndex();
-					rComponent = std::move(m_Components.back());
-					//std::swap(rComponent, m_Components.back());
-					SetComponentIndex(rComponent, index);
-				}
-
-				m_Components.pop_back();
+			for (auto& itr : m_ComponentsToRemove) {  
+				typename plf::colony<T>::iterator* pCompItr = itr;
+				m_Components.erase(*pCompItr);
+				delete pCompItr;
 			}
 			m_ComponentsToRemove.clear();
 		}
 
-		std::vector<T> m_Components;
-		std::vector<std::reference_wrapper<IComponent>> m_ComponentsToRemove; // Components to be removed
+		plf::colony<T> m_Components;
+		std::vector<typename plf::colony<T>::iterator*> m_ComponentsToRemove; // Components to be removed
 	};
 }

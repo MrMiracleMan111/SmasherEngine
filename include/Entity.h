@@ -15,9 +15,6 @@ namespace Smasher {
 	class IComponent;
 	class Engine;
 
-	template<typename T>
-	concept IComponentType = std::is_base_of_v<IComponent, T>;
-
 	class SMASHER_API Entity {
 
 	public:

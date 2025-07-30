@@ -4,6 +4,7 @@
 #include "GenericComponentManager.h"
 #include "Entity.h"
 
+
 namespace Smasher {
 	/*
 		Instantiates a Component Manager to handle the provided component type. Components
@@ -14,13 +15,16 @@ namespace Smasher {
 	template <class T>
 	void GameState::LoadComponentManager()
 	{
+		static_assert(IComponentType<T>, "T should be derived from IComponent");
+
 		// Component specifies a manager to use
 		if constexpr (HasStaticInstantiateManager<T>) {
+			using ManagerType = std::decay_t<decltype(T::StaticInstantiateManager(*this))>::type;
+			static_assert(ComponentManagerHasAddComponent<ManagerType, T>, "ComponentManager is missing AddComponent method");
+			static_assert(std::derived_from<ManagerType, IComponentManager>, "StaticInstantiateManager return type must derive from IComponentManager");
+
 			m_ComponentManagers.emplace(std::type_index(typeid(T)), T::StaticInstantiateManager(*this));
 			auto& rManagerPtr = m_ComponentManagers[std::type_index(typeid(T))];
-			using ManagerType = decltype(T::StaticInstantiateManager(*this));
-
-			static_assert(std::derived_from<ManagerType, IComponentManager>, "StaticInstantiateManager return type must derive from IComponentManager");
 
 			// Was Update method overriden?
 			if constexpr (!std::same_as<ManagerType::Update, decltype(&IComponentManager::Update)>) {
@@ -34,7 +38,9 @@ namespace Smasher {
 		}
 		// Use a GenericComponentManager<T> if Component doesn't specify a manager to use
 		else {
+			// Move static_assert outside the class
 			m_ComponentManagers.emplace(std::type_index(typeid(T)), std::make_unique<GenericComponentManager<T>>(*this));
+			static_assert(ComponentManagerHasAddComponent<GenericComponentManager<T>, T>, "ComponentManager is missing AddComponent method");
 			auto& rManagerPtr = m_ComponentManagers[std::type_index(typeid(T))];
 
 			if constexpr (HasStaticRenderComponent<T>) {

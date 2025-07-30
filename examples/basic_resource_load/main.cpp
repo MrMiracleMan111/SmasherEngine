@@ -1,9 +1,10 @@
-#include "Core.h"
-#include "Manifest.h"
-#include "ExampleResourcesGameState.h"
 #include "Components/DrawableComponent.h"
 #include "Components/Transform2DComponent.h"
 #include "Components/TextComponent.h"
+#include "Core.h"
+#include "Manifest.h"
+#include "ExampleResourcesGameState.h"
+
 
 int main() {
 	Smasher::Engine engine(640, 420);
@@ -17,9 +18,10 @@ int main() {
 
 	message.AddComponent<Transform2DComponent>();
 	message.AddComponent<TextComponent>()
-		.SetFontAsset<Resources::Fonts::arial>()
-		.SetString("Hello World").UseDefaults();
+		.SetString("Hello World")
+		.UseDefaults()
+		.SetFontAsset<Resources::Fonts::arial>();
 
-	state.Activate();
+ 	state.Activate();
 	engine.Run();
 }

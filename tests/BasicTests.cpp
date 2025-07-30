@@ -1,7 +1,11 @@
 #include <gtest/gtest.h>
+#include <fstream>
+#include <iostream>
 #include "Core.h"
 #include "BaseComponentManager.h"
 #include "Entity.h"
+#include "ResourceManager.h"
+#include "Resources.h"
 
 class DummyGameState : public Smasher::GameState {
 public:
@@ -41,22 +45,12 @@ protected:
 	int m_Value;
 };
 
-struct CustomComponent;
-
-class CustomComponentManager : public Smasher::BaseComponentManager<CustomComponent> {
-public:
-	CustomComponentManager(Smasher::GameState& state) : Smasher::BaseComponentManager<CustomComponent>(state) {}
-	CustomComponentManager(const CustomComponentManager&) = default;
-	~CustomComponentManager() = default;
-
-	void Update(Smasher::Millisecond delta) override {};
-	void Render(sf::RenderWindow& rWindow) override {};
-};
+struct CustomComponentManager;
 
 struct CustomComponent : public Smasher::IComponent {
 public:
 	SMASHER_USE_COMPONENT_MANAGER(CustomComponentManager)
-	CustomComponent(int value) : m_Value(value) {
+		CustomComponent(int value) : m_Value(value) {
 	};
 	~CustomComponent() = default;
 
@@ -67,6 +61,16 @@ protected:
 	int m_Value;
 };
 
+
+class CustomComponentManager : public Smasher::BaseComponentManager<CustomComponent> {
+public:
+	CustomComponentManager(Smasher::GameState& state) : Smasher::BaseComponentManager<CustomComponent>(state) {}
+	CustomComponentManager(const CustomComponentManager&) = default;
+	~CustomComponentManager() = default;
+
+	void Update(Smasher::Millisecond delta) override {};
+	void Render(sf::RenderWindow& rWindow) override {};
+};
 
 // Component that deletes itself during update
 struct DeleteTestComponent : public Smasher::IComponent {
@@ -227,6 +231,29 @@ TEST(ComponentsTest, ExceptionRemoveComponentDataChange) {
 	ASSERT_NO_THROW({ engine.Update(Smasher::Millisecond{10}); });
 	ASSERT_NO_THROW({ engine.Update(Smasher::Millisecond{10}); });
 }
+
+TEST(ResourcesTest, OpenFileResource) {
+	Smasher::Engine engine(640, 420);
+	Smasher::ResourceManager& rResourceManager = engine.GetResourceManager();
+	std::ios_base::openmode flags = std::ios_base::out;
+	auto pFileResource = rResourceManager.GetOrLoadResource<Smasher::FileResource>(1, "test_file", flags);
+	pFileResource->GetFileStream() << "message";
+
+	char buffer[16] = { 0 };
+	std::fstream file("test_file", std::ios_base::in);
+	file.seekg(0);
+	file.read(buffer, 16);
+	EXPECT_STREQ(buffer, "message");
+}
+
+TEST(ResourcesTest, OpenReleaseFileResource) {
+	Smasher::Engine engine(640, 420);
+	Smasher::ResourceManager& rResourceManager = engine.GetResourceManager();
+	std::ios_base::openmode flags = std::ios_base::out;
+	auto pFileResource = rResourceManager.GetOrLoadResource<Smasher::FileResource>(1, "test_file", flags);
+	pFileResource->GetFileStream() << "message";
+}
+
 
 void TestCallback(Smasher::DummyEvent *e) {};
 

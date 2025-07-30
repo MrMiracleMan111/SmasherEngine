@@ -35,6 +35,5 @@ namespace Smasher {
 		SMASHER_EXCEPTION(ResourceFailedToLoad)
 		SMASHER_EXCEPTION(ResourceNotLoaded)
 		SMASHER_EXCEPTION(ResourceAlreadyExists)
-		SMASHER_EXCEPTION(ResourceTypeMismatch)
 	}
 }

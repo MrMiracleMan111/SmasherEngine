@@ -14,9 +14,13 @@ namespace Smasher {
 	*/
 	template <class T>
 	class SMASHER_API BaseComponentManager : public IComponentManager {
+	static_assert(std::is_base_of_v<IComponent, T>, "T should be derived from IComponent");
+
 		friend class Entity;
 	public:
-		BaseComponentManager(GameState& state) : IComponentManager(state) {};
+		BaseComponentManager(GameState& state) : IComponentManager(state) {
+			m_ComponentsToRemove.reserve(64); // Arbitrary can be improved upon later
+		};
 		BaseComponentManager() = delete;
 		BaseComponentManager(const BaseComponentManager&) = delete;
 		BaseComponentManager(BaseComponentManager&&) = delete;
@@ -28,27 +32,39 @@ namespace Smasher {
 		virtual void UpdateComponents(Millisecond delta) {};
 		virtual void RenderComponents(sf::RenderWindow& rWindow) {};
 
-	protected:
-		IComponent& AddComponent(IComponent&& xComponent) override {
-			T* pComponent = dynamic_cast<T*>(&xComponent);
-			if (pComponent == nullptr) {
-				throw Exceptions::ComponentDowncastFailed(std::format("Component not of type {}", typeid(T).name()));
-			}
-			SetComponentStatus(*pComponent, ComponentStatus::VALID);
-			m_Components.emplace_back(std::move(*pComponent));
-			return m_Components.back();
+		template<typename... Args>
+		T& AddComponent(Entity& rEntity, Args&&... args) {
+			size_t index = m_Components.size();
+			auto itr = m_Components.emplace(std::forward<Args>(args)...);
+			T& rComponent = *itr;
+			SetComponentStatus(rComponent, ComponentStatus::VALID);
+			SetComponentEntity(rComponent, rEntity);
+			SetComponentManager(rComponent, *this);
+			SetComponentIterator<T>(rComponent, new typename plf::colony<T>::iterator(itr));
+
+			return rComponent;
 		}
 
-		void RemoveComponent(IComponent& rComponent) override {
+		void RemoveComponent(IComponent& rComponentInterface) {
+			T& rComponent = static_cast<T&>(rComponentInterface);
 			if (rComponent.GetStatus() != ComponentStatus::VALID) {
 				return;
 			}
-
+			typename plf::colony<T>::iterator* pItr = GetComponentIterator<T>(rComponent);
 			SetComponentStatus(rComponent, ComponentStatus::INVALID);
-			m_ComponentsToRemove.emplace_back(rComponent);
+			m_ComponentsToRemove.emplace_back(pItr);
 		}
 
 	private:
+		void RemoveMarkedComponents() {
+			for (auto& itr : m_ComponentsToRemove) {
+				typename plf::colony<T>::iterator* pCompItr = itr;
+				m_Components.erase(*pCompItr);
+				delete pCompItr;
+			}
+			m_ComponentsToRemove.clear();
+		}
+
 		void PreUpdate(Millisecond delta) override {
 			RemoveMarkedComponents();
 		}
@@ -61,31 +77,7 @@ namespace Smasher {
 			RenderComponents(rWindow);
 		}
 
-		void RemoveMarkedComponents() {
-			for (IComponent& rComponent : m_ComponentsToRemove) {
-				if (rComponent.GetStatus() == ComponentStatus::REMOVED) {
-					throw Exceptions::ComponentInvalid("Component was already destroyed");
-				}
-				else if (rComponent.GetStatus() != ComponentStatus::INVALID) {
-					throw std::logic_error("Component Status is wrong, it should be marked INVALID");
-				}
-
-				// Need to do the empty() check to avoid size_t overflow from 
-				// the expression m_Components.size() - 1
-				if (!m_Components.empty() && (rComponent.GetIndex() < (m_Components.size() - 1))) {
-					// Move last element into this index and pop off last element
-					size_t index = rComponent.GetIndex();
-					rComponent = std::move(m_Components.back());
-					//std::swap(rComponent, m_Components.back());
-					SetComponentIndex(rComponent, index);
-				}
-
-				m_Components.pop_back();
-			}
-			m_ComponentsToRemove.clear();
-		}
-
-		std::vector<T> m_Components;
-		std::vector<std::reference_wrapper<IComponent>> m_ComponentsToRemove; // Components to be removed
+		plf::colony<T> m_Components;
+		std::vector<typename plf::colony<T>::iterator*> m_ComponentsToRemove; // Components to be removed
 	};
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include "plf_colony.h"
 #include <SFML/Graphics.hpp>
 #include "IComponent.h"
 #include "Base.h"
@@ -15,11 +16,20 @@ namespace Smasher {
 		virtual void Update(Millisecond delta) {}; // Override this to enable component updating
 		virtual void Render(sf::RenderWindow& rWindow) {}; // Override this to enable component rendering
 		virtual void RemoveComponent(IComponent& component) = 0;
-		virtual IComponent& AddComponent(IComponent&& component) = 0;
 
 		const GameState& m_GameState;
 	protected:
 		void SetComponentStatus(IComponent& rComponent, ComponentStatus status) { rComponent.SetStatus(status); }
-		void SetComponentIndex(IComponent& rComponent, size_t index) { rComponent.SetIndex(index); }
+		void SetComponentEntity(IComponent& rComponent, Entity& rEntity) { rComponent.SetEntity(rEntity); }
+		void SetComponentManager(IComponent& rComponent, IComponentManager& rManager) { rComponent.SetManager(rManager); }
+		template<class T>
+		typename plf::colony<T>::iterator* GetComponentIterator(T& rComponent) {
+			return rComponent.GetIterator<T>();
+		}
+
+		template<class T>
+		void SetComponentIterator(T& rComponent, typename plf::colony<T>::iterator* itrPtr) {
+			rComponent.SetIterator<T>(itrPtr);
+		}
 	};
 }

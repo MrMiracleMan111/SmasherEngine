@@ -53,6 +53,7 @@ namespace Smasher {
 
 		void RemoveEntity(UUID uuid);
 
+        // Component Type <T>
 		template <class T>
 		IComponentManager& GetComponentManager();
 

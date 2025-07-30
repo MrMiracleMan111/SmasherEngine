@@ -10,15 +10,24 @@ namespace Smasher {
 			throw Exceptions::EntityDuplicateComponent(exceptionMessage);
 		}
 
-		auto& rManager = m_GameState.template GetComponentManager<T>();
-		T component = T(std::forward<Args>(componentArgs)...);
-		component.SetEntity(this);
-		component.SetManager(&rManager);
-
-		std::reference_wrapper<IComponent> rComponent(rManager.AddComponent(std::move(component)));
-		m_ComponentsByType.insert({ std::type_index(typeid(T)), rComponent });
-
-		return static_cast<T&>(rComponent.get());
+		if constexpr (HasStaticInstantiateManager<T>) {
+			// Use Custom Manager
+			using ManagerType = std::decay_t<decltype(T::StaticInstantiateManager(*this))>::type;
+			ManagerType& rManager = static_cast<ManagerType&>(m_GameState.GetComponentManager<T>());
+			T& rComponent = rManager.AddComponent(*this, std::forward<Args>(componentArgs)...);
+			IComponent& rComponentInterface = static_cast<IComponent&>(rComponent);
+			m_ComponentsByType.emplace(std::type_index(typeid(T)), rComponentInterface);
+			return rComponent;
+		}
+		else {
+			// Use Generic
+    		using ManagerType = GenericComponentManager<T>;
+            ManagerType& rManager = static_cast<ManagerType&>(m_GameState.GetComponentManager<T>());
+			T& rComponent = rManager.AddComponent(*this, std::forward<Args>(componentArgs)...);
+			IComponent& rComponentInterface = static_cast<IComponent&>(rComponent);
+			m_ComponentsByType.emplace(std::type_index(typeid(T)), rComponentInterface);
+			return rComponent;
+		}
 	}
 
 	template<class T>
