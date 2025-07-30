@@ -33,6 +33,7 @@ namespace Smasher {
 	using Millisecond = std::chrono::milliseconds;
 	using ResourceID = uint64_t;
 	using ResourcePath = std::filesystem::path;
+	using Degrees = float; // In Degrees
 
 	template <typename T, typename U>
 	concept ComponentManagerHasAddComponent = requires(T t, Entity & rEntity) {
