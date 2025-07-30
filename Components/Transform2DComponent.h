@@ -6,7 +6,6 @@
 
 namespace Smasher {
 	class SMASHER_API Transform2DComponent : public IComponent, public sf::Transformable {
-	public:
-		Transform2DComponent() : IComponent(), sf::Transformable() {}
+
 	};
 }
