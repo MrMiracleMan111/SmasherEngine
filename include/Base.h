@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
+#include "plf_colony.h"
 #include "Exceptions.h"
 #include "Smasher_export.h"
 // EngineAPI.hpp
@@ -27,9 +28,19 @@ constexpr uint64_t hash_str(const char* str) {
 
 namespace Smasher {
 	class GameState;
+	class IComponent;
+	class Entity;
 	using Millisecond = std::chrono::milliseconds;
 	using ResourceID = uint64_t;
 	using ResourcePath = std::filesystem::path;
+
+	template <typename T, typename U>
+	concept ComponentManagerHasAddComponent = requires(T t, Entity & rEntity) {
+		{ t.AddComponent(rEntity) } -> std::same_as<U&>;
+	};
+
+	template<typename T>
+	concept IComponentType = std::is_base_of_v<IComponent, T>;
 
 	template <typename T>
 	concept ManifestItemHasResourceID = requires(T) {
@@ -72,6 +83,7 @@ namespace Smasher {
 		FONT,
 		AUDIO,
 		SHADER,
+		FILE,
 		INVALID
 	};
 

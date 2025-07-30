@@ -1,4 +1,6 @@
 #pragma once
+#include <ios>
+#include <fstream>
 #include "Base.h"
 
 #define SMASHER_RESOURCE_TYPE(type) ResourceType GetType() const { return GetStaticType();} \
@@ -67,6 +69,7 @@ namespace Smasher {
 	private:
 		sf::Music m_Music;
 	};
+
 	class SMASHER_API ShaderResource : public Resource {
 	public:
 		SMASHER_RESOURCE_TYPE(ResourceType::SHADER)
@@ -75,4 +78,25 @@ namespace Smasher {
 			Resource(id, relativePath, resourcesDirectory) {}
 	};
 
+	class SMASHER_API FileResource : public Resource {
+	public:
+		SMASHER_RESOURCE_TYPE(ResourceType::FILE)
+		FileResource() = delete;
+		FileResource(ResourceID id, const ResourcePath& relativePath, const std::filesystem::path& resourcesDirectory, std::ios_base::openmode mode) :
+			Resource(id, relativePath, resourcesDirectory), m_File(m_Path, mode) {
+
+		}
+		FileResource(const FileResource& other) = default;
+		FileResource(FileResource&& other) = default;
+		~FileResource() {
+			if (m_File.is_open()) {
+				m_File.close();
+			}
+		}
+
+		std::fstream& GetFileStream() { return m_File; }
+
+	private:
+		std::fstream m_File;
+	};
 }
