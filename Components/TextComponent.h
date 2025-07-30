@@ -6,13 +6,16 @@
 #include "EngineConfig.h"
 
 namespace Smasher {
-	class SMASHER_API TextComponent : public IComponent
-	{
+	class SMASHER_API TextComponent : public IComponent {
 	public:
 		TextComponent() : IComponent() {
 			m_Text.setCharacterSize(EngineConfig::DEFAULT_FONT_SIZE);
 			m_Text.setColor(EngineConfig::DEFAULT_FONT_COLOR);
 		}
+		TextComponent(const TextComponent&) = default;
+		TextComponent& operator=(const TextComponent&) = default;
+
+
 		static void StaticRenderComponent(TextComponent& self, sf::RenderWindow& rWindow);
 
 		TextComponent& UseDefaults() {
@@ -23,8 +26,7 @@ namespace Smasher {
 		template <class T>
 		TextComponent& SetFontAsset() {
 			auto& rResourceManager = GetEntity().GetEngine().GetResourceManager();
-			m_ResourceHandle = rResourceManager.GetResourceHandle<T>(ResourceType::FONT);
-			m_Font = rResourceManager.GetResource<FontResource>(m_ResourceHandle);
+			m_Font = rResourceManager.GetOrLoadResource<T, FontResource>();
 			m_Text.setFont(m_Font->GetFont());
 			m_FontLoaded = true;
 			return *this;
@@ -45,6 +47,5 @@ namespace Smasher {
 		std::shared_ptr<FontResource> m_Font;
 		sf::Text m_Text;
 		bool m_FontLoaded = false;
-		ResourceHandle m_ResourceHandle;
 	};
 }
