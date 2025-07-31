@@ -40,6 +40,15 @@ namespace Smasher {
 		{ t.AddComponent(rEntity) } -> std::same_as<U&>;
 	};
 
+	template<class T>
+	concept HasPathVariable = std::same_as<std::decay_t<decltype(T::PATH)>, ResourcePath>;
+
+	template <class T>
+	concept HasPathsVariable = std::same_as<std::decay_t<decltype(T::PATHS)>, ResourcePath*>;
+	
+	template <typename T>
+	concept HasPathOrPathsVariable = HasPathVariable<T> || HasPathsVariable<T>;
+
 	template<typename T>
 	concept IComponentType = std::is_base_of_v<IComponent, T>;
 
