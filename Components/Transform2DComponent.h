@@ -12,6 +12,11 @@ namespace Smasher {
 			return *this;
 		}
 
+		Transform2DComponent& SetRotation(Degrees angle) {
+			setRotation((Degrees)angle);
+			return *this;
+		}
+
 		Transform2DComponent& SetScale(sf::Vector2f factors) {
 			setScale(factors);
 			return *this;
