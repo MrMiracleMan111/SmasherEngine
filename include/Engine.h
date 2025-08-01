@@ -19,6 +19,7 @@ namespace Smasher {
 	public:
 		Engine();
 		Engine(int width, int height);
+		Engine(int width, int height, const sf::ContextSettings& settings);
 		~Engine() {};
 
 		void Run();
