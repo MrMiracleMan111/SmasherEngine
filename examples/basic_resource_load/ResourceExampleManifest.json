@@ -10,6 +10,9 @@
     "bg_music_2": "assets/songs/bg2.wav"
   },
   "Fonts": {
-    "arial":  "assets/fonts/arial.ttf"
+    "arial": "assets/fonts/arial.ttf"
+  },
+  "Shaders": {
+    "basic_texture_shader": [ "assets/shaders/basic_texture_vertex_shader.glsl", "assets/shaders/basic_texture_fragment_shader.glsl" ]
   }
 }
