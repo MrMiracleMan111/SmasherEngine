@@ -44,7 +44,7 @@ namespace Smasher {
 	concept HasPathVariable = std::same_as<std::decay_t<decltype(T::PATH)>, ResourcePath>;
 
 	template <class T>
-	concept HasPathsVariable = std::same_as<std::decay_t<decltype(T::PATHS)>, ResourcePath*>;
+	concept HasPathsVariable = std::is_array_v<decltype(T::PATHS)> && std::same_as<std::remove_extent_t<decltype(T::PATHS)>, const ResourcePath>;
 	
 	template <typename T>
 	concept HasPathOrPathsVariable = HasPathVariable<T> || HasPathsVariable<T>;
