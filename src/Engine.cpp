@@ -1,18 +1,39 @@
+#if defined(_WIN32)
+#define NOMINMAX
+#include <windows.h>
+#include <GL/gl.h>
+#elif defined(__linux__)
+#include <GL/gl.h>
+#elif defined(__APPLE__)
+#include <OpenGL/gl.h>
+#endif
+
 #include <format>
 #include <exception>
 #include <stdexcept>
 #include <iostream>
+#include <SFML/Window.hpp>
 #include "Engine.h"
 #include "Exceptions.h"
 #include "EngineConfig.h"
 
 namespace Smasher {
-	Engine::Engine() : m_Window(sf::VideoMode(EngineConfig::WINDOW_WIDTH, EngineConfig::WINDOW_HEIGHT), EngineConfig::TITLE) {
-
+	Engine::Engine(int width, int height, const sf::ContextSettings& settings) :
+		m_Window(
+			sf::VideoMode(EngineConfig::WINDOW_WIDTH, EngineConfig::WINDOW_HEIGHT),
+			EngineConfig::TITLE,
+			sf::Style::Default,
+			settings) {
 	}
 
 	Engine::Engine(int width, int height) : m_Window(sf::VideoMode(width, height), EngineConfig::TITLE) {
 	}
+
+	Engine::Engine() :
+		m_Window(sf::VideoMode(EngineConfig::WINDOW_WIDTH, EngineConfig::WINDOW_HEIGHT), EngineConfig::TITLE) {
+
+	}
+
 
 	void Engine::Run() {
 #ifdef NDEBUG
@@ -72,6 +93,7 @@ namespace Smasher {
 
 	void Engine::Render(sf::RenderWindow& window) {
 		m_Window.clear();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear Screen And Depth Buffer
 		for (const auto& [_, pGameState] : m_GameStateByType) {
 			if (pGameState->GetStatus() == GameStateStatus::ACTIVE) {
 				pGameState->Render(window);
