@@ -28,7 +28,10 @@ int main() {
 	sf::Vector2f windowSize = sf::Vector2f(engine.GetWindow().getSize().x , engine.GetWindow().getSize().y);
 	shader->GetShader().setUniform("windowSize", windowSize);
 
-	for (size_t i = 0; i < 10; ++i) {
+	const size_t numEntities = 10;
+	for (size_t i = 0; i < numEntities; ++i) {
+		float depth = (float)(rand() % 100) / 100.0;
+
 		Entity& image = state.AddEntity<Smasher::Entity>();
 		image.AddComponent<Transform2DComponent>()
 			.SetPosition(sf::Vector2f(i * 10, i * 10))
@@ -36,7 +39,7 @@ int main() {
 		image.AddComponent<DrawableComponent>()
 			.SetShader(shader)
 			.SetTextureAsset<Resources::Textures::small_art>()
-			.SetDepth(1.0f - ((float)(i) / 10.0f)); // Render in reverse with i=0 being on top
+			.SetDepth(depth); // Render in reverse with i=0 being on top
 	}
 	
 	/*message.AddComponent<Transform2DComponent>();
