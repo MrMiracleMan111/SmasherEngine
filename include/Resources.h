@@ -93,22 +93,15 @@ namespace Smasher {
 		SMASHER_RESOURCE_TYPE(ResourceType::SHADER)
 			ShaderResource() = delete;
 
-		// One Shader File - Type must be specified
-		ShaderResource(ResourceID id,
-			const ResourcePath* const relativePaths, const size_t numPaths,
-			const ResourcePath& resourcesDirectory, sf::Shader::Type type) :
-			Resource(id, relativePaths, numPaths, resourcesDirectory) {
-
-			assert(numPaths == 1);
-			m_Shader.loadFromFile(m_Paths[0].string(), type);
-		}
-
 		ShaderResource(ResourceID id,
 			const ResourcePath* const relativePaths, const size_t numPaths,
 			const ResourcePath& resourcesDirectory) :
 			Resource(id, relativePaths, numPaths, resourcesDirectory) {
 			
 			switch (numPaths) {
+			case 1:
+				m_Shader.loadFromFile(m_Paths[0].string(), sf::Shader::Type::Fragment);
+				break;
 			case 2:
 				m_Shader.loadFromFile(m_Paths[0].string(), m_Paths[1].string());
 				break;
