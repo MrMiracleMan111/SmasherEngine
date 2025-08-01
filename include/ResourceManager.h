@@ -35,12 +35,8 @@ namespace Smasher {
 			else if constexpr (HasPathVariable<ManifestData>) {
 				return LoadResource<T>(ManifestData::ID, &ManifestData::PATH, 1, resourceArgs...);
 			}
-			else {
-				// Error
-				//static_assert(false, "Manifest struct doesn't have any PATH or PATHS");
-			}
 
-			//static_assert(false, "Error");
+			assert(false);
 			return std::shared_ptr<T>(nullptr);
 		}
 
