@@ -1,4 +1,6 @@
 ﻿cmake_minimum_required (VERSION 3.8)
+find_package(OpenGL REQUIRED)
+include_directories(${OPENGL_INCLUDE_DIRS})
 
 project ("SmasherEngine")
 include(GenerateExportHeader)
@@ -105,6 +107,7 @@ target_link_libraries(SmasherEngine PUBLIC
 "sfml-graphics${SFML_DYNAMIC_LIB_SUFFIX}"
 "sfml-network${SFML_DYNAMIC_LIB_SUFFIX}"
 "sfml-system${SFML_DYNAMIC_LIB_SUFFIX}")
+target_link_libraries(SmasherEngine PUBLIC ${OPENGL_LIBRARIES})
 
 target_compile_features(SmasherEngine PUBLIC cxx_std_20)
 
