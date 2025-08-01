@@ -42,7 +42,7 @@ namespace Smasher {
 		IComponent() : m_Status(ComponentStatus::INVALID) {};
 
 		void SetStatus(ComponentStatus status) { m_Status = status; }
-		void SetEntity(Entity& pEntity) { m_Entity = &pEntity; }
+		virtual void SetEntity(Entity& pEntity) { m_Entity = &pEntity; }
 		void SetManager(IComponentManager& pManager) { m_Manager = &pManager; }
 		template<class T>
 		void SetIterator(typename plf::colony<T>::iterator* itrPtr) {
