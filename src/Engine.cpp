@@ -94,6 +94,8 @@ namespace Smasher {
 	void Engine::Render(sf::RenderWindow& window) {
 		m_Window.clear();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear Screen And Depth Buffer
+		glAlphaFunc(GL_GREATER, 0.0);
+		glEnable(GL_ALPHA_TEST);
 		for (const auto& [_, pGameState] : m_GameStateByType) {
 			if (pGameState->GetStatus() == GameStateStatus::ACTIVE) {
 				pGameState->Render(window);
