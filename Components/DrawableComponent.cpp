@@ -15,14 +15,21 @@ namespace Smasher {
 		Transform2DComponent& rTransform = self.GetEntity().GetComponent<Transform2DComponent>();
 		
 		sf::RenderTarget& target = rWindow;
+        if (self.m_TextureResource.get() == nullptr) {
+            return;
+        }
+
 		if (self.m_ShaderResource.get() == nullptr) {
-			self.m_ShaderResource->GetShader().setUniform("depth", self.m_Depth);
 			//rWindow.draw(self.m_Vertices, &self.m_ShaderResource->GetShader());
             self.draw(rWindow);
-
         }
         else {
             self.m_ShaderResource->GetShader().setUniform("depth", self.m_Depth);
+            self.m_ShaderResource->GetShader().setUniform("depth", self.m_Depth);
+            self.m_ShaderResource->GetShader().setUniform("textureSize", sf::Glsl::Ivec2(self.m_TextureResource->GetTexture().getSize()));
+            self.m_ShaderResource->GetShader().setUniform("clipCoords", self.m_ClipRect.getPosition());
+            self.m_ShaderResource->GetShader().setUniform("clipSize", self.m_ClipRect.getSize());
+
             //rWindow.draw(self.m_Vertices, self.m_RenderState);
             self.draw(rWindow);
         }

@@ -83,6 +83,7 @@ namespace Smasher {
 			m_TextureResource = rResourceManager.GetOrLoadResource<T, TextureResource>();
 
 			sf::Texture& texture = m_TextureResource->GetTexture();
+			m_ClipRect = sf::IntRect{ 0, 0, (int)(texture.getSize().x), (int)(texture.getSize().y)};
 			m_Vertices[0].texCoords = sf::Vector2f(0, 0);
 			m_Vertices[1].texCoords = sf::Vector2f(0, texture.getSize().y);
 			m_Vertices[2].texCoords = sf::Vector2f(texture.getSize().x, texture.getSize().y);
@@ -111,6 +112,20 @@ namespace Smasher {
 		DrawableComponent& SetShader(std::shared_ptr<ShaderResource> pShader) {
 			m_ShaderResource = pShader;
 			m_RenderState = sf::RenderStates(sf::BlendNone, GetEntity().GetComponent<Transform2DComponent>().GetTransform(), &m_TextureResource->GetTexture(), &m_ShaderResource->GetShader());
+			return *this;
+		}
+
+		DrawableComponent& SetClipRect(sf::IntRect clipRect) {
+			m_ClipRect = clipRect;
+			return *this;
+		}
+
+		DrawableComponent& SetSize(sf::Vector2f size) {
+			float depth = 1.0f;
+			m_Vertices[0].position = sf::Vector3f(0, 0, depth);
+			m_Vertices[1].position = sf::Vector3f(0, size.y, depth);
+			m_Vertices[2].position = sf::Vector3f(size.x, size.y, depth);
+			m_Vertices[3].position = sf::Vector3f(size.x, 0, depth);
 			return *this;
 		}
 
@@ -147,6 +162,7 @@ namespace Smasher {
 		//sf::Sprite m_Sprite;
 		//sf::VertexArray m_Vertices;
 		QuadVertex m_Vertices[4]; // 
+		sf::IntRect m_ClipRect{0, 0, 1, 1};
 		sf::Transform const* m_TransformRef = nullptr; // Cache it's location
 		bool m_TextureLoaded = false;
 		float m_Depth = 0.0f;
