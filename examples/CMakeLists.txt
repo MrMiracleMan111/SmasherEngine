@@ -5,8 +5,8 @@ set(SMASHER_ENGINE_OUTPUT_DIR ${CMAKE_BINARY_DIR})
 # Generate Manifest Header for Basic Resource Load
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 set(MANIFEST_GENERATOR "${CMAKE_SOURCE_DIR}/scripts/ManifestHeaderGenerator.py")
-set(RESOURCE_EXAMPLE_MANIFEST_JSON "${CMAKE_CURRENT_SOURCE_DIR}/basic_resource_load/ResourceExampleManifest.json")
-set(RESOURCE_EXAMPLE_MANIFEST_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/basic_resource_load/include/Manifest.h")
+set(RESOURCE_EXAMPLE_MANIFEST_JSON "${CMAKE_CURRENT_SOURCE_DIR}/Manifest.json")
+set(RESOURCE_EXAMPLE_MANIFEST_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/Manifest.h")
 
 add_custom_command(
     OUTPUT Manifest.h
@@ -14,7 +14,7 @@ add_custom_command(
         ${MANIFEST_GENERATOR}
         --files ${RESOURCE_EXAMPLE_MANIFEST_JSON}
         --out ${RESOURCE_EXAMPLE_MANIFEST_HEADER}
-        --resources "${CMAKE_SOURCE_DIR}/examples/basic_resource_load"
+        --resources "${CMAKE_SOURCE_DIR}/examples"
 
     DEPENDS "${MANIFEST_GENERATOR}" "${RESOURCE_EXAMPLE_MANIFEST_JSON}"
     COMMENT "Generating Manifest header file..."
@@ -31,7 +31,7 @@ foreach(CONFIG ${CMAKE_CONFIGURATION_TYPES})
 endforeach()
 set_target_properties(BasicWindowExample PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${SMASHER_ENGINE_OUTPUT_DIR}")
 target_compile_features(BasicWindowExample PUBLIC cxx_std_20)
-target_include_directories (BasicWindowExample PUBLIC "basic_window/include" "basic_window/src")
+target_include_directories (BasicWindowExample PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "basic_window/include" "basic_window/src")
 target_link_libraries( BasicWindowExample PRIVATE SmasherEngine )
 
 # Basic Resource Load Example
@@ -41,5 +41,5 @@ add_executable (BasicResourceLoadExample "basic_resource_load/main.cpp" "basic_r
 set_target_properties(BasicResourceLoadExample PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${SMASHER_ENGINE_OUTPUT_DIR}")
 add_dependencies(SmasherEngine generate_manifest_BasicResourceLoadExample)
 target_compile_features(BasicResourceLoadExample PUBLIC cxx_std_20)
-target_include_directories (BasicResourceLoadExample PUBLIC "basic_resource_load/include" "basic_resource_load/src")
+target_include_directories (BasicResourceLoadExample PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "basic_resource_load/include" "basic_resource_load/src")
 target_link_libraries( BasicResourceLoadExample PRIVATE SmasherEngine )
