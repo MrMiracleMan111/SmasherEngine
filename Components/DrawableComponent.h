@@ -48,6 +48,8 @@ namespace Smasher {
 
 		DrawableComponent& SetClipRect(sf::IntRect clipRect);
 
+		DrawableComponent& SetClipRotation(Degrees angle);
+
 		// Pushes transform to RenderBatch for rendering
 		// This MUST be called after changing Transform or ClipRect
 		// Try to call this as infrequently as possible
@@ -58,6 +60,9 @@ namespace Smasher {
 		float GetDepth() const { return m_Depth; }
 
 		sf::Color GetColor() const { return m_Color; }
+		const sf::IntRect& GetClipRect() const { return m_ClipRect; }
+
+		Degrees GetClipRotation() const { return m_ClipRotation; }
 
 		const sf::Transform& GetClipTransform();
 
@@ -74,6 +79,7 @@ namespace Smasher {
 		bool m_TextureLoaded = false;
 		bool m_ClipChanged = false;
 		float m_Depth = 0.0f;
+		Degrees m_ClipRotation = 0.0f;
 	};
 }
 

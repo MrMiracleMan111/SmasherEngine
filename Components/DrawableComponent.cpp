@@ -44,6 +44,12 @@ namespace Smasher {
         return *this;
     }
 
+    DrawableComponent& DrawableComponent::SetClipRotation(Degrees angle) {
+        m_ClipChanged = true;
+        m_ClipRotation = angle;
+        return *this;
+    }
+
     const sf::Transform& DrawableComponent::GetTransformPtr() const {
         assert(m_TransformPtr != nullptr);
         return *m_TransformPtr;
