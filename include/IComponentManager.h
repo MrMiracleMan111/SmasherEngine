@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include "plf_colony.h"
-#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
 #include "IComponent.h"
 #include "Base.h"
 
@@ -17,7 +17,9 @@ namespace Smasher {
 		virtual void Render(sf::RenderWindow& rWindow) {}; // Override this to enable component rendering
 		virtual void RemoveComponent(IComponent& component) = 0;
 
-		const GameState& m_GameState;
+		GameState& GetGameState() { return m_GameState; }
+
+		GameState& m_GameState;
 	protected:
 		void SetComponentStatus(IComponent& rComponent, ComponentStatus status) { rComponent.SetStatus(status); }
 		void SetComponentEntity(IComponent& rComponent, Entity& rEntity) { rComponent.SetEntity(rEntity); }

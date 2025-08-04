@@ -3,8 +3,6 @@
 #include "plf_colony.h"
 #include "Base.h"
 
-#define SMASHER_USE_COMPONENT_MANAGER(manager) std::unique_ptr<manager> StaticInstantiateManager(Smasher::GameState& state) { return std::make_unique<manager>(state); }
-
 namespace Smasher {
 	class IComponentManager;
 	class Entity;

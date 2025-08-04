@@ -13,7 +13,7 @@ namespace Smasher {
 
 	void EventManager::Dispatch() {
 		for (const auto& pEvent : m_EventQueue ) {
-			size_t index = static_cast<size_t>(pEvent->GetEventType());
+			std::size_t index = static_cast<std::size_t>(pEvent->GetEventType());
 			auto& subscriptionList = m_EventSubscriptionsByType[index];
 			for (auto& subsription : subscriptionList) {
 				subsription.Callback(pEvent.get());

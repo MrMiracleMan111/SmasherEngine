@@ -10,7 +10,7 @@ namespace Smasher {
 	public:
 		TextComponent() : IComponent() {
 			m_Text.setCharacterSize(EngineConfig::DEFAULT_FONT_SIZE);
-			m_Text.setColor(EngineConfig::DEFAULT_FONT_COLOR);
+			m_Text.setFillColor(EngineConfig::DEFAULT_FONT_COLOR);
 		}
 		TextComponent(const TextComponent&) = default;
 		TextComponent& operator=(const TextComponent&) = default;

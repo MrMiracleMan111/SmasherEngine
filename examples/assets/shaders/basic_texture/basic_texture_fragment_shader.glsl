@@ -1,19 +1,33 @@
-#version 120
+#version 330 core
 precision mediump float;
+precision highp int;
 
-uniform float depth;
+in vec4 vertexColor;
+in vec2 texCoord;
+
+out vec4 FragColor;
+
+//uniform float depth;
 uniform sampler2D texture;
-uniform vec2 windowSize;
+uniform bool translucentPass;
+//uniform vec2 windowSize;
 
 void main()
 {
     // lookup the pixel in the texture
-    vec4 pixel = texture2D(texture, gl_TexCoord[0].xy);
+    vec4 pixel = texture2D(texture, texCoord);
 
-    vec2 uv = gl_FragCoord.xy / windowSize;
-    uv = gl_TexCoord[0].xy;
+    // Discard transparent stuff during Opaque pass 
+    if (!translucentPass && (pixel.a <= 0.95f)) {
+        discard;
+    }
 
-    // multiply it by the color
-    gl_FragColor = gl_Color * pixel;
-    gl_FragColor = vec4(uv, 0.0, 1.0);
+    // Discard opaque stuff during transparent pass
+    if (translucentPass && (pixel.a > 0.95f)) {
+        discard;
+    }
+
+
+    //FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    FragColor = vertexColor * pixel;
 }

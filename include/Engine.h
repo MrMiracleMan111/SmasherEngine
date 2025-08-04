@@ -4,7 +4,6 @@
 #include <mutex>
 #include <atomic>
 #include <SFML/System.hpp>
-#include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include "Base.h"
 #include "EngineConfig.h"
@@ -22,6 +21,7 @@ namespace Smasher {
 		Engine(int width, int height, const sf::ContextSettings& settings);
 		~Engine() {};
 
+		void Init();
 		void Run();
 		void Shutdown();
 		void Update(Millisecond delta);

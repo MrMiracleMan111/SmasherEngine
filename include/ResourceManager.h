@@ -29,7 +29,7 @@ namespace Smasher {
 			// static_assert(HasPathOrPathsVariable<ManifestData>, "Manifest item must either have PATH of type ResourcePath or PATHS of type ResourcePath*"); 
 
 			if constexpr (HasPathsVariable<ManifestData>) {
-				constexpr size_t numPaths = sizeof(ManifestData::PATHS) / sizeof(ResourcePath);
+				constexpr std::size_t numPaths = sizeof(ManifestData::PATHS) / sizeof(ResourcePath);
 				return LoadResource<T>(ManifestData::ID, ManifestData::PATHS, numPaths, resourceArgs...);
 			}
 			else if constexpr (HasPathVariable<ManifestData>) {
@@ -40,10 +40,16 @@ namespace Smasher {
 			return std::shared_ptr<T>(nullptr);
 		}
 
-		// Lazily Loads Resource
+		// Lazily Loads Resource that requires multiple paths
 		template <class T, typename... Args>
-		std::shared_ptr<T> GetOrLoadResource(ResourceID id, ResourcePath* paths, const size_t numPaths, Args&&... resourceArgs) {
+		std::shared_ptr<T> GetOrLoadResource(ResourceID id, const ResourcePath* paths, const std::size_t numPaths, Args&&... resourceArgs) {
 			return LoadResource<T>(id, paths, numPaths, resourceArgs...);
+		}
+
+		// Lazily Loads Resource from single path
+		template <class T, typename... Args>
+		std::shared_ptr<T> GetOrLoadResource(ResourceID id, const ResourcePath& path, Args&&... resourceArgs) {
+			return GetOrLoadResource<T>(id, &path, size_t{ 1 }, resourceArgs...);
 		}
 
 
@@ -67,13 +73,13 @@ namespace Smasher {
 
 
 		template <class T>
-		std::shared_ptr<T> GetResource(ResourceID resourceID, ResourcePath& path) {
+		std::shared_ptr<T> GetResource(ResourceID resourceID) {
 			static_assert(std::is_base_of<Resource, T>::value, "T must inherit from Resource");
 
 			if (m_ResourceMap.find(resourceID) == m_ResourceMap.end()) {
-				throw Exceptions::ResourceNotLoaded(std::format("Resource {} not loaded", path.string()));
+				throw Exceptions::ResourceNotLoaded(std::format("Resource with ID {} not loaded", resourceID));
 			}
-			return std::static_pointer_cast<T>(m_ResourceMap.at(path));
+			return std::static_pointer_cast<T>(m_ResourceMap.at(resourceID));
 		}
 
 		// Remove internal internally, resource object will be deleted once all objects using it free it
@@ -88,7 +94,7 @@ namespace Smasher {
 		const std::filesystem::path& GetResourceDirectory() { return m_ResourceDirectory; }
 	private:
 		template <class T, typename... Args>
-		std::shared_ptr<T> LoadResource(ResourceID resourceID, const ResourcePath* paths, const size_t numPaths, Args&&... resourceArgs) {
+		std::shared_ptr<T> LoadResource(ResourceID resourceID, const ResourcePath* paths, const std::size_t numPaths, Args&&... resourceArgs) {
 			auto itr = m_ResourceMap.find(resourceID);
 			if (itr != m_ResourceMap.end()) {
 				return std::static_pointer_cast<T>(itr->second);

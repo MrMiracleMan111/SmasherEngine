@@ -1,7 +1,4 @@
 ﻿cmake_minimum_required (VERSION 3.8)
-find_package(OpenGL REQUIRED)
-include_directories(${OPENGL_INCLUDE_DIRS})
-
 project ("SmasherEngine")
 include(GenerateExportHeader)
 include(FetchContent)
@@ -27,6 +24,14 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/local.cmake")
     include("${CMAKE_SOURCE_DIR}/local.cmake")
 endif()
 
+find_package(OpenGL REQUIRED)
+
+include_directories(${OPENGL_INCLUDE_DIRS})
+
+list(APPEND CMAKE_PREFIX_PATH "${GLEW_PATH}")
+# list(APPEND CMAKE_LIBRARY_PATH "${GLEW_LIB_PATHS}")
+
+find_package(GLEW REQUIRED)
 
 if(DEFINED SFML_INCLUDE_DIR)
     message(STATUS "SFML_INCLUDE_DIR " ${SFML_INCLUDE_DIR})
@@ -95,8 +100,8 @@ foreach(DYNAMIC_LIB ${SFML_DYNAMIC_LIB_LIST})
 endforeach()
 
 # Compile Engine
-add_library(SmasherEngine SHARED "Core.cpp" "Core.h" "include/GameState.h" "include/UUID.h" "src/UUID.cpp" "include/Base.h" "src/GameState.cpp" "include/Engine.h" "src/Engine.cpp" "include/Exceptions.h" "include/EventManager.h" "src/EventManager.cpp" "include/Events.h"  "ComponentManagers/GenericComponentManager.h" "include/IComponent.h"  "include/Entity.h" "src/Entity.cpp"   "Components/Transform2DComponent.h" "include/EngineConfig.h"   "include/ResourceManager.h" "include/IComponentManager.h" "ComponentManagers/BaseComponentManager.h"  "Components/DrawableComponent.h" "Components/DrawableComponent.cpp" "include/Resources.h" "Components/TextComponent.h" "Components/TextComponent.cpp")
-add_dependencies(SmasherEngine copy_sfml_shared_libs)
+add_library(SmasherEngine SHARED "Core.cpp" "Core.h" "include/GameState.h" "include/UUID.h" "src/UUID.cpp" "include/Base.h" "src/GameState.cpp" "include/Engine.h" "src/Engine.cpp" "include/Exceptions.h" "include/EventManager.h" "src/EventManager.cpp" "include/Events.h"  "ComponentManagers/GenericComponentManager.h" "include/IComponent.h"  "include/Entity.h" "src/Entity.cpp"   "Components/Transform2DComponent.h" "include/EngineConfig.h"   "include/ResourceManager.h" "include/IComponentManager.h" "ComponentManagers/BaseComponentManager.h"  "Components/DrawableComponent.h" "Components/DrawableComponent.cpp" "include/Resources.h" "Components/TextComponent.h" "Components/TextComponent.cpp" "ComponentManagers/DrawableComponentManager.h" "ComponentManagers/DrawableComponentManager.cpp" "ComponentManagers/RenderBatch.h" "ComponentManagers/RenderBatch.cpp" "src/Base.cpp")
+
 generate_export_header(SmasherEngine EXPORT_FILE_NAME "${CMAKE_BINARY_DIR}/exports/Smasher_export.h")
 target_include_directories(SmasherEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/ComponentManagers" "${SFML_INCLUDE_DIR}" "${CMAKE_BINARY_DIR}/exports")
 target_link_directories(SmasherEngine PUBLIC "${SFML_LIB_TARGET_DIR}")
@@ -106,7 +111,8 @@ target_link_libraries(SmasherEngine PUBLIC
 "sfml-window${SFML_DYNAMIC_LIB_SUFFIX}"
 "sfml-graphics${SFML_DYNAMIC_LIB_SUFFIX}"
 "sfml-network${SFML_DYNAMIC_LIB_SUFFIX}"
-"sfml-system${SFML_DYNAMIC_LIB_SUFFIX}")
+"sfml-system${SFML_DYNAMIC_LIB_SUFFIX}"
+GLEW::GLEW)
 target_link_libraries(SmasherEngine PUBLIC ${OPENGL_LIBRARIES})
 
 target_compile_features(SmasherEngine PUBLIC cxx_std_20)

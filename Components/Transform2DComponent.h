@@ -1,6 +1,5 @@
 #pragma once
-#include <SFML/System.hpp>
-#include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Transformable.hpp>
 #include "Base.h"
 #include "IComponent.h"
 
