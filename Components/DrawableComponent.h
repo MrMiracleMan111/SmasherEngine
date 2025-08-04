@@ -6,13 +6,6 @@
 #include "IComponent.h"
 #include "RenderBatch.h"
 
-//#include "IComponent.h"
-//#include "Transform2DComponent.h"
-//#include "ResourceManager.h"
-//#include "Entity.h"
-//#include "RenderBatch.h"
-//#include "ComponentManagers/DrawableComponentManager.h"
-
 namespace Smasher {
 	class DrawableComponentManager;
 	class IComponent;
@@ -24,7 +17,7 @@ namespace Smasher {
 
 	public:
 		DrawableComponent() : IComponent(),
-			m_TransformRef(nullptr),
+			m_TransformPtr(nullptr),
 			m_OpaqueBatchContext(nullptr, SIZE_MAX),
 			m_TranslucentBatchContext(nullptr, SIZE_MAX) {
 		}
@@ -33,7 +26,7 @@ namespace Smasher {
 			std::shared_ptr<ShaderResource> shaderPtr) : IComponent(),
 			m_ShaderResource(shaderPtr),
 			m_TextureResource(texturePtr),
-			m_TransformRef(nullptr),
+			m_TransformPtr(nullptr),
 			m_OpaqueBatchContext(nullptr, SIZE_MAX),
 			m_TranslucentBatchContext(nullptr, SIZE_MAX) {}
 		~DrawableComponent();
@@ -72,9 +65,9 @@ namespace Smasher {
 		// Try to call this as infrequently as possible
 		DrawableComponent& PushToGPU();
 
-		const sf::Transform& GetTransformRef() {
-			assert(m_TransformRef != nullptr);
-			return *m_TransformRef;
+		const sf::Transform& GetTransformPtr() {
+			assert(m_TransformPtr != nullptr);
+			return *m_TransformPtr;
 		}
 
 		float GetDepth() const { return m_Depth; }
@@ -89,13 +82,9 @@ namespace Smasher {
 		std::shared_ptr<TextureResource> m_TextureResource; // Solely for preventing destruction of resource object
 		std::shared_ptr<ShaderResource> m_ShaderResource; // Solely for preventing destruction of resource object
 	private:
-		// Draws to render target
-		// Code pulled from https://jordansavant.com/book/graphics/sfml/sfml2_depth_buffering.md
-		void applyCurrentView(sf::RenderTarget& target) const;
-		sf::IntRect getViewport(sf::RenderTarget& target, const sf::View& view) const;
 		sf::IntRect m_ClipRect{0, 0, 100, 100};
 		sf::Color m_Color = sf::Color::White;
-		sf::Transform const* m_TransformRef = nullptr; // Cache it's location
+		sf::Transform const* m_TransformPtr = nullptr; // Cache it's location
 		bool m_TextureLoaded = false;
 		float m_Depth = 0.0f;
 	};

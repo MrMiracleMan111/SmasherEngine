@@ -65,7 +65,7 @@ namespace Smasher {
 		}
 
 		// Overwrite transform data in models 
-		Smasher::Mat4 matrix(rComponent.GetTransformRef().getMatrix());
+		Smasher::Mat4 matrix(rComponent.GetTransformPtr().getMatrix());
 		matrix.array[3 * 4 + 2] = rComponent.GetDepth();
 
 		sf::Color color = rComponent.GetColor();
