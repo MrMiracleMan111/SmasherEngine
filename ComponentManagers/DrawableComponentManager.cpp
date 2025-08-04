@@ -12,6 +12,7 @@
 
 #include "ComponentManagers/DrawableComponentManager.h"
 #include "Components/DrawableComponent.h"
+#include "Components/Transform2DComponent.h"
 #include "GameState.h"
 #include "ResourceManager.h"
 #include "RenderBatch.h"
@@ -64,6 +65,8 @@ namespace Smasher {
 			return;
 		}
 
+		// Force Transform Update
+		rComponent.GetEntity().GetComponent<Transform2DComponent>().GetTransform();
 		// Overwrite transform data in models 
 		Smasher::Mat4 matrix(rComponent.GetTransformPtr().getMatrix());
 		matrix.array[3 * 4 + 2] = rComponent.GetDepth();
