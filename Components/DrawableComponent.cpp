@@ -17,27 +17,6 @@ namespace Smasher {
         return *this;
     }
 
-    const sf::Transform& DrawableComponent::GetClipTransform()
-    {
-        assert(m_TextureLoaded);
-        if (!m_ClipChanged) {
-            return m_ClipTransform;
-        }
-
-        m_ClipTransform = sf::Transform::Identity;
-        sf::Texture& pTexture = m_TextureResource->GetTexture();
-        sf::Vector2f dimensions = sf::Vector2f(pTexture.getSize().x, pTexture.getSize().y);
-        sf::Transform transform;
-        float left = m_ClipRect.left + std::copysign(1.0f, m_ClipRect.width) * -0.5f;
-        float top = m_ClipRect.top + std::copysign(1.0f, m_ClipRect.height) * -0.5f;
-
-        transform.scale(m_ClipRect.width / dimensions.x, m_ClipRect.height / dimensions.y);
-        transform.translate(left / dimensions.x, top / dimensions.y);
-
-        m_ClipChanged = false;
-        return m_ClipTransform;
-    }
-
     void DrawableComponent::SetEntity(Entity& pEntity) {
         IComponent::SetEntity(pEntity);
         assert(GetEntity().HasComponent<Transform2DComponent>());
@@ -64,4 +43,31 @@ namespace Smasher {
         m_ClipRect = clipRect;
         return *this;
     }
+
+    const sf::Transform& DrawableComponent::GetTransformPtr() const {
+        assert(m_TransformPtr != nullptr);
+        return *m_TransformPtr;
+    }
+
+
+    const sf::Transform& DrawableComponent::GetClipTransform()
+    {
+        assert(m_TextureLoaded);
+        if (!m_ClipChanged) {
+            return m_ClipTransform;
+        }
+
+        m_ClipTransform = sf::Transform::Identity;
+        sf::Texture& pTexture = m_TextureResource->GetTexture();
+        sf::Vector2f dimensions = sf::Vector2f(pTexture.getSize().x, pTexture.getSize().y);
+        float left = m_ClipRect.left + std::copysign(1.0f, m_ClipRect.width) * -0.5f;
+        float top = m_ClipRect.top + std::copysign(1.0f, m_ClipRect.height) * -0.5f;
+
+        m_ClipTransform.scale(m_ClipRect.width / dimensions.x, m_ClipRect.height / dimensions.y);
+        m_ClipTransform.translate(left / dimensions.x, top / dimensions.y);
+
+        m_ClipChanged = false;
+        return m_ClipTransform;
+    }
+
 }
