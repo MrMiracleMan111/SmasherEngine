@@ -1,6 +1,7 @@
 #pragma once
 #include "RenderBatch.h"
 #include "Base.h"
+#include <iostream>
 
 #include <GL/glew.h>
 #if defined(_WIN32)
@@ -107,8 +108,16 @@ namespace Smasher {
 	// Resize buffer to fit "count" entries
 	void RenderBatch::ResizeBuffer(std::size_t count) {
 		dirty = false;
+		assert(count != models.size()); // Weird edge case
 		models.resize(count);
-		// Resize buffer data
+		if (count < models.size()) {
+			models.shrink_to_fit();
+		}
+		if (models.size() != count) {
+			std::cout << "RenderBatch size: " << models.size() << std::endl;
+			std::cout << "Expected size: " << count << std::endl;
+		}
+		// Resize buffer data to (we want to use models.size no models.capacity)
 		glBindVertexArray(instanceVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
 		glBufferData(GL_ARRAY_BUFFER, models.size() * sizeof(Smasher::ModelData), models.data(), GL_DYNAMIC_DRAW);
@@ -118,22 +127,18 @@ namespace Smasher {
 	void RenderBatch::RemoveModel(BatchContext& context) {
 		dirty = true;
 
-		--modelCount;
-
-		if (context.index == models.size()) {
-			models.pop_back();
-		}
-		else {
+		assert(context.index <= modelCount);
+		if (context.index < modelCount) {
 			// Swap and pop from old batch
-			std::swap(models[context.index], models.back());
-			models.pop_back();
+			std::swap(models.at(context.index), models.at(modelCount));
 		}
 
+		--modelCount;
 		context.batch = nullptr;
 		context.index = SIZE_MAX;
 
 		// Remove unused extra space
-		if ((modelCount - models.capacity()) >= (2 * RenderBatch::RESERVE)) {
+		if ((modelCount - models.size()) >= (2 * RenderBatch::RESERVE)) {
 			ResizeBuffer(modelCount - RenderBatch::RESERVE); // Leave 32 extra slots
 		}
 	}
@@ -143,9 +148,8 @@ namespace Smasher {
 		context.index = modelCount;
 		context.batch = this;
 		++modelCount;
-		if (modelCount >= models.capacity()) {
-			std::size_t newCapacity = modelCount + RenderBatch::RESERVE;
-			ResizeBuffer(newCapacity);
+		if (modelCount >= models.size()) {
+			ResizeBuffer(modelCount + RenderBatch::RESERVE);
 		}
 	}
 
