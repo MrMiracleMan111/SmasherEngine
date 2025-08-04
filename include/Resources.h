@@ -1,6 +1,10 @@
 #pragma once
 #include <ios>
 #include <fstream>
+#include <SFML/Graphics/Font.hpp>
+#include <SFML/Graphics/Shader.hpp>
+#include <SFML/Audio.hpp>
+
 #include "Base.h"
 
 #define SMASHER_RESOURCE_TYPE(type) ResourceType GetType() const { return GetStaticType();} \
@@ -12,18 +16,19 @@ namespace Smasher {
 		friend class ResourceManager;
 	public:
 		Resource() = delete;
+		const ResourceID GetID() const { return m_ID; }
 		virtual ~Resource() {};
 		virtual ResourceType GetType() const = 0;
 	protected:
 		Resource(ResourceID id, 
-			const ResourcePath* const relativePaths, const size_t numPaths,
+			const ResourcePath* const relativePaths, const std::size_t numPaths,
 			const ResourcePath& resourcesDirectory) :
 			m_ID(id), m_Paths(numPaths, "") {
 
 			assert(m_Paths.size() > 0);
 
 			// Using std::min just in case there is some wacky issue
-			for (size_t i = 0; i < std::min(numPaths, m_Paths.size()); i++) {
+			for (std::size_t i = 0; i < std::min(numPaths, m_Paths.size()); i++) {
 				ResourcePath& path = m_Paths[i];
 				path += resourcesDirectory;
 				path += relativePaths[i];
@@ -42,7 +47,7 @@ namespace Smasher {
 		SMASHER_RESOURCE_TYPE(ResourceType::TEXTURE)
 		TextureResource() = delete;
 		TextureResource(ResourceID id,
-			const ResourcePath* const relativePaths, const size_t numPaths,
+			const ResourcePath* const relativePaths, const std::size_t numPaths,
 			const ResourcePath& resourcesDirectory) :
 			Resource(id, relativePaths, numPaths, resourcesDirectory) {
 			assert(numPaths > 0);
@@ -60,7 +65,7 @@ namespace Smasher {
 		SMASHER_RESOURCE_TYPE(ResourceType::FONT)
 		FontResource() = delete;
 		FontResource(ResourceID id,
-			const ResourcePath* const relativePaths, const size_t numPaths,
+			const ResourcePath* const relativePaths, const std::size_t numPaths,
 			const ResourcePath& resourcesDirectory) :
 			Resource(id, relativePaths, numPaths, resourcesDirectory) {
 			if (!m_Font.loadFromFile(m_Paths[0].string())) {
@@ -77,7 +82,7 @@ namespace Smasher {
 		SMASHER_RESOURCE_TYPE(ResourceType::AUDIO)
 			AudioResource() = delete;
 		AudioResource(ResourceID id,
-			const ResourcePath* const relativePaths, const size_t numPaths,
+			const ResourcePath* const relativePaths, const std::size_t numPaths,
 			const ResourcePath& resourcesDirectory) :
 			Resource(id, relativePaths, numPaths, resourcesDirectory) {
 			if (!m_Music.openFromFile(m_Paths[0].string())) {
@@ -94,7 +99,7 @@ namespace Smasher {
 			ShaderResource() = delete;
 
 		ShaderResource(ResourceID id,
-			const ResourcePath* const relativePaths, const size_t numPaths,
+			const ResourcePath* const relativePaths, const std::size_t numPaths,
 			const ResourcePath& resourcesDirectory) :
 			Resource(id, relativePaths, numPaths, resourcesDirectory) {
 			
@@ -127,7 +132,7 @@ namespace Smasher {
 		SMASHER_RESOURCE_TYPE(ResourceType::FILE)
 		FileResource() = delete;
 		FileResource(ResourceID id,
-			const ResourcePath* const relativePaths, const size_t numPaths,
+			const ResourcePath* const relativePaths, const std::size_t numPaths,
 			const ResourcePath& resourcesDirectory, std::ios_base::openmode mode) :
 			Resource(id, relativePaths, numPaths, resourcesDirectory), m_File(m_Paths[0], mode) {
 

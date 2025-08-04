@@ -57,7 +57,7 @@ namespace Smasher {
 
 		template<typename... Args>
 		T& AddComponent(Entity& rEntity, Args&&... args) {
-			size_t index = m_Components.size();
+			std::size_t index = m_Components.size();
 			auto itr = m_Components.emplace(std::forward<Args>(args)...);
 			T& rComponent = *itr;
 			SetComponentStatus(rComponent, ComponentStatus::VALID);

@@ -12,7 +12,9 @@ namespace Smasher {
 
 		if constexpr (HasStaticInstantiateManager<T>) {
 			// Use Custom Manager
-			using ManagerType = std::decay_t<decltype(T::StaticInstantiateManager(*this))>::type;
+			using ManagerType = typename decltype(T::template StaticInstantiateManager(m_GameState))::element_type;
+
+			
 			ManagerType& rManager = static_cast<ManagerType&>(m_GameState.GetComponentManager<T>());
 			T& rComponent = rManager.AddComponent(*this, std::forward<Args>(componentArgs)...);
 			IComponent& rComponentInterface = static_cast<IComponent&>(rComponent);

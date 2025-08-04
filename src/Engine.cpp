@@ -1,3 +1,4 @@
+#include <GL/glew.h>
 #if defined(_WIN32)
 #define NOMINMAX
 #include <windows.h>
@@ -24,16 +25,28 @@ namespace Smasher {
 			EngineConfig::TITLE,
 			sf::Style::Default,
 			settings) {
+		Init();
 	}
 
-	Engine::Engine(int width, int height) : m_Window(sf::VideoMode(width, height), EngineConfig::TITLE) {
+	Engine::Engine(int width, int height) : m_Window(sf::VideoMode(width, height), EngineConfig::TITLE,
+		sf::Style::Default, EngineConfig::DEFAULT_SETTINGS) {
+		Init();
 	}
 
 	Engine::Engine() :
-		m_Window(sf::VideoMode(EngineConfig::WINDOW_WIDTH, EngineConfig::WINDOW_HEIGHT), EngineConfig::TITLE) {
-
+		m_Window(sf::VideoMode(EngineConfig::WINDOW_WIDTH, EngineConfig::WINDOW_HEIGHT), EngineConfig::TITLE, sf::Style::Default, EngineConfig::DEFAULT_SETTINGS) {
+		Init();
 	}
 
+	void Engine::Init() {
+		glewExperimental = GL_TRUE;
+		GLenum status = glewInit();
+		if (status != GLEW_OK) {
+			std::string_view errCode = reinterpret_cast<const char*>(glewGetErrorString(status));
+			std::string message = std::format("GLEW Failed to initialize, status: {}", errCode);
+			throw Exceptions::GLEWInitFailed(message);
+		}
+	}
 
 	void Engine::Run() {
 #ifdef NDEBUG
@@ -94,8 +107,6 @@ namespace Smasher {
 	void Engine::Render(sf::RenderWindow& window) {
 		m_Window.clear();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear Screen And Depth Buffer
-		glAlphaFunc(GL_GREATER, 0.0);
-		glEnable(GL_ALPHA_TEST);
 		for (const auto& [_, pGameState] : m_GameStateByType) {
 			if (pGameState->GetStatus() == GameStateStatus::ACTIVE) {
 				pGameState->Render(window);
@@ -103,6 +114,12 @@ namespace Smasher {
 			}
 		}
 		m_Window.display();
+
+		GLenum err;
+		while ((err = glGetError()) != GL_NO_ERROR)
+		{
+			std::cout << "GL Error: \"" << gluErrorString(err) << "\" Code: " << err << std::endl;
+		}
 	}
 
 	void Engine::Shutdown() {

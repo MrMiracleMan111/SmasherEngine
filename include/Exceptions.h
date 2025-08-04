@@ -1,4 +1,5 @@
 #pragma once
+#pragma warning (disable : 4275)
 #include <exception>
 #include <stdexcept>
 #include "Smasher_export.h"
@@ -35,5 +36,8 @@ namespace Smasher {
 		SMASHER_EXCEPTION(ResourceFailedToLoad)
 		SMASHER_EXCEPTION(ResourceNotLoaded)
 		SMASHER_EXCEPTION(ResourceAlreadyExists)
+
+		// ==== OPENGL EXCEPTIONS ====
+		SMASHER_EXCEPTION(GLEWInitFailed)
 	}
 }

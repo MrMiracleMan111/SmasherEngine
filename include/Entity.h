@@ -5,7 +5,6 @@
 #include <typeindex>
 #include <format>
 #include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
 #include "Base.h"
 #include "UUID.h"
 #include "GameState.h"

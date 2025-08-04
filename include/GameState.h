@@ -3,7 +3,7 @@
 #include <optional>
 #include <type_traits>
 #include <typeindex>
-#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
 #include "Base.h"
 #include "UUID.h"
 #include "EventManager.h"
@@ -54,7 +54,7 @@ namespace Smasher {
 		void RemoveEntity(UUID uuid);
 
         // Component Type <T>
-		template <class T>
+		template <class ComponentType>
 		IComponentManager& GetComponentManager();
 
 	protected:

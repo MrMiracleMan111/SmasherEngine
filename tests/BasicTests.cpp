@@ -48,8 +48,8 @@ protected:
 struct CustomComponentManager;
 
 struct CustomComponent : public Smasher::IComponent {
-public:
 	SMASHER_USE_COMPONENT_MANAGER(CustomComponentManager)
+public:
 		CustomComponent(int value) : m_Value(value) {
 	};
 	~CustomComponent() = default;
@@ -236,7 +236,9 @@ TEST(ResourcesTest, OpenFileResource) {
 	Smasher::Engine engine(640, 420);
 	Smasher::ResourceManager& rResourceManager = engine.GetResourceManager();
 	std::ios_base::openmode flags = std::ios_base::out;
-	auto pFileResource = rResourceManager.GetOrLoadResource<Smasher::FileResource>(1, "test_file", flags);
+	auto pFileResource = rResourceManager.GetOrLoadResource<Smasher::FileResource>(Smasher::ResourceID{ 1 }, Smasher::ResourcePath{ "test_file" }, flags);
+
+	//auto pFileResource = rResourceManager.GetOrLoadResource<Smasher::FileResource>(1, { Smasher::ResourcePath{"test_file"} }, size_t{ 1 }, flags);
 	pFileResource->GetFileStream() << "message";
 
 	char buffer[16] = { 0 };
@@ -250,7 +252,8 @@ TEST(ResourcesTest, OpenReleaseFileResource) {
 	Smasher::Engine engine(640, 420);
 	Smasher::ResourceManager& rResourceManager = engine.GetResourceManager();
 	std::ios_base::openmode flags = std::ios_base::out;
-	auto pFileResource = rResourceManager.GetOrLoadResource<Smasher::FileResource>(1, "test_file", flags);
+	Smasher::ResourcePath paths[] = { Smasher::ResourcePath{"test_file"} };
+	auto pFileResource = rResourceManager.GetOrLoadResource<Smasher::FileResource>(Smasher::ResourceID{ 1 }, paths, size_t{ 1 }, flags);
 	pFileResource->GetFileStream() << "message";
 }
 

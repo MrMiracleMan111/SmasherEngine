@@ -2,14 +2,17 @@
 #include <cstdint>
 #include <chrono>
 #include <filesystem>
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
 #include "plf_colony.h"
 #include "Exceptions.h"
 #include "Smasher_export.h"
 // EngineAPI.hpp
 #pragma once
 #define SMASHER_API SMASHERENGINE_EXPORT
+
+#define SMASHER_USE_COMPONENT_MANAGER(managerType) \
+	public: \
+	static std::unique_ptr<managerType> StaticInstantiateManager(Smasher::GameState& state) { return std::make_unique<managerType>(state);} \
 
 #define SMASHER_ADD_CAPABILITIES(args) \
 virtual static constexpr uint32_t GetStaticCapabilities() { \
@@ -62,9 +65,14 @@ namespace Smasher {
 		T::PATH; // Checks if 'member_name' is a valid member access
 	};
 
-	template <typename T>
-	concept HasStaticInstantiateManager = requires(Smasher::GameState & arg) {
-		T::StaticInstantiateManager(arg);
+	//template <typename ComponentType, typename ManagerType>
+	//concept HasStaticInstantiateManager = requires() {
+	//	{ ComponentType::template StaticInstantiateManager<ComponentType>(std::declval<Smasher::GameState&>()) } -> std::same_as<std::unique_ptr<ManagerType>>;
+	//};
+
+	template <typename ComponentType>
+	concept HasStaticInstantiateManager = requires() {
+		ComponentType::template StaticInstantiateManager(std::declval<Smasher::GameState&>());
 	};
 
 	template <typename T>
@@ -79,13 +87,13 @@ namespace Smasher {
 
 
 	template <typename T>
-	concept HasRenderCapability = requires(sf::RenderWindow & arg) {
-		T::Render(arg);
+	concept HasRenderCapability = requires(T t, sf::RenderWindow & arg) {
+		t.Render(arg);
 	};
 
 	template <typename T>
-	concept HasUpdateCapability = requires(Millisecond & arg) {
-		T::Update(arg);
+	concept HasUpdateCapability = requires(T t, Millisecond & arg) {
+		t.Update(arg);
 	};
 
 	enum class ResourceType {
@@ -131,4 +139,54 @@ namespace Smasher {
 		MouseMoveEvent,
 		END
 	};
+
+	// Copied from SFML defintion
+	// Default constructor was added so that it plays nice with std::vector
+	template <std::size_t Columns, std::size_t Rows>
+	struct SMASHER_API Matrix
+	{
+		void copyMatrix(const float* source, std::size_t elements, float* dest)
+		{
+			std::copy(source, source + elements, dest);
+		}
+
+		void copyMatrix(const sf::Transform& transform) {
+			static_assert("Not implemented for this matrix size");
+		}
+
+
+		Matrix() = default;
+
+		explicit Matrix(const float* pointer)
+		{
+			copyMatrix(pointer, Columns * Rows, array);
+		}
+
+		Matrix(const Matrix& other)
+		{
+			copyMatrix(other.array, Columns * Rows, array);
+		}
+
+		Matrix(const sf::Transform& transform)
+		{
+			copyMatrix(transform);
+		}
+
+		Matrix<Columns, Rows>& operator = (const Matrix& other)
+		{
+			copyMatrix(other.array, Columns * Rows, array);
+			return *this;
+		}
+
+		float array[Columns * Rows] = {0};
+	};
+
+	template<>
+	void Matrix<3, 3>::copyMatrix(const sf::Transform& transform);
+
+	template<>
+	void Matrix<4, 4>::copyMatrix(const sf::Transform& transform);
+
+	using Mat4 = Matrix<4, 4>;
+	using Mat3 = Matrix<3, 3>;
 }

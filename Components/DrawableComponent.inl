@@ -1,0 +1,29 @@
+#pragma once
+#include "DrawableComponent.h"
+#include "ResourceManager.h"
+
+namespace Smasher {
+
+	template <class T>
+	DrawableComponent& DrawableComponent::SetTextureAsset() {
+		return SetTextureAsset<T>(false);
+	}
+
+	template <class T>
+	DrawableComponent& DrawableComponent::SetTextureAsset(bool transulcent) {
+		auto& rResourceManager = GetEntity().GetEngine().GetResourceManager();
+		auto& rCompManager = static_cast<DrawableComponentManager&>(GetManager());
+		// Load Resource
+		auto pTextureResource = rResourceManager.GetOrLoadResource<T, TextureResource>();
+		// Update Render Batch
+		rCompManager.OnComponentSetTexture(*this, T::ID, transulcent);
+		// Assign texture to component
+		m_TextureResource = pTextureResource;
+
+		sf::Texture& texture = m_TextureResource->GetTexture();
+		m_ClipRect = sf::IntRect{ 0, 0, (int)(texture.getSize().x), (int)(texture.getSize().y) };
+		m_TextureLoaded = true;
+		return *this;
+	}
+
+}

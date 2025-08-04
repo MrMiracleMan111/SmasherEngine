@@ -1,0 +1,82 @@
+#pragma once
+#include <GL/glew.h>
+#if defined(_WIN32)
+#define NOMINMAX
+#include <windows.h>
+#include <GL/gl.h>
+#elif defined(__linux__)
+#include <GL/gl.h>
+#elif defined(__APPLE__)
+#include <OpenGL/gl.h>
+#endif
+#include <array>
+#include "Base.h"
+
+namespace Smasher {
+	struct BatchContext;
+
+	struct SMASHER_API ModelData {
+		Mat4 transform;
+		Mat3 texTransform;
+		uint32_t color;
+	};
+
+	// Models will use 2D plane
+	struct SMASHER_API RenderBatch {
+		RenderBatch();
+		~RenderBatch();
+		RenderBatch(const RenderBatch& other);
+		RenderBatch(RenderBatch&&) = delete;
+		RenderBatch& operator = (const RenderBatch& other);
+		RenderBatch& operator = (RenderBatch&&) = delete;
+
+		std::vector<ModelData> models; // doesn't keep accurate track of model count
+		static const std::size_t RESERVE = 32; // Pre allocate space for 32 entities
+		sf::Texture* pTexture = nullptr;
+		bool dirty = false; // Has the render batch or any elemnts inside changed?
+		std::size_t modelCount = 0; // Keeps accurate track of model count
+		GLuint instanceVAO;
+		GLuint instanceVBO;
+		GLuint quadVBO;
+		GLuint quadEBO;
+		static inline const GLubyte StaticIndices[6]{
+			0, 1, 2,   // first triangle
+			2, 3, 0    // second triangle
+		};
+
+		static inline const float StaticVertices[24]{
+			//   Position       Tex Coord
+			   -0.5f, -0.5f,     0.0, 0.0,   // bottom left
+				0.5f, -0.5f,     1.0, 0.0,   // bottom right
+				0.5f,  0.5f,     1.0, 1.0,   // top right
+			   -0.5f,  0.5f,     0.0, 1.0,   // top left
+		};
+
+		void InitGlObjects();
+
+		// Resize buffer to fit "count" entries
+		void ResizeBuffer(std::size_t count);
+
+		void AddModel(BatchContext& context);
+
+		void RemoveModel(BatchContext& context);
+
+		// Copies models array into buffer
+		// Try to call this as infrequently as possible
+		void UpdateGLBufferData();
+	};
+
+	struct SMASHER_API BatchContext {
+		RenderBatch* batch = nullptr; // Pointer to a render batch the drawable component is a part of
+		std::size_t index = SIZE_MAX; // Index of the drawable component within the Render Batch
+
+		operator bool() const {
+			return batch != nullptr && index != SIZE_MAX;
+		}
+
+		BatchContext(RenderBatch* batch, std::size_t index) :
+			batch(batch), index(index) {
+		}
+	};
+
+}

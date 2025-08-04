@@ -8,7 +8,7 @@
 #include "Base.h"
 
 namespace Smasher {
-	class Event;
+	struct Event;
 
 	struct EventSubscription {
 		std::function<void(Event*)> Callback;
@@ -65,7 +65,7 @@ namespace Smasher {
 		template<class T>
 		EventSubscriptionHandle Subscribe(std::function<void(T*)> callback) {
 			static_assert(std::is_base_of<Event, T>::value, "T must inherit from Event");
-			constexpr size_t index = static_cast<size_t>(T::GetStaticEventType());
+			constexpr std::size_t index = static_cast<std::size_t>(T::GetStaticEventType());
 			std::list<EventSubscription>& list = m_EventSubscriptionsByType.at(index);
 			auto bound = [callback](Event* arg) {callback(static_cast<T*>(arg)); };
 			list.push_back(EventSubscription{ bound });
@@ -82,7 +82,7 @@ namespace Smasher {
 		void Dispatch();
 
 	private:
-		std::array< std::list<EventSubscription>, static_cast<size_t>(EventType::END)> m_EventSubscriptionsByType{};
+		std::array< std::list<EventSubscription>, static_cast<std::size_t>(EventType::END)> m_EventSubscriptionsByType{};
 		std::vector<std::unique_ptr<Event>> m_EventQueue;
 	};
 }

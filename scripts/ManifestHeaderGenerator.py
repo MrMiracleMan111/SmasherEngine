@@ -73,12 +73,12 @@ def RecursiveParse(data, name, out_file, depth, resource_dir=None):
         out_file.write((depth * "\t") + f"namespace {FormatName(name)}" + " {\n")
         
         # Write metadata
-        if depth == 0:
+        if depth == 1:
             out_file.write(
             """
-    namespace Metadata {
-        static const inline ResourcePath RESOURCES_DIRECTORY {"WORKING_PATH"};
-    }
+        namespace Metadata {
+            static const inline ResourcePath RESOURCES_DIRECTORY {"WORKING_PATH"};
+        }
 """.replace("WORKING_PATH", resource_dir).replace("\\","/"))
 
         for key, value in data.items():
@@ -113,9 +113,10 @@ def GenerateHeaders(data, out_path, resource_dir=None):
 #pragma once
 #include "Base.h"
 
-using namespace Smasher;
+namespace Smasher {
 """)
-            RecursiveParse(data, "Resources", out, 0, resource_dir)
+            RecursiveParse(data, "Resources", out, 1, resource_dir)
+            out.write("}\n");
             out.close()
     except Exception as e:
         print(f"An unexpected error occurred when opening output file: {e}")

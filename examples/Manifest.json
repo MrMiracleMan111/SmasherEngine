@@ -16,6 +16,7 @@
   },
   "Shaders": {
     "basic_texture_shader": [ "assets/shaders/basic_texture/basic_texture_vertex_shader.glsl", "assets/shaders/basic_texture/basic_texture_fragment_shader.glsl" ],
-    "basic_texture_clip_shader": [ "assets/shaders/basic_texture_clip/basic_texture_clip_vertex_shader.glsl", "assets/shaders/basic_texture_clip/basic_texture_clip_fragment_shader.glsl" ]
+    "basic_texture_clip_shader": [ "assets/shaders/basic_texture_clip/basic_texture_clip_vertex_shader.glsl", "assets/shaders/basic_texture_clip/basic_texture_clip_fragment_shader.glsl" ],
+    "batch_texture": [ "assets/shaders/batch_texture/batch_texture_vertex.glsl", "assets/shaders/batch_texture/batch_texture_fragment.glsl" ] 
   }
 }
