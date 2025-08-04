@@ -59,7 +59,8 @@ namespace Smasher {
 
 		float GetDepth() const { return m_Depth; }
 
-		sf::Color GetColor() const { return m_Color; }
+		const sf::Color& GetColor() const { return m_Color; }
+
 		const sf::IntRect& GetClipRect() const { return m_ClipRect; }
 
 		Degrees GetClipRotation() const { return m_ClipRotation; }
