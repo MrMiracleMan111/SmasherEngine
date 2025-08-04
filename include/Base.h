@@ -145,36 +145,49 @@ namespace Smasher {
 	template <std::size_t Columns, std::size_t Rows>
 	struct SMASHER_API Matrix
 	{
-		void copyMatrix(const float* source, std::size_t elements, float* dest)
+		void CopyMatrix(const float* source, std::size_t elements, float* dest)
 		{
 			std::copy(source, source + elements, dest);
 		}
 
-		void copyMatrix(const sf::Transform& transform) {
+		void CopyMatrix(const sf::Transform& transform) {
 			static_assert("Not implemented for this matrix size");
 		}
 
+		// Get Row Major Matrix from internal Column Major order
+		std::string ToString() {
+			std::string out;
+			for (size_t i = 0; i < Rows; i++) {
+				out.append("[  ");
+				for (size_t j = 0; j < Columns; j++) {
+					out.append(std::to_string(array[j * Columns + i]));
+					out.append("  ");
+				}
+				out.append("]\n");
+			}
+			return out;
+		}
 
 		Matrix() = default;
 
 		explicit Matrix(const float* pointer)
 		{
-			copyMatrix(pointer, Columns * Rows, array);
+			CopyMatrix(pointer, Columns * Rows, array);
 		}
 
 		Matrix(const Matrix& other)
 		{
-			copyMatrix(other.array, Columns * Rows, array);
+			CopyMatrix(other.array, Columns * Rows, array);
 		}
 
 		Matrix(const sf::Transform& transform)
 		{
-			copyMatrix(transform);
+			CopyMatrix(transform);
 		}
 
 		Matrix<Columns, Rows>& operator = (const Matrix& other)
 		{
-			copyMatrix(other.array, Columns * Rows, array);
+			CopyMatrix(other.array, Columns * Rows, array);
 			return *this;
 		}
 
@@ -182,10 +195,10 @@ namespace Smasher {
 	};
 
 	template<>
-	void Matrix<3, 3>::copyMatrix(const sf::Transform& transform);
+	void Matrix<3, 3>::CopyMatrix(const sf::Transform& transform);
 
 	template<>
-	void Matrix<4, 4>::copyMatrix(const sf::Transform& transform);
+	void Matrix<4, 4>::CopyMatrix(const sf::Transform& transform);
 
 	using Mat4 = Matrix<4, 4>;
 	using Mat3 = Matrix<3, 3>;
