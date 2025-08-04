@@ -26,6 +26,10 @@ set (GOOGLE_TEST_INCLUDE_DIR FILEPATH "Include directory for Google's GTest tool
 set (SMASHER_EXAMPLES TRUE CACHE BOOL "Should examples be compiled")
 set (SMASHER_STRESS_TEST TRUE CACHE BOOL "Should stress test be compiled")
 set (SMASHER_TESTS TRUE CACHE BOOL "Should unit tests be compiled")
+
+set(MANIFEST_GENERATOR "${CMAKE_SOURCE_DIR}/scripts/ManifestHeaderGenerator.py")
+
+
 # Try to include machine-specific config if it exists
 if(EXISTS "${CMAKE_SOURCE_DIR}/local.cmake")
     message(STATUS "Including local configuration from local.cmake")
