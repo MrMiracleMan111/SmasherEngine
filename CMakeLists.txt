@@ -141,6 +141,10 @@ if(DEFINED SMASHER_EXAMPLES)
     add_subdirectory("examples")
 endif()
 
+if(DEFINED SMASHER_STRESS_TEST)
+    add_subdirectory("stress_test")
+endif()
+
 # Compile Tests
 
 if(DEFINED SMASHER_TESTS)
