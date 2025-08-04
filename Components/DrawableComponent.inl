@@ -21,8 +21,9 @@ namespace Smasher {
 		m_TextureResource = pTextureResource;
 
 		sf::Texture& texture = m_TextureResource->GetTexture();
-		m_ClipRect = sf::IntRect{ 0, 0, (int)(texture.getSize().x), (int)(texture.getSize().y) };
 		m_TextureLoaded = true;
+		SetClipRect(sf::IntRect{ 0, 0, (int)(texture.getSize().x), (int)(texture.getSize().y) });
+		GetClipTransform(); // Cache the clip transform
 		return *this;
 	}
 
