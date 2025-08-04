@@ -111,7 +111,7 @@ namespace Smasher {
 		// Resize buffer data
 		glBindVertexArray(instanceVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-		glBufferData(GL_ARRAY_BUFFER, models.capacity() * sizeof(Smasher::ModelData), &models[0], GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, models.size() * sizeof(Smasher::ModelData), models.data(), GL_DYNAMIC_DRAW);
 		glBindVertexArray(0);
 	}
 
@@ -157,7 +157,7 @@ namespace Smasher {
 		}
 		glBindVertexArray(instanceVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, modelCount * sizeof(Smasher::ModelData), &models[0]);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, modelCount * sizeof(Smasher::ModelData), models.data());
 		glBindVertexArray(0);
 		dirty = false;
 	}
