@@ -41,7 +41,7 @@ int main() {
 	
 	// Create 10 entites
 	// Half will have a non-alpha image
-	// Half will have image iwth alpha pixels
+	// Half will have image with alpha pixels
 	const std::size_t numEntities = 10;
 	for (int i = 0; i < numEntities; ++i) {
 		float depth = (float)(rand() % 100) / 100.0f;
