@@ -49,14 +49,11 @@ namespace Smasher {
 		DrawableComponent& SetClipRect(sf::IntRect clipRect);
 
 		// Pushes transform to RenderBatch for rendering
-		// This MUST be called after changing Transform
+		// This MUST be called after changing Transform or ClipRect
 		// Try to call this as infrequently as possible
 		DrawableComponent& PushToGPU();
 
-		const sf::Transform& GetTransformPtr() const {
-			assert(m_TransformPtr != nullptr);
-			return *m_TransformPtr;
-		}
+		const sf::Transform& GetTransformPtr() const;
 
 		float GetDepth() const { return m_Depth; }
 
@@ -70,7 +67,7 @@ namespace Smasher {
 		std::shared_ptr<TextureResource> m_TextureResource; // Solely for preventing destruction of resource object
 		std::shared_ptr<ShaderResource> m_ShaderResource; // Solely for preventing destruction of resource object
 	private:
-		sf::IntRect m_ClipRect{0, 0, 100, 100};
+		sf::IntRect m_ClipRect{0, 0, 0, 0};
 		sf::Color m_Color = sf::Color::White;
 		sf::Transform m_ClipTransform;
 		sf::Transform const* m_TransformPtr = nullptr; // Cache it's location
