@@ -1,7 +1,6 @@
 #pragma once
 #include "RenderBatch.h"
 #include "Base.h"
-#include <iostream>
 
 #include <GL/glew.h>
 #if defined(_WIN32)
@@ -112,10 +111,6 @@ namespace Smasher {
 		models.resize(count);
 		if (count < models.size()) {
 			models.shrink_to_fit();
-		}
-		if (models.size() != count) {
-			std::cout << "RenderBatch size: " << models.size() << std::endl;
-			std::cout << "Expected size: " << count << std::endl;
 		}
 		// Resize buffer data to (we want to use models.size no models.capacity)
 		glBindVertexArray(instanceVAO);
