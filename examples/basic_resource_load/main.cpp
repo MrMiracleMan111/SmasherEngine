@@ -23,6 +23,7 @@ int main() {
 	shader->GetShader().setUniform("windowSize", windowSize);
 	shader->GetShader().setUniform("ViewProjectionMatrix", viewProjectionMatrix);
 	
+
 	// TODO: FIND A BETTER SOLUTION
 // I shouldn't have to worry about loading DrawableComponentManager after drawable component
 	DrawableComponentManager& rCompManager = static_cast<DrawableComponentManager&>(state.GetComponentManager<DrawableComponent>());
@@ -30,12 +31,13 @@ int main() {
 
 	Entity& image = state.AddEntity<Smasher::Entity>();
 	image.AddComponent<Transform2DComponent>()
-		.SetPosition(sf::Vector2f(300.0f, 300.0f))
+		.SetPosition(sf::Vector2f(500.0f, 300.0f))
 		.SetScale(sf::Vector2f(400.0f, 400.0f));
 	image.AddComponent<DrawableComponent>()
 		.SetShader(shader)
 		.SetTextureAsset<Smasher::Resources::Textures::small_art>()
-		.SetClipRect(sf::IntRect{ 0, 0, 400, 400 })
+		//.SetClipRect(sf::IntRect{ 0, 0, 64, 64 })
+		.SetClipRotation(Smasher::Degrees{30})
 		.SetDepth(0.2f)
 		.PushToGPU(); // Render in reverse with i=0 being on top
 	
@@ -47,7 +49,7 @@ int main() {
 		float depth = (float)(rand() % 100) / 100.0f;
 
 		int separation = 20;
-		int offset = 0;
+		int offset = 100;
 		Entity& image = state.AddEntity<Smasher::Entity>();
 		image.AddComponent<Transform2DComponent>()
 			.SetPosition(sf::Vector2f((float)(i * separation + offset), (float)(i * separation + offset)))
@@ -75,24 +77,25 @@ int main() {
 	Entity& window1 = state.AddEntity<Smasher::Entity>();
 	window1.AddComponent<Transform2DComponent>()
 		.SetPosition(sf::Vector2f(400, 200))
-		.SetScale(sf::Vector2f(100.0f, 100.0f));
+		.SetScale(sf::Vector2f(150.0f, 150.0f));
 
 	window1.AddComponent<DrawableComponent>()
 		.SetShader(shader)
 		.SetTextureAsset<Smasher::Resources::Textures::window>(true)
-		.SetClipRect(sf::IntRect{ 0, 0, 64, 64 })
+		.SetClipRect(sf::IntRect{ 10, 0, 64, 64 })
+		.SetClipRotation(Smasher::Degrees{ 30 })
 		.SetDepth(0.6)
 		.PushToGPU(); // Window on top
 
 	Entity& window2 = state.AddEntity<Smasher::Entity>();
 	window2.AddComponent<Transform2DComponent>()
 		.SetPosition(sf::Vector2f(420, 220))
-		.SetScale(sf::Vector2f(100.0f, 100.0f));
+		.SetScale(sf::Vector2f(150.0f, 150.0f));
 
 	window2.AddComponent<DrawableComponent>()
 		.SetShader(shader)
 		.SetTextureAsset<Smasher::Resources::Textures::window>(true)
-		.SetClipRect(sf::IntRect{ 0, 0, 64, 64 })
+		//.SetClipRect(sf::IntRect{ 0, 0, 64, 64 })
 		.SetDepth(0.5)
 		.PushToGPU(); // Window on bottom
 
@@ -104,9 +107,10 @@ int main() {
 	inWindowEntity.AddComponent<DrawableComponent>()
 		.SetShader(shader)
 		.SetTextureAsset<Smasher::Resources::Textures::alpha_test>()
-		.SetClipRect(sf::IntRect{ 0, 0, 64, 64 })
+		.SetClipRotation(Smasher::Degrees{ 30 })
 		.SetDepth(0.55)
 		.PushToGPU(); // Window on bottom
+
 
 
 	Entity& message = state.AddEntity<Smasher::Entity>();
@@ -115,8 +119,6 @@ int main() {
 		.SetString("Hello World")
 		.UseDefaults()
 		.SetFontAsset<Smasher::Resources::Fonts::arial>();
-
-	
 
  	state.Activate();
 	engine.Run();

@@ -95,25 +95,35 @@ namespace Smasher {
 
 	void Engine::Update(Millisecond delta) {
 		for (auto& [_, pGameState] : m_GameStateByType) {
+			m_UpdateTimestamp = std::chrono::system_clock::now();
 			if (pGameState->GetStatus() == GameStateStatus::ACTIVE) {
 				pGameState->PreUpdate(delta);
 				pGameState->PreUpdateComponentManagers(delta);
 				pGameState->Update(delta);
 				pGameState->UpdateComponentManagers(delta);
 			}
+			Millisecond diff = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - m_UpdateTimestamp);
+			pGameState->SetUpdateTime(diff);
 		}
 	}
 
-	void Engine::Render(sf::RenderWindow& window) {
+	void Engine::Render(sf::RenderWindow& rWindow) {
+		//rWindow.pushGLStates();
 		m_Window.clear();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear Screen And Depth Buffer
 		for (const auto& [_, pGameState] : m_GameStateByType) {
+			m_RenderTimestamp = std::chrono::system_clock::now();
+
 			if (pGameState->GetStatus() == GameStateStatus::ACTIVE) {
-				pGameState->Render(window);
-				pGameState->RenderComponentManagers(window);
+				pGameState->Render(rWindow);
+				pGameState->RenderComponentManagers(rWindow);
 			}
+
+			Millisecond diff = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - m_RenderTimestamp);
+			pGameState->SetRenderTime(diff);
 		}
 		m_Window.display();
+		//rWindow.popGLStates();
 
 		GLenum err;
 		while ((err = glGetError()) != GL_NO_ERROR)

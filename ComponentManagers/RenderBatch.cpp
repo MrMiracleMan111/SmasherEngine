@@ -2,6 +2,7 @@
 #include "RenderBatch.h"
 #include "Base.h"
 
+#include <iostream>
 #include <GL/glew.h>
 #if defined(_WIN32)
 #define NOMINMAX

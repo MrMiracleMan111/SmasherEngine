@@ -72,6 +72,11 @@ namespace Smasher {
 		BatchContext m_TranslucentBatchContext;
 		std::shared_ptr<TextureResource> m_TextureResource; // Solely for preventing destruction of resource object
 		std::shared_ptr<ShaderResource> m_ShaderResource; // Solely for preventing destruction of resource object
+
+#ifdef BENCHMARK
+		static inline std::chrono::microseconds s_TimeSum;
+#endif
+	
 	private:
 		sf::IntRect m_ClipRect{0, 0, 0, 0};
 		sf::Color m_Color = sf::Color::White;

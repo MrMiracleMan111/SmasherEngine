@@ -18,8 +18,10 @@ namespace Smasher {
 
 		static void StaticRenderComponent(TextComponent& self, sf::RenderWindow& rWindow);
 
+		void SetEntity(Entity& rEntity) override;
+
 		TextComponent& UseDefaults() {
-			m_FontLoaded = true;
+			m_Text.setCharacterSize(30);
 			return *this;
 		}
 
@@ -32,15 +34,15 @@ namespace Smasher {
 			return *this;
 		}
 
-		TextComponent& SetString(const std::string& str) {
-			m_Text.setString(str);
-			return *this;
-		}
+		TextComponent& SetString(const std::string& str);
 
-		TextComponent& SetFontSize(unsigned int size) {
-			m_Text.setCharacterSize(size);
-			return *this;
-		}
+		TextComponent& SetFontSize(unsigned int size);
+
+		TextComponent& SetFillColor(sf::Color color);
+
+		TextComponent& SetOutlineThickness(float thickness);
+
+		TextComponent& SetOutlineColor(sf::Color color);
 
 
 	private:

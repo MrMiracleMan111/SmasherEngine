@@ -16,11 +16,23 @@
 #include "GameState.h"
 #include "ResourceManager.h"
 #include "RenderBatch.h"
+#include <iostream>
 
 namespace Smasher {
 	void DrawableComponentManager::Render(sf::RenderWindow& rWindow) {
-		rWindow.pushGLStates();
+#ifdef	BENCHMARK
+		double milliseconds = (double)DrawableComponent::s_TimeSum.count() / 1000.0;
+		std::cout << "Drawable Component PushToGPU time sum microseconds: " << milliseconds << std::endl;
+		DrawableComponent::s_TimeSum = std::chrono::microseconds::zero();
+#endif
+
+
+		GLint currentVAO, currentVBO;
+		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &currentVAO);
+		glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &currentVBO);
+
 		sf::Glsl::Mat4 ViewProjectionMatrix(rWindow.getView().getTransform().getMatrix());
+		sf::Shader::bind(&m_ShaderResource->GetShader());
 		static_assert(std::is_same_v<std::shared_ptr<ShaderResource>, decltype(m_ShaderResource)>, "fail");
 		m_ShaderResource->GetShader().setUniform("ViewProjectionMatrix", ViewProjectionMatrix);
 		m_ShaderResource->GetShader().setUniform("translucentPass", false);
@@ -44,20 +56,26 @@ namespace Smasher {
 			RenderBatch& batch = itr.second;
 			DrawBatch(batch);
 		}
-		rWindow.popGLStates();
+
+		glDisable(GL_DEPTH_TEST);
+		glDepthMask(GL_TRUE);
+		glDepthFunc(GL_ALWAYS);
+		glDepthRange(1.0f, -1.0f); // top = 1, bottom = 0
+
+		sf::Shader::bind(NULL);
+
+		glBindVertexArray(currentVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, currentVBO);
 	}
 
 	void DrawableComponentManager::DrawBatch(RenderBatch& rRenderBatch) {
 		rRenderBatch.UpdateGLBufferData(); // Updates only if dirty
-		sf::Shader& rShader = m_ShaderResource->GetShader();
-		sf::Shader::bind(&rShader);
 		sf::Texture::bind(rRenderBatch.pTexture, sf::Texture::Pixels);
 		glBindVertexArray(rRenderBatch.instanceVAO);
 		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, RenderBatch::StaticIndices);
 		glDrawElementsInstanced(GL_TRIANGLES, (GLsizei)6, GL_UNSIGNED_BYTE, (GLvoid*)0, (GLsizei)rRenderBatch.modelCount);
 		glBindVertexArray(0);
 		sf::Texture::bind(NULL);
-		sf::Shader::bind(NULL);
 	}
 
 	void DrawableComponentManager::OnComponentChangeData(DrawableComponent& rComponent) {
@@ -65,11 +83,21 @@ namespace Smasher {
 			return;
 		}
 
+#ifdef BENCHMARK
+		std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
+#endif
+
 		// Force Transform Update
 		rComponent.GetEntity().GetComponent<Transform2DComponent>().GetTransform();
+
 		// Overwrite transform data in models 
 		Smasher::Mat4 matrix(rComponent.GetTransformPtr().getMatrix());
 		matrix.array[3 * 4 + 2] = rComponent.GetDepth();
+
+#ifdef	BENCHMARK
+		auto diff = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - now);
+		DrawableComponent::s_TimeSum += diff;
+#endif
 
 		sf::Color color = rComponent.GetColor();
 		uint32_t colorData =

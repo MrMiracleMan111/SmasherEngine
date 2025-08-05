@@ -25,7 +25,7 @@ namespace Smasher {
 		void Run();
 		void Shutdown();
 		void Update(Millisecond delta);
-		void Render(sf::RenderWindow& window);
+		void Render(sf::RenderWindow& rWindow);
 
 		template<class T, typename... Args>
 		T& AddState(Args&&... componentArgs);
@@ -54,6 +54,10 @@ namespace Smasher {
 		ResourceManager m_ResourceManager;
 		Millisecond m_UpdateInterval = EngineConfig::UPDATE_INTERVAL;
 		Millisecond m_RenderInterval = EngineConfig::RENDER_INTERVAL;
+
+		// Cached for internal update/render speed checks
+		std::chrono::time_point<std::chrono::system_clock> m_UpdateTimestamp;
+		std::chrono::time_point<std::chrono::system_clock> m_RenderTimestamp;
 	};
 }
 

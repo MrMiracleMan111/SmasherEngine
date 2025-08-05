@@ -33,7 +33,16 @@ namespace Smasher {
 		GameState& operator=(const GameState&) = delete;
 		GameState& operator=(const GameState&&) noexcept = delete;
 
+		Millisecond GetUpdateTime() const { return m_UpdateTime; }
+		Millisecond GetRenderTime() const { return m_RenderTime; }
+
+		void SetUpdateTime(Millisecond time) { m_UpdateTime = time; }
+		void SetRenderTime(Millisecond time) { m_RenderTime = time; }
+
+		// Called once after game state is added to game engine
 		virtual void Init() {};
+
+		// User calls this to reset the game state
 		virtual void Reset() {};
 		virtual void Render(sf::RenderWindow& window) {};
 		virtual void PreUpdate(Millisecond delta) {};
@@ -81,6 +90,9 @@ namespace Smasher {
 		EventManager& m_EventManager;
 		ResourceManager& m_ResourceManager;
 		Engine& m_Engine;
+
+		Millisecond m_UpdateTime;
+		Millisecond m_RenderTime;
 	};
 }
 
