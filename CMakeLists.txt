@@ -26,7 +26,7 @@ set (GOOGLE_TEST_INCLUDE_DIR FILEPATH "Include directory for Google's GTest tool
 set (SMASHER_EXAMPLES TRUE CACHE BOOL "Should examples be compiled")
 set (SMASHER_STRESS_TEST TRUE CACHE BOOL "Should stress test be compiled")
 set (SMASHER_TESTS TRUE CACHE BOOL "Should unit tests be compiled")
-set (SMASHER_BENCHMARK FALSE CACHE BOOL "Should game engine outptu benchmarking information")
+set (SMASHER_BENCHMARK FALSE CACHE BOOL "Should game engine output benchmarking information")
 
 set(MANIFEST_GENERATOR "${CMAKE_SOURCE_DIR}/scripts/ManifestHeaderGenerator.py")
 
