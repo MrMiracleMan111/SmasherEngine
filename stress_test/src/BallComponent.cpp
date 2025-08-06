@@ -51,6 +51,6 @@ BallComponent& BallComponent::SetVelocity(sf::Vector2f velocity) {
 	return *this;
 }
 
-const BallComponent& BallComponent::GetVelocity() const {
+const sf::Vector2f& BallComponent::GetVelocity() const {
 	return m_Velocity;
 }
