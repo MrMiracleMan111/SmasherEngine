@@ -16,9 +16,13 @@ namespace Smasher {
 	struct BatchContext;
 
 	struct SMASHER_API ModelData {
-		Mat4 transform;
-		Mat3 texTransform;
-		uint32_t color;
+		float position[3] = {0}; //x, y, z
+		float scale[2] = {0}; // x, y
+		Mat3 texTransform = Mat3{};
+		Radians rotation = Radians{ 0 };
+		uint32_t color = 0;
+
+		//ModelData() = default;
 	};
 
 	// Models will use 2D plane

@@ -67,19 +67,22 @@ namespace Smasher {
 		glBindVertexArray(instanceVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
 
-		// Instance Transform Matrix
-		glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Smasher::ModelData), (GLvoid*)(offsetof(Smasher::ModelData, transform) + (0 * sizeof(float))));
-		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Smasher::ModelData), (GLvoid*)(offsetof(Smasher::ModelData, transform) + (4 * sizeof(float))));
-		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(Smasher::ModelData), (GLvoid*)(offsetof(Smasher::ModelData, transform) + (8 * sizeof(float))));
-		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(Smasher::ModelData), (GLvoid*)(offsetof(Smasher::ModelData, transform) + (12 * sizeof(float))));
+		// Instance Position Vec3
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Smasher::ModelData), (GLvoid*)(offsetof(Smasher::ModelData, position)));
+		
+		// Instance Scale Vec 2
+		glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Smasher::ModelData), (GLvoid*)(offsetof(Smasher::ModelData, scale)));
 
 		// Instance Tex Transform Matrix
-		glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, sizeof(Smasher::ModelData), (GLvoid*)(offsetof(Smasher::ModelData, texTransform) + (0 * sizeof(float))));
-		glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(Smasher::ModelData), (GLvoid*)(offsetof(Smasher::ModelData, texTransform) + (3 * sizeof(float))));
-		glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, sizeof(Smasher::ModelData), (GLvoid*)(offsetof(Smasher::ModelData, texTransform) + (6 * sizeof(float))));
+		glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Smasher::ModelData), (GLvoid*)(offsetof(Smasher::ModelData, texTransform) + (0 * sizeof(float))));
+		glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, sizeof(Smasher::ModelData), (GLvoid*)(offsetof(Smasher::ModelData, texTransform) + (3 * sizeof(float))));
+		glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, sizeof(Smasher::ModelData), (GLvoid*)(offsetof(Smasher::ModelData, texTransform) + (6 * sizeof(float))));
 
-		// Color Code
-		glVertexAttribIPointer(9, 1, GL_UNSIGNED_INT, sizeof(Smasher::ModelData), (GLvoid*)(offsetof(Smasher::ModelData, color)));
+		// Instance Color Code
+		glVertexAttribIPointer(7, 1, GL_UNSIGNED_INT, sizeof(Smasher::ModelData), (GLvoid*)(offsetof(Smasher::ModelData, color)));
+
+		// Instance Rotation
+		glVertexAttribPointer(8, 1, GL_FLOAT, GL_FALSE, sizeof(Smasher::ModelData), (GLvoid*)(offsetof(Smasher::ModelData, rotation)));
 
 		glEnableVertexAttribArray(2);
 		glEnableVertexAttribArray(3);
@@ -88,19 +91,14 @@ namespace Smasher {
 		glEnableVertexAttribArray(6);
 		glEnableVertexAttribArray(7);
 		glEnableVertexAttribArray(8);
-		glEnableVertexAttribArray(9);
 
-		glVertexAttribDivisor(2 + 0, 1);  // Instance attribute
-		glVertexAttribDivisor(2 + 1, 1);  // Instance attribute
-		glVertexAttribDivisor(2 + 2, 1);  // Instance attribute
-		glVertexAttribDivisor(2 + 3, 1);  // Instance attribute
-
-		glVertexAttribDivisor(6 + 0, 1);  // Instance attribute
-		glVertexAttribDivisor(6 + 1, 1);  // Instance attribute
-		glVertexAttribDivisor(6 + 2, 1);  // Instance attribute
-
-		glVertexAttribDivisor(9, 1);      // Instance attribute
-
+		glVertexAttribDivisor(2, 1);  // Instance attribute
+		glVertexAttribDivisor(3, 1);  // Instance attribute
+		glVertexAttribDivisor(4, 1);  // Instance attribute
+		glVertexAttribDivisor(5, 1);  // Instance attribute
+		glVertexAttribDivisor(6, 1);  // Instance attribute
+		glVertexAttribDivisor(7, 1);  // Instance attribute
+		glVertexAttribDivisor(8, 1);  // Instance attribute
 
 		glBindVertexArray(0);
 	}

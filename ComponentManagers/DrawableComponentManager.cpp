@@ -1,3 +1,5 @@
+#include <numbers>
+
 #include <GL/glew.h>
 #if defined(_WIN32)
 #define NOMINMAX
@@ -88,11 +90,12 @@ namespace Smasher {
 #endif
 
 		// Force Transform Update
-		rComponent.GetEntity().GetComponent<Transform2DComponent>().GetTransform();
+		// rComponent.GetEntity().GetComponent<Transform2DComponent>().GetTransform();
+		Transform2DComponent& rTransfom2DComp = rComponent.GetEntity().GetComponent<Transform2DComponent>();
 
 		// Overwrite transform data in models 
-		Smasher::Mat4 matrix(rComponent.GetTransformPtr().getMatrix());
-		matrix.array[3 * 4 + 2] = rComponent.GetDepth();
+		//Smasher::Mat4 matrix(rComponent.GetTransformPtr().getMatrix());
+		//matrix.array[3 * 4 + 2] = rComponent.GetDepth();
 
 #ifdef	BENCHMARK
 		auto diff = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - now);
@@ -106,7 +109,14 @@ namespace Smasher {
 			((unsigned char)(color.b) << 16) |
 			((unsigned char)(color.a) << 24);
 
-		ModelData data = ModelData{ matrix, Mat3(rComponent.GetClipTransform()), colorData };
+		Radians rotation = Radians{ (float)rTransfom2DComp.GetRotation() * ((float)std::numbers::pi / 180.0f) };
+		ModelData data = ModelData{
+			{ rTransfom2DComp.GetPosition().x, rTransfom2DComp.GetPosition().y, rComponent.GetDepth() },
+			{ rTransfom2DComp.GetScale().x, rTransfom2DComp.GetScale().y },
+			Mat3(rComponent.GetClipTransform()),
+			rotation,
+			colorData
+		};
 		if (rComponent.m_OpaqueBatchContext) {
 			rComponent.m_OpaqueBatchContext.batch->models.at(rComponent.m_OpaqueBatchContext.index) = data;
 			rComponent.m_OpaqueBatchContext.batch->dirty = true;

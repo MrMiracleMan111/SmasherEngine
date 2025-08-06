@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <chrono>
 #include <filesystem>
+#include <SFML/System.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include "plf_colony.h"
 #include "Exceptions.h"
@@ -37,6 +38,7 @@ namespace Smasher {
 	using ResourceID = uint64_t;
 	using ResourcePath = std::filesystem::path;
 	using Degrees = float; // In Degrees
+	using Radians = float;
 
 	template <typename T, typename U>
 	concept ComponentManagerHasAddComponent = requires(T t, Entity & rEntity) {
@@ -139,6 +141,42 @@ namespace Smasher {
 		MouseMoveEvent,
 		END
 	};
+
+	struct SMASHER_API Vec2 {
+		Vec2(const sf::Vector2f& vec) : data{ .x = vec.x, .y = vec.y } {}
+		Vec2(float x, float y) : data{ .x = 0.0f, .y = 0.0f } {}
+		Vec2() : data{ .x = 0.0f, .y = 0.0f } {}
+
+		union {
+			struct {
+				float x, y;
+			};
+			float arr[2];
+		} data;
+
+		operator const float* () {
+			return data.arr;
+		}
+	};
+
+	struct SMASHER_API Vec3 {
+		Vec3(const sf::Vector3f& vec) : data{ .x = vec.x, .y = vec.y } {}
+		Vec3(const sf::Vector2f& vec, float z) : data{ .x = vec.x, .y = vec.y, .z = z } {}
+		Vec3(float x, float y, float z) : data{ .x = 0.0f, .y = 0.0f, .z = z } {}
+		Vec3() : data{ .x = 0.0f, .y = 0.0f, .z = 0.0f} {}
+
+		union {
+			struct {
+				float x, y, z;
+			};
+			float arr[3];
+		} data;
+
+		operator const float* () {
+			return data.arr;
+		}
+	};
+
 
 	// Copied from SFML defintion
 	// Default constructor was added so that it plays nice with std::vector
