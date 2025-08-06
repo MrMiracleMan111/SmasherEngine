@@ -5,30 +5,32 @@
 #include "Resources.h"
 #include "IComponent.h"
 #include "RenderBatch.h"
+#include "Components/Transform2DWrapper.h"
 
 namespace Smasher {
 	class DrawableComponentManager;
 	class IComponent;
 
-	class SMASHER_API DrawableComponent : public IComponent {
+	class SMASHER_API DrawableComponent : public IComponent, public Transform2DWrapper<DrawableComponent>{
 	friend class DrawableComponentManager;
 
 	SMASHER_USE_COMPONENT_MANAGER(DrawableComponentManager)
 
 	public:
-		DrawableComponent() : IComponent(),
-			m_TransformPtr(nullptr),
+		DrawableComponent() : IComponent(), Transform2DWrapper(*this),
 			m_OpaqueBatchContext(nullptr, SIZE_MAX),
 			m_TranslucentBatchContext(nullptr, SIZE_MAX) {
+			SetScale(sf::Vector2f(100.0f, 100.0f));
 		}
 		DrawableComponent(
 			std::shared_ptr<TextureResource> texturePtr,
-			std::shared_ptr<ShaderResource> shaderPtr) : IComponent(),
+			std::shared_ptr<ShaderResource> shaderPtr) : IComponent(), Transform2DWrapper(*this),
 			m_ShaderResource(shaderPtr),
 			m_TextureResource(texturePtr),
-			m_TransformPtr(nullptr),
 			m_OpaqueBatchContext(nullptr, SIZE_MAX),
-			m_TranslucentBatchContext(nullptr, SIZE_MAX) {}
+			m_TranslucentBatchContext(nullptr, SIZE_MAX) {
+			SetScale(sf::Vector2f(100.0f, 100.0f));
+		}
 		~DrawableComponent();
 
 		template <class T>
@@ -53,9 +55,7 @@ namespace Smasher {
 		// Pushes transform to RenderBatch for rendering
 		// This MUST be called after changing Transform or ClipRect
 		// Try to call this as infrequently as possible
-		DrawableComponent& PushToGPU();
-
-		const sf::Transform& GetTransformPtr() const;
+		inline DrawableComponent& PushToGPU();
 
 		float GetDepth() const { return m_Depth; }
 
@@ -72,16 +72,11 @@ namespace Smasher {
 		BatchContext m_TranslucentBatchContext;
 		std::shared_ptr<TextureResource> m_TextureResource; // Solely for preventing destruction of resource object
 		std::shared_ptr<ShaderResource> m_ShaderResource; // Solely for preventing destruction of resource object
-
-#ifdef BENCHMARK
-		static inline std::chrono::microseconds s_TimeSum;
-#endif
-	
+		bool m_Changed = false;
 	private:
 		sf::IntRect m_ClipRect{0, 0, 0, 0};
 		sf::Color m_Color = sf::Color::White;
 		sf::Transform m_ClipTransform;
-		sf::Transform const* m_TransformPtr = nullptr; // Cache it's location
 		bool m_TextureLoaded = false;
 		bool m_ClipChanged = false;
 		float m_Depth = 0.0f;

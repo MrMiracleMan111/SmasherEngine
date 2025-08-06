@@ -6,19 +6,16 @@
 void BallComponent::SetEntity(Smasher::Entity& rEntity)
 {
 	IComponent::SetEntity(rEntity);
-	assert(rEntity.HasComponent<Smasher::Transform2DComponent>());
-	m_TransformComponentPtr = &rEntity.GetComponent<Smasher::Transform2DComponent>();
 	assert(rEntity.HasComponent<Smasher::DrawableComponent>());
 	m_DrawableComponentPtr = &rEntity.GetComponent<Smasher::DrawableComponent>();
-	m_Collider.left = (int)m_TransformComponentPtr->GetPosition().x;
-	m_Collider.top = (int)m_TransformComponentPtr->GetPosition().y;
-	m_Collider.width = (int)m_TransformComponentPtr->GetScale().x;
-	m_Collider.height = (int)m_TransformComponentPtr->GetScale().y;
+	m_Collider.left = (int)m_DrawableComponentPtr->GetPosition().x;
+	m_Collider.top = (int)m_DrawableComponentPtr->GetPosition().y;
+	m_Collider.width = (int)m_DrawableComponentPtr->GetScale().x;
+	m_Collider.height = (int)m_DrawableComponentPtr->GetScale().y;
 }
 
 void BallComponent::StaticUpdateComponent(BallComponent& self, Smasher::Millisecond delta) {
-	sf::Vector2f position = self.m_TransformComponentPtr->GetPosition();
-
+	sf::Vector2f position = self.m_DrawableComponentPtr->GetPosition();
 	sf::Vector2u windowSizeUint = self.GetEntity().GetEngine().GetWindow().getSize();
 	sf::Vector2f windowSize((float)windowSizeUint.x, (float)(windowSizeUint.y));
 
@@ -42,7 +39,7 @@ void BallComponent::StaticUpdateComponent(BallComponent& self, Smasher::Millisec
 		position.y = windowSize.y;
 	}
 
-	self.m_TransformComponentPtr->SetPosition(position);
+	self.m_DrawableComponentPtr->SetPosition(position);
 	self.m_DrawableComponentPtr->PushToGPU();
 }
 

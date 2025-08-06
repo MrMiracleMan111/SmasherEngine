@@ -1,5 +1,5 @@
 #include <numbers>
-
+#include <chrono>
 #include <GL/glew.h>
 #if defined(_WIN32)
 #define NOMINMAX
@@ -10,6 +10,7 @@
 #elif defined(__APPLE__)
 #include <OpenGL/gl.h>
 #endif
+#include "Base.h"
 #include "Resources.h"
 
 #include "ComponentManagers/DrawableComponentManager.h"
@@ -22,12 +23,16 @@
 
 namespace Smasher {
 	void DrawableComponentManager::Render(sf::RenderWindow& rWindow) {
-#ifdef	BENCHMARK
-		double milliseconds = (double)DrawableComponent::s_TimeSum.count() / 1000.0;
-		std::cout << "Drawable Component PushToGPU time sum microseconds: " << milliseconds << std::endl;
-		DrawableComponent::s_TimeSum = std::chrono::microseconds::zero();
+#ifdef BENCHMARK
+		std::chrono::time_point<std::chrono::system_clock> BENCHMARK_now = std::chrono::system_clock::now();
 #endif
-
+		for (auto& itr : m_Components) {
+			OnComponentChangeData(itr);
+		}
+#ifdef	BENCHMARK
+		std::chrono::microseconds BENCHMARK_diff = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - BENCHMARK_now);
+		Smasher::InternalTimers::SMASHER_TimeAccumulator += BENCHMARK_diff;
+#endif
 
 		GLint currentVAO, currentVBO;
 		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &currentVAO);
@@ -80,27 +85,16 @@ namespace Smasher {
 		sf::Texture::bind(NULL);
 	}
 
-	void DrawableComponentManager::OnComponentChangeData(DrawableComponent& rComponent) {
-		if (!rComponent.m_TextureLoaded) {
+	inline void DrawableComponentManager::OnComponentChangeData(DrawableComponent& rComponent) {
+		if (!rComponent.m_TextureLoaded or !rComponent.m_Changed) {
 			return;
 		}
-
-#ifdef BENCHMARK
-		std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
-#endif
+		rComponent.m_Changed = false;
 
 		// Force Transform Update
-		// rComponent.GetEntity().GetComponent<Transform2DComponent>().GetTransform();
-		Transform2DComponent& rTransfom2DComp = rComponent.GetEntity().GetComponent<Transform2DComponent>();
-
-		// Overwrite transform data in models 
-		//Smasher::Mat4 matrix(rComponent.GetTransformPtr().getMatrix());
-		//matrix.array[3 * 4 + 2] = rComponent.GetDepth();
-
-#ifdef	BENCHMARK
-		auto diff = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - now);
-		DrawableComponent::s_TimeSum += diff;
-#endif
+		 //rComponent.GetEntity().GetComponent<Transform2DComponent>().GetTransform();
+		//Transform2DComponent& rTransfom2DComp = rComponent.GetEntity().GetComponent<Transform2DComponent>();
+		//sf::Transformable& rTransfom2DComp = rComponent.m_Internal;
 
 		sf::Color color = rComponent.GetColor();
 		uint32_t colorData =
@@ -109,14 +103,15 @@ namespace Smasher {
 			((unsigned char)(color.b) << 16) |
 			((unsigned char)(color.a) << 24);
 
-		Radians rotation = Radians{ (float)rTransfom2DComp.GetRotation() * ((float)std::numbers::pi / 180.0f) };
+		Radians rotation = Radians{ (float)rComponent.GetRotation() * ((float)std::numbers::pi / 180.0f) };
 		ModelData data = ModelData{
-			{ rTransfom2DComp.GetPosition().x, rTransfom2DComp.GetPosition().y, rComponent.GetDepth() },
-			{ rTransfom2DComp.GetScale().x, rTransfom2DComp.GetScale().y },
+			{ rComponent.GetPosition().x, rComponent.GetPosition().y, rComponent.GetDepth() },
+			{ rComponent.GetScale().x, rComponent.GetScale().y },
 			Mat3(rComponent.GetClipTransform()),
 			rotation,
 			colorData
 		};
+
 		if (rComponent.m_OpaqueBatchContext) {
 			rComponent.m_OpaqueBatchContext.batch->models.at(rComponent.m_OpaqueBatchContext.index) = data;
 			rComponent.m_OpaqueBatchContext.batch->dirty = true;

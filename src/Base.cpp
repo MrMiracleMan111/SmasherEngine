@@ -1,6 +1,15 @@
 #include "Base.h"
 #include <iostream>
 namespace Smasher {
+
+#ifdef BENCHMARK
+	namespace InternalTimers {
+		std::chrono::microseconds SMASHER_TimeAccumulator{}; // Used for time checking in benchmarks
+		std::chrono::microseconds SMASHER_TimeSampleSum{}; // Used for time checking in benchmarks
+		size_t SMASHER_TimeSampleCount{}; // Used for time checking in benchmarks
+	}
+#endif
+
 	// Column major order Copy
 	template<>
 	void Matrix<3, 3>::CopyMatrix(const sf::Transform& transform) {

@@ -55,6 +55,8 @@ namespace Smasher {
 			m_ComponentsToRemove.emplace_back(pItr);
 		}
 
+	protected:
+		plf::colony<T> m_Components;
 	private:
 		void RemoveMarkedComponents() {
 			for (auto& itr : m_ComponentsToRemove) {
@@ -77,7 +79,6 @@ namespace Smasher {
 			RenderComponents(rWindow);
 		}
 
-		plf::colony<T> m_Components;
 		std::vector<typename plf::colony<T>::iterator*> m_ComponentsToRemove; // Components to be removed
 	};
 }

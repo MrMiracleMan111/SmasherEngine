@@ -45,6 +45,10 @@ namespace Smasher {
 		bool IsRunning() const { return m_RunningAtomic; }
 
 	private:
+#ifdef BENCHMARK
+		void BENCHMARK_LogAccumulatedTime();
+#endif
+
 		std::unordered_map<std::type_index, std::unique_ptr<GameState>> m_GameStateByType;
 		sf::RenderWindow m_Window;
 		std::atomic_bool m_RunningAtomic = true;

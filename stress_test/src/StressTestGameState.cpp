@@ -6,6 +6,7 @@
 #include "ComponentManagers/DrawableComponentManager.h"
 #include "Components/DrawableComponent.h"
 #include "Resources.h"
+#include "BallComponent.h"
 
 void StressTestGameState::Init()
 {

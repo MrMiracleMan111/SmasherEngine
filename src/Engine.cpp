@@ -1,3 +1,4 @@
+#include <chrono>
 #include <GL/glew.h>
 #if defined(_WIN32)
 #define NOMINMAX
@@ -79,18 +80,22 @@ namespace Smasher {
 					renderTimer = Millisecond{ 0 };
 				}
 
+#ifdef BENCHMARK
+				BENCHMARK_LogAccumulatedTime();
+#endif
+
 				Millisecond minInterval = std::min(m_UpdateInterval, m_RenderInterval);
 				std::chrono::milliseconds loopTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - now);
 				Millisecond sleepTime = std::max(minInterval - loopTime, std::chrono::milliseconds::zero());
 				std::this_thread::sleep_for(sleepTime);
 			}
 			Shutdown();
-		#ifdef NDEBUG
+#ifdef NDEBUG
 		}
 		catch (const std::exception& e) {
 			std::cerr << "Exception Thrown: " << e.what() << std::endl;
 		}
-		#endif
+#endif
 	}
 
 	void Engine::Update(Millisecond delta) {
@@ -131,6 +136,21 @@ namespace Smasher {
 			std::cout << "GL Error: \"" << gluErrorString(err) << "\" Code: " << err << std::endl;
 		}
 	}
+
+#ifdef	BENCHMARK
+	void Engine::BENCHMARK_LogAccumulatedTime() {
+		// Calculate average update time in ms after every 10 samples
+		InternalTimers::SMASHER_TimeSampleSum += InternalTimers::SMASHER_TimeAccumulator;
+		InternalTimers::SMASHER_TimeAccumulator = std::chrono::microseconds::zero();
+		++InternalTimers::SMASHER_TimeSampleCount;
+		if (InternalTimers::SMASHER_TimeSampleCount % 10 == 0) {
+			double avg = (double)(InternalTimers::SMASHER_TimeSampleSum.count()) / (double)InternalTimers::SMASHER_TimeSampleCount;
+			InternalTimers::SMASHER_TimeSampleCount = 0;
+			InternalTimers::SMASHER_TimeSampleSum = std::chrono::microseconds::zero();
+			std::printf("Accumulated Time: %.2fms\n", avg / 1000.0);
+		}
+	}
+#endif
 
 	void Engine::Shutdown() {
 		m_RunningAtomic = false;

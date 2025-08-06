@@ -1,4 +1,5 @@
 #pragma once
+#include <chrono>
 #include "Base.h"
 #include "IComponent.h"
 #include "ComponentManagers/DrawableComponentManager.h"
@@ -24,7 +25,6 @@ public:
 private:
 	sf::Vector2f m_Velocity;
 	sf::IntRect m_Collider;
-	Smasher::Transform2DComponent* m_TransformComponentPtr = nullptr;
 	Smasher::DrawableComponent* m_DrawableComponentPtr = nullptr;
 
 };

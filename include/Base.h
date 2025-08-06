@@ -40,6 +40,14 @@ namespace Smasher {
 	using Degrees = float; // In Degrees
 	using Radians = float;
 
+#ifdef BENCHMARK
+	namespace InternalTimers {
+		extern SMASHER_API std::chrono::microseconds SMASHER_TimeAccumulator; // Used for time checking in benchmarks
+		extern SMASHER_API std::chrono::microseconds SMASHER_TimeSampleSum; // Used for time checking in benchmarks
+		extern SMASHER_API size_t SMASHER_TimeSampleCount; // Used for time checking in benchmarks
+	}
+#endif
+
 	template <typename T, typename U>
 	concept ComponentManagerHasAddComponent = requires(T t, Entity & rEntity) {
 		{ t.AddComponent(rEntity) } -> std::same_as<U&>;

@@ -1,4 +1,5 @@
 #include <cmath>
+#include <chrono>
 #include "DrawableComponent.h"
 #include "IComponent.h"
 #include "Entity.h"
@@ -11,50 +12,47 @@ namespace Smasher {
         rCompManager.OnComponentDelete(*this);
     }
 
-    DrawableComponent& DrawableComponent::PushToGPU() {
-        auto& rManager = static_cast<DrawableComponentManager&>(GetManager());
-        rManager.OnComponentChangeData(*this);
+    inline DrawableComponent& DrawableComponent::PushToGPU() {
+        m_Changed = true;
         return *this;
     }
 
     void DrawableComponent::SetEntity(Entity& pEntity) {
         IComponent::SetEntity(pEntity);
-        assert(GetEntity().HasComponent<Transform2DComponent>());
-        m_TransformPtr = &GetEntity().GetComponent<Transform2DComponent>().GetTransform();
+        m_Changed = true;
     }
 
     DrawableComponent& DrawableComponent::SetDepth(float depth) {
+        m_Changed = true;
         m_Depth = depth;
         return *this;
     }
 
     DrawableComponent& DrawableComponent::SetColor(sf::Color color) {
+        m_Changed = true;
         m_Color = color;
         return *this;
     }
 
     DrawableComponent& DrawableComponent::SetShader(std::shared_ptr<ShaderResource> pShader) {
+        m_Changed = true;
         m_ShaderResource = pShader;
         return *this;
     }
 
     DrawableComponent& DrawableComponent::SetClipRect(sf::IntRect clipRect) {
+        m_Changed = true;
         m_ClipChanged = true;
         m_ClipRect = clipRect;
         return *this;
     }
 
     DrawableComponent& DrawableComponent::SetClipRotation(Degrees angle) {
+        m_Changed = true;
         m_ClipChanged = true;
         m_ClipRotation = angle;
         return *this;
     }
-
-    const sf::Transform& DrawableComponent::GetTransformPtr() const {
-        assert(m_TransformPtr != nullptr);
-        return *m_TransformPtr;
-    }
-
 
     const sf::Transform& DrawableComponent::GetClipTransform()
     {
