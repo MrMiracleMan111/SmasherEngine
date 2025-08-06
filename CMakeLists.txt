@@ -29,6 +29,7 @@ set (SMASHER_TESTS TRUE CACHE BOOL "Should unit tests be compiled")
 set (SMASHER_BENCHMARK FALSE CACHE BOOL "Should game engine output benchmarking information")
 
 set(MANIFEST_GENERATOR "${CMAKE_SOURCE_DIR}/scripts/ManifestHeaderGenerator.py")
+set(SMASHER_ENGINE_OUTPUT_DIR ${CMAKE_BINARY_DIR})
 
 
 # Try to include machine-specific config if it exists

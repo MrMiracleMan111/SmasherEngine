@@ -1,6 +1,3 @@
-# Get Game Engine DLL Directory
-set(SMASHER_ENGINE_OUTPUT_DIR ${CMAKE_BINARY_DIR})
-
 
 # Generate Manifest Header for Basic Resource Load
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
