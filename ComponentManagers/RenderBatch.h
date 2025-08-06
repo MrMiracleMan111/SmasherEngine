@@ -21,8 +21,6 @@ namespace Smasher {
 		Mat3 texTransform = Mat3{};
 		Radians rotation = Radians{ 0 };
 		uint32_t color = 0;
-
-		//ModelData() = default;
 	};
 
 	// Models will use 2D plane
