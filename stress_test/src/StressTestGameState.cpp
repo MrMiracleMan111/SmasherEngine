@@ -10,14 +10,14 @@
 
 void StressTestGameState::Init()
 {
-	std::shared_ptr<Smasher::ShaderResource> shader = GetEngine().GetResourceManager().GetOrLoadResource<Smasher::Resources::Shaders::basic_texture_shader, Smasher::ShaderResource>();
+	std::shared_ptr<Smasher::ShaderResource> pShader = GetEngine().GetResourceManager().GetOrLoadResource<Smasher::Resources::Shaders::basic_texture_shader, Smasher::ShaderResource>();
 	sf::Vector2f windowSize = sf::Vector2f(GetEngine().GetWindow().getSize().x, GetEngine().GetWindow().getSize().y);
 	sf::Glsl::Mat4 viewProjectionMatrix = sf::Glsl::Mat4(GetEngine().GetWindow().getView().getTransform().getMatrix());
-	shader->GetShader().setUniform("windowSize", windowSize);
-	shader->GetShader().setUniform("ViewProjectionMatrix", viewProjectionMatrix);
+	pShader->GetShader().setUniform("windowSize", windowSize);
+	pShader->GetShader().setUniform("ViewProjectionMatrix", viewProjectionMatrix);
 
 	auto& rCompManager = static_cast<Smasher::DrawableComponentManager&>(GetComponentManager<Smasher::DrawableComponent>());
-	rCompManager.SetShaderResource(shader);
+	rCompManager.SetShaderResource(pShader);
 
 	Smasher::Entity& rUpdateTracker = AddEntity<Smasher::Entity>();
 	Smasher::Entity& rRenderTracker = AddEntity<Smasher::Entity>();
