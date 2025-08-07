@@ -75,14 +75,31 @@ namespace Smasher {
 			list.push_back(EventSubscription{ bound });
 			return EventSubscriptionHandle{ list, std::prev(list.end()) };
 		}
+
+		// Subscribe to asynchronous event handling (uses separate Event thread)
+		template<class T>
+		EventSubscriptionHandle SubscribeAsync(std::function<void(T*)> callback) {
+			static_assert(std::is_base_of<Event, T>::value, "T must inherit from Event");
+
+			constexpr std::size_t index = static_cast<std::size_t>(T::GetStaticEventType());
+			std::list<EventSubscription>& list = m_EventSubscriptionsByType.at(index);
+
+			auto bound = [callback](const Event& arg) {callback(static_cast<const T&>(arg)); };
+
+			list.push_back(EventSubscription{ bound });
+			return EventSubscriptionHandle{ list, std::prev(list.end()) };
+		}
+
 		void Unsubscribe(EventSubscriptionHandle handle);
 
+		// Defaults to Synchronous
 		template<class T, typename... Args>
 		void Publish(Args&&... eventArgs) {
 			static_assert(std::is_base_of<Event, T>::value, "T must inherit from Event");
 			std::unique_ptr<T> pEvent = std::make_unique<T>(std::chrono::system_clock::now(), std::forward<Args>(eventArgs)...);
 			m_EventQueue.push_back(std::move(pEvent));
 		};
+
 		void Dispatch();
 
 	private:
