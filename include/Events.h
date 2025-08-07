@@ -78,7 +78,12 @@ namespace Smasher {
 	struct SMASHER_API MouseMoveEvent : public MouseEvent {
 		sf::Vector2f Delta;
 		SMASHER_EVENT_TYPE(EventType::MouseMoveEvent)
-			MouseMoveEvent(SMASHER_TIMESTAMP timestamp, Mouse::MouseEventType type, sf::Vector2f delta) :
+		MouseMoveEvent(SMASHER_TIMESTAMP timestamp, Mouse::MouseEventType type, sf::Vector2f delta) :
 			MouseEvent(timestamp, type), Delta(delta) {};
+	};
+
+	struct SMASHER_API WindowCloseEvent : public Event {
+		SMASHER_EVENT_TYPE(EventType::WindowCloseEvent)
+		WindowCloseEvent(SMASHER_TIMESTAMP timestamp) : Event(timestamp) {}
 	};
 }
