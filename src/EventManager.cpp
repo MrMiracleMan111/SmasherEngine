@@ -16,7 +16,7 @@ namespace Smasher {
 			std::size_t index = static_cast<std::size_t>(pEvent->GetEventType());
 			auto& subscriptionList = m_EventSubscriptionsByType[index];
 			for (auto& subsription : subscriptionList) {
-				subsription.Callback(pEvent.get());
+				subsription.Callback(*pEvent.get());
 			}
 		}
 		m_EventQueue.clear();

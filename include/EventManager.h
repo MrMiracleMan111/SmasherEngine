@@ -11,8 +11,8 @@ namespace Smasher {
 	struct Event;
 
 	struct EventSubscription {
-		std::function<void(Event*)> Callback;
-		EventSubscription(std::function<void(Event*)> callback) : Callback(callback) {}
+		std::function<void(const Event&)> Callback;
+		EventSubscription(std::function<void(const Event&)> callback) : Callback(callback) {}
 		~EventSubscription() {};
 
 		EventSubscription(EventSubscription&) = delete;
@@ -62,12 +62,16 @@ namespace Smasher {
 		EventManager& operator= (EventManager&) = delete;
 		EventManager& operator= (EventManager&&) = delete;
 
+		// Subscribe to synchronous event handling (immediately after its called)
 		template<class T>
-		EventSubscriptionHandle Subscribe(std::function<void(T*)> callback) {
+		EventSubscriptionHandle Subscribe(std::function<void(const T&)> callback) {
 			static_assert(std::is_base_of<Event, T>::value, "T must inherit from Event");
+			
 			constexpr std::size_t index = static_cast<std::size_t>(T::GetStaticEventType());
 			std::list<EventSubscription>& list = m_EventSubscriptionsByType.at(index);
-			auto bound = [callback](Event* arg) {callback(static_cast<T*>(arg)); };
+			
+			auto bound = [callback](const Event& arg) {callback(static_cast<const T&>(arg)); };
+			
 			list.push_back(EventSubscription{ bound });
 			return EventSubscriptionHandle{ list, std::prev(list.end()) };
 		}
