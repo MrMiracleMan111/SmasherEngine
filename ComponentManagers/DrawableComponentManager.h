@@ -34,7 +34,7 @@ namespace Smasher {
 		void OnComponentDelete(DrawableComponent& rComponent);
 		void SetShaderResource(std::shared_ptr<ShaderResource> pShaderResource) { m_ShaderResource = pShaderResource; }
 
-		void OnWindowClose(const WindowCloseEvent& event);
+		void OnWindowClose(const Events::WindowCloseEvent& event);
 
 	private:
 		void DrawBatch(RenderBatch& rRenderBatch);

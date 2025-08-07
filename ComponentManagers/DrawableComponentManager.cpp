@@ -28,7 +28,7 @@ namespace Smasher {
 		BaseComponentManager<DrawableComponent>(state) {
 
 		EventManager& rEventManager = state.GetEngine().GetEventManager();
-		EventSubscriptionHandle handle = rEventManager.Subscribe<WindowCloseEvent>(
+		EventSubscriptionHandle handle = rEventManager.Subscribe<Events::WindowCloseEvent>(
 			std::bind(&DrawableComponentManager::OnWindowClose, this, std::placeholders::_1)
 		);
 	}
@@ -178,7 +178,13 @@ namespace Smasher {
 		}
 	}
 
-	void DrawableComponentManager::OnWindowClose(const WindowCloseEvent& event) {
+	void DrawableComponentManager::OnWindowClose(const Events::WindowCloseEvent& event) {
+		// Invalidate all Batch Contexts
+		for (auto& itr : m_Components) {
+			itr.m_OpaqueBatchContext = BatchContext{}; // Invalidate it
+			itr.m_TranslucentBatchContext = BatchContext{}; // Invalidate it
+		}
+		
 		// Clear all OpenGL Buffers
 		m_OpaqueBatches.clear();
 		m_TranslucentBatches.clear();
