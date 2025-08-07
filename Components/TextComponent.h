@@ -4,11 +4,12 @@
 #include "Transform2DComponent.h"
 #include "ResourceManager.h"
 #include "EngineConfig.h"
+#include "Transform2DWrapper.h"
 
 namespace Smasher {
-	class SMASHER_API TextComponent : public IComponent {
+	class SMASHER_API TextComponent : public IComponent, public Transform2DWrapper<TextComponent> {
 	public:
-		TextComponent() : IComponent() {
+		TextComponent() : IComponent(), Transform2DWrapper(*this, m_Text) {
 			m_Text.setCharacterSize(EngineConfig::DEFAULT_FONT_SIZE);
 			m_Text.setFillColor(EngineConfig::DEFAULT_FONT_COLOR);
 		}

@@ -4,21 +4,13 @@
 namespace Smasher {
 	void TextComponent::StaticRenderComponent(TextComponent& self, sf::RenderWindow& rWindow) {
 		if (self.m_FontLoaded) {
-			Transform2DComponent& rTransform = self.GetEntity().GetComponent<Transform2DComponent>();
-			rWindow.draw(self.m_Text, rTransform.GetTransform());
-			//self.m_Text.setCharacterSize(60);
-			//self.m_Text.setPosition(10.0f, 10.0f);
-			//self.m_Text.setColor(sf::Color::White);
-			//rWindow.draw(self.m_Text);
+			rWindow.draw(self.m_Text);
 		}
 	}
 
 	void TextComponent::SetEntity(Entity& rEntity)
 	{
 		IComponent::SetEntity(rEntity);
-		rEntity.DependsOnComponent<Transform2DComponent>();
-		rEntity.GetComponent<Transform2DComponent>()
-			.SetScale(1.0f, 1.0f);
 	}
 
 	TextComponent& TextComponent::SetString(const std::string& str) {
