@@ -17,11 +17,12 @@
 #include "ComponentManagers/BaseComponentManager.h"
 #include "RenderBatch.h"
 #include "Components/DrawableComponent.h"
+#include "Events.h"
 
 namespace Smasher {
 	class SMASHER_API DrawableComponentManager : public BaseComponentManager<DrawableComponent> {
 	public:
-		DrawableComponentManager(GameState& state) : BaseComponentManager<DrawableComponent>(state) {}
+		DrawableComponentManager(GameState& state);
 		DrawableComponentManager(const DrawableComponentManager&) = default;
 		~DrawableComponentManager() = default;
 
@@ -32,6 +33,8 @@ namespace Smasher {
 		void OnComponentSetTexture(DrawableComponent& rComponent, ResourceID id, bool transulcent);
 		void OnComponentDelete(DrawableComponent& rComponent);
 		void SetShaderResource(std::shared_ptr<ShaderResource> pShaderResource) { m_ShaderResource = pShaderResource; }
+
+		void OnWindowClose(const WindowCloseEvent& event);
 
 	private:
 		void DrawBatch(RenderBatch& rRenderBatch);

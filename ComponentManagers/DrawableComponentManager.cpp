@@ -19,9 +19,22 @@
 #include "GameState.h"
 #include "ResourceManager.h"
 #include "RenderBatch.h"
+#include "EventManager.h"
+#include "Events.h"
 #include <iostream>
 
 namespace Smasher {
+	DrawableComponentManager::DrawableComponentManager(GameState& state) :
+		BaseComponentManager<DrawableComponent>(state) {
+
+		EventManager& rEventManager = state.GetEngine().GetEventManager();
+		EventSubscriptionHandle handle = rEventManager.Subscribe<WindowCloseEvent>(
+			std::bind(&DrawableComponentManager::OnWindowClose, this, std::placeholders::_1)
+		);
+	}
+
+
+
 	void DrawableComponentManager::Render(sf::RenderWindow& rWindow) {
 #ifdef BENCHMARK
 		std::chrono::time_point<std::chrono::system_clock> BENCHMARK_now = std::chrono::system_clock::now();
@@ -163,5 +176,11 @@ namespace Smasher {
 		if (rComponent.m_TranslucentBatchContext) {
 			rComponent.m_TranslucentBatchContext.batch->RemoveModel(rComponent.m_TranslucentBatchContext);
 		}
+	}
+
+	void DrawableComponentManager::OnWindowClose(const WindowCloseEvent& event) {
+		// Clear all OpenGL Buffers
+		m_OpaqueBatches.clear();
+		m_TranslucentBatches.clear();
 	}
 }
