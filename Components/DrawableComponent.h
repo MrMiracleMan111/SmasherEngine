@@ -52,11 +52,6 @@ namespace Smasher {
 
 		DrawableComponent& SetClipRotation(Degrees angle);
 
-		// Pushes transform to RenderBatch for rendering
-		// This MUST be called after changing Transform or ClipRect
-		// Try to call this as infrequently as possible
-		inline DrawableComponent& PushToGPU();
-
 		float GetDepth() const { return m_Depth; }
 
 		const sf::Color& GetColor() const { return m_Color; }
@@ -72,7 +67,6 @@ namespace Smasher {
 		BatchContext m_TranslucentBatchContext;
 		std::shared_ptr<TextureResource> m_TextureResource; // Solely for preventing destruction of resource object
 		std::shared_ptr<ShaderResource> m_ShaderResource; // Solely for preventing destruction of resource object
-		bool m_Changed = false;
 	private:
 		sf::IntRect m_ClipRect{0, 0, 0, 0};
 		sf::Color m_Color = sf::Color::White;

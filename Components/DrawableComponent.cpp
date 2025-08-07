@@ -12,43 +12,36 @@ namespace Smasher {
         rCompManager.OnComponentDelete(*this);
     }
 
-    inline DrawableComponent& DrawableComponent::PushToGPU() {
-        m_Changed = true;
-        return *this;
-    }
-
     void DrawableComponent::SetEntity(Entity& pEntity) {
         IComponent::SetEntity(pEntity);
-        m_Changed = true;
+        m_TransformChanged = true;
     }
 
     DrawableComponent& DrawableComponent::SetDepth(float depth) {
-        m_Changed = true;
+        m_TransformChanged = true;
         m_Depth = depth;
         return *this;
     }
 
     DrawableComponent& DrawableComponent::SetColor(sf::Color color) {
-        m_Changed = true;
+        m_TransformChanged = true;
         m_Color = color;
         return *this;
     }
 
     DrawableComponent& DrawableComponent::SetShader(std::shared_ptr<ShaderResource> pShader) {
-        m_Changed = true;
+        m_TransformChanged = true;
         m_ShaderResource = pShader;
         return *this;
     }
 
     DrawableComponent& DrawableComponent::SetClipRect(sf::IntRect clipRect) {
-        m_Changed = true;
         m_ClipChanged = true;
         m_ClipRect = clipRect;
         return *this;
     }
 
     DrawableComponent& DrawableComponent::SetClipRotation(Degrees angle) {
-        m_Changed = true;
         m_ClipChanged = true;
         m_ClipRotation = angle;
         return *this;
