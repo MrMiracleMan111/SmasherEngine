@@ -12,16 +12,33 @@
 #include "BallComponent.h"
 
 using namespace Smasher;
-int main() {
+int main(int argc, char **argv) {
 	Smasher::Engine engine(640, 420);
-	
+	std::size_t numEntities = 100000;
+
+	if (argc >= 2) {
+		numEntities = std::size_t{ std::stoull(argv[1]) };
+	}
+
 	engine.GetResourceManager().SetResourceDirectory(Resources::Metadata::RESOURCES_DIRECTORY);
 	StressTestGameState& state = engine.AddState<StressTestGameState>();
+
+	state.AddEntity<Smasher::Entity>()
+		.AddComponent<Smasher::Transform2DComponent>()
+		.SetPosition(10.0f, 100.0f)
+		.GetEntity()
+		.AddComponent<Smasher::TextComponent>()
+		.UseDefaults()
+		.SetFontAsset<Smasher::Resources::Fonts::arial>()
+		.SetFillColor(sf::Color::White)
+		.SetOutlineThickness(5.0f)
+		.SetOutlineColor(sf::Color::Black)
+		.SetFontSize(20)
+		.SetString(std::format("Number of Entites: {}", numEntities));
 
 	// Create 10 entites
 	// Half will have a non-alpha image
 	// Half will have image with alpha pixels
-	const std::size_t numEntities = 100000;
 	const float toRadian = (float)(180.0 / std::numbers::pi);
 	for (int i = 0; i < numEntities; ++i) {
 		float angle = (float)(rand() % 360);
