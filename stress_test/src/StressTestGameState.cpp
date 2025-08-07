@@ -51,15 +51,28 @@ void StressTestGameState::Init()
 }
 
 void StressTestGameState::Update(Smasher::Millisecond delta) {
+	++m_UpdateTimeSampleCount;
+	m_UpdateTimeSum += GetUpdateTime();
+	if (m_UpdateTimeSampleCount >= s_SamplesPerAverage) {
+		m_UpdateTimeAverage = (double)m_UpdateTimeSum.count() / (double)m_UpdateTimeSampleCount;
+		m_UpdateTimeSampleCount = 0;
+		m_UpdateTimeSum = Smasher::Millisecond::zero();
+	}
 }
 
 void StressTestGameState::Render(sf::RenderWindow& rWindow) {
-	auto updateMilliseconds = GetUpdateTime().count();
-	auto renderMilliseconds = GetRenderTime().count();
+	++m_RenderTimeSampleCount;
+	Smasher::Millisecond tmp = GetRenderTime();
+	m_RenderTimeSum += GetRenderTime();
+	if (m_RenderTimeSampleCount >= s_SamplesPerAverage) {
+		m_RenderTimeAverage = (double)m_RenderTimeSum.count() / (double)m_RenderTimeSampleCount;
+		m_RenderTimeSampleCount = 0;
+		m_RenderTimeSum = Smasher::Millisecond::zero();
+	}
 
 	m_UpdateTrackerPtr->GetComponent<Smasher::TextComponent>()
-		.SetString(std::format("Update: {}ms", updateMilliseconds));
+		.SetString(std::format("Update: {}ms", m_UpdateTimeAverage));
 	
 	m_RenderTrackerPtr->GetComponent<Smasher::TextComponent>()
-		.SetString(std::format("Render: {}ms", renderMilliseconds));
+		.SetString(std::format("Render: {}ms", m_RenderTimeAverage));
 }
