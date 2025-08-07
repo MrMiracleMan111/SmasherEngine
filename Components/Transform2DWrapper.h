@@ -47,6 +47,7 @@ namespace Smasher {
 
 	protected:
 		sf::Transformable& m_Transformable;
+		bool m_TransformChanged = false;
 	private:
 		T& m_Caller;
 	};
