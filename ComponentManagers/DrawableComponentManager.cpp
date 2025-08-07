@@ -27,6 +27,8 @@ namespace Smasher {
 		std::chrono::time_point<std::chrono::system_clock> BENCHMARK_now = std::chrono::system_clock::now();
 #endif
 		for (auto& itr : m_Components) {
+			if (!itr.m_Changed)
+				continue;
 			OnComponentChangeData(itr);
 		}
 #ifdef	BENCHMARK
@@ -86,7 +88,7 @@ namespace Smasher {
 	}
 
 	inline void DrawableComponentManager::OnComponentChangeData(DrawableComponent& rComponent) {
-		if (!rComponent.m_TextureLoaded or !rComponent.m_Changed) {
+		if (!rComponent.m_TextureLoaded) {
 			return;
 		}
 		rComponent.m_Changed = false;
