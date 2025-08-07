@@ -18,6 +18,7 @@
 #include "Engine.h"
 #include "Exceptions.h"
 #include "EngineConfig.h"
+#include "EventFeeder.h"
 
 namespace Smasher {
 	Engine::Engine(int width, int height, const sf::ContextSettings& settings) :
@@ -50,6 +51,7 @@ namespace Smasher {
 	}
 
 	void Engine::Run() {
+		EventFeeder m_EventFeeder(m_EventManager);
 		try {
 			std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
 			Millisecond updateTimer{ 0 };
@@ -61,12 +63,13 @@ namespace Smasher {
 				now = tmp;
 				sf::Event event;
 				while (m_Window.pollEvent(event)) {
-					if (event.type == sf::Event::Closed) {
-						m_Window.close();
-					}
+					m_EventFeeder.ForwardSFMLEvent(event);
 				}
+
 				updateTimer += diff;
 				renderTimer += diff;
+
+				m_EventManager.Dispatch();
 
 				if (updateTimer >= m_UpdateInterval) {
 					Update(Millisecond{ updateTimer });
