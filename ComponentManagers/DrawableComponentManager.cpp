@@ -52,7 +52,7 @@ namespace Smasher {
 		glDepthRange(1.0f, -1.0f); // top = 1, bottom = 0
 		glDisable(GL_BLEND);
 
-		for (auto& itr : OpaqueBatches) {
+		for (auto& itr : m_OpaqueBatches) {
 			RenderBatch& batch = itr.second;
 			DrawBatch(batch);
 		}
@@ -61,7 +61,7 @@ namespace Smasher {
 		glDepthMask(GL_FALSE); // Disable depth writes
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		for (auto& itr : TranslucentBatches) {
+		for (auto& itr : m_TranslucentBatches) {
 			RenderBatch& batch = itr.second;
 			DrawBatch(batch);
 		}
@@ -131,7 +131,7 @@ namespace Smasher {
 			}
 		}
 
-		RenderBatch* opaqueBatch = &OpaqueBatches[id];
+		RenderBatch* opaqueBatch = &m_OpaqueBatches[id];
 		if (opaqueBatch->pTexture == nullptr) {
 			ResourceManager& rResourceManager = GetGameState().GetEngine().GetResourceManager();
 			auto pTexture = rResourceManager.GetResource<TextureResource>(id);
@@ -141,7 +141,7 @@ namespace Smasher {
 		opaqueBatch->AddModel(rComponent.m_OpaqueBatchContext);
 
 		if (translucent) {
-			RenderBatch* translucentBatch = &TranslucentBatches[id];
+			RenderBatch* translucentBatch = &m_TranslucentBatches[id];
 			if (translucentBatch->pTexture == nullptr) {
 				ResourceManager& rResourceManager = GetGameState().GetEngine().GetResourceManager();
 				auto pTexture = rResourceManager.GetResource<TextureResource>(id);

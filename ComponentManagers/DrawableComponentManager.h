@@ -35,8 +35,8 @@ namespace Smasher {
 
 	private:
 		void DrawBatch(RenderBatch& rRenderBatch);
-		std::map<ResourceID, RenderBatch> OpaqueBatches;
-		std::map<ResourceID, RenderBatch> TranslucentBatches;
+		std::map<ResourceID, RenderBatch> m_OpaqueBatches;
+		std::map<ResourceID, RenderBatch> m_TranslucentBatches;
 
 		std::shared_ptr<ShaderResource> m_ShaderResource; // Solely for preventing destruction of resource object
 	};
