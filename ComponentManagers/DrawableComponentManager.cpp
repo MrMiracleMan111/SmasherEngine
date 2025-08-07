@@ -27,7 +27,7 @@ namespace Smasher {
 		std::chrono::time_point<std::chrono::system_clock> BENCHMARK_now = std::chrono::system_clock::now();
 #endif
 		for (auto& itr : m_Components) {
-			if (!itr.m_Changed)
+			if (!itr.m_TransformChanged)
 				continue;
 			OnComponentChangeData(itr);
 		}
@@ -91,7 +91,7 @@ namespace Smasher {
 		if (!rComponent.m_TextureLoaded) {
 			return;
 		}
-		rComponent.m_Changed = false;
+		rComponent.m_TransformChanged = false;
 
 		uint32_t colorData = (uint32_t)rComponent.GetColor().toInteger();
 
