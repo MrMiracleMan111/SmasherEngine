@@ -93,17 +93,7 @@ namespace Smasher {
 		}
 		rComponent.m_Changed = false;
 
-		// Force Transform Update
-		 //rComponent.GetEntity().GetComponent<Transform2DComponent>().GetTransform();
-		//Transform2DComponent& rTransfom2DComp = rComponent.GetEntity().GetComponent<Transform2DComponent>();
-		//sf::Transformable& rTransfom2DComp = rComponent.m_Internal;
-
-		sf::Color color = rComponent.GetColor();
-		uint32_t colorData =
-			((unsigned char)(color.r) << 0)  |
-			((unsigned char)(color.g) << 8)  |
-			((unsigned char)(color.b) << 16) |
-			((unsigned char)(color.a) << 24);
+		uint32_t colorData = (uint32_t)rComponent.GetColor().toInteger();
 
 		Radians rotation = Radians{ (float)rComponent.GetRotation() * ((float)std::numbers::pi / 180.0f) };
 		ModelData data = ModelData{
