@@ -37,6 +37,13 @@ namespace Smasher {
 			return m_ComponentsByType.find(index) != m_ComponentsByType.end();
 		}
 
+		template<class T>
+		void DependsOnComponent() {
+			if (!HasComponent<T>()) {
+				throw Exceptions::MissingComponentDependency(std::format("Missing Component Dependency {}", typeid(T).name()));
+			}
+		}
+
 		template<IComponentType T, typename... Args>
 		T& AddComponent(Args&&... componentArgs);
 
