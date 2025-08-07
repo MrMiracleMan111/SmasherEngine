@@ -105,11 +105,13 @@ namespace Smasher {
 		};
 
 		if (rComponent.m_OpaqueBatchContext) {
-			rComponent.m_OpaqueBatchContext.batch->models.at(rComponent.m_OpaqueBatchContext.index) = data;
+			memcpy(&rComponent.m_OpaqueBatchContext.batch->models[rComponent.m_OpaqueBatchContext.index], &data, sizeof(ModelData));
+			//rComponent.m_OpaqueBatchContext.batch->models[rComponent.m_OpaqueBatchContext.index] = data;
 			rComponent.m_OpaqueBatchContext.batch->dirty = true;
 		}
 		if (rComponent.m_TranslucentBatchContext) {
-			rComponent.m_TranslucentBatchContext.batch->models.at(rComponent.m_TranslucentBatchContext.index) = data;
+			memcpy(&rComponent.m_OpaqueBatchContext.batch->models[rComponent.m_OpaqueBatchContext.index], &data, sizeof(ModelData));
+			//rComponent.m_TranslucentBatchContext.batch->models[rComponent.m_TranslucentBatchContext.index] = data;
 			rComponent.m_TranslucentBatchContext.batch->dirty = true;
 		}
 	}
