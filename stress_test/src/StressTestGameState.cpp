@@ -23,11 +23,9 @@ void StressTestGameState::Init()
 	Smasher::Entity& rRenderTracker = AddEntity<Smasher::Entity>();
 
 	rUpdateTracker
-		.AddComponent<Smasher::Transform2DComponent>()
+		.AddComponent<Smasher::TextComponent>()
 			.SetPosition(10.0f, 10.0f)
 			.SetScale(1.0f, 1.0f)
-			.GetEntity()
-		.AddComponent<Smasher::TextComponent>()
 			.UseDefaults()
 			.SetFontAsset<Smasher::Resources::Fonts::arial>()
 			.SetFillColor(sf::Color::White)
@@ -35,11 +33,9 @@ void StressTestGameState::Init()
 			.SetOutlineColor(sf::Color::Black);
 
 	rRenderTracker
-		.AddComponent<Smasher::Transform2DComponent>()
+		.AddComponent<Smasher::TextComponent>()
 			.SetPosition(10.0f, 50.0f)
 			.SetScale(1.0f, 1.0f)
-			.GetEntity()
-		.AddComponent<Smasher::TextComponent>()
 			.UseDefaults()
 			.SetFontAsset<Smasher::Resources::Fonts::arial>()
 			.SetFillColor(sf::Color::White)
