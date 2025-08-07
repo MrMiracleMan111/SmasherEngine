@@ -6,7 +6,7 @@
 void BallComponent::SetEntity(Smasher::Entity& rEntity)
 {
 	IComponent::SetEntity(rEntity);
-	assert(rEntity.HasComponent<Smasher::DrawableComponent>());
+	rEntity.DependsOnComponent<Smasher::DrawableComponent>();
 	m_DrawableComponentPtr = &rEntity.GetComponent<Smasher::DrawableComponent>();
 	m_Collider.left = (int)m_DrawableComponentPtr->GetPosition().x;
 	m_Collider.top = (int)m_DrawableComponentPtr->GetPosition().y;
