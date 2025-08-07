@@ -50,10 +50,7 @@ namespace Smasher {
 	}
 
 	void Engine::Run() {
-#ifdef NDEBUG
 		try {
-#endif
-
 			std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
 			Millisecond updateTimer{ 0 };
 			Millisecond renderTimer{ 0 };
@@ -90,12 +87,11 @@ namespace Smasher {
 				std::this_thread::sleep_for(sleepTime);
 			}
 			Shutdown();
-#ifdef NDEBUG
 		}
 		catch (const std::exception& e) {
 			std::cerr << "Exception Thrown: " << e.what() << std::endl;
+			throw e;
 		}
-#endif
 	}
 
 	void Engine::Update(Millisecond delta) {
