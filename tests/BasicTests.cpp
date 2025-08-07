@@ -258,7 +258,7 @@ TEST(ResourcesTest, OpenReleaseFileResource) {
 }
 
 
-void TestCallback(Smasher::DummyEvent *e) {};
+void TestCallback(const Smasher::DummyEvent& e) {};
 
 TEST(EventsTest, InvalidEventHandle) {
 	Smasher::Engine engine(640, 420);
@@ -292,7 +292,7 @@ TEST(EventsTest, SinglePublishEvent) {
 	Smasher::EventManager& manager = state.GetEventManager();
 
 	int triggered_count = 0;
-	std::function<void(Smasher::DummyEvent*)> callback = [&triggered_count](Smasher::DummyEvent* event) {
+	std::function<void(const Smasher::DummyEvent&)> callback = [&triggered_count](const Smasher::DummyEvent& event) {
 		++triggered_count;
 	};
 	Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::DummyEvent>(callback);
@@ -309,8 +309,8 @@ TEST(EventsTest, MultiplePublishEvent) {
 	Smasher::EventManager& manager = state.GetEventManager();
 
 	int triggered_count = 0;
-	std::function<void(Smasher::DummyEvent*)> callback =
-	[&triggered_count](Smasher::DummyEvent* event) {
+	std::function<void(const Smasher::DummyEvent&)> callback =
+	[&triggered_count](const Smasher::DummyEvent& event) {
 		triggered_count++;
 	};
 	Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::DummyEvent>(callback);
@@ -330,7 +330,7 @@ TEST(EventsTest, SinglePublishUnsubscribeEvent) {
 	Smasher::EventManager& manager = state.GetEventManager();
 
 	int triggered_count = 0;
-	std::function<void(Smasher::DummyEvent*)> callback = [&triggered_count](Smasher::DummyEvent* event) {
+	std::function<void(const Smasher::DummyEvent&)> callback = [&triggered_count](const Smasher::DummyEvent& event) {
 		++triggered_count;
 		};
 	Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::DummyEvent>(callback);
@@ -352,14 +352,14 @@ TEST(EventsTest, MultiplePublishMultipleSubscribeEvent) {
 	Smasher::EventManager& manager = state.GetEventManager();
 
 	int triggered_count_1 = 0;
-	std::function<void(Smasher::DummyEvent*)> callback1 =
-		[&triggered_count_1](Smasher::DummyEvent* event) {
+	std::function<void(const Smasher::DummyEvent&)> callback1 =
+		[&triggered_count_1](const Smasher::DummyEvent& event) {
 		triggered_count_1++;
 		};
 
 	int triggered_count_2 = 0;
-	std::function<void(Smasher::DummyEventExtra*)> callback2 =
-		[&triggered_count_2](Smasher::DummyEventExtra* event) {
+	std::function<void(const Smasher::DummyEventExtra&)> callback2 =
+		[&triggered_count_2](const Smasher::DummyEventExtra& event) {
 		triggered_count_2++;
 		};
 
