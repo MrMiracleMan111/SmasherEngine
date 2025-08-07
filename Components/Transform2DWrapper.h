@@ -6,7 +6,8 @@ namespace Smasher {
 	template <class T>
 	class Transform2DWrapper {
 	public:
-		Transform2DWrapper(T& caller) : m_Transformable(), m_Caller(caller) {}
+		Transform2DWrapper(T& caller, sf::Transformable& rTransformable) :
+			m_Transformable(rTransformable), m_Caller(caller) {}
 
 		T& SetPosition(sf::Vector2f position);
 
@@ -22,8 +23,7 @@ namespace Smasher {
 
 		T& SetOrigin(float x, float y);
 
-		sf::Vector2f GetPosition() const { return m_Transformable.getPosition();
-		}
+		sf::Vector2f GetPosition() const { return m_Transformable.getPosition(); }
 
 		Degrees GetRotation() const { return (Degrees)(m_Transformable.getRotation()); }
 
@@ -46,7 +46,7 @@ namespace Smasher {
 		T& Scale(float x, float y);
 
 	protected:
-		sf::Transformable m_Transformable;
+		sf::Transformable& m_Transformable;
 	private:
 		T& m_Caller;
 	};
