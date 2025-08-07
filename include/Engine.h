@@ -9,7 +9,7 @@
 #include "EngineConfig.h"
 #include "ResourceManager.h"
 #include "EventManager.h"
-
+#include "Events.h"
 
 namespace Smasher {
 	class GameState;
@@ -48,6 +48,8 @@ namespace Smasher {
 #ifdef BENCHMARK
 		void BENCHMARK_LogAccumulatedTime();
 #endif
+
+		void OnWindowClose(const Events::WindowCloseEvent& event);
 
 		std::unordered_map<std::type_index, std::unique_ptr<GameState>> m_GameStateByType;
 		sf::RenderWindow m_Window;

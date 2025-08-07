@@ -48,6 +48,8 @@ namespace Smasher {
 			std::string message = std::format("GLEW Failed to initialize, status: {}", errCode);
 			throw Exceptions::GLEWInitFailed(message);
 		}
+
+		m_EventManager.Subscribe<Events::WindowCloseEvent>(std::bind(&Engine::OnWindowClose, this, std::placeholders::_1));
 	}
 
 	void Engine::Run() {
@@ -150,6 +152,10 @@ namespace Smasher {
 		}
 	}
 #endif
+
+	void Engine::OnWindowClose(const Events::WindowCloseEvent& event) {
+		m_RunningAtomic = false;
+	}
 
 	void Engine::Shutdown() {
 		m_RunningAtomic = false;
