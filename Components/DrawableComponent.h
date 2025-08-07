@@ -17,14 +17,14 @@ namespace Smasher {
 	SMASHER_USE_COMPONENT_MANAGER(DrawableComponentManager)
 
 	public:
-		DrawableComponent() : IComponent(), Transform2DWrapper(*this),
+		DrawableComponent() : IComponent(), Transform2DWrapper(*this, m_Transformable),
 			m_OpaqueBatchContext(nullptr, SIZE_MAX),
 			m_TranslucentBatchContext(nullptr, SIZE_MAX) {
 			SetScale(sf::Vector2f(100.0f, 100.0f));
 		}
 		DrawableComponent(
 			std::shared_ptr<TextureResource> texturePtr,
-			std::shared_ptr<ShaderResource> shaderPtr) : IComponent(), Transform2DWrapper(*this),
+			std::shared_ptr<ShaderResource> shaderPtr) : IComponent(), Transform2DWrapper(*this, m_Transformable),
 			m_ShaderResource(shaderPtr),
 			m_TextureResource(texturePtr),
 			m_OpaqueBatchContext(nullptr, SIZE_MAX),
@@ -77,6 +77,7 @@ namespace Smasher {
 		sf::IntRect m_ClipRect{0, 0, 0, 0};
 		sf::Color m_Color = sf::Color::White;
 		sf::Transform m_ClipTransform;
+		sf::Transformable m_Transformable;
 		bool m_TextureLoaded = false;
 		bool m_ClipChanged = false;
 		float m_Depth = 0.0f;
