@@ -76,9 +76,9 @@ namespace Smasher {
 			return batch != nullptr && index != SIZE_MAX;
 		}
 
+		BatchContext() = default; // Invalid state
 		BatchContext(RenderBatch* batch, std::size_t index) :
-			batch(batch), index(index) {
-		}
+			batch(batch), index(index) {}
 	};
 
 }
