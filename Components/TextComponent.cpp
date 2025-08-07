@@ -16,8 +16,7 @@ namespace Smasher {
 	void TextComponent::SetEntity(Entity& rEntity)
 	{
 		IComponent::SetEntity(rEntity);
-		assert(rEntity.HasComponent<Transform2DComponent>());
-
+		rEntity.DependsOnComponent<Transform2DComponent>();
 		rEntity.GetComponent<Transform2DComponent>()
 			.SetScale(1.0f, 1.0f);
 	}
