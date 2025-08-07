@@ -37,10 +37,9 @@ int main() {
 		.SetShader(shader)
 		.SetTextureAsset<Smasher::Resources::Textures::small_art>()
 		//.SetClipRect(sf::IntRect{ 0, 0, 64, 64 })
-		.SetClipRotation(Smasher::Degrees{30})
-		.SetDepth(0.2f)
-		.PushToGPU(); // Render in reverse with i=0 being on top
-	
+		.SetClipRotation(Smasher::Degrees{ 30 })
+		.SetDepth(0.2f);
+
 	// Create 10 entites
 	// Half will have a non-alpha image
 	// Half will have image with alpha pixels
@@ -61,14 +60,12 @@ int main() {
 			.SetDepth(depth);
 
 		if (i % 2 == 0) {
-			 image.GetComponent<DrawableComponent>()
-				 .SetTextureAsset<Smasher::Resources::Textures::alpha_test>()
-				 .PushToGPU();
+			image.GetComponent<DrawableComponent>()
+				.SetTextureAsset<Smasher::Resources::Textures::alpha_test>();
 		}
 		else {
 			image.GetComponent<DrawableComponent>()
-				.SetTextureAsset<Smasher::Resources::Textures::small_art>()
-				.PushToGPU();
+				.SetTextureAsset<Smasher::Resources::Textures::small_art>();
 		}
 
 	}
@@ -84,8 +81,7 @@ int main() {
 		.SetTextureAsset<Smasher::Resources::Textures::window>(true)
 		.SetClipRect(sf::IntRect{ 10, 0, 64, 64 })
 		.SetClipRotation(Smasher::Degrees{ 30 })
-		.SetDepth(0.6)
-		.PushToGPU(); // Window on top
+		.SetDepth(0.6);
 
 	Entity& window2 = state.AddEntity<Smasher::Entity>();
 	window2.AddComponent<Transform2DComponent>()
@@ -96,8 +92,7 @@ int main() {
 		.SetShader(shader)
 		.SetTextureAsset<Smasher::Resources::Textures::window>(true)
 		//.SetClipRect(sf::IntRect{ 0, 0, 64, 64 })
-		.SetDepth(0.5)
-		.PushToGPU(); // Window on bottom
+		.SetDepth(0.5);
 
 	Entity& inWindowEntity = state.AddEntity<Smasher::Entity>();
 	inWindowEntity.AddComponent<Transform2DComponent>()
@@ -108,8 +103,7 @@ int main() {
 		.SetShader(shader)
 		.SetTextureAsset<Smasher::Resources::Textures::alpha_test>()
 		.SetClipRotation(Smasher::Degrees{ 30 })
-		.SetDepth(0.55)
-		.PushToGPU(); // Window on bottom
+		.SetDepth(0.55);
 
 
 

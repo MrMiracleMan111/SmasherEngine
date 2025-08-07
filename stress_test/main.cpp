@@ -24,10 +24,8 @@ int main(int argc, char **argv) {
 	StressTestGameState& state = engine.AddState<StressTestGameState>();
 
 	state.AddEntity<Smasher::Entity>()
-		.AddComponent<Smasher::Transform2DComponent>()
-		.SetPosition(10.0f, 100.0f)
-		.GetEntity()
 		.AddComponent<Smasher::TextComponent>()
+		.SetPosition(10.0f, 100.0f)
 		.UseDefaults()
 		.SetFontAsset<Smasher::Resources::Fonts::arial>()
 		.SetFillColor(sf::Color::White)
@@ -59,13 +57,11 @@ int main(int argc, char **argv) {
 
 		if (i % 2 == 0) {
 			image.GetComponent<DrawableComponent>()
-				.SetTextureAsset<Smasher::Resources::Textures::alpha_test>()
-				.PushToGPU();
+				.SetTextureAsset<Smasher::Resources::Textures::alpha_test>();
 		}
 		else {
 			image.GetComponent<DrawableComponent>()
-				.SetTextureAsset<Smasher::Resources::Textures::small_art>()
-				.PushToGPU();
+				.SetTextureAsset<Smasher::Resources::Textures::small_art>();
 		}
 
 	}
