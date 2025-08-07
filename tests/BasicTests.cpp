@@ -258,7 +258,7 @@ TEST(ResourcesTest, OpenReleaseFileResource) {
 }
 
 
-void TestCallback(const Smasher::DummyEvent& e) {};
+void TestCallback(const Smasher::Events::DummyEvent& e) {};
 
 TEST(EventsTest, InvalidEventHandle) {
 	Smasher::Engine engine(640, 420);
@@ -266,7 +266,7 @@ TEST(EventsTest, InvalidEventHandle) {
 
 
 	Smasher::EventManager& manager = state.GetEventManager();
-	Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::DummyEvent>(TestCallback);
+	Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::Events::DummyEvent>(TestCallback);
 	Smasher::EventSubscriptionHandle other_handle = std::move(handle);
 	ASSERT_THROW({
 		manager.Unsubscribe(std::move(handle));
@@ -283,7 +283,7 @@ TEST(EventsTest, SubscribeEvent) {
 	Smasher::Engine engine(640, 420);
 	DummyGameState& state = engine.AddState<DummyGameState>();
 	Smasher::EventManager& manager = state.GetEventManager();
-	Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::DummyEvent>(TestCallback);
+	Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::Events::DummyEvent>(TestCallback);
 }
 
 TEST(EventsTest, SinglePublishEvent) {
@@ -292,12 +292,12 @@ TEST(EventsTest, SinglePublishEvent) {
 	Smasher::EventManager& manager = state.GetEventManager();
 
 	int triggered_count = 0;
-	std::function<void(const Smasher::DummyEvent&)> callback = [&triggered_count](const Smasher::DummyEvent& event) {
+	std::function<void(const Smasher::Events::DummyEvent&)> callback = [&triggered_count](const Smasher::Events::DummyEvent& event) {
 		++triggered_count;
 	};
-	Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::DummyEvent>(callback);
+	Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::Events::DummyEvent>(callback);
 
-	manager.Publish<Smasher::DummyEvent>("Dummy Event 1");
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
 	manager.Dispatch();
 	manager.Dispatch();
 	ASSERT_EQ(triggered_count, 1);
@@ -309,15 +309,15 @@ TEST(EventsTest, MultiplePublishEvent) {
 	Smasher::EventManager& manager = state.GetEventManager();
 
 	int triggered_count = 0;
-	std::function<void(const Smasher::DummyEvent&)> callback =
-	[&triggered_count](const Smasher::DummyEvent& event) {
+	std::function<void(const Smasher::Events::DummyEvent&)> callback =
+	[&triggered_count](const Smasher::Events::DummyEvent& event) {
 		triggered_count++;
 	};
-	Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::DummyEvent>(callback);
+	Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::Events::DummyEvent>(callback);
 
-	manager.Publish<Smasher::DummyEvent>("Dummy Event 1");
-	manager.Publish<Smasher::DummyEvent>("Dummy Event 2");
-	manager.Publish<Smasher::DummyEvent>("Dummy Event 3");
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 2");
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 3");
 	manager.Dispatch();
 	manager.Dispatch();
 	ASSERT_EQ(triggered_count, 3);
@@ -330,12 +330,12 @@ TEST(EventsTest, SinglePublishUnsubscribeEvent) {
 	Smasher::EventManager& manager = state.GetEventManager();
 
 	int triggered_count = 0;
-	std::function<void(const Smasher::DummyEvent&)> callback = [&triggered_count](const Smasher::DummyEvent& event) {
+	std::function<void(const Smasher::Events::DummyEvent&)> callback = [&triggered_count](const Smasher::Events::DummyEvent& event) {
 		++triggered_count;
 		};
-	Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::DummyEvent>(callback);
+	Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::Events::DummyEvent>(callback);
 
-	manager.Publish<Smasher::DummyEvent>("Dummy Event 1");
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
 	manager.Unsubscribe(std::move(handle));
 	ASSERT_THROW({
 		manager.Unsubscribe(std::move(handle));
@@ -352,25 +352,25 @@ TEST(EventsTest, MultiplePublishMultipleSubscribeEvent) {
 	Smasher::EventManager& manager = state.GetEventManager();
 
 	int triggered_count_1 = 0;
-	std::function<void(const Smasher::DummyEvent&)> callback1 =
-		[&triggered_count_1](const Smasher::DummyEvent& event) {
+	std::function<void(const Smasher::Events::DummyEvent&)> callback1 =
+		[&triggered_count_1](const Smasher::Events::DummyEvent& event) {
 		triggered_count_1++;
 		};
 
 	int triggered_count_2 = 0;
-	std::function<void(const Smasher::DummyEventExtra&)> callback2 =
-		[&triggered_count_2](const Smasher::DummyEventExtra& event) {
+	std::function<void(const Smasher::Events::DummyEventExtra&)> callback2 =
+		[&triggered_count_2](const Smasher::Events::DummyEventExtra& event) {
 		triggered_count_2++;
 		};
 
-	Smasher::EventSubscriptionHandle handle1 = manager.Subscribe<Smasher::DummyEvent>(callback1);
-	Smasher::EventSubscriptionHandle handle2 = manager.Subscribe<Smasher::DummyEventExtra>(callback2);
+	Smasher::EventSubscriptionHandle handle1 = manager.Subscribe<Smasher::Events::DummyEvent>(callback1);
+	Smasher::EventSubscriptionHandle handle2 = manager.Subscribe<Smasher::Events::DummyEventExtra>(callback2);
 
-	manager.Publish<Smasher::DummyEvent>("Dummy Event 1");
-	manager.Publish<Smasher::DummyEvent>("Dummy Event 2");
-	manager.Publish<Smasher::DummyEventExtra>("Dummy Event Extra 1");
-	manager.Publish<Smasher::DummyEvent>("Dummy Event 3");
-	manager.Publish<Smasher::DummyEventExtra>("Dummy Event Extra 2");
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 2");
+	manager.Publish<Smasher::Events::DummyEventExtra>("Dummy Event Extra 1");
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 3");
+	manager.Publish<Smasher::Events::DummyEventExtra>("Dummy Event Extra 2");
 	manager.Dispatch();
 	manager.Dispatch();
 	ASSERT_EQ(triggered_count_1, 3);
