@@ -70,7 +70,9 @@ namespace Smasher {
 		GameState(Engine& engine) :
 			m_Engine(engine),
 			m_EventManager(engine.GetEventManager()),
-			m_ResourceManager(engine.GetResourceManager()) {}
+			m_ResourceManager(engine.GetResourceManager()),
+			m_UpdateTime(Millisecond::zero()),
+			m_RenderTime(Millisecond::zero()){}
 
 		void RenderComponentManagers(sf::RenderWindow& window);
 		void UpdateComponentManagers(Millisecond delta);
