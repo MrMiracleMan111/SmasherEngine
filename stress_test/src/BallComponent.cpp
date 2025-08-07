@@ -40,7 +40,6 @@ void BallComponent::StaticUpdateComponent(BallComponent& self, Smasher::Millisec
 	}
 
 	self.m_DrawableComponentPtr->SetPosition(position);
-	self.m_DrawableComponentPtr->PushToGPU();
 }
 
 BallComponent& BallComponent::SetVelocity(sf::Vector2f velocity) {
