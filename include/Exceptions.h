@@ -24,6 +24,8 @@ namespace Smasher {
 		// ==== COMPONENT EXCEPTIONS ====
 		SMASHER_EXCEPTION(ComponentInvalid)
 		SMASHER_EXCEPTION(ComponentDowncastFailed)
+		SMASHER_EXCEPTION(MissingComponentDependency)
+
 
 		// ==== ENTITY EXCEPTIONS ====
 		SMASHER_EXCEPTION(EntityDuplicateComponent)
