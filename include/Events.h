@@ -7,14 +7,14 @@
 
 #define SMASHER_EVENT_TYPE(type) \
 static constexpr EventType GetStaticEventType() { return type; }; \
-EventType GetEventType() override { return GetStaticEventType(); }; \
+EventType GetEventType() const override { return GetStaticEventType(); }; \
 
 namespace Smasher {
 	using SMASHER_TIMESTAMP = std::chrono::time_point<std::chrono::system_clock>;
 
 	struct SMASHER_API Event {
 		SMASHER_TIMESTAMP Timestamp;
-		virtual EventType GetEventType() = 0;
+		virtual EventType GetEventType() const = 0;
 		virtual ~Event() {};
 		Event() = delete;
 
@@ -53,7 +53,7 @@ namespace Smasher {
 		// Intermediate class to represent mouse events
 		struct MouseEvent : public Event {
 			Mouse::MouseEventType Type;
-			EventType GetEventType() = 0;
+			virtual EventType GetEventType() const = 0;
 			~MouseEvent() {};
 		protected:
 			MouseEvent() = delete;
