@@ -5,6 +5,7 @@
 #include <array>
 #include <chrono>
 #include <functional>
+#include <mutex>
 #include "Base.h"
 
 namespace Smasher {
@@ -55,7 +56,7 @@ namespace Smasher {
 
 	class SMASHER_API EventManager final {
 	public:
-		EventManager();
+		EventManager() : m_AsyncEventConsumerThread(&EventManager::AsyncEventConsumer, this) {}
 		~EventManager();
 		EventManager(EventManager&) = delete;
 		EventManager(EventManager&&) = delete;
@@ -85,9 +86,17 @@ namespace Smasher {
 
 		// Subscribe to asynchronous event handling (uses separate Event thread)
 		template<class T>
-		EventSubscriptionHandle SubscribeAsync(std::function<void(T*)> callback) {
-			static_assert(false, "TODO");
-			return EventSubscriptionHandle{ };
+		EventSubscriptionHandle SubscribeAsync(std::function<void(const T&)> callback) {
+			std::scoped_lock lock(m_AsyncEventSwapQueueMutex);
+			static_assert(std::is_base_of<Event, T>::value, "T must inherit from Event");
+
+			constexpr std::size_t index = static_cast<std::size_t>(T::GetStaticEventType());
+			std::list<EventSubscription>& list = m_AsyncEventSubscriptionsByType.at(index);
+
+			auto bound = [callback](const Event& arg) {callback(static_cast<const T&>(arg)); };
+
+			list.push_back(EventSubscription{ bound });
+			return EventSubscriptionHandle{ list, std::prev(list.end()) };
 		}
 
 		template<class T, class C>
@@ -101,14 +110,38 @@ namespace Smasher {
 		template<class T, typename... Args>
 		void Publish(Args&&... eventArgs) {
 			static_assert(std::is_base_of<Event, T>::value, "T must inherit from Event");
-			std::unique_ptr<T> pEvent = std::make_unique<T>(std::chrono::system_clock::now(), std::forward<Args>(eventArgs)...);
-			m_EventQueue.push_back(std::move(pEvent));
+			std::shared_ptr<const T> pEvent = std::make_shared<const T>(std::chrono::system_clock::now(), std::forward<Args>(eventArgs)...);
+			m_EventQueue.push_back(pEvent);
+
+			std::unique_lock lock(m_AsyncEventSwapQueueMutex);
+			m_AsyncEventSwapQueue.push_back(pEvent);
+			lock.unlock();
+
+			std::unique_lock notifyLock(m_AsyncEventsMutex);
+			m_AsyncEventsCV.notify_all();
 		};
 
 		void Dispatch();
 
+		void DispatchAsync();
+
+		void AsyncEventConsumer();
+
+		void Shutdown();
+
 	private:
 		std::array< std::list<EventSubscription>, static_cast<std::size_t>(EventType::END)> m_EventSubscriptionsByType{};
-		std::vector<std::unique_ptr<Event>> m_EventQueue;
+		std::array< std::list<EventSubscription>, static_cast<std::size_t>(EventType::END)> m_AsyncEventSubscriptionsByType{};
+
+		std::vector<std::shared_ptr<const Event>> m_EventQueue;
+		std::vector<std::shared_ptr<const Event>> m_AsyncEventQueue; // Events currently being processed in async queue
+
+		std::vector<std::shared_ptr<const Event>> m_AsyncEventSwapQueue; // Events to be processed next in async queue
+		std::condition_variable m_AsyncEventsCV;
+		std::atomic_bool m_AsyncRunning = true;
+		std::mutex m_AsyncEventsMutex;
+		std::mutex m_AsyncEventSwapQueueMutex;
+
+		std::thread m_AsyncEventConsumerThread;
 	};
 }
