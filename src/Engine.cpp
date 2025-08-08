@@ -49,7 +49,7 @@ namespace Smasher {
 			throw Exceptions::GLEWInitFailed(message);
 		}
 
-		m_EventManager.Subscribe<Events::WindowCloseEvent>(std::bind(&Engine::OnWindowClose, this, std::placeholders::_1));
+		m_EventManager.Subscribe<Events::WindowCloseEvent>(&Engine::OnWindowClose, this);
 	}
 
 	void Engine::Run() {

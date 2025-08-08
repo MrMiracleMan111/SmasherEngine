@@ -29,7 +29,7 @@ namespace Smasher {
 
 		EventManager& rEventManager = state.GetEngine().GetEventManager();
 		EventSubscriptionHandle handle = rEventManager.Subscribe<Events::WindowCloseEvent>(
-			std::bind(&DrawableComponentManager::OnWindowClose, this, std::placeholders::_1)
+			&DrawableComponentManager::OnWindowClose, this
 		);
 	}
 
