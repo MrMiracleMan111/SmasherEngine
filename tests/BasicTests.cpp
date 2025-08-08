@@ -267,6 +267,7 @@ TEST(ResourcesTest, OpenReleaseFileResource) {
 
 void TestCallback(const Smasher::Events::DummyEvent& e) {};
 
+
 TEST(EventsTest, InvalidEventHandle) {
 	Smasher::Engine engine(640, 420);
 	DummyGameState& state = engine.AddState<DummyGameState>();
@@ -382,6 +383,51 @@ TEST(EventsTest, MultiplePublishMultipleSubscribeEvent) {
 	manager.Dispatch();
 	ASSERT_EQ(3, triggered_count_1);
 	ASSERT_EQ(2, triggered_count_2);
+}
+
+TEST(AsyncEventTest, SubscribeEvent) {
+	Smasher::Engine engine(640, 420);
+	DummyGameState& state = engine.AddState<DummyGameState>();
+	Smasher::EventManager& manager = state.GetEventManager();
+	Smasher::EventSubscriptionHandle handle = manager.SubscribeAsync<Smasher::Events::DummyEvent>(TestCallback);
+
+}
+
+TEST(AsyncEventTest, PublishEvent) {
+	Smasher::Engine engine(640, 420);
+	DummyGameState& state = engine.AddState<DummyGameState>();
+	Smasher::EventManager& manager = state.GetEventManager();
+	int count = 10;
+	auto incrementFunc = [&count] (const Smasher::Events::DummyEvent&) {
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+		count += 5;
+	};
+
+	Smasher::EventSubscriptionHandle handle = manager.SubscribeAsync<Smasher::Events::DummyEvent>(incrementFunc);
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
+	ASSERT_EQ(10, count);
+	std::this_thread::sleep_for(std::chrono::seconds(2));
+	ASSERT_EQ(15, count);
+}
+
+TEST(AsyncEventTest, MultiplePublishEvent) {
+	Smasher::Engine engine(640, 420);
+	DummyGameState& state = engine.AddState<DummyGameState>();
+	Smasher::EventManager& manager = state.GetEventManager();
+	int count = 10;
+	auto incrementFunc = [&count](const Smasher::Events::DummyEvent&) {
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+		count += 5;
+	};
+
+	Smasher::EventSubscriptionHandle handle = manager.SubscribeAsync<Smasher::Events::DummyEvent>(incrementFunc);
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
+	ASSERT_EQ(10, count);
+	std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+	ASSERT_EQ(15, count);
+	std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+	ASSERT_EQ(20, count);
 }
 
 TEST(EngineTest, NoShutdownEngine) {
