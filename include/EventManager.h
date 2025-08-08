@@ -76,6 +76,13 @@ namespace Smasher {
 			return EventSubscriptionHandle{ list, std::prev(list.end()) };
 		}
 
+		// Overload for class memebr function ex:
+		// Subscribe<EventType>(&Class::MemberFunc, classInstancePointer);
+		template<class T, class C>
+		EventSubscriptionHandle Subscribe(void (C::* method)(const T&), C* instance) {
+			return Subscribe<T>(std::bind(method, instance, std::placeholders::_1));
+		}
+
 		// Subscribe to asynchronous event handling (uses separate Event thread)
 		template<class T>
 		EventSubscriptionHandle SubscribeAsync(std::function<void(T*)> callback) {
@@ -86,8 +93,9 @@ namespace Smasher {
 
 			auto bound = [callback](const Event& arg) {callback(static_cast<const T&>(arg)); };
 
-			list.push_back(EventSubscription{ bound });
-			return EventSubscriptionHandle{ list, std::prev(list.end()) };
+		template<class T, class C>
+		EventSubscriptionHandle SubscribeAsync(void (C::* method)(const T&), C* instance) {
+			return SubscribeAsync<T>(std::bind(method, instance, std::placeholders::_1));
 		}
 
 		void Unsubscribe(EventSubscriptionHandle handle);
