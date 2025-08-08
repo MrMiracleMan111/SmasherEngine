@@ -236,16 +236,23 @@ TEST(ResourcesTest, OpenFileResource) {
 	Smasher::Engine engine(640, 420);
 	Smasher::ResourceManager& rResourceManager = engine.GetResourceManager();
 	std::ios_base::openmode flags = std::ios_base::out;
-	auto pFileResource = rResourceManager.GetOrLoadResource<Smasher::FileResource>(Smasher::ResourceID{ 1 }, Smasher::ResourcePath{ "test_file" }, flags);
+	Smasher::ResourceID fileResourceID{ 1 };
+	auto pFileResource = rResourceManager.GetOrLoadResource<Smasher::FileResource>(fileResourceID, Smasher::ResourcePath{ "test_file" }, flags);
 
-	//auto pFileResource = rResourceManager.GetOrLoadResource<Smasher::FileResource>(1, { Smasher::ResourcePath{"test_file"} }, size_t{ 1 }, flags);
+	ASSERT_NO_THROW({ rResourceManager.GetResource<Smasher::FileResource>(fileResourceID); });
+	ASSERT_TRUE(pFileResource->GetFileStream().is_open());
 	pFileResource->GetFileStream() << "message";
+	ASSERT_TRUE(pFileResource->GetFileStream().is_open());
+	rResourceManager.ReleaseResource(fileResourceID);
+	pFileResource.reset();
+	ASSERT_THROW({ rResourceManager.GetResource<Smasher::FileResource>(fileResourceID); }, Smasher::Exceptions::ResourceNotLoaded);
+	ASSERT_EQ(nullptr, pFileResource.get());
 
-	char buffer[16] = { 0 };
-	std::fstream file("test_file", std::ios_base::in);
-	file.seekg(0);
-	file.read(buffer, 16);
-	EXPECT_STREQ("message", buffer);
+	std::string line;
+	std::ifstream file("test_file", std::ios_base::in);
+	ASSERT_TRUE(file.is_open());
+	std::getline(file, line);
+	ASSERT_STREQ("message", line.c_str());
 }
 
 TEST(ResourcesTest, OpenReleaseFileResource) {
