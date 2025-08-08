@@ -86,12 +86,9 @@ namespace Smasher {
 		// Subscribe to asynchronous event handling (uses separate Event thread)
 		template<class T>
 		EventSubscriptionHandle SubscribeAsync(std::function<void(T*)> callback) {
-			static_assert(std::is_base_of<Event, T>::value, "T must inherit from Event");
-
-			constexpr std::size_t index = static_cast<std::size_t>(T::GetStaticEventType());
-			std::list<EventSubscription>& list = m_EventSubscriptionsByType.at(index);
-
-			auto bound = [callback](const Event& arg) {callback(static_cast<const T&>(arg)); };
+			static_assert(false, "TODO");
+			return EventSubscriptionHandle{ };
+		}
 
 		template<class T, class C>
 		EventSubscriptionHandle SubscribeAsync(void (C::* method)(const T&), C* instance) {
