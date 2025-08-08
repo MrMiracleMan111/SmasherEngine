@@ -1,7 +1,6 @@
 #pragma once
 #include "Base.h"
 #include "IComponent.h"
-#include "Transform2DComponent.h"
 #include "ResourceManager.h"
 #include "EngineConfig.h"
 #include "Transform2DWrapper.h"

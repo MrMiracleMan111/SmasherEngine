@@ -15,7 +15,6 @@
 
 #include "ComponentManagers/DrawableComponentManager.h"
 #include "Components/DrawableComponent.h"
-#include "Components/Transform2DComponent.h"
 #include "GameState.h"
 #include "ResourceManager.h"
 #include "RenderBatch.h"

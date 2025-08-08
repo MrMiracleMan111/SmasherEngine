@@ -3,7 +3,6 @@
 #include "DrawableComponent.h"
 #include "IComponent.h"
 #include "Entity.h"
-#include "Components/Transform2DComponent.h"
 #include "ComponentManagers/DrawableComponentManager.h"
 
 namespace Smasher {
