@@ -30,10 +30,9 @@ int main() {
 	rCompManager.SetShaderResource(shader);
 
 	Entity& image = state.AddEntity<Smasher::Entity>();
-	image.AddComponent<Transform2DComponent>()
-		.SetPosition(sf::Vector2f(500.0f, 300.0f))
-		.SetScale(sf::Vector2f(400.0f, 400.0f));
 	image.AddComponent<DrawableComponent>()
+		.SetPosition(sf::Vector2f(500.0f, 300.0f))
+		.SetScale(sf::Vector2f(400.0f, 400.0f))
 		.SetShader(shader)
 		.SetTextureAsset<Smasher::Resources::Textures::small_art>()
 		//.SetClipRect(sf::IntRect{ 0, 0, 64, 64 })
@@ -50,11 +49,9 @@ int main() {
 		int separation = 20;
 		int offset = 100;
 		Entity& image = state.AddEntity<Smasher::Entity>();
-		image.AddComponent<Transform2DComponent>()
-			.SetPosition(sf::Vector2f((float)(i * separation + offset), (float)(i * separation + offset)))
-			.SetScale(sf::Vector2f(100.0f, 100.0f));
-
 		image.AddComponent<DrawableComponent>()
+			.SetPosition(sf::Vector2f((float)(i * separation + offset), (float)(i * separation + offset)))
+			.SetScale(sf::Vector2f(100.0f, 100.0f))
 			.SetShader(shader)
 			.SetClipRect(sf::IntRect{ 0, 0, 30, 20 })
 			.SetDepth(depth);
@@ -72,11 +69,9 @@ int main() {
 
 	// Create a window
 	Entity& window1 = state.AddEntity<Smasher::Entity>();
-	window1.AddComponent<Transform2DComponent>()
-		.SetPosition(sf::Vector2f(400, 200))
-		.SetScale(sf::Vector2f(150.0f, 150.0f));
-
 	window1.AddComponent<DrawableComponent>()
+		.SetPosition(sf::Vector2f(400, 200))
+		.SetScale(sf::Vector2f(150.0f, 150.0f))
 		.SetShader(shader)
 		.SetTextureAsset<Smasher::Resources::Textures::window>(true)
 		.SetClipRect(sf::IntRect{ 10, 0, 64, 64 })
@@ -84,22 +79,18 @@ int main() {
 		.SetDepth(0.6);
 
 	Entity& window2 = state.AddEntity<Smasher::Entity>();
-	window2.AddComponent<Transform2DComponent>()
-		.SetPosition(sf::Vector2f(420, 220))
-		.SetScale(sf::Vector2f(150.0f, 150.0f));
-
 	window2.AddComponent<DrawableComponent>()
+		.SetPosition(sf::Vector2f(420, 220))
+		.SetScale(sf::Vector2f(150.0f, 150.0f))
 		.SetShader(shader)
 		.SetTextureAsset<Smasher::Resources::Textures::window>(true)
 		//.SetClipRect(sf::IntRect{ 0, 0, 64, 64 })
 		.SetDepth(0.5);
 
 	Entity& inWindowEntity = state.AddEntity<Smasher::Entity>();
-	inWindowEntity.AddComponent<Transform2DComponent>()
-		.SetPosition(sf::Vector2f(410, 210))
-		.SetScale(sf::Vector2f(100.0f, 100.0f));
-
 	inWindowEntity.AddComponent<DrawableComponent>()
+		.SetPosition(sf::Vector2f(410, 210))
+		.SetScale(sf::Vector2f(100.0f, 100.0f))
 		.SetShader(shader)
 		.SetTextureAsset<Smasher::Resources::Textures::alpha_test>()
 		.SetClipRotation(Smasher::Degrees{ 30 })
@@ -108,7 +99,6 @@ int main() {
 
 
 	Entity& message = state.AddEntity<Smasher::Entity>();
-	message.AddComponent<Transform2DComponent>();
 	message.AddComponent<TextComponent>()
 		.SetString("Hello World")
 		.UseDefaults()
