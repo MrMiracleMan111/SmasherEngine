@@ -147,7 +147,7 @@ TEST(EntityTest, InitEntity) {
 	Smasher::Engine engine(640, 420);
 	DummyGameState& state = engine.AddState<DummyGameState>();
 	InitEntityTest& entity = state.AddEntity<InitEntityTest>();
-	EXPECT_EQ(entity.GetValue(), 1);
+	EXPECT_EQ(1, entity.GetValue());
 }
 
 TEST(EntityTest, InitRemoveEntity) {
@@ -245,7 +245,7 @@ TEST(ResourcesTest, OpenFileResource) {
 	std::fstream file("test_file", std::ios_base::in);
 	file.seekg(0);
 	file.read(buffer, 16);
-	EXPECT_STREQ(buffer, "message");
+	EXPECT_STREQ("message", buffer);
 }
 
 TEST(ResourcesTest, OpenReleaseFileResource) {
@@ -300,7 +300,7 @@ TEST(EventsTest, SinglePublishEvent) {
 	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
 	manager.Dispatch();
 	manager.Dispatch();
-	ASSERT_EQ(triggered_count, 1);
+	ASSERT_EQ(1, triggered_count);
 }
 
 TEST(EventsTest, MultiplePublishEvent) {
@@ -320,7 +320,7 @@ TEST(EventsTest, MultiplePublishEvent) {
 	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 3");
 	manager.Dispatch();
 	manager.Dispatch();
-	ASSERT_EQ(triggered_count, 3);
+	ASSERT_EQ(3, triggered_count);
 }
 
 
@@ -342,7 +342,7 @@ TEST(EventsTest, SinglePublishUnsubscribeEvent) {
 	}, Smasher::Exceptions::EventHandleInvalid);
 	manager.Dispatch();
 	manager.Dispatch();
-	ASSERT_EQ(triggered_count, 0);
+	ASSERT_EQ(0, triggered_count);
 }
 
 
@@ -373,8 +373,8 @@ TEST(EventsTest, MultiplePublishMultipleSubscribeEvent) {
 	manager.Publish<Smasher::Events::DummyEventExtra>("Dummy Event Extra 2");
 	manager.Dispatch();
 	manager.Dispatch();
-	ASSERT_EQ(triggered_count_1, 3);
-	ASSERT_EQ(triggered_count_2, 2);
+	ASSERT_EQ(3, triggered_count_1);
+	ASSERT_EQ(2, triggered_count_2);
 }
 
 TEST(EngineTest, NoShutdownEngine) {
@@ -426,12 +426,12 @@ TEST(EngineTest, ShutdownEngine) {
 TEST(GameStateTest, InitGameState) {
 	Smasher::Engine engine(640, 420);
 	InitTestGameState& state = engine.AddState<InitTestGameState>();
-	EXPECT_EQ(state.GetValue(), 1);
+	EXPECT_EQ(1, state.GetValue());
 	state.Activate();
 	engine.Update(Smasher::Millisecond{ 10 });
 	engine.Update(Smasher::Millisecond{ 10 });
 	engine.Render(engine.GetWindow());
-	EXPECT_EQ(state.GetValue(), 1);
+	EXPECT_EQ(1, state.GetValue());
 }
 
 TEST(EngineTest, ExplicitDoubleShutdownEngine) {
