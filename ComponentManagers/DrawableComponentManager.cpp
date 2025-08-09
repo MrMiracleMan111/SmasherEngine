@@ -113,17 +113,20 @@ namespace Smasher {
 			{ rComponent.GetScale().x, rComponent.GetScale().y },
 			Mat3(rComponent.GetClipTransform()),
 			rotation,
-			colorData
+			colorData,
+			nullptr
 		};
 
 		if (rComponent.m_OpaqueBatchContext) {
 			memcpy(&rComponent.m_OpaqueBatchContext.batch->models[rComponent.m_OpaqueBatchContext.index], &data, sizeof(ModelData));
 			//rComponent.m_OpaqueBatchContext.batch->models[rComponent.m_OpaqueBatchContext.index] = data;
+			rComponent.m_OpaqueBatchContext.batch->models[rComponent.m_OpaqueBatchContext.index].ownerContext = &rComponent.m_OpaqueBatchContext;
 			rComponent.m_OpaqueBatchContext.batch->dirty = true;
 		}
 		if (rComponent.m_TranslucentBatchContext) {
 			memcpy(&rComponent.m_TranslucentBatchContext.batch->models[rComponent.m_TranslucentBatchContext.index], &data, sizeof(ModelData));
 			//rComponent.m_TranslucentBatchContext.batch->models[rComponent.m_TranslucentBatchContext.index] = data;
+			rComponent.m_TranslucentBatchContext.batch->models[rComponent.m_TranslucentBatchContext.index].ownerContext = &rComponent.m_TranslucentBatchContext;
 			rComponent.m_TranslucentBatchContext.batch->dirty = true;
 		}
 	}
@@ -180,8 +183,8 @@ namespace Smasher {
 	void DrawableComponentManager::OnWindowClose(const Events::WindowCloseEvent& event) {
 		// Invalidate all Batch Contexts
 		for (auto& itr : m_Components) {
-			itr.m_OpaqueBatchContext = BatchContext{}; // Invalidate it
-			itr.m_TranslucentBatchContext = BatchContext{}; // Invalidate it
+			itr.m_OpaqueBatchContext.Invalidate(); // Invalidate it
+			itr.m_TranslucentBatchContext.Invalidate(); // Invalidate it
 		}
 		
 		// Clear all OpenGL Buffers

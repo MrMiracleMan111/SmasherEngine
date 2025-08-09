@@ -21,6 +21,7 @@ namespace Smasher {
 		Mat3 texTransform = Mat3{};
 		Radians rotation = Radians{ 0 };
 		uint32_t color = 0;
+		BatchContext* ownerContext = nullptr;
 	};
 
 	// Models will use 2D plane
@@ -72,13 +73,22 @@ namespace Smasher {
 		RenderBatch* batch = nullptr; // Pointer to a render batch the drawable component is a part of
 		std::size_t index = SIZE_MAX; // Index of the drawable component within the Render Batch
 
+		BatchContext() = default; // Invalid state
+		BatchContext(RenderBatch* batch, std::size_t index) :
+			batch(batch), index(index) {}
+
+		// Non-Copyable
+		BatchContext(const BatchContext&) = delete;
+		BatchContext& operator =(const BatchContext&) = delete;
+
 		operator bool() const {
 			return batch != nullptr && index != SIZE_MAX;
 		}
 
-		BatchContext() = default; // Invalid state
-		BatchContext(RenderBatch* batch, std::size_t index) :
-			batch(batch), index(index) {}
+		void Invalidate() {
+			batch = nullptr;
+			index = SIZE_MAX;
+		}
 	};
 
 }
