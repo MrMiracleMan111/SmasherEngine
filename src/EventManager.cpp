@@ -5,11 +5,12 @@ namespace Smasher {
 		Shutdown();
 	}
 
-	void EventManager::Unsubscribe(EventSubscriptionHandle handle) {
+	void EventManager::Unsubscribe(EventSubscriptionHandle& handle) {
 		if (!handle.IsValid()) {
 			throw Exceptions::EventHandleInvalid("Handle is invalid");
 		}
-		handle.m_List.erase(handle.m_Itr);
+		handle.Invalidate();
+		handle.m_SubscriptionListPtr->erase(handle.m_Itr);
 	}
 
 	void EventManager::Dispatch() {
@@ -53,5 +54,34 @@ namespace Smasher {
 			lock.unlock();
 			m_AsyncEventConsumerThread.join();
 		}
+	}
+	EventSubscriptionHandle::~EventSubscriptionHandle()
+	{
+		if (IsValid()) {
+			m_EventManagerPtr->Unsubscribe(*this);
+		}
+	}
+
+	EventSubscriptionHandle::EventSubscriptionHandle(EventSubscriptionHandle&& other) noexcept :
+		m_SubscriptionListPtr(other.m_SubscriptionListPtr),
+		m_Itr(other.m_Itr),
+		m_Valid(other.m_Valid),
+		m_EventManagerPtr(other.m_EventManagerPtr) {
+		other.Invalidate();
+	}
+
+	EventSubscriptionHandle& EventSubscriptionHandle::operator=(EventSubscriptionHandle&& other) noexcept
+	{
+		if (&other != this) {
+			if (IsValid()) {
+				m_EventManagerPtr->Unsubscribe(*this);
+			}
+			m_EventManagerPtr = other.m_EventManagerPtr;
+			m_SubscriptionListPtr = other.m_SubscriptionListPtr;
+			m_Itr = other.m_Itr;
+			m_Valid = other.m_Valid;
+			other.Invalidate();
+		}
+		return *this;
 	}
 }

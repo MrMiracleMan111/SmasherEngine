@@ -22,19 +22,16 @@ namespace Smasher {
 		EventSubscription& operator=(EventSubscription&&) = delete;
 	};
 
+	// Event subscriptions last for the lifetime of EventSubscriptionHandle
 	struct SMASHER_API EventSubscriptionHandle {
 	friend class EventManager;
 	public:
-		EventSubscriptionHandle(EventSubscriptionHandle&& other) noexcept :
-			m_List(other.m_List),
-			m_Itr(other.m_Itr),
-			m_Valid(other.m_Valid) {
-			other.m_Valid = false;
-		}
-		EventSubscriptionHandle() = delete;
-		EventSubscriptionHandle(EventSubscriptionHandle&) = delete;
+		EventSubscriptionHandle() = default;
+		~EventSubscriptionHandle();
+		EventSubscriptionHandle(const EventSubscriptionHandle&) = delete;
+		EventSubscriptionHandle(EventSubscriptionHandle&& other) noexcept;
 		EventSubscriptionHandle& operator =(EventSubscriptionHandle&) = delete;
-		EventSubscriptionHandle& operator =(EventSubscriptionHandle&&) = delete;
+		EventSubscriptionHandle& operator =(EventSubscriptionHandle&&) noexcept;
 
 
 		bool IsValid() const { return m_Valid; }
@@ -42,19 +39,23 @@ namespace Smasher {
 	// Only EventManagers should have privilege to instantiate EventSubscriptionHandles
 	protected:
 		EventSubscriptionHandle(std::list<EventSubscription>& list,
-			std::list<EventSubscription>::iterator itr) :
-			m_List(list),
+			std::list<EventSubscription>::iterator itr, EventManager& rEventManager) :
+			m_SubscriptionListPtr(&list),
 			m_Itr(itr),
-			m_Valid(true) {
-		};
+			m_Valid(true),
+			m_EventManagerPtr(&rEventManager) {};
+
+		void Invalidate() { m_Valid = false; }
 
 	private:
-		std::list<EventSubscription>& m_List;
+		std::list<EventSubscription>* m_SubscriptionListPtr = nullptr;
 		std::list<EventSubscription>::iterator m_Itr;
+		EventManager* m_EventManagerPtr = nullptr;
 		bool m_Valid = false;
 	};
 
 	class SMASHER_API EventManager final {
+		friend struct EventSubscriptionHandle;
 	public:
 		EventManager() : m_AsyncEventConsumerThread(&EventManager::AsyncEventConsumer, this) {}
 		~EventManager();
@@ -74,8 +75,13 @@ namespace Smasher {
 			auto bound = [callback](const Event& arg) {callback(static_cast<const T&>(arg)); };
 			
 			list.push_back(EventSubscription{ bound });
-			return EventSubscriptionHandle{ list, std::prev(list.end()) };
+			return EventSubscriptionHandle{ list, std::prev(list.end()), *this };
 		}
+
+		// Manually unsubscribes an event handle
+		// EventSubscriptionHandles will automatically unsubscribe
+		// at the end of their lifetime
+		void Unsubscribe(EventSubscriptionHandle& handle);
 
 		// Overload for class memebr function ex:
 		// Subscribe<EventType>(&Class::MemberFunc, classInstancePointer);
@@ -96,15 +102,13 @@ namespace Smasher {
 			auto bound = [callback](const Event& arg) {callback(static_cast<const T&>(arg)); };
 
 			list.push_back(EventSubscription{ bound });
-			return EventSubscriptionHandle{ list, std::prev(list.end()) };
+			return EventSubscriptionHandle{ list, std::prev(list.end()), *this };
 		}
 
 		template<class T, class C>
 		EventSubscriptionHandle SubscribeAsync(void (C::* method)(const T&), C* instance) {
 			return SubscribeAsync<T>(std::bind(method, instance, std::placeholders::_1));
 		}
-
-		void Unsubscribe(EventSubscriptionHandle handle);
 
 		// Defaults to Synchronous
 		template<class T, typename... Args>
