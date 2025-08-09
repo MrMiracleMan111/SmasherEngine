@@ -14,7 +14,7 @@
 using namespace Smasher;
 int main(int argc, char **argv) {
 	Smasher::Engine engine(640, 420);
-	std::size_t numEntities = 200000;
+	std::size_t numEntities = 100000;
 
 	if (argc >= 2) {
 		numEntities = std::size_t{ std::stoull(argv[1]) };
