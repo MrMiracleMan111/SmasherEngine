@@ -332,6 +332,73 @@ TEST(EventsTest, MultiplePublishEvent) {
 }
 
 
+TEST(EventsTest, SubscriptionLifetimeTest) {
+	Smasher::Engine engine(640, 420);
+	DummyGameState& state = engine.AddState<DummyGameState>();
+	Smasher::EventManager& manager = state.GetEventManager();
+
+	int triggered_count = 0;
+	std::function<void(const Smasher::Events::DummyEvent&)> callback =
+		[&triggered_count](const Smasher::Events::DummyEvent& event) {
+		triggered_count++;
+		};
+
+	{
+		// "handle" will be unsubscribed once it goes out of scope
+		Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::Events::DummyEvent>(callback);
+		manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
+		manager.Dispatch();
+		manager.Dispatch();
+	}
+
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 2");
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 3");
+	manager.Dispatch();
+	manager.Dispatch();
+	ASSERT_EQ(1, triggered_count);
+}
+
+TEST(EventsTest, SubscriptionLifetimeHandoffTest) {
+	Smasher::Engine engine(640, 420);
+	DummyGameState& state = engine.AddState<DummyGameState>();
+	Smasher::EventManager& manager = state.GetEventManager();
+
+	int triggered_count = 0;
+	std::function<void(const Smasher::Events::DummyEvent&)> callback =
+		[&triggered_count](const Smasher::Events::DummyEvent& event) {
+		triggered_count++;
+		};
+
+	{
+		// "handle" will be unsubscribed once it goes out of scope
+		Smasher::EventSubscriptionHandle tmp;
+		manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
+		manager.Dispatch();
+		manager.Dispatch();
+
+		{
+			// "handle" will be unsubscribed once it goes out of scope
+			Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::Events::DummyEvent>(callback);
+			manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
+			manager.Dispatch();
+			manager.Dispatch();
+			tmp = std::move(handle); // handoff
+		}
+		manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
+		manager.Dispatch();
+		manager.Dispatch();
+		manager.Dispatch();
+
+	}
+
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 2");
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 3");
+	manager.Dispatch();
+	manager.Dispatch();
+	ASSERT_EQ(2, triggered_count);
+}
+
+
 TEST(EventsTest, SinglePublishUnsubscribeEvent) {
 	Smasher::Engine engine(640, 420);
 	DummyGameState& state = engine.AddState<DummyGameState>();
