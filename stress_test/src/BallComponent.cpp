@@ -21,27 +21,35 @@ void BallComponent::StaticUpdateComponent(BallComponent& self, Smasher::Millisec
 
 	position += (self.m_Velocity * (float)delta.count() * 0.001f);
 
-	if (position.x < 0 || position.y < 0 ||
-		position.x > windowSize.x || position.y > windowSize.y) {
+	//if (position.x < 0 || position.y < 0 ||
+	//	position.x > windowSize.x || position.y > windowSize.y) {
+	//	Smasher::Entity& entity = self.GetEntity();
+	//	entity.GetGameState().RemoveEntity(entity.GetUUID());
+	//	return;
+	//}
+
+	if (position.x <= 0) {
+		self.m_Velocity.x = -self.m_Velocity.x;
+		position.x = 0;
+
+		Smasher::Entity& entity = self.GetEntity();
+		entity.GetGameState().RemoveEntity(entity.GetUUID());
+		return;
+	}
+	if (position.y <= 0) {
+		self.m_Velocity.y = -self.m_Velocity.y;
+		position.y = 0;
+
 		Smasher::Entity& entity = self.GetEntity();
 		entity.GetGameState().RemoveEntity(entity.GetUUID());
 		return;
 	}
 
-	if (position.x == 0) {
-		self.m_Velocity.x = -self.m_Velocity.x;
-		position.x = 0;
-	}
-	if (position.y == 0) {
-		self.m_Velocity.y = -self.m_Velocity.y;
-		position.y = 0;
-	}
-
-	if (position.x == windowSize.x) {
+	if (position.x >= windowSize.x) {
 		self.m_Velocity.x = -self.m_Velocity.x;
 		position.x = windowSize.x;
 	}
-	if (position.y == windowSize.y) {
+	if (position.y >= windowSize.y) {
 		self.m_Velocity.y = -self.m_Velocity.y;
 		position.y = windowSize.y;
 	}
