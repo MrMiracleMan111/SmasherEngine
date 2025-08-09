@@ -21,50 +21,7 @@ int main(int argc, char **argv) {
 	}
 
 	engine.GetResourceManager().SetResourceDirectory(Resources::Metadata::RESOURCES_DIRECTORY);
-	StressTestGameState& state = engine.AddState<StressTestGameState>();
-
-	state.AddEntity<Smasher::Entity>()
-		.AddComponent<Smasher::TextComponent>()
-		.SetPosition(10.0f, 100.0f)
-		.UseDefaults()
-		.SetFontAsset<Smasher::Resources::Fonts::arial>()
-		.SetFillColor(sf::Color::White)
-		.SetOutlineThickness(5.0f)
-		.SetOutlineColor(sf::Color::Black)
-		.SetFontSize(20)
-		.SetString(std::format("Number of Entites: {}", numEntities));
-
-	// Create 10 entites
-	// Half will have a non-alpha image
-	// Half will have image with alpha pixels
-	const float toRadian = (float)(180.0 / std::numbers::pi);
-	for (int i = 0; i < numEntities; ++i) {
-		float angle = (float)(rand() % 360);
-		float speed = (float)(rand() % 100 + 100);
-		float tmpX = cos(angle * toRadian) * speed;
-		float tmpY = sin(angle * toRadian) * speed;
-		float depth = (float)(rand() % 100) / 100.0f;
-		float positionX = (float)((rand() % 100) * 5);
-		float positionY = (float)((rand() % 100) * 5);
-		Entity& image = state.AddEntity<Smasher::Entity>();
-		image.AddComponent<DrawableComponent>()
-				.SetPosition(sf::Vector2f(positionX, positionY))
-				.SetScale(sf::Vector2f(20.0f, 20.0f))
-				.SetDepth(depth)
-				.GetEntity()
-			.AddComponent<BallComponent>()
-				.SetVelocity(sf::Vector2f(tmpX, tmpY));
-
-		if (i % 2 == 0) {
-			image.GetComponent<DrawableComponent>()
-				.SetTextureAsset<Smasher::Resources::Textures::alpha_test>();
-		}
-		else {
-			image.GetComponent<DrawableComponent>()
-				.SetTextureAsset<Smasher::Resources::Textures::small_art>();
-		}
-
-	}
+	StressTestGameState& state = engine.AddState<StressTestGameState>(numEntities);
 
 	state.Activate();
 	engine.Run();

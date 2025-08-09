@@ -1,3 +1,4 @@
+#include <numbers>
 #include "StressTestGameState.h"
 #include "Manifest.h"
 #include "Base.h"
@@ -7,6 +8,7 @@
 #include "Components/DrawableComponent.h"
 #include "Resources.h"
 #include "BallComponent.h"
+#include "Entity.h"
 
 void StressTestGameState::Init()
 {
@@ -21,6 +23,7 @@ void StressTestGameState::Init()
 
 	Smasher::Entity& rUpdateTracker = AddEntity<Smasher::Entity>();
 	Smasher::Entity& rRenderTracker = AddEntity<Smasher::Entity>();
+	Smasher::Entity& rBallCounter = AddEntity<Smasher::Entity>();
 
 	rUpdateTracker
 		.AddComponent<Smasher::TextComponent>()
@@ -42,8 +45,55 @@ void StressTestGameState::Init()
 			.SetOutlineThickness(5.0f)
 			.SetOutlineColor(sf::Color::Black);
 
+	rBallCounter
+		.AddComponent<Smasher::TextComponent>()
+			.SetPosition(10.0f, 100.0f)
+			.SetScale(1.0f, 1.0f)
+			.UseDefaults()
+			.SetFontAsset<Smasher::Resources::Fonts::arial>()
+			.SetFillColor(sf::Color::White)
+			.SetOutlineThickness(5.0f)
+			.SetOutlineColor(sf::Color::Black)
+			.SetFontSize(20);
+
 	m_UpdateTrackerPtr = &rUpdateTracker;
 	m_RenderTrackerPtr = &rRenderTracker;
+	m_BallCounterPtr = &rBallCounter;
+
+
+	// Create 10 entites
+	// Half will have a non-alpha image
+	// Half will have image with alpha pixels
+	const float toRadian = (float)(180.0 / std::numbers::pi);
+	for (std::size_t i = 0; i < m_NumEntities; ++i) {
+		int minSpeed = 100;
+		int speedVariance = 100;
+		float angle = (float)(rand() % 360);
+		float speed = (float)(rand() % speedVariance + minSpeed);
+		float tmpX = cos(angle * toRadian) * speed;
+		float tmpY = sin(angle * toRadian) * speed;
+		float depth = (float)(rand() % 100) / 100.0f;
+		float positionX = (float)((rand() % 100) * 5);
+		float positionY = (float)((rand() % 100) * 5);
+		Smasher::Entity& image = AddEntity<Smasher::Entity>();
+		image.AddComponent<Smasher::DrawableComponent>()
+			.SetPosition(sf::Vector2f(positionX, positionY))
+			.SetScale(sf::Vector2f(20.0f, 20.0f))
+			.SetDepth(depth)
+			.GetEntity()
+			.AddComponent<BallComponent>()
+			.SetVelocity(sf::Vector2f(tmpX, tmpY));
+
+		if (i % 2 == 0) {
+			image.GetComponent<Smasher::DrawableComponent>()
+				.SetTextureAsset<Smasher::Resources::Textures::alpha_test>();
+		}
+		else {
+			image.GetComponent<Smasher::DrawableComponent>()
+				.SetTextureAsset<Smasher::Resources::Textures::small_art>();
+		}
+
+	}
 }
 
 void StressTestGameState::Update(Smasher::Millisecond delta) {
@@ -54,6 +104,11 @@ void StressTestGameState::Update(Smasher::Millisecond delta) {
 		m_UpdateTimeSampleCount = 0;
 		m_UpdateTimeSum = Smasher::Millisecond::zero();
 	}
+
+	std::size_t numBalls = EntityCount();
+	m_BallCounterPtr->GetComponent<Smasher::TextComponent>()
+		.SetString(std::format("Number of Entites: {}", numBalls));
+
 }
 
 void StressTestGameState::Render(sf::RenderWindow& rWindow) {
