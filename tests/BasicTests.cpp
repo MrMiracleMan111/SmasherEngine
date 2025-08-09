@@ -277,13 +277,13 @@ TEST(EventsTest, InvalidEventHandle) {
 	Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::Events::DummyEvent>(TestCallback);
 	Smasher::EventSubscriptionHandle other_handle = std::move(handle);
 	ASSERT_THROW({
-		manager.Unsubscribe(std::move(handle));
+		manager.Unsubscribe(handle);
 		}, Smasher::Exceptions::EventHandleInvalid);
 
-	ASSERT_NO_THROW({ manager.Unsubscribe(std::move(other_handle)); });
+	ASSERT_NO_THROW({ manager.Unsubscribe(other_handle); });
 
 	ASSERT_THROW({
-		manager.Unsubscribe(std::move(other_handle));
+		manager.Unsubscribe(other_handle);
 		}, Smasher::Exceptions::EventHandleInvalid);
 }
 
@@ -344,9 +344,9 @@ TEST(EventsTest, SinglePublishUnsubscribeEvent) {
 	Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::Events::DummyEvent>(callback);
 
 	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
-	manager.Unsubscribe(std::move(handle));
+	manager.Unsubscribe(handle);
 	ASSERT_THROW({
-		manager.Unsubscribe(std::move(handle));
+		manager.Unsubscribe(handle);
 	}, Smasher::Exceptions::EventHandleInvalid);
 	manager.Dispatch();
 	manager.Dispatch();
