@@ -139,7 +139,7 @@ namespace Smasher {
 		context.batch = nullptr;
 		context.index = SIZE_MAX;
 
-		// Leave 2 empty lists
+		// Leave 1 empty list
 		if (modelCount == 0 && ownerBatchList.size() > 1) {
 			ownerBatchList.erase(iterator);
 			return;
