@@ -134,10 +134,10 @@ namespace Smasher {
 		context.batch = nullptr;
 		context.index = SIZE_MAX;
 
-		// Remove unused extra space
-		if ((modelCount - models.size()) >= (2 * RenderBatch::RESERVE)) {
-			ResizeBuffer(modelCount - RenderBatch::RESERVE); // Leave 32 extra slots
-		}
+		// Remove unused extra space [DON'T DO THIS, NOT WORTH IT RIGHT NOW]
+		//if ((models.size() - modelCount) >= (2 * RenderBatch::RESERVE)) {
+		//	ResizeBuffer(models.size() - RenderBatch::RESERVE); // Leave 32 extra slots
+		//}
 	}
 
 	void RenderBatch::AddModel(BatchContext& context) {
