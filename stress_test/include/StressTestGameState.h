@@ -22,6 +22,9 @@ public:
 	void Render(sf::RenderWindow& rWindow) override;
 
 private:
+	void OnMouseMove(const Smasher::Events::MouseMoveEvent& event);
+	Smasher::Entity& SpawnBouncingBall(sf::Vector2i position);
+
 	Smasher::Millisecond m_UpdateTimeSum;
 	Smasher::Millisecond m_RenderTimeSum;
 	double m_UpdateTimeAverage = 0.0;
@@ -33,4 +36,5 @@ private:
 	Smasher::Entity* m_RenderTrackerPtr = nullptr;
 	Smasher::Entity* m_BallCounterPtr = nullptr;
 	const std::size_t m_NumEntities;
+	Smasher::EventSubscriptionHandle m_OnMouseMoveHandle;
 };
