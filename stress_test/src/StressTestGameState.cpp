@@ -135,3 +135,12 @@ void StressTestGameState::Render(sf::RenderWindow& rWindow) {
 	m_RenderTrackerPtr->GetComponent<Smasher::TextComponent>()
 		.SetString(std::format("Render: {}ms", m_RenderTimeAverage));
 }
+
+// Spawn an entity at mouse position
+void StressTestGameState::OnMouseMove(const Smasher::Events::MouseMoveEvent& event) {
+	sf::Window& rWindow = GetEngine().GetWindow();
+	sf::Vector2i entityPos = sf::Vector2i(event.Position) - rWindow.getPosition();
+	Smasher::Entity& ball = SpawnBouncingBall(entityPos);
+	ball.GetComponent<Smasher::DrawableComponent>()
+		.SetTextureAsset<Smasher::Resources::Textures::alpha_test>();
+}
