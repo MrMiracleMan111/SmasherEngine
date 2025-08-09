@@ -63,23 +63,26 @@ namespace Smasher {
 
 		struct SMASHER_API MouseButtonEvent : public MouseEvent {
 			sf::Mouse::Button ButtonCode;
+			sf::Vector2i Position;
 			SMASHER_EVENT_TYPE(EventType::MouseButtonEvent)
-			MouseButtonEvent(SMASHER_TIMESTAMP timestamp, Mouse::MouseEventType type, sf::Mouse::Button buttoncode) :
-				MouseEvent(timestamp, type), ButtonCode(buttoncode) {};
+			MouseButtonEvent(SMASHER_TIMESTAMP timestamp, Mouse::MouseEventType type, sf::Mouse::Button buttoncode, sf::Vector2i position) :
+				MouseEvent(timestamp, type), ButtonCode(buttoncode), Position(position) {};
 		};
 
 		struct SMASHER_API MouseScrollWheelEvent : public MouseEvent {
-			int Delta;
+			float Delta;
+			sf::Vector2i Position;
 			SMASHER_EVENT_TYPE(EventType::MouseScrollWheelEvent)
-			MouseScrollWheelEvent(SMASHER_TIMESTAMP timestamp, Mouse::MouseEventType type, int delta) :
-				MouseEvent(timestamp, type), Delta(delta) {};
+			MouseScrollWheelEvent(SMASHER_TIMESTAMP timestamp, Mouse::MouseEventType type, float delta, sf::Vector2i position) :
+				MouseEvent(timestamp, type), Delta(delta), Position(position) {};
 		};
 
 		struct SMASHER_API MouseMoveEvent : public MouseEvent {
-			sf::Vector2f Delta;
+			sf::Vector2i Delta;
+			sf::Vector2i Position;
 			SMASHER_EVENT_TYPE(EventType::MouseMoveEvent)
-			MouseMoveEvent(SMASHER_TIMESTAMP timestamp, Mouse::MouseEventType type, sf::Vector2f delta) :
-				MouseEvent(timestamp, type), Delta(delta) {};
+			MouseMoveEvent(SMASHER_TIMESTAMP timestamp, Mouse::MouseEventType type, sf::Vector2i delta, sf::Vector2i position) :
+				MouseEvent(timestamp, type), Delta(delta), Position(position) {};
 		};
 
 		struct SMASHER_API WindowCloseEvent : public Event {
