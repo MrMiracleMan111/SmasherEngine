@@ -64,18 +64,36 @@ namespace Smasher {
 		glDepthRange(1.0f, -1.0f); // top = 1, bottom = 0
 		glDisable(GL_BLEND);
 
+		sf::Texture* pTexture = nullptr;
 		for (auto& itr : m_OpaqueBatches) {
-			RenderBatch& batch = itr.second;
-			DrawBatch(batch);
+			std::list<RenderBatch>& batchList = itr.second;
+			if (!batchList.empty()) {
+				pTexture = batchList.back().pTexture;
+				assert(pTexture != nullptr);
+			}
+			sf::Texture::bind(pTexture, sf::Texture::Pixels);
+			for (auto& batch : batchList) {
+				DrawBatch(batch);
+			}
+			sf::Texture::bind(NULL);
 		}
 
 		m_ShaderResource->GetShader().setUniform("translucentPass", true);
 		glDepthMask(GL_FALSE); // Disable depth writes
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 		for (auto& itr : m_TranslucentBatches) {
-			RenderBatch& batch = itr.second;
-			DrawBatch(batch);
+			std::list<RenderBatch>& batchList = itr.second;
+			if (!batchList.empty()) {
+				pTexture = batchList.back().pTexture;
+				assert(pTexture != nullptr);
+			}
+			sf::Texture::bind(batchList.back().pTexture, sf::Texture::Pixels);
+			for (auto& batch : batchList) {
+				DrawBatch(batch);
+			}
+			sf::Texture::bind(NULL);
 		}
 
 		glDisable(GL_DEPTH_TEST);
@@ -91,12 +109,11 @@ namespace Smasher {
 
 	void DrawableComponentManager::DrawBatch(RenderBatch& rRenderBatch) {
 		rRenderBatch.UpdateGLBufferData(); // Updates only if dirty
-		sf::Texture::bind(rRenderBatch.pTexture, sf::Texture::Pixels);
 		glBindVertexArray(rRenderBatch.instanceVAO);
 		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, RenderBatch::StaticIndices);
 		glDrawElementsInstanced(GL_TRIANGLES, (GLsizei)6, GL_UNSIGNED_BYTE, (GLvoid*)0, (GLsizei)rRenderBatch.modelCount);
+
 		glBindVertexArray(0);
-		sf::Texture::bind(NULL);
 	}
 
 	inline void DrawableComponentManager::OnComponentChangeData(DrawableComponent& rComponent) {
@@ -146,25 +163,47 @@ namespace Smasher {
 			}
 		}
 
-		RenderBatch* opaqueBatch = &m_OpaqueBatches[id];
-		if (opaqueBatch->pTexture == nullptr) {
+		std::list<RenderBatch>& opaqueBatches = m_OpaqueBatches[id];
+		// Find batch that isn't full
+		// Assume front of list is empty
+		auto itr = opaqueBatches.begin();
+		if (opaqueBatches.size() == 0) {
+			RenderBatch& batch = opaqueBatches.emplace_front(opaqueBatches);
+			batch.iterator = opaqueBatches.begin();
 			ResourceManager& rResourceManager = GetGameState().GetEngine().GetResourceManager();
 			auto pTexture = rResourceManager.GetResource<TextureResource>(id);
-			opaqueBatch->pTexture = &pTexture->GetTexture();
+			batch.pTexture = &pTexture->GetTexture();
+			itr = opaqueBatches.begin();
 		}
-
-		opaqueBatch->AddModel(rComponent.m_OpaqueBatchContext);
-
-		if (translucent) {
-			RenderBatch* translucentBatch = &m_TranslucentBatches[id];
-			if (translucentBatch->pTexture == nullptr) {
-				ResourceManager& rResourceManager = GetGameState().GetEngine().GetResourceManager();
-				auto pTexture = rResourceManager.GetResource<TextureResource>(id);
-				translucentBatch->pTexture = &pTexture->GetTexture();
+		else {
+			while (itr != opaqueBatches.end()) {
+				if (!itr->full) {
+					break;
+				}
+				++itr;
 			}
 
-			translucentBatch->AddModel(rComponent.m_TranslucentBatchContext);
+			// Everything was full, add a new RenderBatch
+			if (itr == opaqueBatches.end()) {
+				RenderBatch& batch = opaqueBatches.emplace_front(opaqueBatches);
+				batch.iterator = opaqueBatches.begin();
+				batch.pTexture = opaqueBatches.back().pTexture;
+				itr = opaqueBatches.begin();
+			}
 		}
+		itr->AddModel(rComponent.m_OpaqueBatchContext);
+
+
+		//if (translucent) {
+		//	RenderBatch* translucentBatch = &m_TranslucentBatches[id];
+		//	if (translucentBatch->pTexture == nullptr) {
+		//		ResourceManager& rResourceManager = GetGameState().GetEngine().GetResourceManager();
+		//		auto pTexture = rResourceManager.GetResource<TextureResource>(id);
+		//		translucentBatch->pTexture = &pTexture->GetTexture();
+		//	}
+
+		//	translucentBatch->AddModel(rComponent.m_TranslucentBatchContext);
+		//}
 	}
 
 	void DrawableComponentManager::OnComponentDelete(DrawableComponent& rComponent) {

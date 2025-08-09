@@ -15,8 +15,8 @@
 #endif
 
 namespace Smasher {
-	RenderBatch::RenderBatch() {
-		InitGlObjects();
+	RenderBatch::RenderBatch(std::list<RenderBatch>& list) : ownerBatchList(list) {
+		InitGLObjects();
 	}
 
 	RenderBatch::~RenderBatch() {
@@ -27,23 +27,25 @@ namespace Smasher {
 
 	}
 
-	RenderBatch::RenderBatch(const RenderBatch& other) {
+	RenderBatch::RenderBatch(RenderBatch&& other) : ownerBatchList(other.ownerBatchList) {
 		models = other.models;
 		pTexture = other.pTexture;
 		dirty = true; // Has the render batch or any elemnts inside changed?
 		modelCount = other.modelCount; // Keeps accurate track of model count
-		InitGlObjects();
+		models = std::move(other.models);
+		InitGLObjects();
 	};
-	RenderBatch& RenderBatch::operator = (const RenderBatch& other) {
+	RenderBatch& RenderBatch::operator = (RenderBatch&& other) {
 		models = other.models;
 		pTexture = other.pTexture;
 		dirty = true; // Has the render batch or any elemnts inside changed?
 		modelCount = other.modelCount; // Keeps accurate track of model count
-		InitGlObjects();
+		models = std::move(other.models);
+		InitGLObjects();
 		return *this;
 	};
 
-	void RenderBatch::InitGlObjects() {
+	void RenderBatch::InitGLObjects() {
 		glGenVertexArrays(1, &instanceVAO);
 		glGenBuffers(1, &instanceVBO);
 		glGenBuffers(1, &quadVBO);
@@ -62,7 +64,10 @@ namespace Smasher {
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(RenderBatch::StaticIndices), RenderBatch::StaticIndices, GL_STATIC_DRAW);
 		glBindVertexArray(0);
 
-		ResizeBuffer(RenderBatch::RESERVE);
+		glBindVertexArray(instanceVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+		glBufferData(GL_ARRAY_BUFFER, models.max_size() * sizeof(Smasher::ModelData), models.data(), GL_DYNAMIC_DRAW);
+		glBindVertexArray(0);
 
 		glBindVertexArray(instanceVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
@@ -103,18 +108,6 @@ namespace Smasher {
 		glBindVertexArray(0);
 	}
 
-	// Resize buffer to fit "count" entries
-	void RenderBatch::ResizeBuffer(std::size_t count) {
-		dirty = false;
-		assert(count > models.size()); // Weird edge case
-		models.resize(count);
-		// Resize buffer data to (we want to use models.size no models.capacity)
-		glBindVertexArray(instanceVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-		glBufferData(GL_ARRAY_BUFFER, count * sizeof(Smasher::ModelData), models.data(), GL_DYNAMIC_DRAW);
-		glBindVertexArray(0);
-	}
-
 	void RenderBatch::RemoveModel(BatchContext& context) {
 		assert(context.batch != nullptr);
 		assert(context.index <= (modelCount - 1));
@@ -145,6 +138,14 @@ namespace Smasher {
 		--modelCount;
 		context.batch = nullptr;
 		context.index = SIZE_MAX;
+
+		// Leave 2 empty lists
+		if (modelCount == 0) {
+			ownerBatchList.erase(iterator);
+			return;
+		}
+		// Move to front of list
+		ownerBatchList.splice(iterator, ownerBatchList, ownerBatchList.begin());
 	}
 
 	void RenderBatch::AddModel(BatchContext& context) {
@@ -154,9 +155,9 @@ namespace Smasher {
 		models[modelCount].ownerContext = &context;
 		++modelCount;
 		full = (modelCount == RenderBatch::MAX_MODEL_COUNT);
-
-		if (modelCount >= models.size()) {
-			ResizeBuffer(modelCount + RenderBatch::RESERVE);
+		if (full) {
+			// Move to back of list since it's full
+			ownerBatchList.splice(ownerBatchList.end(), ownerBatchList, iterator);
 		}
 	}
 

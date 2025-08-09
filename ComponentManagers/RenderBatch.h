@@ -1,4 +1,5 @@
 #pragma once
+#include <list>
 #include <GL/glew.h>
 #if defined(_WIN32)
 #define NOMINMAX
@@ -26,17 +27,19 @@ namespace Smasher {
 
 	// Models will use 2D plane
 	struct SMASHER_API RenderBatch {
-		RenderBatch();
+		RenderBatch() = delete;
+		RenderBatch(std::list<RenderBatch>& list);
 		~RenderBatch();
-		RenderBatch(const RenderBatch& other);
-		RenderBatch(RenderBatch&&) = delete;
-		RenderBatch& operator = (const RenderBatch& other);
-		RenderBatch& operator = (RenderBatch&&) = delete;
+		RenderBatch(const RenderBatch& other) = delete;
+		RenderBatch(RenderBatch&&);
+		RenderBatch& operator = (const RenderBatch& other) = delete;
+		RenderBatch& operator = (RenderBatch&&);
 
-		std::vector<ModelData> models; // doesn't keep accurate track of model count
-		static const std::size_t RESERVE = 32; // Pre allocate space for 32 entities
-		static const std::size_t MAX_MODEL_COUNT = RenderBatch::RESERVE * 16; // Arbitrary
+		static const std::size_t MAX_MODEL_COUNT = 512; // Arbitrary
+		std::array<ModelData, RenderBatch::MAX_MODEL_COUNT> models; // doesn't keep accurate track of model count
 		sf::Texture* pTexture = nullptr;
+		std::list<RenderBatch>& ownerBatchList;
+		std::list<RenderBatch>::iterator iterator;
 		bool dirty = false; // Has the render batch or any elemnts inside changed?
 		bool full = false; // Can more models be added to this batch
 		std::size_t modelCount = 0; // Keeps accurate track of model count
@@ -57,10 +60,7 @@ namespace Smasher {
 			   -0.5f,  0.5f,     0.0, 1.0,   // top left
 		};
 
-		void InitGlObjects();
-
-		// Resize buffer to fit "count" entries
-		void ResizeBuffer(std::size_t count);
+		void InitGLObjects();
 
 		void AddModel(BatchContext& context);
 
