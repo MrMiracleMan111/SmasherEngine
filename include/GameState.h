@@ -66,6 +66,8 @@ namespace Smasher {
 		template <class ComponentType>
 		IComponentManager& GetComponentManager();
 
+		std::size_t EntityCount() { return m_EntityMap.size(); }
+
 	protected:
 		GameState(Engine& engine) :
 			m_Engine(engine),
