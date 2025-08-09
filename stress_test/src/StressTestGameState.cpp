@@ -10,6 +10,27 @@
 #include "BallComponent.h"
 #include "Entity.h"
 
+Smasher::Entity& StressTestGameState::SpawnBouncingBall(sf::Vector2i position)
+{
+	const float toRadian = (float)(180.0 / std::numbers::pi);
+	int minSpeed = 100;
+	int speedVariance = 100;
+	float angle = (float)(rand() % 360);
+	float speed = (float)(rand() % speedVariance + minSpeed);
+	float tmpX = cos(angle * toRadian) * speed;
+	float tmpY = sin(angle * toRadian) * speed;
+	float depth = (float)(rand() % 100) / 100.0f;
+	Smasher::Entity& image = AddEntity<Smasher::Entity>();
+	image.AddComponent<Smasher::DrawableComponent>()
+		.SetPosition(sf::Vector2f(position.x, position.y))
+		.SetScale(sf::Vector2f(20.0f, 20.0f))
+		.SetDepth(depth)
+		.GetEntity()
+		.AddComponent<BallComponent>()
+		.SetVelocity(sf::Vector2f(tmpX, tmpY));
+	return image;
+}
+
 void StressTestGameState::Init()
 {
 	std::shared_ptr<Smasher::ShaderResource> pShader = GetEngine().GetResourceManager().GetOrLoadResource<Smasher::Resources::Shaders::basic_texture_shader, Smasher::ShaderResource>();
@@ -17,6 +38,8 @@ void StressTestGameState::Init()
 	sf::Glsl::Mat4 viewProjectionMatrix = sf::Glsl::Mat4(GetEngine().GetWindow().getView().getTransform().getMatrix());
 	pShader->GetShader().setUniform("windowSize", windowSize);
 	pShader->GetShader().setUniform("ViewProjectionMatrix", viewProjectionMatrix);
+
+	m_OnMouseMoveHandle = GetEngine().GetEventManager().Subscribe<Smasher::Events::MouseMoveEvent>(&StressTestGameState::OnMouseMove, this);
 
 	auto& rCompManager = static_cast<Smasher::DrawableComponentManager&>(GetComponentManager<Smasher::DrawableComponent>());
 	rCompManager.SetShaderResource(pShader);
@@ -64,25 +87,10 @@ void StressTestGameState::Init()
 	// Create 10 entites
 	// Half will have a non-alpha image
 	// Half will have image with alpha pixels
-	const float toRadian = (float)(180.0 / std::numbers::pi);
 	for (std::size_t i = 0; i < m_NumEntities; ++i) {
-		int minSpeed = 100;
-		int speedVariance = 100;
-		float angle = (float)(rand() % 360);
-		float speed = (float)(rand() % speedVariance + minSpeed);
-		float tmpX = cos(angle * toRadian) * speed;
-		float tmpY = sin(angle * toRadian) * speed;
-		float depth = (float)(rand() % 100) / 100.0f;
 		float positionX = (float)((rand() % 100) * 5);
 		float positionY = (float)((rand() % 100) * 5);
-		Smasher::Entity& image = AddEntity<Smasher::Entity>();
-		image.AddComponent<Smasher::DrawableComponent>()
-			.SetPosition(sf::Vector2f(positionX, positionY))
-			.SetScale(sf::Vector2f(20.0f, 20.0f))
-			.SetDepth(depth)
-			.GetEntity()
-			.AddComponent<BallComponent>()
-			.SetVelocity(sf::Vector2f(tmpX, tmpY));
+		Smasher::Entity& image = SpawnBouncingBall(sf::Vector2i(positionX, positionY));
 
 		if (i % 2 == 0) {
 			image.GetComponent<Smasher::DrawableComponent>()
