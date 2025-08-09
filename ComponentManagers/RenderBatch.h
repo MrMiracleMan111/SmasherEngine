@@ -35,6 +35,7 @@ namespace Smasher {
 
 		std::vector<ModelData> models; // doesn't keep accurate track of model count
 		static const std::size_t RESERVE = 32; // Pre allocate space for 32 entities
+		static const std::size_t MAX_MODEL_COUNT = RenderBatch::RESERVE * 16; // Arbitrary
 		sf::Texture* pTexture = nullptr;
 		bool dirty = false; // Has the render batch or any elemnts inside changed?
 		std::size_t modelCount = 0; // Keeps accurate track of model count
