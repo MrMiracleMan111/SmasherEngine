@@ -7,8 +7,9 @@
 
 class StressTestGameState : public Smasher::GameState {
 public:
-	StressTestGameState(Smasher::Engine& engine) :
+	StressTestGameState(Smasher::Engine& engine, std::size_t numEntities) :
 		Smasher::GameState(engine),
+		m_NumEntities(numEntities),
 		m_UpdateTimeAverage(0.0), m_RenderTimeAverage(0.0), 
 		m_UpdateTimeSum(Smasher::Millisecond::zero()),
 		m_RenderTimeSum(Smasher::Millisecond::zero()) {
@@ -30,4 +31,6 @@ private:
 	static const std::size_t s_SamplesPerAverage = 10;
 	Smasher::Entity* m_UpdateTrackerPtr = nullptr;
 	Smasher::Entity* m_RenderTrackerPtr = nullptr;
+	Smasher::Entity* m_BallCounterPtr = nullptr;
+	const std::size_t m_NumEntities;
 };
