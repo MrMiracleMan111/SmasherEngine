@@ -106,14 +106,8 @@ namespace Smasher {
 	// Resize buffer to fit "count" entries
 	void RenderBatch::ResizeBuffer(std::size_t count) {
 		dirty = false;
-		assert(count != models.size()); // Weird edge case
-		if (count < models.size()) {
-			models.resize(count);
-			models.shrink_to_fit();
-		}
-		else {
-			models.resize(count);
-		}
+		assert(count > models.size()); // Weird edge case
+		models.resize(count);
 		// Resize buffer data to (we want to use models.size no models.capacity)
 		glBindVertexArray(instanceVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
@@ -150,11 +144,6 @@ namespace Smasher {
 		--modelCount;
 		context.batch = nullptr;
 		context.index = SIZE_MAX;
-
-		// Remove unused extra space [DON'T DO THIS, NOT WORTH IT RIGHT NOW]
-		//if ((models.size() - modelCount) >= (2 * RenderBatch::RESERVE)) {
-		//	ResizeBuffer(models.size() - RenderBatch::RESERVE); // Leave 32 extra slots
-		//}
 	}
 
 	void RenderBatch::AddModel(BatchContext& context) {
