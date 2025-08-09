@@ -122,12 +122,29 @@ namespace Smasher {
 	}
 
 	void RenderBatch::RemoveModel(BatchContext& context) {
+		assert(context.batch != nullptr);
+		assert(context.index <= (modelCount - 1));
+		assert(models[context.index].ownerContext == &context);
 		dirty = true;
 
-		assert(context.index <= modelCount);
-		if (context.index < modelCount) {
+		if (context.index < (modelCount - 1)) {
 			// Swap and pop from old batch
-			std::swap(models.at(context.index), models.at(modelCount));
+			const std::size_t index = context.index;
+			models.at(index).ownerContext = nullptr;
+
+			const BatchContext* newOwnerContex = models.at(modelCount - 1).ownerContext;
+			std::swap(models.at(index), models.at(modelCount - 1));
+			if (models.at(index).ownerContext != nullptr) {
+				models.at(index).ownerContext->index = index;
+			}
+			assert(models.at(index).ownerContext == newOwnerContex);
+			assert(models.at(index).ownerContext != nullptr);
+		}
+		else if (context.index == (modelCount - 1)) {
+			// Nothing
+		}
+		else {
+			assert(false); // unreachable
 		}
 
 		--modelCount;
@@ -144,6 +161,7 @@ namespace Smasher {
 		dirty = true; // Data will be copied in later
 		context.index = modelCount;
 		context.batch = this;
+		models[modelCount].ownerContext = &context;
 		++modelCount;
 		if (modelCount >= models.size()) {
 			ResizeBuffer(modelCount + RenderBatch::RESERVE);
