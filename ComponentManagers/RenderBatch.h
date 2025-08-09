@@ -38,6 +38,7 @@ namespace Smasher {
 		static const std::size_t MAX_MODEL_COUNT = RenderBatch::RESERVE * 16; // Arbitrary
 		sf::Texture* pTexture = nullptr;
 		bool dirty = false; // Has the render batch or any elemnts inside changed?
+		bool full = false; // Can more models be added to this batch
 		std::size_t modelCount = 0; // Keeps accurate track of model count
 		GLuint instanceVAO;
 		GLuint instanceVBO;

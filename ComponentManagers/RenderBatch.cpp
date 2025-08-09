@@ -120,6 +120,7 @@ namespace Smasher {
 		assert(context.index <= (modelCount - 1));
 		assert(models[context.index].ownerContext == &context);
 		dirty = true;
+		full = false;
 
 		if (context.index < (modelCount - 1)) {
 			// Swap and pop from old batch
@@ -152,6 +153,8 @@ namespace Smasher {
 		context.batch = this;
 		models[modelCount].ownerContext = &context;
 		++modelCount;
+		full = (modelCount == RenderBatch::MAX_MODEL_COUNT);
+
 		if (modelCount >= models.size()) {
 			ResizeBuffer(modelCount + RenderBatch::RESERVE);
 		}
