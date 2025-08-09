@@ -107,14 +107,17 @@ namespace Smasher {
 	void RenderBatch::ResizeBuffer(std::size_t count) {
 		dirty = false;
 		assert(count != models.size()); // Weird edge case
-		models.resize(count);
 		if (count < models.size()) {
+			models.resize(count);
 			models.shrink_to_fit();
+		}
+		else {
+			models.resize(count);
 		}
 		// Resize buffer data to (we want to use models.size no models.capacity)
 		glBindVertexArray(instanceVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-		glBufferData(GL_ARRAY_BUFFER, models.size() * sizeof(Smasher::ModelData), models.data(), GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, count * sizeof(Smasher::ModelData), models.data(), GL_DYNAMIC_DRAW);
 		glBindVertexArray(0);
 	}
 
