@@ -35,6 +35,7 @@ private:
 	Smasher::Entity* m_UpdateTrackerPtr = nullptr;
 	Smasher::Entity* m_RenderTrackerPtr = nullptr;
 	Smasher::Entity* m_BallCounterPtr = nullptr;
+	Smasher::Entity* m_CameraPtr = nullptr;
 	const std::size_t m_NumEntities;
 	Smasher::EventSubscriptionHandle m_OnMouseMoveHandle;
 };
