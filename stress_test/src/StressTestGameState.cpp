@@ -6,6 +6,7 @@
 #include "Components/TextComponent.h"
 #include "ComponentManagers/DrawableComponentManager.h"
 #include "Components/DrawableComponent.h"
+#include "Components/CameraComponent.h"
 #include "Resources.h"
 #include "BallComponent.h"
 #include "Entity.h"
@@ -47,6 +48,7 @@ void StressTestGameState::Init()
 	Smasher::Entity& rUpdateTracker = AddEntity<Smasher::Entity>();
 	Smasher::Entity& rRenderTracker = AddEntity<Smasher::Entity>();
 	Smasher::Entity& rBallCounter = AddEntity<Smasher::Entity>();
+	Smasher::Entity& rCamera = AddEntity<Smasher::Entity>();
 
 	rUpdateTracker
 		.AddComponent<Smasher::TextComponent>()
@@ -79,10 +81,13 @@ void StressTestGameState::Init()
 			.SetOutlineColor(sf::Color::Black)
 			.SetFontSize(20);
 
+	rCamera
+		.AddComponent<Smasher::CameraComponent>();
+
 	m_UpdateTrackerPtr = &rUpdateTracker;
 	m_RenderTrackerPtr = &rRenderTracker;
 	m_BallCounterPtr = &rBallCounter;
-
+	m_CameraPtr = &rCamera;
 
 	// Create 10 entites
 	// Half will have a non-alpha image
@@ -99,6 +104,11 @@ void StressTestGameState::Init()
 		else {
 			image.GetComponent<Smasher::DrawableComponent>()
 				.SetTextureAsset<Smasher::Resources::Textures::small_art>();
+		}
+
+		if (i == 10) {
+			image.GetComponent<BallComponent>().SetCamera(rCamera.GetComponent<Smasher::CameraComponent>());
+			image.GetComponent<BallComponent>().SetWindow(GetEngine().GetWindow());
 		}
 
 	}
