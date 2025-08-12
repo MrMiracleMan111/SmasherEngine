@@ -1,7 +1,15 @@
+#include <SFML/Window.hpp>
 #include "BallComponent.h"
 #include "Components/Transform2DComponent.h"
 #include "Components/DrawableComponent.h"
+#include "Components/CameraComponent.h"
 #include "Entity.h"
+
+BallComponent& BallComponent::SetCamera(Smasher::CameraComponent& rCamera)
+{
+	m_CameraComponentPtr = &rCamera;
+	return *this;
+}
 
 void BallComponent::SetEntity(Smasher::Entity& rEntity)
 {
@@ -33,7 +41,7 @@ void BallComponent::StaticUpdateComponent(BallComponent& self, Smasher::Millisec
 		position.x = 0;
 
 		Smasher::Entity& entity = self.GetEntity();
-		entity.GetGameState().RemoveEntity(entity.GetUUID());
+		//entity.GetGameState().RemoveEntity(entity.GetUUID());
 		return;
 	}
 	if (position.y <= 0) {
@@ -41,7 +49,7 @@ void BallComponent::StaticUpdateComponent(BallComponent& self, Smasher::Millisec
 		position.y = 0;
 
 		Smasher::Entity& entity = self.GetEntity();
-		entity.GetGameState().RemoveEntity(entity.GetUUID());
+		//entity.GetGameState().RemoveEntity(entity.GetUUID());
 		return;
 	}
 
@@ -55,10 +63,21 @@ void BallComponent::StaticUpdateComponent(BallComponent& self, Smasher::Millisec
 	}
 
 	self.m_DrawableComponentPtr->SetPosition(position);
+
+	if (self.m_CameraComponentPtr && self.m_WindowPtr) {
+		self.m_CameraComponentPtr->SetPosition(position);
+		self.m_WindowPtr->setView(self.m_CameraComponentPtr->GetView());
+	}
 }
 
 BallComponent& BallComponent::SetVelocity(sf::Vector2f velocity) {
 	m_Velocity = velocity;
+	return *this;
+}
+
+BallComponent& BallComponent::SetWindow(sf::RenderWindow& rWindow)
+{
+	m_WindowPtr = &rWindow;
 	return *this;
 }
 
