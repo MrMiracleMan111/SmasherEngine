@@ -17,6 +17,7 @@ public:
 			m_RenderTimeSum = Smasher::Millisecond::zero();
 	
 	}
+
 	void Init() override;
 	void Update(Smasher::Millisecond delta) override;
 	void Render(sf::RenderWindow& rWindow) override;
