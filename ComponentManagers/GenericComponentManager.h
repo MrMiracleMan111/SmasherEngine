@@ -65,6 +65,7 @@ namespace Smasher {
 			SetComponentEntity(rComponent, rEntity);
 			SetComponentManager(rComponent, *this);
 			SetComponentIterator<T>(rComponent, new typename plf::colony<T>::iterator(itr));
+			CallOnAddComponent(rComponent); // called when component has been initialiazed and added
 
 			return rComponent;
 		}

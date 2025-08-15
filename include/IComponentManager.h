@@ -24,6 +24,8 @@ namespace Smasher {
 		void SetComponentStatus(IComponent& rComponent, ComponentStatus status) { rComponent.SetStatus(status); }
 		void SetComponentEntity(IComponent& rComponent, Entity& rEntity) { rComponent.SetEntity(rEntity); }
 		void SetComponentManager(IComponent& rComponent, IComponentManager& rManager) { rComponent.SetManager(rManager); }
+		void CallOnAddComponent(IComponent& rComponent) { rComponent.OnAddComponent(); } // called when component has been initialiazed and added
+
 		template<class T>
 		typename plf::colony<T>::iterator* GetComponentIterator(T& rComponent) {
 			return rComponent.GetIterator<T>();

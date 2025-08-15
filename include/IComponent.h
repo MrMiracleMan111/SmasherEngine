@@ -42,6 +42,7 @@ namespace Smasher {
 		void SetStatus(ComponentStatus status) { m_Status = status; }
 		virtual void SetEntity(Entity& pEntity) { m_Entity = &pEntity; }
 		void SetManager(IComponentManager& pManager) { m_Manager = &pManager; }
+		virtual void OnAddComponent() {}; // called when component has been initialiazed and added
 		template<class T>
 		void SetIterator(typename plf::colony<T>::iterator* itrPtr) {
 			m_ItrPtr = itrPtr;
