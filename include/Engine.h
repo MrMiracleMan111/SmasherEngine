@@ -19,7 +19,7 @@ namespace Smasher {
 		Engine();
 		Engine(int width, int height);
 		Engine(int width, int height, const sf::ContextSettings& settings);
-		~Engine() {};
+		~Engine();
 
 		void Init();
 		void Run();
@@ -64,6 +64,9 @@ namespace Smasher {
 		// Cached for internal update/render speed checks
 		std::chrono::time_point<std::chrono::system_clock> m_UpdateTimestamp;
 		std::chrono::time_point<std::chrono::system_clock> m_RenderTimestamp;
+
+		// Handles must be deconstructed first
+		EventSubscriptionHandle m_WindowCloseHandle;
 	};
 }
 

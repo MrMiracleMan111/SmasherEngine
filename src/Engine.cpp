@@ -30,6 +30,11 @@ namespace Smasher {
 		Init();
 	}
 
+	Engine::~Engine()
+	{
+		m_GameStateByType.clear();
+	}
+
 	Engine::Engine(int width, int height) : m_Window(sf::VideoMode(width, height), EngineConfig::TITLE,
 		sf::Style::Default, EngineConfig::DEFAULT_SETTINGS) {
 		Init();
@@ -49,7 +54,7 @@ namespace Smasher {
 			throw Exceptions::GLEWInitFailed(message);
 		}
 
-		m_EventManager.Subscribe<Events::WindowCloseEvent>(&Engine::OnWindowClose, this);
+		m_WindowCloseHandle = m_EventManager.Subscribe<Events::WindowCloseEvent>(&Engine::OnWindowClose, this);
 	}
 
 	void Engine::Run() {
