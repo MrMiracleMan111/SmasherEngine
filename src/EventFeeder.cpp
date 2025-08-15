@@ -25,6 +25,9 @@ void Smasher::EventFeeder::ForwardSFMLEvent(const sf::Event& event)
 	case sf::Event::MouseWheelScrolled:
 		m_EventManager.Publish<Events::MouseScrollWheelEvent>(Mouse::MouseEventType::SCROLL, event.mouseWheelScroll.delta,  sf::Mouse::getPosition());
 		break;
+	case sf::Event::Resized:
+		m_EventManager.Publish<Events::WindowResizeEvent>(sf::Vector2i(event.size.width, event.size.height));
+		break;
 	default:
 		break;
 	}

@@ -89,5 +89,12 @@ namespace Smasher {
 			SMASHER_EVENT_TYPE(EventType::WindowCloseEvent)
 			WindowCloseEvent(SMASHER_TIMESTAMP timestamp) : Event(timestamp) {}
 		};
+
+		struct SMASHER_API WindowResizeEvent : public Event {
+			sf::Vector2i WindowSize;
+			SMASHER_EVENT_TYPE(EventType::WindowResizeEvent)
+				WindowResizeEvent(SMASHER_TIMESTAMP timestamp, sf::Vector2i size) :
+				Event(timestamp), WindowSize(size) {}
+		};
 	}
 }

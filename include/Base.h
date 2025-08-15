@@ -148,6 +148,7 @@ namespace Smasher {
 		MouseScrollWheelEvent,
 		MouseMoveEvent,
 		WindowCloseEvent,
+		WindowResizeEvent,
 		END
 	};
 
