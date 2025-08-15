@@ -1,6 +1,22 @@
+#include <iostream>
 #include "CameraComponent.h"
+#include "IComponentManager.h"
+#include "GameState.h"
+#include "Events.h"
+#include "EventManager.h"
 
 namespace Smasher {
+	void CameraComponent::OnAddComponent()
+	{
+		EventManager& rEventManager = GetManager().GetGameState().GetEngine().GetEventManager();
+
+		m_ResizeHandle = rEventManager.Subscribe<Events::WindowResizeEvent>(&CameraComponent::OnWindowResize, this);
+	}
+
+	void CameraComponent::OnWindowResize(const Events::WindowResizeEvent& event) {
+		m_View.setSize(event.WindowSize.x, event.WindowSize.y);
+	}
+
 	CameraComponent& CameraComponent::SetPosition(sf::Vector2f position) {
 		m_View.setCenter(position);
 		return *this;
