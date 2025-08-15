@@ -37,7 +37,11 @@ namespace Smasher {
 		IComponentManager& GetManager() const { return *m_Manager; }
 
 	protected:
-		IComponent() : m_Status(ComponentStatus::INVALID) {};
+		IComponent() :
+			m_Status(ComponentStatus::INVALID),
+			m_ItrPtr(nullptr),
+			m_Entity(nullptr),
+			m_Manager(nullptr) {};
 
 		void SetStatus(ComponentStatus status) { m_Status = status; }
 		virtual void SetEntity(Entity& pEntity) { m_Entity = &pEntity; }
@@ -53,9 +57,9 @@ namespace Smasher {
 		}
 
 	private:
-		void* m_ItrPtr; // Taboo but necessary
-		Entity* m_Entity;
-		IComponentManager* m_Manager;
+		void* m_ItrPtr = nullptr; // Taboo but necessary
+		Entity* m_Entity = nullptr;
+		IComponentManager* m_Manager = nullptr;
 		ComponentStatus m_Status = ComponentStatus::INVALID; // Component not yet added to manager
 	};
 }
