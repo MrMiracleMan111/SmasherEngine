@@ -22,10 +22,21 @@ namespace Smasher {
 		return *this;
 	}
 
+	CameraComponent& CameraComponent::Move(sf::Vector2f position) {
+		m_View.move(position);
+		return *this;
+	}
+
 	CameraComponent& CameraComponent::SetRotation(Degrees rotation) {
 		m_View.setRotation(rotation);
 		return *this;
 	}
+
+	CameraComponent& CameraComponent::Rotate(Degrees rotation) {
+		m_View.rotate(rotation);
+		return *this;
+	}
+
 
 	CameraComponent& CameraComponent::SetSize(sf::Vector2f size) {
 		m_View.setSize(size);

@@ -14,7 +14,9 @@ namespace Smasher {
 	class SMASHER_API CameraComponent : public IComponent {
 	public:
 		CameraComponent& SetPosition(sf::Vector2f position);
+		CameraComponent& Move(sf::Vector2f position);
 		CameraComponent& SetRotation(Degrees rotation);
+		CameraComponent& Rotate(Degrees rotation);
 		CameraComponent& SetSize(sf::Vector2f size);
 		CameraComponent& Zoom(float factor);
 
