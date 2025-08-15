@@ -65,6 +65,8 @@ void BallComponent::StaticUpdateComponent(BallComponent& self, Smasher::Millisec
 	self.m_DrawableComponentPtr->SetPosition(position);
 
 	if (self.m_CameraComponentPtr && self.m_WindowPtr) {
+		Smasher::Degrees rotation = 10.0f * ((float)delta.count() / 1000.0f);
+		self.m_CameraComponentPtr->Rotate(rotation);
 		self.m_CameraComponentPtr->SetPosition(position);
 		self.m_WindowPtr->setView(self.m_CameraComponentPtr->GetView());
 	}
