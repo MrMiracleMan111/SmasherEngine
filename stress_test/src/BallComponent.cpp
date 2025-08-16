@@ -64,25 +64,16 @@ void BallComponent::StaticUpdateComponent(BallComponent& self, Smasher::Millisec
 
 	self.m_DrawableComponentPtr->SetPosition(position);
 
-	if (self.m_CameraComponentPtr && self.m_WindowPtr) {
+	if (self.m_CameraComponentPtr) {
 		Smasher::Degrees rotation = 10.0f * ((float)delta.count() / 1000.0f);
-		self.m_CameraComponentPtr->Rotate(rotation);
-		self.m_CameraComponentPtr->SetPosition(position);
-		self.m_WindowPtr->setView(self.m_CameraComponentPtr->GetView());
+		self.m_CameraComponentPtr->
+			 Rotate(rotation)
+			.SetPosition(position)
+			.ApplyToTarget(); // Apply changes to view
 	}
 }
 
 BallComponent& BallComponent::SetVelocity(sf::Vector2f velocity) {
 	m_Velocity = velocity;
 	return *this;
-}
-
-BallComponent& BallComponent::SetWindow(sf::RenderWindow& rWindow)
-{
-	m_WindowPtr = &rWindow;
-	return *this;
-}
-
-const sf::Vector2f& BallComponent::GetVelocity() const {
-	return m_Velocity;
 }

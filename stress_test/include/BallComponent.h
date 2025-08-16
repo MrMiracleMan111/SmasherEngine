@@ -22,7 +22,6 @@ public:
 	static void StaticUpdateComponent(BallComponent& self, Smasher::Millisecond delta);
 
 	BallComponent& SetVelocity(sf::Vector2f velocity);
-	BallComponent& SetWindow(sf::RenderWindow& rWindow);
 
 	const sf::Vector2f& GetVelocity() const;
 
@@ -32,5 +31,4 @@ private:
 	Smasher::DrawableComponent* m_DrawableComponentPtr = nullptr;
 
 	Smasher::CameraComponent* m_CameraComponentPtr = nullptr;
-	sf::RenderWindow * m_WindowPtr = nullptr;
 };
