@@ -81,8 +81,13 @@ void StressTestGameState::Init()
 			.SetOutlineColor(sf::Color::Black)
 			.SetFontSize(20);
 
+	// Add camera and apply it to window
 	rCamera
-		.AddComponent<Smasher::CameraComponent>();
+		.AddComponent<Smasher::CameraComponent>()
+			.SetSize(sf::Vector2f(GetEngine().GetWindow().getSize().x,
+								  GetEngine().GetWindow().getSize().y))
+			.SetTarget(GetEngine().GetWindow())
+			.ApplyToTarget();
 
 	m_UpdateTrackerPtr = &rUpdateTracker;
 	m_RenderTrackerPtr = &rRenderTracker;
@@ -108,7 +113,6 @@ void StressTestGameState::Init()
 
 		if (i == 10) {
 			image.GetComponent<BallComponent>().SetCamera(rCamera.GetComponent<Smasher::CameraComponent>());
-			image.GetComponent<BallComponent>().SetWindow(GetEngine().GetWindow());
 		}
 
 	}
