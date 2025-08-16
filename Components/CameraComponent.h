@@ -19,6 +19,10 @@ namespace Smasher {
 		CameraComponent& Rotate(Degrees rotation);
 		CameraComponent& SetSize(sf::Vector2f size);
 		CameraComponent& Zoom(float factor);
+		CameraComponent& SetTarget(sf::RenderTarget& target);
+		CameraComponent& ApplyToTarget();
+		CameraComponent& ApplyToTarget(sf::RenderTarget& target);
+
 
 		void OnAddComponent() override;
 		void OnWindowResize(const Events::WindowResizeEvent& event);
@@ -27,9 +31,10 @@ namespace Smasher {
 		sf::Vector2f GetPosition() const { return m_View.getCenter(); };
 		Degrees GetRotation() const { return Degrees{ m_View.getRotation() }; };
 		sf::Vector2f GetSize() const { return m_View.getSize(); };
-
+		sf::RenderTarget& GetTarget() const { return *m_Target; }
 	private:
 		EventSubscriptionHandle m_ResizeHandle;
 		sf::View m_View;
+		sf::RenderTarget* m_Target = nullptr;
 	};
 }

@@ -26,6 +26,8 @@ namespace Smasher {
 		SMASHER_EXCEPTION(ComponentDowncastFailed)
 		SMASHER_EXCEPTION(MissingComponentDependency)
 
+		// ==== CAMERA EXCEPTIONS ====
+		SMASHER_EXCEPTION(CameraTargetNotSet)
 
 		// ==== ENTITY EXCEPTIONS ====
 		SMASHER_EXCEPTION(EntityDuplicateComponent)

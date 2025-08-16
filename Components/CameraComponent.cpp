@@ -47,4 +47,25 @@ namespace Smasher {
 		m_View.zoom(factor);
 		return *this;
 	}
+
+	CameraComponent& CameraComponent::SetTarget(sf::RenderTarget& target)
+	{
+		m_Target = &target;
+		return *this;
+	}
+
+	CameraComponent& CameraComponent::ApplyToTarget()
+	{
+		if (m_Target == nullptr) {
+			throw Exceptions::CameraTargetNotSet("m_Target is NULL");
+		}
+		m_Target->setView(m_View);
+		return *this;
+	}
+
+	CameraComponent& CameraComponent::ApplyToTarget(sf::RenderTarget& target)
+	{
+		target.setView(m_View);
+		return *this;
+	}
 }
