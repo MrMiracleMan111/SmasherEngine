@@ -23,7 +23,7 @@ public:
 
 	BallComponent& SetVelocity(sf::Vector2f velocity);
 
-	const sf::Vector2f& GetVelocity() const;
+	const sf::Vector2f& GetVelocity() const { return m_Velocity; }
 
 private:
 	sf::Vector2f m_Velocity;
