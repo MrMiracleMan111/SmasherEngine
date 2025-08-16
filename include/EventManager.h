@@ -54,15 +54,19 @@ namespace Smasher {
 		bool m_Valid = false;
 	};
 
+	// Non-Copyable
 	class SMASHER_API EventManager final {
 		friend struct EventSubscriptionHandle;
 	public:
-		EventManager() : m_AsyncEventConsumerThread(&EventManager::AsyncEventConsumer, this) {}
+		EventManager() :
+			m_AsyncEventConsumerThread(&EventManager::AsyncEventConsumer, this),
+			m_EventQueuePtr(std::make_unique<std::vector<std::shared_ptr<const Event>>>()),
+			m_AsyncEventQueuePtr(std::make_unique<std::vector<std::shared_ptr<const Event>>>()) {}
 		~EventManager();
 		EventManager(EventManager&) = delete;
-		EventManager(EventManager&&) = delete;
+		EventManager(EventManager&& other) noexcept;
 		EventManager& operator= (EventManager&) = delete;
-		EventManager& operator= (EventManager&&) = delete;
+		EventManager& operator= (EventManager&& other) noexcept;
 
 		// Subscribe to synchronous event handling (immediately after its called)
 		template<class T>
@@ -115,7 +119,7 @@ namespace Smasher {
 		void Publish(Args&&... eventArgs) {
 			static_assert(std::is_base_of<Event, T>::value, "T must inherit from Event");
 			std::shared_ptr<const T> pEvent = std::make_shared<const T>(std::chrono::system_clock::now(), std::forward<Args>(eventArgs)...);
-			m_EventQueue.push_back(pEvent);
+			m_EventQueuePtr->push_back(pEvent);
 
 			std::unique_lock lock(m_AsyncEventSwapQueueMutex);
 			m_AsyncEventSwapQueue.push_back(pEvent);
@@ -131,14 +135,14 @@ namespace Smasher {
 
 		void AsyncEventConsumer();
 
-		void Shutdown();
+		void StopAsync(); // Stops async event thread
 
 	private:
 		std::array< std::list<EventSubscription>, static_cast<std::size_t>(EventType::END)> m_EventSubscriptionsByType{};
 		std::array< std::list<EventSubscription>, static_cast<std::size_t>(EventType::END)> m_AsyncEventSubscriptionsByType{};
 
-		std::vector<std::shared_ptr<const Event>> m_EventQueue;
-		std::vector<std::shared_ptr<const Event>> m_AsyncEventQueue; // Events currently being processed in async queue
+		std::unique_ptr<std::vector<std::shared_ptr<const Event>>> m_EventQueuePtr;
+		std::unique_ptr<std::vector<std::shared_ptr<const Event>>> m_AsyncEventQueuePtr; // Events currently being processed in async queue
 
 		std::vector<std::shared_ptr<const Event>> m_AsyncEventSwapQueue; // Events to be processed next in async queue
 		std::condition_variable m_AsyncEventsCV;
