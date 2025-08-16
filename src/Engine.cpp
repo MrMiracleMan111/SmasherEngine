@@ -80,7 +80,6 @@ namespace Smasher {
 		m_UpdateTimestamp(other.m_UpdateTimestamp),
 		m_RenderTimestamp(other.m_RenderTimestamp)
 	{
-		//		std::mutex m_WindowMutex,
 		bool tmp = other.m_RunningAtomic;
 		m_RunningAtomic = tmp;
 		m_UpdateInterval = EngineConfig::UPDATE_INTERVAL;
