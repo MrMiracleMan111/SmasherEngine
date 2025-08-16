@@ -21,12 +21,46 @@
 #include "EventFeeder.h"
 
 namespace Smasher {
-	Engine::Engine(int width, int height, const sf::ContextSettings& settings) :
+
+	Engine::Engine() :
+		m_Headless(false),
 		m_Window(
-			sf::VideoMode(EngineConfig::WINDOW_WIDTH, EngineConfig::WINDOW_HEIGHT),
-			EngineConfig::TITLE,
-			sf::Style::Default,
-			settings) {
+			std::make_unique<sf::RenderWindow>(
+				sf::VideoMode(EngineConfig::WINDOW_WIDTH, EngineConfig::WINDOW_HEIGHT),
+				EngineConfig::TITLE, sf::Style::Default,
+				EngineConfig::DEFAULT_SETTINGS
+			)
+		) {
+		Init();
+	}
+
+	Engine::Engine(bool headless) : m_Headless(true) {
+		assert(headless == true);
+		Init();
+	}
+
+	Engine::Engine(int width, int height, const sf::ContextSettings& settings) :
+		m_Headless(false),
+		m_Window(
+			std::make_unique<sf::RenderWindow>(
+				sf::VideoMode(EngineConfig::WINDOW_WIDTH, EngineConfig::WINDOW_HEIGHT),
+				EngineConfig::TITLE,
+				sf::Style::Default,
+				settings
+			)
+		) {
+		Init();
+	}
+
+	Engine::Engine(int width, int height) :
+		m_Headless(false),
+		m_Window(
+			std::make_unique<sf::RenderWindow>(
+				sf::VideoMode(width, height),
+				EngineConfig::TITLE,
+				sf::Style::Default, EngineConfig::DEFAULT_SETTINGS
+			)
+		) {
 		Init();
 	}
 
@@ -35,14 +69,27 @@ namespace Smasher {
 		m_GameStateByType.clear();
 	}
 
-	Engine::Engine(int width, int height) : m_Window(sf::VideoMode(width, height), EngineConfig::TITLE,
-		sf::Style::Default, EngineConfig::DEFAULT_SETTINGS) {
-		Init();
+	Engine::Engine(Engine&& other) noexcept : 
+		m_Headless(other.m_Headless),
+		m_GameStateByType(std::move(other.m_GameStateByType)),
+		m_Window(std::move(other.m_Window)),
+		m_IsWindowOpen(other.m_IsWindowOpen),
+		m_EventManager(std::move(other.m_EventManager)),
+		m_ResourceManager(std::move(other.m_ResourceManager)),
+		m_WindowCloseHandle(std::move(other.m_WindowCloseHandle)),
+		m_UpdateTimestamp(other.m_UpdateTimestamp),
+		m_RenderTimestamp(other.m_RenderTimestamp)
+	{
+		//		std::mutex m_WindowMutex,
+		bool tmp = other.m_RunningAtomic;
+		m_RunningAtomic = tmp;
+		m_UpdateInterval = EngineConfig::UPDATE_INTERVAL;
+		m_RenderInterval = EngineConfig::RENDER_INTERVAL;
 	}
 
-	Engine::Engine() :
-		m_Window(sf::VideoMode(EngineConfig::WINDOW_WIDTH, EngineConfig::WINDOW_HEIGHT), EngineConfig::TITLE, sf::Style::Default, EngineConfig::DEFAULT_SETTINGS) {
-		Init();
+	Engine Engine::CreateHeadless()
+	{
+		return Engine(true);
 	}
 
 	void Engine::Init() {
@@ -64,12 +111,12 @@ namespace Smasher {
 			Millisecond updateTimer{ 0 };
 			Millisecond renderTimer{ 0 };
 
-			while (m_Window.isOpen() and m_RunningAtomic) {
+			while (m_Window->isOpen() and m_RunningAtomic) {
 				std::chrono::time_point<std::chrono::system_clock> tmp = std::chrono::system_clock::now();
 				Millisecond diff = std::chrono::duration_cast<std::chrono::milliseconds>(tmp - now);
 				now = tmp;
 				sf::Event event;
-				while (m_Window.pollEvent(event)) {
+				while (m_Window->pollEvent(event)) {
 					m_EventFeeder.ForwardSFMLEvent(event);
 				}
 
@@ -83,7 +130,7 @@ namespace Smasher {
 					updateTimer = Millisecond{ 0 };
 				}
 				if (renderTimer >= m_RenderInterval) {
-					Render(m_Window);
+					Render(*m_Window);
 					renderTimer = Millisecond{ 0 };
 				}
 
@@ -120,7 +167,7 @@ namespace Smasher {
 
 	void Engine::Render(sf::RenderWindow& rWindow) {
 		//rWindow.pushGLStates();
-		m_Window.clear();
+		m_Window->clear();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear Screen And Depth Buffer
 		for (const auto& [_, pGameState] : m_GameStateByType) {
 			m_RenderTimestamp = std::chrono::system_clock::now();
@@ -133,7 +180,7 @@ namespace Smasher {
 			Millisecond diff = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - m_RenderTimestamp);
 			pGameState->SetRenderTime(diff);
 		}
-		m_Window.display();
+		m_Window->display();
 		//rWindow.popGLStates();
 
 		GLenum err;
@@ -167,12 +214,12 @@ namespace Smasher {
 
 		std::scoped_lock lock(m_WindowMutex);
 		if (m_IsWindowOpen) {
-			m_Window.close();
+			m_Window->close();
 			m_IsWindowOpen = false;
 		}
 	}
 
-	sf::RenderWindow& Engine::GetWindow() { return m_Window; }
+	sf::RenderWindow& Engine::GetWindow() { return *m_Window; }
 	EventManager& Engine::GetEventManager() { return m_EventManager; };
 	ResourceManager& Engine::GetResourceManager() { return m_ResourceManager; };
 

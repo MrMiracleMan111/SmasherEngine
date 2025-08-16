@@ -14,12 +14,21 @@
 namespace Smasher {
 	class GameState;
 
+	// Non-Copyable
 	class SMASHER_API Engine final {
 	public:
 		Engine();
 		Engine(int width, int height);
 		Engine(int width, int height, const sf::ContextSettings& settings);
 		~Engine();
+
+		// Non-Copyable
+		Engine(const Engine&) = delete;
+		Engine(Engine&& other) noexcept;
+		Engine& operator =(const Engine&) = delete;
+		Engine& operator =(Engine&& other) = delete;
+
+		static Engine CreateHeadless();
 
 		void Init();
 		void Run();
@@ -43,17 +52,19 @@ namespace Smasher {
 		void SetUpdateInterval(Millisecond interval) { m_UpdateInterval = interval; }
 		void SetRenderInterval(Millisecond interval) { m_RenderInterval = interval; }
 		bool IsRunning() const { return m_RunningAtomic; }
+		bool IsHeadless() const { return m_Headless; }
 
 	private:
 #ifdef BENCHMARK
 		void BENCHMARK_LogAccumulatedTime();
 #endif
-
+		Engine(bool headless); // Headless constructor
 		void OnWindowClose(const Events::WindowCloseEvent& event);
 
 		std::unordered_map<std::type_index, std::unique_ptr<GameState>> m_GameStateByType;
-		sf::RenderWindow m_Window;
+		std::unique_ptr<sf::RenderWindow> m_Window = nullptr;
 		std::atomic_bool m_RunningAtomic = true;
+		const bool m_Headless = false;
 		bool m_IsWindowOpen = false; // Needed to prevent double delete on Window Context
 		std::mutex m_WindowMutex; // Prevent double delete on Window Context
 		EventManager m_EventManager;
