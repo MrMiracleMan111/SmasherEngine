@@ -198,12 +198,12 @@ TEST(ComponentsTest, RemoveComponent) {
 	DummyGameState& state = engine.AddState<DummyGameState>();
 	Smasher::Entity entity = state.AddEntity<Smasher::Entity>();
 	entity.AddComponent<TestComponent>(10);
-	ASSERT_TRUE(entity.HasComponent<TestComponent>());
-	ASSERT_NO_THROW({
+	EXPECT_TRUE(entity.HasComponent<TestComponent>());
+	EXPECT_NO_THROW({
 		entity.RemoveComponent<TestComponent>();
 	});
-	ASSERT_FALSE(entity.HasComponent<TestComponent>());
-	ASSERT_THROW({
+	EXPECT_FALSE(entity.HasComponent<TestComponent>());
+	EXPECT_THROW({
 		entity.RemoveComponent<TestComponent>();
 	}, Smasher::Exceptions::EntityComponentNotFound);
 }
@@ -214,10 +214,10 @@ TEST(ComponentsTest, RemoveComponentDataChange) {
 	state.Activate();
 	Smasher::Entity entity = state.AddEntity<Smasher::Entity>();
 	entity.AddComponent<DeleteTestComponent>();
-	ASSERT_TRUE(entity.HasComponent<DeleteTestComponent>());
-	ASSERT_NO_THROW({ engine.Update(Smasher::Millisecond{10}); });
-	ASSERT_FALSE(entity.HasComponent<DeleteTestComponent>());
-	ASSERT_THROW({
+	EXPECT_TRUE(entity.HasComponent<DeleteTestComponent>());
+	EXPECT_NO_THROW({ engine.Update(Smasher::Millisecond{10}); });
+	EXPECT_FALSE(entity.HasComponent<DeleteTestComponent>());
+	EXPECT_THROW({
 		entity.RemoveComponent<TestComponent>();
 	}, Smasher::Exceptions::EntityComponentNotFound);
 }
@@ -227,9 +227,9 @@ TEST(ComponentsTest, ExceptionRemoveComponentDataChange) {
 	engine.AddState<DummyGameState>().Activate();
 	Smasher::Entity entity = engine.GetState<DummyGameState>().AddEntity<Smasher::Entity>();
 	entity.AddComponent<SpicyDeleteTestComponent>();
-	ASSERT_TRUE(entity.HasComponent<SpicyDeleteTestComponent>());
-	ASSERT_NO_THROW({ engine.Update(Smasher::Millisecond{10}); });
-	ASSERT_NO_THROW({ engine.Update(Smasher::Millisecond{10}); });
+	EXPECT_TRUE(entity.HasComponent<SpicyDeleteTestComponent>());
+	EXPECT_NO_THROW({ engine.Update(Smasher::Millisecond{10}); });
+	EXPECT_NO_THROW({ engine.Update(Smasher::Millisecond{10}); });
 }
 
 TEST(ResourcesTest, OpenFileResource) {
@@ -239,20 +239,20 @@ TEST(ResourcesTest, OpenFileResource) {
 	Smasher::ResourceID fileResourceID{ 1 };
 	auto pFileResource = rResourceManager.GetOrLoadResource<Smasher::FileResource>(fileResourceID, Smasher::ResourcePath{ "test_file" }, flags);
 
-	ASSERT_NO_THROW({ rResourceManager.GetResource<Smasher::FileResource>(fileResourceID); });
-	ASSERT_TRUE(pFileResource->GetFileStream().is_open());
+	EXPECT_NO_THROW({ rResourceManager.GetResource<Smasher::FileResource>(fileResourceID); });
+	EXPECT_TRUE(pFileResource->GetFileStream().is_open());
 	pFileResource->GetFileStream() << "message";
-	ASSERT_TRUE(pFileResource->GetFileStream().is_open());
+	EXPECT_TRUE(pFileResource->GetFileStream().is_open());
 	rResourceManager.ReleaseResource(fileResourceID);
 	pFileResource.reset();
-	ASSERT_THROW({ rResourceManager.GetResource<Smasher::FileResource>(fileResourceID); }, Smasher::Exceptions::ResourceNotLoaded);
-	ASSERT_EQ(nullptr, pFileResource.get());
+	EXPECT_THROW({ rResourceManager.GetResource<Smasher::FileResource>(fileResourceID); }, Smasher::Exceptions::ResourceNotLoaded);
+	EXPECT_EQ(nullptr, pFileResource.get());
 
 	std::string line;
 	std::ifstream file("test_file", std::ios_base::in);
-	ASSERT_TRUE(file.is_open());
+	EXPECT_TRUE(file.is_open());
 	std::getline(file, line);
-	ASSERT_STREQ("message", line.c_str());
+	EXPECT_STREQ("message", line.c_str());
 }
 
 TEST(ResourcesTest, OpenReleaseFileResource) {
@@ -276,13 +276,13 @@ TEST(EventsTest, InvalidEventHandle) {
 	Smasher::EventManager& manager = state.GetEventManager();
 	Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::Events::DummyEvent>(TestCallback);
 	Smasher::EventSubscriptionHandle other_handle = std::move(handle);
-	ASSERT_THROW({
+	EXPECT_THROW({
 		manager.Unsubscribe(handle);
 		}, Smasher::Exceptions::EventHandleInvalid);
 
-	ASSERT_NO_THROW({ manager.Unsubscribe(other_handle); });
+	EXPECT_NO_THROW({ manager.Unsubscribe(other_handle); });
 
-	ASSERT_THROW({
+	EXPECT_THROW({
 		manager.Unsubscribe(other_handle);
 		}, Smasher::Exceptions::EventHandleInvalid);
 }
@@ -308,7 +308,7 @@ TEST(EventsTest, SinglePublishEvent) {
 	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
 	manager.Dispatch();
 	manager.Dispatch();
-	ASSERT_EQ(1, triggered_count);
+	EXPECT_EQ(1, triggered_count);
 }
 
 TEST(EventsTest, MultiplePublishEvent) {
@@ -328,7 +328,7 @@ TEST(EventsTest, MultiplePublishEvent) {
 	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 3");
 	manager.Dispatch();
 	manager.Dispatch();
-	ASSERT_EQ(3, triggered_count);
+	EXPECT_EQ(3, triggered_count);
 }
 
 
@@ -355,7 +355,7 @@ TEST(EventsTest, SubscriptionLifetimeTest) {
 	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 3");
 	manager.Dispatch();
 	manager.Dispatch();
-	ASSERT_EQ(1, triggered_count);
+	EXPECT_EQ(1, triggered_count);
 }
 
 TEST(EventsTest, SubscriptionLifetimeHandoffTest) {
@@ -395,7 +395,7 @@ TEST(EventsTest, SubscriptionLifetimeHandoffTest) {
 	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 3");
 	manager.Dispatch();
 	manager.Dispatch();
-	ASSERT_EQ(2, triggered_count);
+	EXPECT_EQ(2, triggered_count);
 }
 
 
@@ -412,12 +412,12 @@ TEST(EventsTest, SinglePublishUnsubscribeEvent) {
 
 	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
 	manager.Unsubscribe(handle);
-	ASSERT_THROW({
+	EXPECT_THROW({
 		manager.Unsubscribe(handle);
 	}, Smasher::Exceptions::EventHandleInvalid);
 	manager.Dispatch();
 	manager.Dispatch();
-	ASSERT_EQ(0, triggered_count);
+	EXPECT_EQ(0, triggered_count);
 }
 
 
@@ -448,8 +448,56 @@ TEST(EventsTest, MultiplePublishMultipleSubscribeEvent) {
 	manager.Publish<Smasher::Events::DummyEventExtra>("Dummy Event Extra 2");
 	manager.Dispatch();
 	manager.Dispatch();
-	ASSERT_EQ(3, triggered_count_1);
-	ASSERT_EQ(2, triggered_count_2);
+	EXPECT_EQ(3, triggered_count_1);
+	EXPECT_EQ(2, triggered_count_2);
+}
+
+// Move with synchronous events in queue
+TEST(EventsTest, MoveEventManagerSync) {
+	try {
+		Smasher::EventManager manager;
+		int count = 10;
+		auto incrementFunc = [&count](const Smasher::Events::DummyEvent&) {
+			count += 5;
+		};
+
+		Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::Events::DummyEvent>(incrementFunc);
+		manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
+
+		// Should wait for all async events to finish before moving
+		EXPECT_EQ(10, count);
+		Smasher::EventManager tmp = std::move(manager);
+		tmp.Dispatch();
+		EXPECT_EQ(15, count);
+		tmp.Unsubscribe(handle); // tmp would be deconstructed before "handle"
+	}
+	catch (...) {
+		FAIL(); // No Throw is allowed
+	}
+}
+
+// Move with async events in queue
+TEST(EventsTest, MoveEventManagerAsync) {
+	try {
+		Smasher::EventManager manager;
+		int count = 10;
+		auto incrementFunc = [&count](const Smasher::Events::DummyEvent&) {
+			std::this_thread::sleep_for(std::chrono::seconds(1));
+			count += 5;
+		};
+
+		Smasher::EventSubscriptionHandle handle = manager.SubscribeAsync<Smasher::Events::DummyEvent>(incrementFunc);
+		manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
+
+		// Should wait for all async events to finish before moving
+		EXPECT_EQ(10, count);
+		Smasher::EventManager tmp = std::move(manager);
+		EXPECT_EQ(15, count);
+		tmp.Unsubscribe(handle); // tmp would be deconstructed before "handle"
+	}
+	catch (...) {
+		FAIL(); // No Throw is allowed
+	}
 }
 
 TEST(AsyncEventTest, SubscribeEvent) {
@@ -472,9 +520,9 @@ TEST(AsyncEventTest, PublishEvent) {
 
 	Smasher::EventSubscriptionHandle handle = manager.SubscribeAsync<Smasher::Events::DummyEvent>(incrementFunc);
 	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
-	ASSERT_EQ(10, count);
+	EXPECT_EQ(10, count);
 	std::this_thread::sleep_for(std::chrono::seconds(2));
-	ASSERT_EQ(15, count);
+	EXPECT_EQ(15, count);
 }
 
 TEST(AsyncEventTest, MultiplePublishEvent) {
@@ -490,11 +538,21 @@ TEST(AsyncEventTest, MultiplePublishEvent) {
 	Smasher::EventSubscriptionHandle handle = manager.SubscribeAsync<Smasher::Events::DummyEvent>(incrementFunc);
 	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
 	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
-	ASSERT_EQ(10, count);
+	EXPECT_EQ(10, count);
 	std::this_thread::sleep_for(std::chrono::milliseconds(1500));
-	ASSERT_EQ(15, count);
+	EXPECT_EQ(15, count);
 	std::this_thread::sleep_for(std::chrono::milliseconds(1500));
-	ASSERT_EQ(20, count);
+	EXPECT_EQ(20, count);
+}
+
+TEST(EngineTest, MoveEngine) {
+	try {
+		Smasher::Engine engine(640, 420);
+		Smasher::Engine tmp = std::move(engine);
+	}
+	catch (...) {
+		FAIL(); // No throws should occur
+	}
 }
 
 TEST(EngineTest, NoShutdownEngine) {
