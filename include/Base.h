@@ -7,8 +7,7 @@
 #include "plf_colony.h"
 #include "Exceptions.h"
 #include "Smasher_export.h"
-// EngineAPI.hpp
-#pragma once
+
 #define SMASHER_API SMASHERENGINE_EXPORT
 
 #define SMASHER_USE_COMPONENT_MANAGER(managerType) \
@@ -30,6 +29,7 @@ constexpr uint64_t hash_str(const char* str) {
 	return hash;
 }
 
+/// Namespace for Smasher Game Engine
 namespace Smasher {
 	class GameState;
 	class IComponent;
@@ -37,7 +37,7 @@ namespace Smasher {
 	using Millisecond = std::chrono::milliseconds;
 	using ResourceID = uint64_t;
 	using ResourcePath = std::filesystem::path;
-	using Degrees = float; // In Degrees
+	using Degrees = float;
 	using Radians = float;
 
 #ifdef BENCHMARK
@@ -75,11 +75,6 @@ namespace Smasher {
 		T::PATH; // Checks if 'member_name' is a valid member access
 	};
 
-	//template <typename ComponentType, typename ManagerType>
-	//concept HasStaticInstantiateManager = requires() {
-	//	{ ComponentType::template StaticInstantiateManager<ComponentType>(std::declval<Smasher::GameState&>()) } -> std::same_as<std::unique_ptr<ManagerType>>;
-	//};
-
 	template <typename ComponentType>
 	concept HasStaticInstantiateManager = requires() {
 		ComponentType::template StaticInstantiateManager(std::declval<Smasher::GameState&>());
@@ -115,10 +110,12 @@ namespace Smasher {
 		INVALID
 	};
 
+	/// @enum ComponentStatus
+	/// @brief Used to determine when it is safe to remove a component
 	enum class ComponentStatus {
-		VALID,   // Component is active within a manager (not removed)
-		INVALID, // Ready to be removed or just created (not assigned to manager yet)
-		REMOVED  // Component was removed 
+		VALID,   ///< Component is active within a manager (not removed).
+		INVALID, ///< Ready to be removed or just created (not assigned to manager yet).
+		REMOVED  ///< Component was removed. 
 	};
 
 	struct Keyboard {
