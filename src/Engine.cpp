@@ -66,7 +66,10 @@ namespace Smasher {
 
 	Engine::~Engine()
 	{
-		m_GameStateByType.clear();
+		if (m_Valid) {
+			m_GameStateByType.clear();
+			m_EventManager.Unsubscribe(m_WindowCloseHandle); // Explicilty unsubscribe before EventManager is deconstructed
+		}
 	}
 
 	Engine::Engine(Engine&& other) noexcept : 
@@ -84,6 +87,7 @@ namespace Smasher {
 	{
 		bool tmp = other.m_RunningAtomic;
 		m_RunningAtomic = tmp;
+		other.m_Valid = false;
 	}
 
 	Engine Engine::CreateHeadless()
