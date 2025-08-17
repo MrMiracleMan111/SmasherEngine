@@ -13,9 +13,12 @@ add_executable(
 
 # Set output directory to parent folder where SFML DLLs are located
 set_target_properties(BasicTests PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY "${SMASHER_ENGINE_OUTPUT_DIR}"
     TIMEOUT 6
 )
+
+set_target_properties(BasicTests PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${SMASHER_ENGINE_OUTPUT_DIR}" TIMEOUT 6)
+set_target_properties(BasicTests PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${SMASHER_ENGINE_OUTPUT_DIR}" TIMEOUT 6)
 
 target_link_libraries(
     BasicTests
@@ -31,9 +34,13 @@ add_executable(
 
 # Set output directory to parent folder where SFML DLLs are located
 set_target_properties(InternalComponentTests PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY "${SMASHER_ENGINE_OUTPUT_DIR}"
     TIMEOUT 6
 )
+
+set_target_properties(InternalComponentTests PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${SMASHER_ENGINE_OUTPUT_DIR}" TIMEOUT 6)
+set_target_properties(InternalComponentTests PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${SMASHER_ENGINE_OUTPUT_DIR}" TIMEOUT 6)
+
 
 target_link_libraries(
     InternalComponentTests
