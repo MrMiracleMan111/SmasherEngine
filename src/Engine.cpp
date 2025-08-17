@@ -34,7 +34,7 @@ namespace Smasher {
 		Init();
 	}
 
-	Engine::Engine(bool headless) : m_Headless(true) {
+	Engine::Engine(bool headless) : m_Headless(true), m_Window(nullptr) {
 		assert(headless == true);
 		Init();
 	}
@@ -68,7 +68,9 @@ namespace Smasher {
 	{
 		if (m_Valid) {
 			m_GameStateByType.clear();
-			m_EventManager.Unsubscribe(m_WindowCloseHandle); // Explicilty unsubscribe before EventManager is deconstructed
+			if (!m_Headless) {
+				m_EventManager.Unsubscribe(m_WindowCloseHandle); // Explicilty unsubscribe before EventManager is deconstructed
+			}
 		}
 	}
 
@@ -96,15 +98,17 @@ namespace Smasher {
 	}
 
 	void Engine::Init() {
-		glewExperimental = GL_TRUE;
-		GLenum status = glewInit();
-		if (status != GLEW_OK) {
-			std::string_view errCode = reinterpret_cast<const char*>(glewGetErrorString(status));
-			std::string message = std::format("GLEW Failed to initialize, status: {}", errCode);
-			throw Exceptions::GLEWInitFailed(message);
-		}
+		if (!m_Headless) {
+			glewExperimental = GL_TRUE;
+			GLenum status = glewInit();
+			if (status != GLEW_OK) {
+				std::string_view errCode = reinterpret_cast<const char*>(glewGetErrorString(status));
+				std::string message = std::format("GLEW Failed to initialize, status: {}", errCode);
+				throw Exceptions::GLEWInitFailed(message);
+			}
 
-		m_WindowCloseHandle = m_EventManager.Subscribe<Events::WindowCloseEvent>(&Engine::OnWindowClose, this);
+			m_WindowCloseHandle = m_EventManager.Subscribe<Events::WindowCloseEvent>(&Engine::OnWindowClose, this);
+		}
 	}
 
 	void Engine::Run() {
@@ -114,13 +118,15 @@ namespace Smasher {
 			Millisecond updateTimer{ 0 };
 			Millisecond renderTimer{ 0 };
 
-			while (m_Window->isOpen() and m_RunningAtomic) {
+			while ((!m_Headless && m_Window->isOpen()) and m_RunningAtomic) {
 				std::chrono::time_point<std::chrono::system_clock> tmp = std::chrono::system_clock::now();
 				Millisecond diff = std::chrono::duration_cast<std::chrono::milliseconds>(tmp - now);
 				now = tmp;
 				sf::Event event;
-				while (m_Window->pollEvent(event)) {
-					m_EventFeeder.ForwardSFMLEvent(event);
+				if (!m_Headless) {
+					while (m_Window->pollEvent(event)) {
+						m_EventFeeder.ForwardSFMLEvent(event);
+					}
 				}
 
 				updateTimer += diff;
@@ -132,7 +138,7 @@ namespace Smasher {
 					Update(Millisecond{ updateTimer });
 					updateTimer = Millisecond{ 0 };
 				}
-				if (renderTimer >= m_RenderInterval) {
+				if (!m_Headless && renderTimer >= m_RenderInterval) {
 					Render(*m_Window);
 					renderTimer = Millisecond{ 0 };
 				}
