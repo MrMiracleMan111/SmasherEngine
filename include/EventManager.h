@@ -151,6 +151,7 @@ namespace Smasher {
 		std::atomic_bool m_AsyncRunning = true;
 		std::mutex m_AsyncEventsMutex;
 		std::mutex m_AsyncEventSwapQueueMutex;
+		std::mutex m_AsyncSubscriptionsMutex;
 
 		std::thread m_AsyncEventConsumerThread;
 	};

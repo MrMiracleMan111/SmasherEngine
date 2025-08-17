@@ -43,6 +43,8 @@ namespace Smasher {
 			throw Exceptions::EventHandleInvalid("Handle is invalid");
 		}
 		handle.Invalidate();
+
+		std::scoped_lock lock(m_AsyncSubscriptionsMutex);
 		handle.m_SubscriptionListPtr->erase(handle.m_Itr);
 	}
 
@@ -59,6 +61,7 @@ namespace Smasher {
 
 	void EventManager::DispatchAsync() {
 		for (const auto& pEvent : m_AsyncEventQueue) {
+			std::scoped_lock lock(m_AsyncSubscriptionsMutex);
 			std::size_t index = static_cast<std::size_t>(pEvent->GetEventType());
 			auto& subscriptionList = (*m_AsyncEventSubscriptionsByTypePtr)[index];
 			for (auto& subsription : subscriptionList) {
