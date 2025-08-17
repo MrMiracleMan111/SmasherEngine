@@ -366,4 +366,5 @@ FodyWeavers.xsd
 /build/x64-debug
 
 build
+doc
 Manifest.h

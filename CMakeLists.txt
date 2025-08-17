@@ -18,6 +18,7 @@ enable_testing()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set (GENERATE_DOCS CACHE BOOL "Generate Doxygen Documentation Files")
 set (SFML_INCLUDE_DIR CACHE FILEPATH "Include directory for SFML version 2.6.2")
 set (SFML_LIB_DIR CACHE FILEPATH "Library directory for SFML version 2.6.2")
 set (GLEW_PATH CACHE FILEPATH "Path to GLEW (used by FindPackage tool) for example C:/Users/Foo/Documents/glew, this project was develoepd with GLEW 2.1.0")
@@ -112,6 +113,30 @@ foreach(DYNAMIC_LIB ${SFML_DYNAMIC_LIB_LIST})
     message(STATUS "Copying ${DYNAMIC_LIB} into ${CMAKE_BINARY_DIR}")
     file(COPY "${DYNAMIC_LIB}" DESTINATION "${CMAKE_BINARY_DIR}/")
 endforeach()
+
+find_package(Doxygen)
+if(GENERATE_DOCS)
+    if(DOXYGEN_FOUND)
+        set(DOXYGEN_INPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+        set(DOXYGEN_OUTPUT_DIR "${CMAKE_SOURCE_DIR}/doc")
+
+        configure_file(
+            "${CMAKE_SOURCE_DIR}/Doxygen.in"
+            "${CMAKE_SOURCE_DIR}/Doxyfile"
+            @ONLY
+        )
+
+        add_custom_target(doxygen_docs ALL
+            COMMAND ${DOXYGEN_EXECUTABLE} "${CMAKE_SOURCE_DIR}/Doxyfile"
+            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/doc"
+            COMMENT "Generating Doxygen files"
+            BYPRODUCTS "${DOXYGEN_OUTPUT_DIR}/html/index.html"
+        )
+    else()
+        message(SEND_ERROR "Could not find Doxygen")
+    endif()
+
+endif()
 
 # Compile Engine
 add_library(SmasherEngine SHARED "Core.cpp" "Core.h" "include/GameState.h" "include/UUID.h" "src/UUID.cpp" "include/Base.h" "src/GameState.cpp" "include/Engine.h" "src/Engine.cpp" "include/Exceptions.h" "include/EventManager.h" "src/EventManager.cpp" "include/Events.h"  "ComponentManagers/GenericComponentManager.h" "include/IComponent.h"  "include/Entity.h" "src/Entity.cpp"   "Components/Transform2DComponent.h" "include/EngineConfig.h"   "include/ResourceManager.h" "include/IComponentManager.h" "ComponentManagers/BaseComponentManager.h"  "Components/DrawableComponent.h" "Components/DrawableComponent.cpp" "include/Resources.h" "Components/TextComponent.h" "Components/TextComponent.cpp" "ComponentManagers/DrawableComponentManager.h" "ComponentManagers/DrawableComponentManager.cpp" "ComponentManagers/RenderBatch.h" "ComponentManagers/RenderBatch.cpp" "src/Base.cpp" "Components/Transform2DComponent.cpp" "Components/Transform2DWrapper.h"  "Components/Transform2DWrapper.inl" "include/EventFeeder.h" "src/EventFeeder.cpp" "Components/CameraComponent.h" "Components/CameraComponent.cpp")
