@@ -555,6 +555,59 @@ TEST(EngineTest, MoveEngine) {
 	}
 }
 
+TEST(EngineTest, HeadlessEngine) {
+	try {
+		bool failed = false;
+		Smasher::Engine engine = Smasher::Engine::CreateHeadless();
+
+		ShutdownEngineGameState& state = engine.AddState<ShutdownEngineGameState>();
+		state.Activate();
+
+		std::thread worker([&engine]() {
+			engine.Run(); // Engine should shutdown after first update
+		});
+
+		std::this_thread::sleep_for(std::chrono::seconds(3));
+		failed = engine.IsRunning();
+		engine.Shutdown();
+		worker.join();
+
+		if (failed) {
+			FAIL() << "Engine should have shutdown";
+		}
+	}
+	catch (...) {
+		FAIL();
+	}
+}
+
+TEST(EngineTest, MoveHeadlessEngine) {
+	try {
+		bool failed = false;
+		Smasher::Engine engine = Smasher::Engine::CreateHeadless();
+		Smasher::Engine tmp = std::move(engine);
+
+		ShutdownEngineGameState& state = tmp.AddState<ShutdownEngineGameState>();
+		state.Activate();
+
+		std::thread worker([&tmp]() {
+			tmp.Run(); // Engine should shutdown after first update
+			});
+
+		std::this_thread::sleep_for(std::chrono::seconds(3));
+		failed = tmp.IsRunning();
+		tmp.Shutdown();
+		worker.join();
+
+		if (failed) {
+			FAIL() << "Engine should have shutdown";
+		}
+	}
+	catch (...) {
+		FAIL();
+	}
+}
+
 TEST(EngineTest, NoShutdownEngine) {
 	bool passed = false;
 	Smasher::Engine engine(640, 420);
