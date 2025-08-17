@@ -59,9 +59,11 @@ namespace Smasher {
 		friend struct EventSubscriptionHandle;
 	public:
 		EventManager() :
+			m_EventSubscriptionsByTypePtr(std::make_unique<std::array<std::list<EventSubscription>, static_cast<std::size_t>(EventType::END)>>()),
+			m_AsyncEventSubscriptionsByTypePtr(std::make_unique<std::array<std::list<EventSubscription>, static_cast<std::size_t>(EventType::END)>>()),
 			m_AsyncEventConsumerThread(&EventManager::AsyncEventConsumer, this),
-			m_EventQueuePtr(std::make_unique<std::vector<std::shared_ptr<const Event>>>()),
-			m_AsyncEventQueuePtr(std::make_unique<std::vector<std::shared_ptr<const Event>>>()) {}
+			m_EventQueue(),
+			m_AsyncEventQueue() {}
 		~EventManager();
 		EventManager(EventManager&) = delete;
 		EventManager(EventManager&& other) noexcept;
@@ -74,7 +76,7 @@ namespace Smasher {
 			static_assert(std::is_base_of<Event, T>::value, "T must inherit from Event");
 			
 			constexpr std::size_t index = static_cast<std::size_t>(T::GetStaticEventType());
-			std::list<EventSubscription>& list = m_EventSubscriptionsByType.at(index);
+			std::list<EventSubscription>& list = m_EventSubscriptionsByTypePtr->at(index);
 			
 			auto bound = [callback](const Event& arg) {callback(static_cast<const T&>(arg)); };
 			
@@ -101,7 +103,7 @@ namespace Smasher {
 			static_assert(std::is_base_of<Event, T>::value, "T must inherit from Event");
 
 			constexpr std::size_t index = static_cast<std::size_t>(T::GetStaticEventType());
-			std::list<EventSubscription>& list = m_AsyncEventSubscriptionsByType.at(index);
+			std::list<EventSubscription>& list = m_AsyncEventSubscriptionsByTypePtr->at(index);
 
 			auto bound = [callback](const Event& arg) {callback(static_cast<const T&>(arg)); };
 
@@ -119,7 +121,7 @@ namespace Smasher {
 		void Publish(Args&&... eventArgs) {
 			static_assert(std::is_base_of<Event, T>::value, "T must inherit from Event");
 			std::shared_ptr<const T> pEvent = std::make_shared<const T>(std::chrono::system_clock::now(), std::forward<Args>(eventArgs)...);
-			m_EventQueuePtr->push_back(pEvent);
+			m_EventQueue.push_back(pEvent);
 
 			std::unique_lock lock(m_AsyncEventSwapQueueMutex);
 			m_AsyncEventSwapQueue.push_back(pEvent);
@@ -138,11 +140,11 @@ namespace Smasher {
 		void StopAsync(); // Stops async event thread
 
 	private:
-		std::array< std::list<EventSubscription>, static_cast<std::size_t>(EventType::END)> m_EventSubscriptionsByType{};
-		std::array< std::list<EventSubscription>, static_cast<std::size_t>(EventType::END)> m_AsyncEventSubscriptionsByType{};
+		std::unique_ptr<std::array<std::list<EventSubscription>, static_cast<std::size_t>(EventType::END)>> m_EventSubscriptionsByTypePtr;
+		std::unique_ptr<std::array<std::list<EventSubscription>, static_cast<std::size_t>(EventType::END)>> m_AsyncEventSubscriptionsByTypePtr;
 
-		std::unique_ptr<std::vector<std::shared_ptr<const Event>>> m_EventQueuePtr;
-		std::unique_ptr<std::vector<std::shared_ptr<const Event>>> m_AsyncEventQueuePtr; // Events currently being processed in async queue
+		std::vector<std::shared_ptr<const Event>> m_EventQueue;
+		std::vector<std::shared_ptr<const Event>> m_AsyncEventQueue; // Events currently being processed in async queue
 
 		std::vector<std::shared_ptr<const Event>> m_AsyncEventSwapQueue; // Events to be processed next in async queue
 		std::condition_variable m_AsyncEventsCV;

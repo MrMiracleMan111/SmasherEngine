@@ -6,14 +6,14 @@ namespace Smasher {
 	}
 
 	EventManager::EventManager(EventManager&& other) noexcept :
-		m_EventSubscriptionsByType(std::move(other.m_EventSubscriptionsByType)),
-		m_AsyncEventSubscriptionsByType(std::move(other.m_AsyncEventSubscriptionsByType)),
-		m_EventQueuePtr(std::move(other.m_EventQueuePtr)),
-		m_AsyncEventQueuePtr(std::move(other.m_AsyncEventQueuePtr)),
-		m_AsyncEventSwapQueue(std::move(other.m_AsyncEventSwapQueue)),
+		m_EventSubscriptionsByTypePtr(std::move(other.m_EventSubscriptionsByTypePtr)),
+		m_EventQueue(std::move(other.m_EventQueue)),
 		m_AsyncRunning(false)
 	{
 		other.StopAsync();
+		m_AsyncEventSubscriptionsByTypePtr = std::move(other.m_AsyncEventSubscriptionsByTypePtr);
+		m_AsyncEventQueue = std::move(other.m_AsyncEventQueue);
+		m_AsyncEventSwapQueue = std::move(other.m_AsyncEventSwapQueue);
 		m_AsyncRunning = true;
 		m_AsyncEventConsumerThread = std::thread(&EventManager::AsyncEventConsumer, this);
 	}
@@ -27,10 +27,10 @@ namespace Smasher {
 			// Wait for async events to finish processing
 			other.StopAsync();
 
-			m_EventSubscriptionsByType = std::move(other.m_EventSubscriptionsByType);
-			m_AsyncEventSubscriptionsByType = std::move(other.m_AsyncEventSubscriptionsByType);
-			m_EventQueuePtr = std::move(other.m_EventQueuePtr);
-			m_AsyncEventQueuePtr = std::move(other.m_AsyncEventQueuePtr);
+			m_EventSubscriptionsByTypePtr = std::move(other.m_EventSubscriptionsByTypePtr);
+			m_AsyncEventSubscriptionsByTypePtr = std::move(other.m_AsyncEventSubscriptionsByTypePtr);
+			m_EventQueue = std::move(other.m_EventQueue);
+			m_AsyncEventQueue = std::move(other.m_AsyncEventQueue);
 			m_AsyncEventSwapQueue = std::move(other.m_AsyncEventSwapQueue);
 			m_AsyncRunning = true;
 			m_AsyncEventConsumerThread = std::thread(&EventManager::AsyncEventConsumer, this);
@@ -47,25 +47,25 @@ namespace Smasher {
 	}
 
 	void EventManager::Dispatch() {
-		for (const auto& pEvent : *m_EventQueuePtr ) {
+		for (const auto& pEvent : m_EventQueue ) {
 			std::size_t index = static_cast<std::size_t>(pEvent->GetEventType());
-			auto& subscriptionList = m_EventSubscriptionsByType[index];
+			auto& subscriptionList = (*m_EventSubscriptionsByTypePtr)[index];
 			for (auto& subsription : subscriptionList) {
 				subsription.Callback(*pEvent.get());
 			}
 		}
-		m_EventQueuePtr->clear();
+		m_EventQueue.clear();
 	}
 
 	void EventManager::DispatchAsync() {
-		for (const auto& pEvent : *m_AsyncEventQueuePtr) {
+		for (const auto& pEvent : m_AsyncEventQueue) {
 			std::size_t index = static_cast<std::size_t>(pEvent->GetEventType());
-			auto& subscriptionList = m_AsyncEventSubscriptionsByType[index];
+			auto& subscriptionList = (*m_AsyncEventSubscriptionsByTypePtr)[index];
 			for (auto& subsription : subscriptionList) {
 				subsription.Callback(*pEvent.get());
 			}
 		}
-		m_AsyncEventQueuePtr->clear();
+		m_AsyncEventQueue.clear();
 	}
 
 	void EventManager::AsyncEventConsumer() {
@@ -73,7 +73,7 @@ namespace Smasher {
 		while (m_AsyncRunning) {
 			m_AsyncEventsCV.wait(lock, [=] { return (m_AsyncEventSwapQueue.size() > 0 || !m_AsyncRunning); });
 			m_AsyncEventSwapQueueMutex.lock();
-			std::swap(m_AsyncEventSwapQueue, *m_AsyncEventQueuePtr);
+			std::swap(m_AsyncEventSwapQueue, m_AsyncEventQueue);
 			DispatchAsync();
 			m_AsyncEventSwapQueueMutex.unlock();
 		}
