@@ -6,29 +6,29 @@
 #include "IComponent.h"
 #include "plf_colony.h"
 
-/**
-	Instead of component logic being handled in the manager, this manager expects
-	components to have a static method "StaticUpdateComponent" to update component.
-
-	The effect is offloading the update code to the component to remove the need for
-	new Component Managers for every component (especially useful for simple components with little logic)
-
-
-	This Component Manager will also check if the template T has a "StaticUpdateComponent" before trying
-	to run it. This removes need for "StaticUpdateComponent" implementation on purely
-	data components (Position, Rotation, etc.) where it wouldn't do anything.
-*/
-
 namespace Smasher {
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief Component Manager that automatically selects functionality to match the Component.
+	/// Like all @ref IComponentManager instances, this class is Non-Copyable and may only be move-assigned
+	/// 
+	/// @param T Type of Component housed in the @ref GenericComponentManager
+	/// 
+	/// The @ref GenericComponentManager is meant to provide an alternative to creating
+	/// custom component managers for each new component. The @ref GenericComponentManager
+	/// will instead look for the `StaticUpdateComponent` and `StaticRenderComponent` methods
+	/// within the custom component class and call them if they exist. Now, instead of creating
+	/// additional Component Manager classes, and simple updates and rendering can be defined
+	/// withing the component class as the static methods `StaticUpdateComponent` and `StaticRenderComponent`.
+	/// Like the @ref BaseComponentManager this class uses @ref plf::colony to house components.
+	//////////////////////////////////////////////////////////////////////////////////////////////////
 	template <class T>
 	class GenericComponentManager final : public IComponentManager {
 		static_assert(std::is_base_of_v<IComponent, T>, "T should be derived from IComponent");
 
 		friend class Entity;
 	public:
-		GenericComponentManager(GameState& state) : IComponentManager(state) {
-			m_ComponentsToRemove.reserve(64); // Arbitrary can be improved upon later
-		};
+		GenericComponentManager(GameState& state);
 		GenericComponentManager() = delete;
 		GenericComponentManager(const GenericComponentManager&) = delete;
 		GenericComponentManager(GenericComponentManager&&) = delete;
@@ -36,61 +36,45 @@ namespace Smasher {
 		GenericComponentManager& operator= (GenericComponentManager&&) = default;
 		virtual ~GenericComponentManager() = default;
 
-		void PreUpdate(Millisecond delta) override {
-			RemoveMarkedComponents();
-		}
+		void PreUpdate(Millisecond delta) override;
 
-		void Update(Millisecond delta) override {
-			if constexpr (HasStaticUpdateComponent<T>) {
-				for (T& itr : m_Components) {
-					T::StaticUpdateComponent(itr, delta);
-				}
-			}
-		}
+		/// @brief Updates all components.
+		/// @param delta Time in @ref Millisecond passed since the last update.
+		/// 
+		/// @ref GenericComponentManager::Update is called only if Component type `T` defines `StaticUpdateComponent(T& self)`
+		/// Update order matching component insertion order is not guaranteed.
+		void Update(Millisecond delta) override;
 
-		void Render(sf::RenderWindow& rWindow) override {
-			if constexpr (HasStaticRenderComponent<T>) {
-				for (T& itr : m_Components) {
-					T::StaticRenderComponent(itr, rWindow);
-				}
-			}
-		}
+		/// @brief Renders all components.
+		/// @param rWindow Reference to the `sf::RenderWindow` to draw on.
+		/// 
+		/// @ref GenericComponentManager::Render is called only if Component type `T` defines `StaticUpdateComponent(T& self)`.
+		/// Render order matching component insertion order is not guaranteed.
+		void Render(sf::RenderWindow& rWindow);
 
+		/// @brief Renders all components
+		/// @param rEntity Entity to attach the component to.
+		/// @param args Arguments to pass to the component constructor.
+		/// 
+		/// @ref GenericComponentManager::Render is called only if Component type `T` defines `StaticUpdateComponent(T& self)`.
 		template<typename... Args>
-		T& AddComponent(Entity& rEntity, Args&&... args) {
-			std::size_t index = m_Components.size();
-			auto itr = m_Components.emplace(std::forward<Args>(args)...);
-			T& rComponent = *itr;
-			SetComponentStatus(rComponent, ComponentStatus::VALID);
-			SetComponentEntity(rComponent, rEntity);
-			SetComponentManager(rComponent, *this);
-			SetComponentIterator<T>(rComponent, new typename plf::colony<T>::iterator(itr));
-			CallOnAddComponent(rComponent); // called when component has been initialiazed and added
+		T& AddComponent(Entity& rEntity, Args&&... args);
 
-			return rComponent;
-		}
-
-		void RemoveComponent(IComponent& rComponentInterface) {
-			T& rComponent = static_cast<T&>(rComponentInterface);
-			if (rComponent.GetStatus() != ComponentStatus::VALID) {
-				return;
-			}
-			typename plf::colony<T>::iterator* pItr = GetComponentIterator<T>(rComponent);
-			SetComponentStatus(rComponent, ComponentStatus::INVALID);
-			m_ComponentsToRemove.emplace_back(pItr);
-		}
+		/// @brief Marks components for removal
+		/// @param rComponentInterface Reference to @ref IComponent instance to remove.
+		/// 
+		/// If the component status is @ref ComponentStatus::VALID it will be ignored
+		/// and nothing will happen. This method only marks components for removal.
+		/// Component removal is handled after @ref GenericComponentManager::Update by the 
+		/// `GenericComponentManager::RemoveMarkedComponents` private method.
+		void RemoveComponent(IComponent& rComponentInterface);
 
 	private:
-		void RemoveMarkedComponents() {
-			for (auto& itr : m_ComponentsToRemove) {  
-				typename plf::colony<T>::iterator* pCompItr = itr;
-				m_Components.erase(*pCompItr);
-				delete pCompItr;
-			}
-			m_ComponentsToRemove.clear();
-		}
+		void RemoveMarkedComponents();
 
 		plf::colony<T> m_Components;
 		std::vector<typename plf::colony<T>::iterator*> m_ComponentsToRemove; // Components to be removed
 	};
 }
+
+#include "ComponentManagers/GenericComponentManager.inl"
