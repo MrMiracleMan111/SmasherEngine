@@ -78,12 +78,12 @@ namespace Smasher {
 		m_ResourceManager(std::move(other.m_ResourceManager)),
 		m_WindowCloseHandle(std::move(other.m_WindowCloseHandle)),
 		m_UpdateTimestamp(other.m_UpdateTimestamp),
-		m_RenderTimestamp(other.m_RenderTimestamp)
+		m_RenderTimestamp(other.m_RenderTimestamp),
+		m_UpdateInterval(other.m_UpdateInterval),
+		m_RenderInterval(other.m_RenderInterval)
 	{
 		bool tmp = other.m_RunningAtomic;
 		m_RunningAtomic = tmp;
-		m_UpdateInterval = EngineConfig::UPDATE_INTERVAL;
-		m_RenderInterval = EngineConfig::RENDER_INTERVAL;
 	}
 
 	Engine Engine::CreateHeadless()
