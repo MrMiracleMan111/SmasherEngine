@@ -14,7 +14,7 @@ namespace Smasher {
 		auto& rResourceManager = GetEntity().GetEngine().GetResourceManager();
 		auto& rCompManager = static_cast<DrawableComponentManager&>(GetManager());
 		// Load Resource
-		auto pTextureResource = rResourceManager.GetOrLoadResource<T, TextureResource>();
+		auto pTextureResource = rResourceManager.template GetOrLoadResource<T, TextureResource>();
 		// Update Render Batch
 		rCompManager.OnComponentSetTexture(*this, T::ID, transulcent);
 		// Assign texture to component
