@@ -13,7 +13,7 @@ namespace Smasher {
 	template <class T>
 	DrawableComponent& DrawableComponent::SetTextureAsset(bool transulcent) {
 		auto& rResourceManager = GetEntity().GetEngine().GetResourceManager();
-		auto& rCompManager = static_cast<DrawableComponentManager&>(GetManager());
+		auto& rCompManager = dynamic_cast<DrawableComponentManager&>(GetManager());
 		// Load Resource
 		auto pTextureResource = rResourceManager.template GetOrLoadResource<T, TextureResource>();
 		// Update Render Batch
