@@ -28,7 +28,7 @@ namespace Smasher {
 		template <class T>
 		TextComponent& SetFontAsset() {
 			auto& rResourceManager = GetEntity().GetEngine().GetResourceManager();
-			m_Font = rResourceManager.GetOrLoadResource<T, FontResource>();
+			m_Font = rResourceManager.template GetOrLoadResource<T, FontResource>();
 			m_Text.setFont(m_Font->GetFont());
 			m_FontLoaded = true;
 			return *this;
