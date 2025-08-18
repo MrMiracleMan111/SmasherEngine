@@ -5,6 +5,8 @@
 #include <array>
 #include <chrono>
 #include <functional>
+#include <condition_variable>
+#include <thread>
 #include <mutex>
 #include "Base.h"
 
