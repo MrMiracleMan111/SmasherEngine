@@ -12,6 +12,7 @@
 
 namespace Smasher {
 	struct Event;
+	class EventManager;
 
 	struct EventSubscription {
 		std::function<void(const Event&)> Callback;
