@@ -1,6 +1,7 @@
 #pragma once
-#include "DrawableComponent.h"
+#include "Components/DrawableComponent.h"
 #include "ResourceManager.h"
+#include "ComponentManagers/DrawableComponentManager.h"
 
 namespace Smasher {
 
