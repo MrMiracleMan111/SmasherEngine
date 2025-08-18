@@ -28,12 +28,12 @@ namespace Smasher {
 
 		template<class T>
 		typename plf::colony<T>::iterator* GetComponentIterator(T& rComponent) {
-			return rComponent.GetIterator<T>();
+			return rComponent.template GetIterator<T>();
 		}
 
 		template<class T>
 		void SetComponentIterator(T& rComponent, typename plf::colony<T>::iterator* itrPtr) {
-			rComponent.SetIterator<T>(itrPtr);
+			rComponent.template SetIterator<T>(itrPtr);
 		}
 	};
 }
