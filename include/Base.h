@@ -77,7 +77,7 @@ namespace Smasher {
 
 	template <typename ComponentType>
 	concept HasStaticInstantiateManager = requires() {
-		ComponentType::template StaticInstantiateManager(std::declval<Smasher::GameState&>());
+		ComponentType::StaticInstantiateManager(std::declval<Smasher::GameState&>());
 	};
 
 	template <typename T>
