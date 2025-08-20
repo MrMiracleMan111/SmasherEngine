@@ -1,4 +1,5 @@
 #include <numbers>
+#include <cmath>
 #include "StressTestGameState.h"
 #include "Manifest.h"
 #include "Base.h"
