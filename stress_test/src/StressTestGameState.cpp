@@ -18,8 +18,8 @@ Smasher::Entity& StressTestGameState::SpawnBouncingBall(sf::Vector2i position)
 	int speedVariance = 100;
 	float angle = (float)(rand() % 360);
 	float speed = (float)(rand() % speedVariance + minSpeed);
-	float tmpX = cos(angle * toRadian) * speed;
-	float tmpY = sin(angle * toRadian) * speed;
+	float tmpX = std::cos(angle * toRadian) * speed;
+	float tmpY = std::sin(angle * toRadian) * speed;
 	float depth = (float)(rand() % 100) / 100.0f;
 	Smasher::Entity& image = AddEntity<Smasher::Entity>();
 	image.AddComponent<Smasher::DrawableComponent>()
