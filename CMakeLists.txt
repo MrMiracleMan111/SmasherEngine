@@ -104,14 +104,14 @@ set_target_properties(SmasherEngine PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "$
 set_target_properties(SmasherEngine PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${SMASHER_ENGINE_OUTPUT_DIR}")
 
 generate_export_header(SmasherEngine EXPORT_FILE_NAME "${CMAKE_BINARY_DIR}/exports/Smasher_export.h")
-target_include_directories(SmasherEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/ComponentManagers" "${CMAKE_BINARY_DIR}/exports")
+target_include_directories(SmasherEngine PUBLIC ${OPENGL_INCLUDE_DIR} ${GLEW_INCLUDE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/ComponentManagers" "${CMAKE_BINARY_DIR}/exports")
 
 target_link_libraries(SmasherEngine PUBLIC
-"sfml-audio${SFML_DYNAMIC_LIB_SUFFIX}"
-"sfml-window${SFML_DYNAMIC_LIB_SUFFIX}"
-"sfml-graphics${SFML_DYNAMIC_LIB_SUFFIX}"
-"sfml-network${SFML_DYNAMIC_LIB_SUFFIX}"
-"sfml-system${SFML_DYNAMIC_LIB_SUFFIX}"
+"sfml-audio"
+"sfml-window"
+"sfml-graphics"
+"sfml-network"
+"sfml-system"
 GLEW::GLEW
 ${OPENGL_LIBRARIES})
 
