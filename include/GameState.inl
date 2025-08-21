@@ -23,7 +23,7 @@ namespace Smasher {
 			static_assert(ComponentManagerHasAddComponent<ManagerType, ComponentType>, "ComponentManager is missing AddComponent method");
 			static_assert(std::derived_from<ManagerType, IComponentManager>, "StaticInstantiateManager return type must derive from IComponentManager");
 
-			m_ComponentManagers.emplace(std::type_index(typeid(ComponentType)), ComponentType::template StaticInstantiateManager(*this));
+			m_ComponentManagers.emplace(std::type_index(typeid(ComponentType)), ComponentType::StaticInstantiateManager(*this));
 			auto& rManagerPtr = m_ComponentManagers[std::type_index(typeid(ComponentType))];
 
 			// Was Update method overriden?
