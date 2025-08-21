@@ -368,3 +368,4 @@ FodyWeavers.xsd
 build
 doc
 Manifest.h
+CMakeSettings.json
