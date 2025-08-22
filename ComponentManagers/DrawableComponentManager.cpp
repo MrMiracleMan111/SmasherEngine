@@ -20,7 +20,6 @@
 #include "RenderBatch.h"
 #include "EventManager.h"
 #include "Events.h"
-#include <iostream>
 
 namespace Smasher {
 	DrawableComponentManager::DrawableComponentManager(GameState& state) :
