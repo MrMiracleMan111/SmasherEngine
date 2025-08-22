@@ -194,16 +194,37 @@ namespace Smasher {
 		itr->AddModel(rComponent.m_OpaqueBatchContext);
 
 
-		//if (translucent) {
-		//	RenderBatch* translucentBatch = &m_TranslucentBatches[id];
-		//	if (translucentBatch->pTexture == nullptr) {
-		//		ResourceManager& rResourceManager = GetGameState().GetEngine().GetResourceManager();
-		//		auto pTexture = rResourceManager.GetResource<TextureResource>(id);
-		//		translucentBatch->pTexture = &pTexture->GetTexture();
-		//	}
+		if (translucent) {
+			std::list<RenderBatch>& translucentBatches = m_TranslucentBatches[id];
+			// Find batch that isn't full
+			// Assume front of list is empty
+			auto itr = translucentBatches.begin();
+			if (translucentBatches.size() == 0) {
+				RenderBatch& batch = translucentBatches.emplace_front(translucentBatches);
+				batch.iterator = translucentBatches.begin();
+				ResourceManager& rResourceManager = GetGameState().GetEngine().GetResourceManager();
+				auto pTexture = rResourceManager.GetResource<TextureResource>(id);
+				batch.pTexture = &pTexture->GetTexture();
+				itr = translucentBatches.begin();
+			}
+			else {
+				while (itr != translucentBatches.end()) {
+					if (!itr->full) {
+						break;
+					}
+					++itr;
+				}
 
-		//	translucentBatch->AddModel(rComponent.m_TranslucentBatchContext);
-		//}
+				// Everything was full, add a new RenderBatch
+				if (itr == translucentBatches.end()) {
+					RenderBatch& batch = translucentBatches.emplace_front(translucentBatches);
+					batch.iterator = translucentBatches.begin();
+					batch.pTexture = translucentBatches.back().pTexture;
+					itr = translucentBatches.begin();
+				}
+			}
+			itr->AddModel(rComponent.m_TranslucentBatchContext);
+		}
 	}
 
 	void DrawableComponentManager::OnComponentDelete(DrawableComponent& rComponent) {
