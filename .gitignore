@@ -369,3 +369,4 @@ build
 doc
 Manifest.h
 CMakeSettings.json
+CMakePresets.json
