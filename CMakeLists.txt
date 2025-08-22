@@ -64,6 +64,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
 else()
     message(WARNING "Unknown Build Type assuming Debug")
     set(SFML_DYNAMIC_LIB_SUFFIX "-d")
+    set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
 if(WIN32)
