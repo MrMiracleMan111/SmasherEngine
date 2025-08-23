@@ -1,7 +1,39 @@
 # SmasherEngine
 
+## Build
+### CMake Dependencies
+- [SFML 2.6.x](https://github.com/SFML/SFML/tree/2.6.x)
+- [GLEW](https://github.com/nigels-com/glew)
+- OpenGL
+
+For **Linux** users, you likely will **NOT** be able to just use:
+```bash
+sudo apt-get install libsfml-dev
+```
+since that will install a more recent version of SFML (SFML 3.0 as of writing this). Instead, you will have to compile and install [SFML 2.6.x](https://github.com/SFML/SFML/tree/2.6.x).
+
+If you are on **Windows** you will most likely have to clone the [SFML 2.6.x](https://github.com/SFML/SFML/tree/2.6.x) and [GLEW](https://github.com/nigels-com/glew) repositories, then follow the instructions to install them. To my knowledge, **Windows** and **Linux** users shouldn't have to do anything to make **OpenGL** accessible to **CMake**. 
+
+### IMPORTANT!!!!
+When compiling dependecies, make sure your **CMake** generator is consistent. For example, if you use **Visual Studio 17 2022** generator for [SFML 2.6.x](https://github.com/SFML/SFML/tree/2.6.x), make sure you also use **Visual Studio 17 2022** generator for [GLEW](https://github.com/nigels-com/glew) and this project.
+
+### Linux Compiling Example
+```bash
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Debug ..
+```
+
+### Windows Compiling Example
+I recommend using **Visual Studio** (in my case *Visual Studio 17 2022*) as your generator you avoid headaches.
+```bash
+mkdir build
+cd build
+cmake -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Debug ..
+```
+
 ## Manifest Tool
-The Resource Manager will use a "Resource.h" header file to store resource
+The Resource Manager will use a "*Resource.h*" header file to store resource
 paths and UUIDs. The `ManifestHeaderGenerator.py` script is used to generate these headers.
 
 ```bash
@@ -51,19 +83,31 @@ namespace Resources {
 }
 ```
 
+## Smasher Engine
+
+```c++
+#include "Core.h"
+#include "Components/Transform2DComponent.h"
+
+int main() {
+	Smasher::Engine engine(640, 420);
+	Smasher::GameState& state = engine.AddState<Smasher::GameState>();
+    state.Activate();
+	Smasher::Entity entity = state.AddEntity<Smasher::Entity>();
+	entity
+    .AddComponent<TextComponent>()
+        .SetString("Hello World!")
+        .SetFontSize(30)
+        .SetOutlineThickness(10);
+    engine.Run();
+}
+```
+
+### Engine
+
+
 ### Core
-The Core header includes all necessary managers
-sets up all managers.
-
-## Mangers
-
-### StateManager
-
-### EventManager
-
-### EntityManager
-
-## Entities
+The Core header includes all necessary managers.
 
 ### Entity
 Entities have no inherent logic. They are a **Composition** of Components.
