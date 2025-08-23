@@ -39,6 +39,13 @@ find_package(SFML 2.6.2 COMPONENTS system network window graphics audio REQUIRED
 find_package(GLEW NAMES glew GLEW QUIET)
 
 if(GLEW_FOUND)
+    if (TARGET GLEW::GLEW)
+        message(STATUS "using GLEW::GLEW target")
+        target_link_libraries(SmasherEngine PUBLIC GLEW::GLEW)
+    else()
+        set(GLEW_TARGET, ${GLEW_LIBRARIES})
+        target_include_directories(SmasherEngine PRIVATE ${GLEW_INCLUDE_DIRS})
+    endif()
     message(STATUS "Found GLEW using find_package")
 else()
     message(STATUS "GLEW not found with find_package, trying pkg-config")
@@ -46,6 +53,10 @@ else()
     pkg_check_modules(GLEW REQUIRED glew)
     if (GLEW_FOUND)
         message(STATUS "Found GLEW using pkg-config")
+        set(GLEW_TARGET, ${GLEW_LIBRARIES})
+        target_compile_options(SmasherEngine PRIVATE ${GLEW_CFLAGS_OTHER})
+        target_link_directories(SmasherEngine PRIVATE ${GLEW_LIBRARY_DIRS})
+        target_include_directories(SmasherEngine PRIVATE ${GLEW_INCLUDE_DIRS})
     else()
         message(SEND_ERROR "Could not find GLEW")
     endif()
@@ -117,12 +128,8 @@ target_link_libraries(SmasherEngine PUBLIC
 "sfml-graphics"
 "sfml-network"
 "sfml-system"
-${GLEW_LIBRARIES}
+${GLEW_TARGET}
 OpenGL::GL)
-
-target_compile_options(SmasherEngine PUBLIC ${GLEW_CFLAGS_OTHER})
-
-target_link_directories(SmasherEngine PUBLIC ${GLEW_LIBRARY_DIRS})
 
 target_compile_features(SmasherEngine PUBLIC cxx_std_20)
 
