@@ -25,6 +25,8 @@ set (SMASHER_TESTS TRUE CACHE BOOL "Should unit tests be compiled")
 set(MANIFEST_GENERATOR "${CMAKE_SOURCE_DIR}/scripts/ManifestHeaderGenerator.py")
 set(SMASHER_ENGINE_OUTPUT_DIR ${CMAKE_BINARY_DIR})
 
+# Compile Engine
+add_library(SmasherEngine SHARED "Core.cpp" "Core.h" "include/GameState.h" "include/UUID.h" "src/UUID.cpp" "include/Base.h" "src/GameState.cpp" "include/Engine.h" "src/Engine.cpp" "include/Exceptions.h" "include/EventManager.h" "src/EventManager.cpp" "include/Events.h"  "ComponentManagers/GenericComponentManager.h" "include/IComponent.h"  "include/Entity.h" "src/Entity.cpp"   "Components/Transform2DComponent.h" "include/EngineConfig.h"   "include/ResourceManager.h" "include/IComponentManager.h" "ComponentManagers/BaseComponentManager.h"  "Components/DrawableComponent.h" "Components/DrawableComponent.cpp" "include/Resources.h" "Components/TextComponent.h" "Components/TextComponent.cpp" "ComponentManagers/DrawableComponentManager.h" "ComponentManagers/DrawableComponentManager.cpp" "ComponentManagers/RenderBatch.h" "ComponentManagers/RenderBatch.cpp" "src/Base.cpp" "Components/Transform2DComponent.cpp" "Components/Transform2DWrapper.h"  "Components/Transform2DWrapper.inl" "include/EventFeeder.h" "src/EventFeeder.cpp" "Components/CameraComponent.h" "Components/CameraComponent.cpp" "ComponentManagers/GenericComponentManager.inl")
 
 # Try to include machine-specific config if it exists
 if(EXISTS "${CMAKE_SOURCE_DIR}/local.cmake")
@@ -32,18 +34,22 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/local.cmake")
     include("${CMAKE_SOURCE_DIR}/local.cmake")
 endif()
 
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(GLEW REQUIRED glew)
-
 find_package(OpenGL REQUIRED)
 find_package(SFML 2.6.2 COMPONENTS system network window graphics audio REQUIRED)
-#find_package(GLEW NAMES glew GLEW REQUIRED)
+find_package(GLEW NAMES glew GLEW QUIET)
 
-message(STATUS "OpenGL libraries: ${OPENGL_LIBRARIES}")
-message(STATUS "OpenGL include dirs: ${OPENGL_INCLUDE_DIRS}")
-message(STATUS "GLEW Found: ${GLEW_FOUND}")
-message(STATUS "GLEW libraries: ${GLEW_LIBRARIES}")
-message(STATUS "GLEW include dirs: ${GLEW_INCLUDE_DIRS}")
+if(GLEW_FOUND)
+    message(STATUS "Found GLEW using find_package")
+else()
+    message(STATUS "GLEW not found with find_package, trying pkg-config")
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(GLEW REQUIRED glew)
+    if (GLEW_FOUND)
+        message(STATUS "Found GLEW using pkg-config")
+    else()
+        message(SEND_ERROR "Could not find GLEW")
+    endif()
+endif()
 
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/include")
     message(STATUS "${PROJECT_SOURCE_DIR}/include")
@@ -99,8 +105,6 @@ if(GENERATE_DOCS)
 
 endif()
 
-# Compile Engine
-add_library(SmasherEngine SHARED "Core.cpp" "Core.h" "include/GameState.h" "include/UUID.h" "src/UUID.cpp" "include/Base.h" "src/GameState.cpp" "include/Engine.h" "src/Engine.cpp" "include/Exceptions.h" "include/EventManager.h" "src/EventManager.cpp" "include/Events.h"  "ComponentManagers/GenericComponentManager.h" "include/IComponent.h"  "include/Entity.h" "src/Entity.cpp"   "Components/Transform2DComponent.h" "include/EngineConfig.h"   "include/ResourceManager.h" "include/IComponentManager.h" "ComponentManagers/BaseComponentManager.h"  "Components/DrawableComponent.h" "Components/DrawableComponent.cpp" "include/Resources.h" "Components/TextComponent.h" "Components/TextComponent.cpp" "ComponentManagers/DrawableComponentManager.h" "ComponentManagers/DrawableComponentManager.cpp" "ComponentManagers/RenderBatch.h" "ComponentManagers/RenderBatch.cpp" "src/Base.cpp" "Components/Transform2DComponent.cpp" "Components/Transform2DWrapper.h"  "Components/Transform2DWrapper.inl" "include/EventFeeder.h" "src/EventFeeder.cpp" "Components/CameraComponent.h" "Components/CameraComponent.cpp" "ComponentManagers/GenericComponentManager.inl")
 set_target_properties(SmasherEngine PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${SMASHER_ENGINE_OUTPUT_DIR}")
 set_target_properties(SmasherEngine PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${SMASHER_ENGINE_OUTPUT_DIR}")
 
