@@ -109,7 +109,7 @@ target_link_libraries(SmasherEngine PUBLIC
 "sfml-network"
 "sfml-system"
 GLEW::GLEW
-${OPENGL_LIBRARIES})
+OpenGL::GL)
 
 target_compile_features(SmasherEngine PUBLIC cxx_std_20)
 
