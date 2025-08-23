@@ -21,7 +21,7 @@ When compiling dependecies, make sure your **CMake** generator is consistent. Fo
 ```bash
 mkdir build
 cd build
-cmake -DCMAKE_BUILD_TYPE=Debug ..
+cmake -DCMAKE_BUILD_TYPE=Debug -DGENERATE_DOCS=FALSE ..
 ```
 
 ### Windows Compiling Example
@@ -29,7 +29,7 @@ I recommend using **Visual Studio** (in my case *Visual Studio 17 2022*) as your
 ```bash
 mkdir build
 cd build
-cmake -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Debug ..
+cmake -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Debug -DGENERATE_DOCS=FALSE ..
 ```
 
 ## Manifest Tool
