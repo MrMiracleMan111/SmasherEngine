@@ -33,7 +33,7 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/local.cmake")
 endif()
 
 find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
+find_package(GLEW NAMES glew GLEW REQUIRED)
 find_package(SFML 2.6.2 COMPONENTS system network window graphics audio REQUIRED)
 
 # include_directories(${OPENGL_INCLUDE_DIRS})
