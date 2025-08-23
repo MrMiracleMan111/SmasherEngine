@@ -32,13 +32,18 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/local.cmake")
     include("${CMAKE_SOURCE_DIR}/local.cmake")
 endif()
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GLEW REQUIRED glew)
+
 find_package(OpenGL REQUIRED)
-find_package(GLEW NAMES glew GLEW REQUIRED)
 find_package(SFML 2.6.2 COMPONENTS system network window graphics audio REQUIRED)
+#find_package(GLEW NAMES glew GLEW REQUIRED)
 
-# include_directories(${OPENGL_INCLUDE_DIRS})
-
-#list(APPEND CMAKE_PREFIX_PATH "${GLEW_PATH}")
+message(STATUS "OpenGL libraries: ${OPENGL_LIBRARIES}")
+message(STATUS "OpenGL include dirs: ${OPENGL_INCLUDE_DIRS}")
+message(STATUS "GLEW Found: ${GLEW_FOUND}")
+message(STATUS "GLEW libraries: ${GLEW_LIBRARIES}")
+message(STATUS "GLEW include dirs: ${GLEW_INCLUDE_DIRS}")
 
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/include")
     message(STATUS "${PROJECT_SOURCE_DIR}/include")
@@ -100,7 +105,7 @@ set_target_properties(SmasherEngine PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "$
 set_target_properties(SmasherEngine PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${SMASHER_ENGINE_OUTPUT_DIR}")
 
 generate_export_header(SmasherEngine EXPORT_FILE_NAME "${CMAKE_BINARY_DIR}/exports/Smasher_export.h")
-target_include_directories(SmasherEngine PUBLIC ${OPENGL_INCLUDE_DIR} ${GLEW_INCLUDE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/ComponentManagers" "${CMAKE_BINARY_DIR}/exports")
+target_include_directories(SmasherEngine PUBLIC ${OPENGL_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/ComponentManagers" "${CMAKE_BINARY_DIR}/exports")
 
 target_link_libraries(SmasherEngine PUBLIC
 "sfml-audio"
@@ -108,8 +113,12 @@ target_link_libraries(SmasherEngine PUBLIC
 "sfml-graphics"
 "sfml-network"
 "sfml-system"
-GLEW::GLEW
+${GLEW_LIBRARIES}
 OpenGL::GL)
+
+target_compile_options(SmasherEngine PUBLIC ${GLEW_CFLAGS_OTHER})
+
+target_link_directories(SmasherEngine PUBLIC ${GLEW_LIBRARY_DIRS})
 
 target_compile_features(SmasherEngine PUBLIC cxx_std_20)
 
