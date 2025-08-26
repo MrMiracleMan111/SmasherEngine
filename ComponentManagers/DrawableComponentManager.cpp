@@ -34,15 +34,13 @@ namespace Smasher {
 
 
 	void DrawableComponentManager::Render(sf::RenderWindow& rWindow) {
-#ifdef BENCHMARK
+#ifdef	BENCHMARK
 		std::chrono::time_point<std::chrono::system_clock> BENCHMARK_now = std::chrono::system_clock::now();
-#endif
 		for (auto& itr : m_Components) {
 			if (!itr.m_TransformChanged)
 				continue;
 			OnComponentChangeData(itr);
 		}
-#ifdef	BENCHMARK
 		std::chrono::microseconds BENCHMARK_diff = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now() - BENCHMARK_now);
 		Smasher::InternalTimers::SMASHER_TimeAccumulator += BENCHMARK_diff;
 #endif
