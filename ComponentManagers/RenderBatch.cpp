@@ -24,7 +24,6 @@ namespace Smasher {
 		glDeleteBuffers(1, &instanceVBO);
 		glDeleteBuffers(1, &quadEBO);
 		glDeleteBuffers(1, &quadVBO);
-
 	}
 
 	RenderBatch::RenderBatch(RenderBatch&& other) : ownerBatchList(other.ownerBatchList) {
@@ -74,7 +73,7 @@ namespace Smasher {
 
 		// Instance Position Vec3
 		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Smasher::ModelData), (GLvoid*)(offsetof(Smasher::ModelData, position)));
-		
+
 		// Instance Scale Vec 2
 		glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Smasher::ModelData), (GLvoid*)(offsetof(Smasher::ModelData, scale)));
 
@@ -106,6 +105,8 @@ namespace Smasher {
 		glVertexAttribDivisor(8, 1);  // Instance attribute
 
 		glBindVertexArray(0);
+		//glBindVertexArray(currentVAO);
+		//glBindBuffer(GL_ARRAY_BUFFER, currentVBO);
 	}
 
 	void RenderBatch::RemoveModel(BatchContext& context) {
