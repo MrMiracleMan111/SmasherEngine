@@ -45,9 +45,9 @@ namespace Smasher {
 	};
 
 	void RenderBatch::InitGLObjects() {
-		//GLint currentVAO, currentVBO;
-		//glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &currentVAO);
-		//glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &currentVBO);
+		GLint currentVAO, currentVBO;
+		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &currentVAO);
+		glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &currentVBO);
 		glGenVertexArrays(1, &instanceVAO);
 		glGenBuffers(1, &instanceVBO);
 		glGenBuffers(1, &quadVBO);
@@ -108,8 +108,8 @@ namespace Smasher {
 		glVertexAttribDivisor(8, 1);  // Instance attribute
 
 		glBindVertexArray(0);
-		//glBindVertexArray(currentVAO);
-		//glBindBuffer(GL_ARRAY_BUFFER, currentVBO);
+		glBindVertexArray(currentVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, currentVBO);
 	}
 
 	void RenderBatch::RemoveModel(BatchContext& context) {
