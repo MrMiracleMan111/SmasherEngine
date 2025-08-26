@@ -25,6 +25,8 @@ set (SMASHER_TESTS TRUE CACHE BOOL "Should unit tests be compiled")
 set(MANIFEST_GENERATOR "${CMAKE_SOURCE_DIR}/scripts/ManifestHeaderGenerator.py")
 set(SMASHER_ENGINE_OUTPUT_DIR ${CMAKE_BINARY_DIR})
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Compile Engine
 add_library(SmasherEngine SHARED "Core.cpp" "Core.h" "include/GameState.h" "include/UUID.h" "src/UUID.cpp" "include/Base.h" "src/GameState.cpp" "include/Engine.h" "src/Engine.cpp" "include/Exceptions.h" "include/EventManager.h" "src/EventManager.cpp" "include/Events.h"  "ComponentManagers/GenericComponentManager.h" "include/IComponent.h"  "include/Entity.h" "src/Entity.cpp"   "Components/Transform2DComponent.h" "include/EngineConfig.h"   "include/ResourceManager.h" "include/IComponentManager.h" "ComponentManagers/BaseComponentManager.h"  "Components/DrawableComponent.h" "Components/DrawableComponent.cpp" "include/Resources.h" "Components/TextComponent.h" "Components/TextComponent.cpp" "ComponentManagers/DrawableComponentManager.h" "ComponentManagers/DrawableComponentManager.cpp" "ComponentManagers/RenderBatch.h" "ComponentManagers/RenderBatch.cpp" "src/Base.cpp" "Components/Transform2DComponent.cpp" "Components/Transform2DWrapper.h"  "Components/Transform2DWrapper.inl" "include/EventFeeder.h" "src/EventFeeder.cpp" "Components/CameraComponent.h" "Components/CameraComponent.cpp" "ComponentManagers/GenericComponentManager.inl")
 
