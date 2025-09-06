@@ -14,7 +14,7 @@ namespace Smasher {
 	}
 
 	void CameraComponent::OnWindowResize(const Events::WindowResizeEvent& event) {
-		m_View.setSize(event.WindowSize.x, event.WindowSize.y);
+		m_View.setSize((float)event.WindowSize.x, (float)event.WindowSize.y);
 	}
 
 	CameraComponent& CameraComponent::SetPosition(sf::Vector2f position) {

@@ -55,7 +55,7 @@ namespace Smasher {
 
         m_ClipTransform = sf::Transform::Identity;
         sf::Texture& pTexture = m_TextureResource->GetTexture();
-        sf::Vector2f dimensions = sf::Vector2f(pTexture.getSize().x, pTexture.getSize().y);
+        sf::Vector2f dimensions = sf::Vector2f((float)pTexture.getSize().x, (float)pTexture.getSize().y);
         
         float initialX = 0.5f * m_ClipRect.width;
         float initialY = 0.5f * m_ClipRect.height;

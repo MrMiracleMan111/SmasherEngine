@@ -17,7 +17,7 @@ int main() {
 	ExampleResourcesGameState& state = engine.AddState<ExampleResourcesGameState>();
 
 	std::shared_ptr<Smasher::ShaderResource> shader = engine.GetResourceManager().GetOrLoadResource<Smasher::Resources::Shaders::basic_texture_shader, Smasher::ShaderResource>();
-	sf::Vector2f windowSize = sf::Vector2f(engine.GetWindow().getSize().x , engine.GetWindow().getSize().y);
+	sf::Vector2f windowSize = sf::Vector2f((float)engine.GetWindow().getSize().x , (float)engine.GetWindow().getSize().y);
 	sf::Glsl::Mat4 viewProjectionMatrix = sf::Glsl::Mat4(engine.GetWindow().getView().getTransform().getMatrix());
 	shader->GetShader().setUniform("windowSize", windowSize);
 	shader->GetShader().setUniform("ViewProjectionMatrix", viewProjectionMatrix);
@@ -75,7 +75,7 @@ int main() {
 		.SetTextureAsset<Smasher::Resources::Textures::window>(true)
 		.SetClipRect(sf::IntRect{ 10, 0, 64, 64 })
 		.SetClipRotation(Smasher::Degrees{ 30 })
-		.SetDepth(0.6);
+		.SetDepth(0.6f);
 
 	Smasher::Entity& window2 = state.AddEntity<Smasher::Entity>();
 	window2.AddComponent<Smasher::DrawableComponent>()
@@ -93,7 +93,7 @@ int main() {
 		.SetShader(shader)
 		.SetTextureAsset<Smasher::Resources::Textures::alpha_test>()
 		.SetClipRotation(Smasher::Degrees{ 30 })
-		.SetDepth(0.55);
+		.SetDepth(0.55f);
 
 
 
