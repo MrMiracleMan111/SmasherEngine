@@ -41,4 +41,3 @@ namespace Smasher {
 		return *this;
 	}
 }
-#endif
