@@ -1,17 +1,14 @@
 #pragma once
-#include "Components/DrawableComponent.h"
-#include "ResourceManager.h"
-#include "ComponentManagers/DrawableComponentManager.h"
 
 namespace Smasher {
 
-	DrawableComponent::DrawableComponent() : IComponent(), Transform2DWrapper(*this, m_Transformable),
+	inline DrawableComponent::DrawableComponent() : IComponent(), Transform2DWrapper(*this, m_Transformable),
 		m_OpaqueBatchContext(nullptr, SIZE_MAX),
 		m_TranslucentBatchContext(nullptr, SIZE_MAX) {
 		SetScale(sf::Vector2f(100.0f, 100.0f));
 	}
 
-	DrawableComponent::DrawableComponent(
+	inline DrawableComponent::DrawableComponent(
 		std::shared_ptr<TextureResource> texturePtr,
 		std::shared_ptr<ShaderResource> shaderPtr) : IComponent(), Transform2DWrapper(*this, m_Transformable),
 		m_ShaderResource(shaderPtr),
@@ -43,5 +40,5 @@ namespace Smasher {
 		GetClipTransform(); // Cache the clip transform
 		return *this;
 	}
-
 }
+#endif
