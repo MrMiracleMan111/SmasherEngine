@@ -492,6 +492,7 @@ TEST(EventsTest, MoveEventManagerAsync) {
 		// Should wait for all async events to finish before moving
 		EXPECT_EQ(10, count);
 		Smasher::EventManager tmp = std::move(manager);
+		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 		EXPECT_EQ(15, count);
 		tmp.Unsubscribe(handle); // tmp would be deconstructed before "handle"
 	}
