@@ -24,7 +24,7 @@ namespace Smasher {
 	}
 	TextComponent& TextComponent::SetFillColor(sf::Color color)
 	{
-		m_Text.setColor(color);
+		m_Text.setFillColor(color);
 		return *this;
 	}
 	TextComponent& TextComponent::SetOutlineThickness(float thickness)
