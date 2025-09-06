@@ -101,6 +101,10 @@ namespace Smasher {
 		t.Update(arg);
 	};
 
+	struct TextureOptions {
+		bool transluscent = false;
+	};
+
 	enum class ResourceType {
 		TEXTURE,
 		FONT,
