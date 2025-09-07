@@ -19,18 +19,13 @@ namespace Smasher {
 	}
 
 	template <class T>
-	DrawableComponent& DrawableComponent::SetTextureAsset() {
-		return SetTextureAsset<T>(false);
-	}
-
-	template <class T>
-	DrawableComponent& DrawableComponent::SetTextureAsset(bool transulcent) {
+	DrawableComponent& DrawableComponent::SetTextureAsset(const TextureOptions& opts) {
 		auto& rResourceManager = GetEntity().GetEngine().GetResourceManager();
 		auto& rCompManager = dynamic_cast<DrawableComponentManager&>(GetManager());
 		// Load Resource
 		auto pTextureResource = rResourceManager.template GetOrLoadResource<T, TextureResource>();
 		// Update Render Batch
-		rCompManager.OnComponentSetTexture(*this, T::ID, transulcent);
+		rCompManager.OnComponentSetTexture(*this, T::ID, opts.transluscent);
 		// Assign texture to component
 		m_TextureResource = pTextureResource;
 

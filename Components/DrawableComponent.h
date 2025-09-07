@@ -24,10 +24,7 @@ namespace Smasher {
 		~DrawableComponent();
 
 		template <class T>
-		DrawableComponent& SetTextureAsset();
-
-		template <class T>
-		DrawableComponent& SetTextureAsset(bool transulcent);
+		DrawableComponent& SetTextureAsset(const TextureOptions& opts);
 
 		virtual void SetEntity(Entity& pEntity);
 
