@@ -105,11 +105,11 @@ void StressTestGameState::Init()
 
 		if (i % 2 == 0) {
 			image.GetComponent<Smasher::DrawableComponent>()
-				.SetTextureAsset<Smasher::Resources::Textures::alpha_test>();
+				.SetTextureAsset<Smasher::Resources::Textures::alpha_test>({});
 		}
 		else {
 			image.GetComponent<Smasher::DrawableComponent>()
-				.SetTextureAsset<Smasher::Resources::Textures::small_art>();
+				.SetTextureAsset<Smasher::Resources::Textures::small_art>({});
 		}
 
 		if (i == 10) {
@@ -157,5 +157,5 @@ void StressTestGameState::OnMouseMove(const Smasher::Events::MouseMoveEvent& eve
 	sf::Vector2i entityPos = sf::Vector2i(event.Position) - rWindow.getPosition();
 	Smasher::Entity& ball = SpawnBouncingBall(entityPos);
 	ball.GetComponent<Smasher::DrawableComponent>()
-		.SetTextureAsset<Smasher::Resources::Textures::alpha_test>();
+		.SetTextureAsset<Smasher::Resources::Textures::alpha_test>({});
 }
