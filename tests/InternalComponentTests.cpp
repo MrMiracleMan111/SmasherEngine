@@ -11,20 +11,21 @@ public:
 class SerializedComponent : public Smasher::IComponent, Smasher::ISerializeable {
 public:
 
-	SerializedComponent(int data1, int data2, const char* data3) :
-		m_Data1(data1), m_Data2(data2), m_Data3(data3),
+	SerializedComponent(int data1, const char* data3) :
+		m_Data1(data1), m_Data3(data3), m_Data2(m_Data3.size()),
 		Smasher::IComponent(), Smasher::ISerializeable() {}
 
 	virtual void Serialize(Smasher::OutputArchive& out) const {
 		out.WriteBytes(m_Data1);
 		out.WriteBytes(m_Data2);
-		out.WriteBytes(m_Data3.c_str(), (std::size_t)(m_Data3.size() + 1));
+		out.WriteBytes(m_Data3.data(), m_Data2);
 	}
 
 	virtual void Deserialize(Smasher::InputArchive& in) {
 		in.ReadBytes(m_Data1);
 		in.ReadBytes(m_Data2);
-		in.ReadBytes(m_Data3);
+		m_Data3.resize(m_Data2);
+		in.ReadBytes(m_Data3.data(), m_Data2);
 	}
 
 	int GetData1() const { return m_Data1; }
@@ -32,9 +33,9 @@ public:
 	const std::string& GetData3() const { return m_Data3; }
 
 private:
-	int m_Data1 = 0;
-	int m_Data2 = 0;
 	std::string m_Data3;
+	int m_Data1 = 0;
+	std::size_t m_Data2 = 0;
 };
 
 class EngineSetupFixture : public ::testing::Test {
@@ -63,29 +64,50 @@ class CameraComponentFixture : public EngineSetupFixture {};
 // Serialize Component Tests
 TEST_F(SerializeComponentFixture, SerializeComponent) {
 	std::stringstream stream;
+	const std::string TEST_STR{ "300 Data" };
 
-	SerializedComponent& component = pEntity->AddComponent<SerializedComponent>(100, 200, "300 Data");
+	SerializedComponent& component = pEntity->AddComponent<SerializedComponent>(100, "300 Data");
 	
 	EXPECT_EQ(100, component.GetData1());
-	EXPECT_EQ(200, component.GetData2());
-	EXPECT_EQ(std::string("300 Data"), component.GetData3());
+	EXPECT_EQ(TEST_STR.size(), component.GetData2());
+	EXPECT_EQ(TEST_STR, component.GetData3());
 
 	Smasher::OutputArchive outputArchive(stream);
 	Smasher::InputArchive inputArchive(stream);
 
-	EXPECT_NO_THROW({ component.Serialize(outputArchive); });
-	char buffer[17] = { 0 };
-	stream.read(buffer, 17);
+	ASSERT_NO_THROW({ component.Serialize(outputArchive); });
+	char buffer[64] = { 0 };
+	// Get number of bytes left in stream
+	std::streampos begin = stream.tellg(); // Save the stream start position
+	int length = (int)stream.seekg(0, std::ios::end).tellg();
+	length = std::min(length, (int)sizeof(buffer));
 
-	int data1, data2;
-	char* data3;
+	stream.seekg(begin);
+	stream.read(buffer, length);
+	stream.seekg(begin);
+
+	int data1 = 0;
+	std::size_t data2 = 0;
 	memcpy(&data1, &buffer[0], sizeof(int));
-	memcpy(&data2, &buffer[sizeof(int)], sizeof(int));
-	data3 = &buffer[2 * sizeof(int)];
+	memcpy(&data2, &buffer[sizeof(int)], sizeof(std::size_t));
+	std::string data3 = &buffer[sizeof(int) + sizeof(std::size_t)];
 
 	EXPECT_EQ(100, data1);
-	EXPECT_EQ(200, data2);
-	EXPECT_STREQ("300 Data", data3);
+	EXPECT_EQ(TEST_STR.size(), data2);
+	EXPECT_EQ(TEST_STR, data3);
+
+	Smasher::Entity& entity2 = pState->AddEntity<Smasher::Entity>();
+	SerializedComponent& newComponent = entity2.AddComponent<SerializedComponent>(5, "20 Data");
+
+	EXPECT_EQ(5, newComponent.GetData1());
+	EXPECT_EQ(std::string("20 Data").size(), newComponent.GetData2());
+	EXPECT_EQ(std::string("20 Data"), newComponent.GetData3());
+
+	ASSERT_NO_THROW({ newComponent.Deserialize(inputArchive); });
+
+	EXPECT_EQ(100, newComponent.GetData1());
+	EXPECT_EQ(TEST_STR.size(), newComponent.GetData2());
+	EXPECT_EQ(TEST_STR, newComponent.GetData3());
 }
 
 // Transform2D Tests
