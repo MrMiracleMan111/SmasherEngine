@@ -20,6 +20,14 @@
 #include "Events.h"
 
 namespace Smasher {
+//////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief Component Manager for rendering @ref DrawableComponent.
+/// 
+/// @details
+/// @ref DrawableComponentManager utilizes render batches to improve rendering performance.
+/// @ref DrawableComponent instances are grouped by texture type and then assigned to @ref RenderBatch instances
+/// which can each hold up to @ref RenderBatch::MAX_MODEL_COUNT number of @ref DrawableComponent instances.
+//////////////////////////////////////////////////////////////////////////////////////////////////
 	class SMASHER_API DrawableComponentManager : public BaseComponentManager<DrawableComponent> {
 	public:
 		DrawableComponentManager(GameState& state);
