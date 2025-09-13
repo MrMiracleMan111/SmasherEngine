@@ -1,13 +1,13 @@
 #pragma once
 namespace Smasher {
 	template<class T>
-	inline BaseComponentManager<T>::BaseComponentManager(GameState& state) : IComponentManager(state) {
+	BaseComponentManager<T>::BaseComponentManager(GameState& state) : IComponentManager(state) {
 		m_ComponentsToRemove.reserve(64); // Arbitrary can be improved upon later
 	}
 
 	template<class T>
 	template<typename... Args>
-	inline T& BaseComponentManager<T>::AddComponent(Entity& rEntity, Args&&... args) {
+	T& BaseComponentManager<T>::AddComponent(Entity& rEntity, Args&&... args) {
 		std::size_t index = m_Components.size();
 		auto itr = m_Components.emplace(std::forward<Args>(args)...);
 		T& rComponent = *itr;
@@ -21,7 +21,7 @@ namespace Smasher {
 	}
 
 	template<class T>
-	inline void BaseComponentManager<T>::RemoveComponent(IComponent& rComponentInterface) {
+	void BaseComponentManager<T>::RemoveComponent(IComponent& rComponentInterface) {
 		T& rComponent = static_cast<T&>(rComponentInterface);
 		if (rComponent.GetStatus() != ComponentStatus::VALID) {
 			return;
@@ -32,7 +32,7 @@ namespace Smasher {
 	}
 
 	template<class T>
-	inline void BaseComponentManager<T>::RemoveMarkedComponents() {
+	void BaseComponentManager<T>::RemoveMarkedComponents() {
 		for (auto& itr : m_ComponentsToRemove) {
 			typename plf::colony<T>::iterator* pCompItr = itr;
 			m_Components.erase(*pCompItr);
@@ -42,17 +42,17 @@ namespace Smasher {
 	}
 
 	template<class T>
-	inline void BaseComponentManager<T>::PreUpdate(Millisecond delta) {
+	void BaseComponentManager<T>::PreUpdate(Millisecond delta) {
 		RemoveMarkedComponents();
 	}
 
 	template<class T>
-	inline void BaseComponentManager<T>::Update(Millisecond delta) {
+	void BaseComponentManager<T>::Update(Millisecond delta) {
 		UpdateComponents(delta);
 	}
 
 	template<class T>
-	inline void BaseComponentManager<T>::Render(sf::RenderWindow& rWindow) {
+	void BaseComponentManager<T>::Render(sf::RenderWindow& rWindow) {
 		RenderComponents(rWindow);
 	}
 }
