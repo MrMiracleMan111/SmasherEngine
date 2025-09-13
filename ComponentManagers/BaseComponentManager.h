@@ -6,12 +6,25 @@ namespace Smasher {
 	class Entity;
 	class GameState;
 
-	/*
-	* 
-	*  This class is meant to be inherited
-	* 
-	* 
-	*/
+	//////////////////////////////////////////////////////////////////////////////////////////////////
+	/// @brief Component Manager meant to be used as a base for Custom Component Managers. Unlike the
+	/// @ref GenericComponentManager, this component manager does not detect component functionality.
+	/// Instead, the @ref BaseComponentManager::Update(Millisecond delta) and @ref BaseComponentManager::Render(sf::RenderWindow& rWindow) methods
+	/// should be overrided as needed.
+	/// Like all @ref IComponentManager instances, this class is Non-Copyable and may only be move-assigned
+	/// 
+	/// @param T Type of Component housed in the @ref GenericComponentManager
+	/// 
+	/// The @ref BaseComponentManager is meant to serve as a base for Custom Component Managers. It
+	/// already implements the @link BaseComponentManager::AddComponent AddComponent @endlink and @link BaseComponentManager::RemoveComponent(IComponent&) RemoveComponent @endlink. Unlike the
+	/// @ref GenericComponentManager, the @ref BaseComponentManager does not detect component
+	/// functionality(`StaticUpdateComponent` and `StaticRenderComponent`). Instead, the 
+	/// @ref Update(Millisecond delta) and @ref Render(sf::RenderWindow& rWindow) methods should
+	/// be overrided as needed.
+	/// 
+	/// The @ref BaseComponentManager uses @ref plf::colony to house components.
+	//////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	template <class T>
 	class BaseComponentManager : public IComponentManager {
 	static_assert(std::is_base_of_v<IComponent, T>, "T should be derived from IComponent");
