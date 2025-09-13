@@ -82,6 +82,11 @@ namespace Smasher {
 			_is.read(reinterpret_cast<char*>(&value), sizeof(T));
 		}
 
+		// Reinterprets value as raw bytes and writes those bytes to the stream
+		void ReadBytes(char* ptr, std::size_t count) {
+			_is.read(ptr, count);
+		}
+
 	private:
 		std::istream& _is;
 	};
