@@ -101,8 +101,13 @@ namespace Smasher {
 		t.Update(arg);
 	};
 
+//////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief Struct defining extra texture settings such as transluscency.
+/// 
+/// 
+//////////////////////////////////////////////////////////////////////////////////////////////////
 	struct TextureOptions {
-		bool transluscent = false;
+		bool transluscent = false; ///< Is the texture transluscent (ex. a window pane)
 	};
 
 	enum class ResourceType {
