@@ -161,8 +161,14 @@ namespace Smasher {
 	};
 
 	struct SMASHER_API Vec2 {
+		Vec2(const Vec2& other) : data{ .x = other.data.x, .y = other.data.y } {}
+		Vec2& operator= (const Vec2& other) {
+			data.x = other.data.x;
+			data.y = other.data.y;
+			return *this;
+		}
 		Vec2(const sf::Vector2f& vec) : data{ .x = vec.x, .y = vec.y } {}
-		Vec2(float x, float y) : data{ .x = 0.0f, .y = 0.0f } {}
+		Vec2(float x, float y) : data{ .x = x, .y = y } {}
 		Vec2() : data{ .x = 0.0f, .y = 0.0f } {}
 
 		union {
@@ -178,7 +184,14 @@ namespace Smasher {
 	};
 
 	struct SMASHER_API Vec3 {
-		Vec3(const sf::Vector3f& vec) : data{ .x = vec.x, .y = vec.y } {}
+		Vec3(const sf::Vector3f& vec) : data{ .x = vec.x, .y = vec.y, .z = vec.z } {}
+		Vec3(const Vec3& other) : data{ .x = other.data.x, .y = other.data.y, .z = other.data.z} {}
+		Vec3& operator= (const Vec3& other) {
+			data.x = other.data.x;
+			data.y = other.data.y;
+			data.z = other.data.z;
+			return *this;
+		}
 		Vec3(const sf::Vector2f& vec, float z) : data{ .x = vec.x, .y = vec.y, .z = z } {}
 		Vec3(float x, float y, float z) : data{ .x = 0.0f, .y = 0.0f, .z = z } {}
 		Vec3() : data{ .x = 0.0f, .y = 0.0f, .z = 0.0f} {}
