@@ -15,7 +15,7 @@ public:
 		m_Data1(data1), m_Data3(data3), m_Data2(m_Data3.size()),
 		Smasher::IComponent(), Smasher::ISerializeable() {}
 
-	virtual void Serialize(Smasher::OutputArchive& out) const {
+	virtual void Serialize(Smasher::OutputArchive& out) {
 		out.WriteBytes(m_Data1);
 		out.WriteBytes(m_Data2);
 		out.WriteBytes(m_Data3.data(), m_Data2);
