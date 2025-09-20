@@ -116,6 +116,7 @@ namespace Smasher {
 					m_Paths[1].string(),
 					m_Paths[2].string());
 			default:
+				throw Smasher::Exceptions::ResourceInvalidNumPaths("numPaths is invalid");
 				assert(false); // Never should be reached
 			}
 		}
