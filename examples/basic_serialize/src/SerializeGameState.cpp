@@ -45,7 +45,7 @@ void SerializeGameState::Init()
 
 	size_t count = 0;
 	Smasher::InputArchive archive(saveFile);
-	while (saveFile.good() && count < m_Balls.size()) {
+	while (saveFile.good() && saveFile.peek() != std::ifstream::traits_type::eof() && count < m_Balls.size()) {
 		Smasher::Entity& ball = m_Balls[count];
 		ball.GetComponent<SavedComponent>()
 			.Deserialize(archive);
