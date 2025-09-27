@@ -28,8 +28,8 @@ void SerializeGameState::Init()
 	Smasher::DrawableComponentManager& rCompManager = static_cast<Smasher::DrawableComponentManager&>(GetComponentManager<Smasher::DrawableComponent>());
 	rCompManager.SetShaderResource(shader);
 
-	const size_t DIMENSION = 10;
-	const size_t SPACING = 30;
+	const size_t DIMENSION = 100;
+	const size_t SPACING = 5;
 	for (size_t i = 0; i < DIMENSION; i++) {
 		for (size_t j = 0; j < DIMENSION; j++) {
 			Smasher::Entity& ball = SpawnBouncingBall(sf::Vector2i(10, 10));
