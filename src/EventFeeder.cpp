@@ -1,4 +1,10 @@
 #include "EventFeeder.h"
+#include "EventManager.h"
+
+Smasher::EventFeeder::EventFeeder(EventManager& eventManager) : m_EventManager(eventManager)
+{
+	m_KeyboardState.fill(false);
+}
 
 void Smasher::EventFeeder::ForwardSFMLEvent(const sf::Event& event)
 {
@@ -8,9 +14,15 @@ void Smasher::EventFeeder::ForwardSFMLEvent(const sf::Event& event)
 		m_EventManager.Publish<Events::WindowCloseEvent>();
 		break;
 	case sf::Event::KeyPressed:
-		m_EventManager.Publish<Events::KeyboardEvent>(Keyboard::KeyboardEventType::KEY_PRESS, event.key.code);
+	{
+		bool& keyState = m_KeyboardState.at(event.key.code);
+		Keyboard::KeyboardEventType keyEventType = keyState ? Keyboard::KeyboardEventType::KEY_HOLD : Keyboard::KeyboardEventType::KEY_PRESS;
+		keyState = true;
+		m_EventManager.Publish<Events::KeyboardEvent>(keyEventType, event.key.code);
 		break;
+	}
 	case sf::Event::KeyReleased:
+		m_KeyboardState.at(event.key.code) = false;
 		m_EventManager.Publish<Events::KeyboardEvent>(Keyboard::KeyboardEventType::KEY_RELEASE, event.key.code);
 		break;
 	case sf::Event::MouseButtonPressed:
