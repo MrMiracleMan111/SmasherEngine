@@ -15,14 +15,14 @@
 
 #include "ComponentManagers/DrawableComponentManager.h"
 #include "Components/DrawableComponent.h"
-#include "GameState.h"
+#include "Layer.h"
 #include "ResourceManager.h"
 #include "RenderBatch.h"
 #include "EventManager.h"
 #include "Events.h"
 
 namespace Smasher {
-	DrawableComponentManager::DrawableComponentManager(GameState& state) :
+	DrawableComponentManager::DrawableComponentManager(Layer& state) :
 		BaseComponentManager<DrawableComponent>(state) {
 
 		EventManager& rEventManager = state.GetEngine().GetEventManager();

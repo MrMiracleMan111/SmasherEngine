@@ -28,7 +28,7 @@ namespace Smasher {
 
 		friend class Entity;
 	public:
-		GenericComponentManager(GameState& state);
+		GenericComponentManager(Layer& state);
 		GenericComponentManager() = delete;
 		GenericComponentManager(const GenericComponentManager&) = delete;
 		GenericComponentManager(GenericComponentManager&&) = delete;

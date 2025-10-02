@@ -1,23 +1,23 @@
-#include "ExampleWindowGameState.h"
+#include "ExampleWindowLayer.h"
 
-ExampleWindowGameState::~ExampleWindowGameState()
+ExampleWindowLayer::~ExampleWindowLayer()
 {
 	GetEngine().GetEventManager().Unsubscribe(m_KeyPressSubscription);
 }
 
-void ExampleWindowGameState::Init() {
-	m_KeyPressSubscription = GetEngine().GetEventManager().Subscribe<Smasher::Events::KeyboardEvent>(&ExampleWindowGameState::OnKeyPress, this);
+void ExampleWindowLayer::Init() {
+	m_KeyPressSubscription = GetEngine().GetEventManager().Subscribe<Smasher::Events::KeyboardEvent>(&ExampleWindowLayer::OnKeyPress, this);
 }
 
-void ExampleWindowGameState::Reset() {
-
-}
-
-void ExampleWindowGameState::Render(sf::RenderWindow& window) {
+void ExampleWindowLayer::Reset() {
 
 }
 
-void ExampleWindowGameState::OnKeyPress(const Smasher::Events::KeyboardEvent& e) {
+void ExampleWindowLayer::Render(sf::RenderWindow& window) {
+
+}
+
+void ExampleWindowLayer::OnKeyPress(const Smasher::Events::KeyboardEvent& e) {
 	std::string type = "NA";
 	switch (e.Type) {
 		case Smasher::Keyboard::KeyboardEventType::KEY_PRESS:

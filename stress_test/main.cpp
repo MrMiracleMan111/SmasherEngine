@@ -8,7 +8,7 @@
 #include "Components/DrawableComponent.h"
 #include "Entity.h"
 
-#include "StressTestGameState.h"
+#include "StressTestLayer.h"
 #include "BallComponent.h"
 
 using namespace Smasher;
@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
 	}
 
 	engine.GetResourceManager().SetResourceDirectory(Resources::Metadata::RESOURCES_DIRECTORY);
-	StressTestGameState& state = engine.AddState<StressTestGameState>(numEntities);
+	StressTestLayer& state = engine.AddState<StressTestLayer>(numEntities);
 
 	state.Activate();
 	engine.Run();

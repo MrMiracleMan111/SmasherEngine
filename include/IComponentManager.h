@@ -6,7 +6,7 @@
 #include "Base.h"
 
 namespace Smasher {
-	class GameState;
+	class Layer;
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief Interface used by all component managers.
@@ -16,15 +16,15 @@ namespace Smasher {
 	class IComponentManager {
 	public:
 		IComponentManager() = delete;
-		IComponentManager(GameState& state) : m_GameState(state) {}
+		IComponentManager(Layer& state) : m_GameState(state) {}
 		virtual void PreUpdate(Millisecond delta) {};
 		virtual void Update(Millisecond delta) {}; // Override this to enable component updating
 		virtual void Render(sf::RenderWindow& rWindow) {}; // Override this to enable component rendering
 		virtual void RemoveComponent(IComponent& component) = 0;
 
-		GameState& GetGameState() { return m_GameState; }
+		Layer& GetGameState() { return m_GameState; }
 
-		GameState& m_GameState;
+		Layer& m_GameState;
 	protected:
 		void SetComponentStatus(IComponent& rComponent, ComponentStatus status) { rComponent.SetStatus(status); }
 		void SetComponentEntity(IComponent& rComponent, Entity& rEntity) { rComponent.SetEntity(rEntity); }

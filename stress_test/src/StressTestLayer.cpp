@@ -1,6 +1,6 @@
 #include <numbers>
 #include <cmath>
-#include "StressTestGameState.h"
+#include "StressTestLayer.h"
 #include "Manifest.h"
 #include "Base.h"
 #include "Components/Transform2DComponent.h"
@@ -12,7 +12,7 @@
 #include "BallComponent.h"
 #include "Entity.h"
 
-Smasher::Entity& StressTestGameState::SpawnBouncingBall(sf::Vector2i position)
+Smasher::Entity& StressTestLayer::SpawnBouncingBall(sf::Vector2i position)
 {
 	const float toRadian = (float)(180.0 / std::numbers::pi);
 	int minSpeed = 100;
@@ -33,7 +33,7 @@ Smasher::Entity& StressTestGameState::SpawnBouncingBall(sf::Vector2i position)
 	return image;
 }
 
-void StressTestGameState::Init()
+void StressTestLayer::Init()
 {
 	std::shared_ptr<Smasher::ShaderResource> pShader = GetEngine().GetResourceManager().GetOrLoadResource<Smasher::Resources::Shaders::basic_texture_shader, Smasher::ShaderResource>();
 	sf::Vector2f windowSize = sf::Vector2f(GetEngine().GetWindow().getSize().x, GetEngine().GetWindow().getSize().y);
@@ -41,7 +41,7 @@ void StressTestGameState::Init()
 	pShader->GetShader().setUniform("windowSize", windowSize);
 	pShader->GetShader().setUniform("ViewProjectionMatrix", viewProjectionMatrix);
 
-	m_OnMouseMoveHandle = GetEngine().GetEventManager().Subscribe<Smasher::Events::MouseMoveEvent>(&StressTestGameState::OnMouseMove, this);
+	m_OnMouseMoveHandle = GetEngine().GetEventManager().Subscribe<Smasher::Events::MouseMoveEvent>(&StressTestLayer::OnMouseMove, this);
 
 	auto& rCompManager = static_cast<Smasher::DrawableComponentManager&>(GetComponentManager<Smasher::DrawableComponent>());
 	rCompManager.SetShaderResource(pShader);
@@ -119,7 +119,7 @@ void StressTestGameState::Init()
 	}
 }
 
-void StressTestGameState::Update(Smasher::Millisecond delta) {
+void StressTestLayer::Update(Smasher::Millisecond delta) {
 	++m_UpdateTimeSampleCount;
 	m_UpdateTimeSum += GetUpdateTime();
 	if (m_UpdateTimeSampleCount >= s_SamplesPerAverage) {
@@ -134,7 +134,7 @@ void StressTestGameState::Update(Smasher::Millisecond delta) {
 
 }
 
-void StressTestGameState::Render(sf::RenderWindow& rWindow) {
+void StressTestLayer::Render(sf::RenderWindow& rWindow) {
 	++m_RenderTimeSampleCount;
 	Smasher::Millisecond tmp = GetRenderTime();
 	m_RenderTimeSum += GetRenderTime();
@@ -152,7 +152,7 @@ void StressTestGameState::Render(sf::RenderWindow& rWindow) {
 }
 
 // Spawn an entity at mouse position
-void StressTestGameState::OnMouseMove(const Smasher::Events::MouseMoveEvent& event) {
+void StressTestLayer::OnMouseMove(const Smasher::Events::MouseMoveEvent& event) {
 	sf::Window& rWindow = GetEngine().GetWindow();
 	sf::Vector2i entityPos = sf::Vector2i(event.Position) - rWindow.getPosition();
 	Smasher::Entity& ball = SpawnBouncingBall(entityPos);

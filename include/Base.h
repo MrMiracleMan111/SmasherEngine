@@ -14,7 +14,7 @@
 
 #define SMASHER_USE_COMPONENT_MANAGER(managerType) \
 	public: \
-	static std::unique_ptr<managerType> StaticInstantiateManager(Smasher::GameState& state) { return std::make_unique<managerType>(state);} \
+	static std::unique_ptr<managerType> StaticInstantiateManager(Smasher::Layer& state) { return std::make_unique<managerType>(state);} \
 
 #define SMASHER_ADD_CAPABILITIES(args) \
 virtual static constexpr uint32_t GetStaticCapabilities() { \
@@ -33,7 +33,7 @@ constexpr uint64_t hash_str(const char* str) {
 
 /// Namespace for Smasher Game Engine
 namespace Smasher {
-	class GameState;
+	class Layer;
 	class IComponent;
 	class Entity;
 	using Millisecond = std::chrono::milliseconds;
@@ -79,7 +79,7 @@ namespace Smasher {
 
 	template <typename ComponentType>
 	concept HasStaticInstantiateManager = requires() {
-		ComponentType::StaticInstantiateManager(std::declval<Smasher::GameState&>());
+		ComponentType::StaticInstantiateManager(std::declval<Smasher::Layer&>());
 	};
 
 	template <typename T>

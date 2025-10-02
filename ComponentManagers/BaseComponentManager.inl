@@ -1,7 +1,7 @@
 #pragma once
 namespace Smasher {
 	template<class T>
-	BaseComponentManager<T>::BaseComponentManager(GameState& state) : IComponentManager(state) {
+	BaseComponentManager<T>::BaseComponentManager(Layer& state) : IComponentManager(state) {
 		m_ComponentsToRemove.reserve(64); // Arbitrary can be improved upon later
 	}
 

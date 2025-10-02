@@ -1,10 +1,10 @@
 #pragma once
 #include "Base.h"
-#include "GameState.h"
+#include "Layer.h"
 
-class SerializeGameState : public Smasher::GameState {
+class SerializeLayer : public Smasher::Layer {
 public:
-	SerializeGameState(Smasher::Engine& engine) : Smasher::GameState(engine) {}
+	SerializeLayer(Smasher::Engine& engine) : Smasher::Layer(engine) {}
 
 	void Init() override;
 	void OnClose(const Smasher::Events::WindowCloseEvent& e);

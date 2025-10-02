@@ -4,7 +4,7 @@
 
 namespace Smasher {
 	class Entity;
-	class GameState;
+	class Layer;
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	/// @brief Component Manager meant to be used as a base for Custom Component Managers. Unlike the
@@ -31,7 +31,7 @@ namespace Smasher {
 
 		friend class Entity;
 	public:
-		BaseComponentManager(GameState& state);
+		BaseComponentManager(Layer& state);
 		BaseComponentManager() = delete;
 		BaseComponentManager(const BaseComponentManager&) = delete;
 		BaseComponentManager(BaseComponentManager&&) = delete;

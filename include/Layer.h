@@ -24,14 +24,14 @@ namespace Smasher {
 		PAUSED
 	};
 
-	class SMASHER_API GameState {
+	class SMASHER_API Layer {
 		friend class Engine;
 	public:
-		virtual ~GameState();
-		GameState() = delete;
-		GameState(const GameState&) = delete;
-		GameState& operator=(const GameState&) = delete;
-		GameState& operator=(const GameState&&) noexcept = delete;
+		virtual ~Layer();
+		Layer() = delete;
+		Layer(const Layer&) = delete;
+		Layer& operator=(const Layer&) = delete;
+		Layer& operator=(const Layer&&) noexcept = delete;
 
 		Millisecond GetUpdateTime() const { return m_UpdateTime; }
 		Millisecond GetRenderTime() const { return m_RenderTime; }
@@ -69,7 +69,7 @@ namespace Smasher {
 		std::size_t EntityCount() { return m_EntityMap.size(); }
 
 	protected:
-		GameState(Engine& engine) :
+		Layer(Engine& engine) :
 			m_Engine(engine),
 			m_EventManager(engine.GetEventManager()),
 			m_ResourceManager(engine.GetResourceManager()),
@@ -100,4 +100,4 @@ namespace Smasher {
 	};
 }
 
-#include "GameState.inl"
+#include "Layer.inl"

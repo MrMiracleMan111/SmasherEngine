@@ -1,5 +1,5 @@
 #pragma once
-#include "GameState.h"
+#include "Layer.h"
 #include "IComponentManager.h"
 #include "GenericComponentManager.h"
 #include "Entity.h"
@@ -13,7 +13,7 @@ namespace Smasher {
 		If Component type T doesn't specify a Component type with a StaticInstantiateManager method, the GenericComponentManager
 	*/
 	template <class ComponentType>
-	void GameState::LoadComponentManager()
+	void Layer::LoadComponentManager()
 	{
 		static_assert(IComponentType<ComponentType>, "T should be derived from IComponent");
 
@@ -58,7 +58,7 @@ namespace Smasher {
 	}
 
 	template <class T, typename... Args>
-	T& GameState::AddEntity(Args&&... componentArgs) {
+	T& Layer::AddEntity(Args&&... componentArgs) {
 		static_assert(std::is_base_of<Entity, T>::value, "T must inherit from Entity");
 		auto pEntity = std::make_unique<T>(*this, UUID::GetUUID(), std::forward<Args>(componentArgs)...);
 		T* pEntityObserver = pEntity.get();
@@ -69,7 +69,7 @@ namespace Smasher {
 	};
 
 	template <class ComponentType>
-	IComponentManager& GameState::GetComponentManager() {
+	IComponentManager& Layer::GetComponentManager() {
 		if (m_ComponentManagers.find(std::type_index(typeid(ComponentType))) == m_ComponentManagers.end()) {
 			// Lazy Load the manager
 			LoadComponentManager<ComponentType>();

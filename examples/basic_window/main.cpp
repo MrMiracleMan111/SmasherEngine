@@ -1,9 +1,9 @@
 #include "Core.h"
-#include "ExampleWindowGameState.h"
+#include "ExampleWindowLayer.h"
 #include "Components/Transform2DComponent.h"
 int main() {
 	Smasher::Engine engine(640, 420);
-	ExampleWindowGameState& state = engine.AddState<ExampleWindowGameState>();
+	ExampleWindowLayer& state = engine.AddState<ExampleWindowLayer>();
 	Smasher::Entity& entity = state.AddEntity<Smasher::Entity>();
 	entity.AddComponent<Smasher::Transform2DComponent>();
 	state.Activate();

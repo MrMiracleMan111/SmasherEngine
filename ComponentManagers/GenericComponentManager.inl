@@ -9,7 +9,7 @@
 
 namespace Smasher {
 	template<class T>
-	GenericComponentManager<T>::GenericComponentManager(GameState& state) : IComponentManager(state) {
+	GenericComponentManager<T>::GenericComponentManager(Layer& state) : IComponentManager(state) {
 		m_ComponentsToRemove.reserve(64); // Arbitrary can be improved upon later
 	}
 

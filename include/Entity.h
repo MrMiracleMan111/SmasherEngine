@@ -7,7 +7,7 @@
 #include <SFML/Window.hpp>
 #include "Base.h"
 #include "UUID.h"
-#include "GameState.h"
+#include "Layer.h"
 
 namespace Smasher {
 
@@ -18,14 +18,14 @@ namespace Smasher {
 
 	public:
 		Entity() = delete;
-		Entity(GameState& state, UUID uuid) : m_GameState(state), m_UUID(uuid), m_Engine(state.GetEngine()) {};
+		Entity(Layer& state, UUID uuid) : m_GameState(state), m_UUID(uuid), m_Engine(state.GetEngine()) {};
 		Entity(const Entity& other) : m_GameState(other.m_GameState), m_UUID(other.m_UUID), m_Engine(other.m_Engine) {};
 		Entity(Entity&& other) : m_GameState(other.m_GameState), m_UUID(other.m_UUID), m_Engine(other.m_Engine) {};
 		Entity& operator =(const Entity& other) = delete;
 		Entity& operator =(Entity&&) = delete;
 		virtual ~Entity();
 
-		GameState& GetGameState() { return m_GameState; };
+		Layer& GetGameState() { return m_GameState; };
 		Engine& GetEngine() { return m_Engine; };
 		UUID GetUUID() const { return m_UUID; };
 
@@ -55,7 +55,7 @@ namespace Smasher {
 
 	private:
 		const UUID m_UUID;
-		GameState& m_GameState;
+		Layer& m_GameState;
 		Engine& m_Engine;
 		std::unordered_map<std::type_index, std::reference_wrapper<IComponent>> m_ComponentsByType;
 	};

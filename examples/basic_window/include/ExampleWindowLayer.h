@@ -1,11 +1,11 @@
 #pragma once
 #include "EventManager.h"
-#include "GameState.h"
+#include "Layer.h"
 
-class ExampleWindowGameState : public Smasher::GameState {
+class ExampleWindowLayer : public Smasher::Layer {
 public:
-	ExampleWindowGameState(Smasher::Engine& engine) : Smasher::GameState(engine) {};
-	~ExampleWindowGameState();
+	ExampleWindowLayer(Smasher::Engine& engine) : Smasher::Layer(engine) {};
+	~ExampleWindowLayer();
 	void Init() override;
 	void Reset() override;
 	void Render(sf::RenderWindow& window) override;

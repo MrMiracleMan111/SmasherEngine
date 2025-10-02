@@ -1,4 +1,4 @@
-#include "ExampleResourcesGameState.h"
+#include "ExampleResourcesLayer.h"
 
 void ExampleResourcesGameState::Init() {
 

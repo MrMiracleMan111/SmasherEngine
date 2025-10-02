@@ -12,7 +12,7 @@
 #include "Events.h"
 
 namespace Smasher {
-	class GameState;
+	class Layer;
 
 	// Non-Copyable
 	class SMASHER_API Engine final {
@@ -62,7 +62,7 @@ namespace Smasher {
 		void OnWindowClose(const Events::WindowCloseEvent& event);
 
 		bool m_Valid = true; // Becomes false if this object is moved
-		std::unordered_map<std::type_index, std::unique_ptr<GameState>> m_GameStateByType;
+		std::unordered_map<std::type_index, std::unique_ptr<Layer>> m_GameStateByType;
 		std::unique_ptr<sf::RenderWindow> m_Window = nullptr;
 		std::atomic_bool m_RunningAtomic = true;
 		const bool m_Headless = false;

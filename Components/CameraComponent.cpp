@@ -1,7 +1,7 @@
 #include <iostream>
 #include "CameraComponent.h"
 #include "IComponentManager.h"
-#include "GameState.h"
+#include "Layer.h"
 #include "Events.h"
 #include "EventManager.h"
 

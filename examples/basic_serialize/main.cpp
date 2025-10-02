@@ -1,12 +1,12 @@
 #include "Core.h"
 #include "SavedComponent.h"
-#include "SerializeGameState.h"
+#include "SerializeLayer.h"
 #include "Manifest.h"
 #include "ComponentManagers\DrawableComponentManager.h"
 
 int main() {
 	Smasher::Engine engine(640, 420);
-	Smasher::GameState& state = engine.AddState<SerializeGameState>();
+	Smasher::Layer& state = engine.AddState<SerializeLayer>();
 	state.Activate();
 	engine.Run();
 }

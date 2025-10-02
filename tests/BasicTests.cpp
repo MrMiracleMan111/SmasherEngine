@@ -7,14 +7,14 @@
 #include "ResourceManager.h"
 #include "Resources.h"
 
-class DummyGameState : public Smasher::GameState {
+class DummyGameState : public Smasher::Layer {
 public:
-	DummyGameState(Smasher::Engine& engine) : Smasher::GameState(engine) {}
+	DummyGameState(Smasher::Engine& engine) : Smasher::Layer(engine) {}
 };
 
-class InitTestGameState : public Smasher::GameState {
+class InitTestGameState : public Smasher::Layer {
 public:
-	InitTestGameState(Smasher::Engine& engine) : Smasher::GameState(engine) {}
+	InitTestGameState(Smasher::Engine& engine) : Smasher::Layer(engine) {}
 
 	void Init() override {
 		++m_Value;
@@ -25,9 +25,9 @@ private:
 	int m_Value = 0;
 };
 
-class ShutdownEngineGameState : public Smasher::GameState {
+class ShutdownEngineGameState : public Smasher::Layer {
 public:
-	ShutdownEngineGameState(Smasher::Engine& engine) : Smasher::GameState(engine) {}
+	ShutdownEngineGameState(Smasher::Engine& engine) : Smasher::Layer(engine) {}
 	void Update(Smasher::Millisecond delta) override {
 		ShutdownEngine();
 	};
@@ -64,7 +64,7 @@ protected:
 
 class CustomComponentManager : public Smasher::BaseComponentManager<CustomComponent> {
 public:
-	CustomComponentManager(Smasher::GameState& state) : Smasher::BaseComponentManager<CustomComponent>(state) {}
+	CustomComponentManager(Smasher::Layer& state) : Smasher::BaseComponentManager<CustomComponent>(state) {}
 	CustomComponentManager(const CustomComponentManager&) = default;
 	~CustomComponentManager() = default;
 
@@ -104,7 +104,7 @@ protected:
 class InitEntityTest : public Smasher::Entity {
 public:
 	InitEntityTest() = delete;
-	InitEntityTest(Smasher::GameState& state, Smasher::UUID uuid) : Smasher::Entity(state, uuid) {}
+	InitEntityTest(Smasher::Layer& state, Smasher::UUID uuid) : Smasher::Entity(state, uuid) {}
 
 	void Init() {
 		++m_Value;
@@ -118,7 +118,7 @@ private:
 class InitRemoveEntityTest : public Smasher::Entity {
 public:
 	InitRemoveEntityTest() = delete;
-	InitRemoveEntityTest(Smasher::GameState& state, Smasher::UUID uuid) : Smasher::Entity(state, uuid) {}
+	InitRemoveEntityTest(Smasher::Layer& state, Smasher::UUID uuid) : Smasher::Entity(state, uuid) {}
 
 	void Init() {
 		++m_Value;

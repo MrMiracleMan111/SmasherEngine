@@ -2,7 +2,7 @@
 #include <SFML/Window.hpp>
 #include "Core.h"
 #include "Manifest.h"
-#include "ExampleResourcesGameState.h"
+#include "ExampleResourcesLayer.h"
 #include "Components/Transform2DComponent.h"
 #include "Components/TextComponent.h"
 #include "ComponentManagers/DrawableComponentManager.h"

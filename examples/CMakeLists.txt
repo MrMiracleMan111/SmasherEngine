@@ -18,7 +18,7 @@ add_custom_command(
 )
 
 # Basic Window Example
-add_executable (BasicWindowExample "basic_window/main.cpp" "basic_window/src/ExampleWindowGameState.cpp" )
+add_executable (BasicWindowExample "basic_window/main.cpp" "basic_window/src/ExampleWindowLayer.cpp" )
 foreach(CONFIG ${CMAKE_CONFIGURATION_TYPES})
     string(TOUPPER ${CMAKE_BUILD_TYPE} CONFIG_UPPER)
     set_target_properties(BasicWindowExample PROPERTIES
@@ -32,7 +32,7 @@ target_include_directories (BasicWindowExample PUBLIC "${CMAKE_CURRENT_SOURCE_DI
 target_link_libraries( BasicWindowExample PRIVATE SmasherEngine )
 
 # Basic Serialize Example
-add_executable (BasicSerializeExample "basic_serialize/main.cpp" "basic_serialize/src/SavedComponent.cpp" "basic_serialize/src/BallComponent.cpp" "basic_serialize/src/SerializeGameState.cpp")
+add_executable (BasicSerializeExample "basic_serialize/main.cpp" "basic_serialize/src/SavedComponent.cpp" "basic_serialize/src/BallComponent.cpp" "basic_serialize/src/SerializeLayer.cpp")
 foreach(CONFIG ${CMAKE_CONFIGURATION_TYPES})
     string(TOUPPER ${CMAKE_BUILD_TYPE} CONFIG_UPPER)
     set_target_properties(BasicSerializeExample PROPERTIES
@@ -48,7 +48,7 @@ target_link_libraries( BasicSerializeExample PRIVATE SmasherEngine )
 
 # Basic Resource Load Example
 add_custom_target(generate_manifest_BasicResourceLoadExample DEPENDS Manifest.h)
-add_executable (BasicResourceLoadExample "basic_resource_load/main.cpp" "basic_resource_load/src/ExampleResourcesGameState.cpp" )
+add_executable (BasicResourceLoadExample "basic_resource_load/main.cpp" "basic_resource_load/src/ExampleResourcesLayer.cpp" )
 
 set_target_properties(BasicResourceLoadExample PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${SMASHER_ENGINE_OUTPUT_DIR}")
 set_target_properties(BasicResourceLoadExample PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${SMASHER_ENGINE_OUTPUT_DIR}")

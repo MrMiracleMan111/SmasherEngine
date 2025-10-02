@@ -3,9 +3,9 @@
 #include "BaseComponentManager.h"
 #include "Components/CameraComponent.h"
 
-class DummyGameState : public Smasher::GameState {
+class DummyGameState : public Smasher::Layer {
 public:
-	DummyGameState(Smasher::Engine& engine) : Smasher::GameState(engine) {}
+	DummyGameState(Smasher::Engine& engine) : Smasher::Layer(engine) {}
 };
 
 class SerializedComponent : public Smasher::IComponent, Smasher::ISerializeable {
@@ -43,7 +43,7 @@ class EngineSetupFixture : public ::testing::Test {
 	void TearDown() override;
 protected:
 	std::unique_ptr<Smasher::Engine> pEngine;
-	Smasher::GameState* pState = nullptr;
+	Smasher::Layer* pState = nullptr;
 	Smasher::Entity* pEntity = nullptr;
 };
 

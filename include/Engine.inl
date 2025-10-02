@@ -1,6 +1,6 @@
 #include <memory>
 #include "Engine.h"
-#include "GameState.h"
+#include "Layer.h"
 
 namespace Smasher {
 	template<class T, typename... Args>

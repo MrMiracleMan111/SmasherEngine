@@ -1,14 +1,14 @@
 #include <numbers>
 #include <iostream>
 #include "Base.h"
-#include "SerializeGameState.h"
-#include "GameState.h"
+#include "SerializeLayer.h"
+#include "Layer.h"
 #include "Manifest.h"
 #include "ComponentManagers\DrawableComponentManager.h"
 #include "SavedComponent.h"
 #include "BallComponent.h"
 
-void SerializeGameState::Init()
+void SerializeLayer::Init()
 {
 	// Open save file
 	std::fstream saveFile("SaveFile.bin", std::ios_base::in | std::ios_base::out | std::ios_base::app | std::ios_base::binary);
@@ -54,10 +54,10 @@ void SerializeGameState::Init()
 	std::cout << "Updated " << count << " component(s) from save file" << std::endl;
 
 	saveFile.close();
-	m_OnCloseSubscription = GetEngine().GetEventManager().Subscribe<Smasher::Events::WindowCloseEvent>(&SerializeGameState::OnClose, this);
+	m_OnCloseSubscription = GetEngine().GetEventManager().Subscribe<Smasher::Events::WindowCloseEvent>(&SerializeLayer::OnClose, this);
 }
 
-Smasher::Entity& SerializeGameState::SpawnBouncingBall(sf::Vector2i position)
+Smasher::Entity& SerializeLayer::SpawnBouncingBall(sf::Vector2i position)
 {
 	const float toRadian = (float)(180.0 / std::numbers::pi);
 	int minSpeed = 100;
@@ -78,7 +78,7 @@ Smasher::Entity& SerializeGameState::SpawnBouncingBall(sf::Vector2i position)
 	return image;
 }
 
-void SerializeGameState::OnClose(const Smasher::Events::WindowCloseEvent& e)
+void SerializeLayer::OnClose(const Smasher::Events::WindowCloseEvent& e)
 {
 	// Open save file
 	std::fstream saveFile("SaveFile.bin", std::ios_base::out | std::ios_base::binary);

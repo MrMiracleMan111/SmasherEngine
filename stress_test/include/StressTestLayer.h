@@ -2,13 +2,12 @@
 #include <chrono>
 #include <SFML/Window.hpp>
 #include "Base.h"
-#include <chrono>
-#include "GameState.h"
+#include "Layer.h"
 
-class StressTestGameState : public Smasher::GameState {
+class StressTestLayer : public Smasher::Layer {
 public:
-	StressTestGameState(Smasher::Engine& engine, std::size_t numEntities) :
-		Smasher::GameState(engine),
+	StressTestLayer(Smasher::Engine& engine, std::size_t numEntities) :
+		Smasher::Layer(engine),
 		m_NumEntities(numEntities),
 		m_UpdateTimeAverage(0.0), m_RenderTimeAverage(0.0), 
 		m_UpdateTimeSum(Smasher::Millisecond::zero()),
