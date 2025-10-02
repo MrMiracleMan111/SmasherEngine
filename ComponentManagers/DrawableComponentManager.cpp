@@ -170,7 +170,7 @@ namespace Smasher {
 		if (opaqueBatches.size() == 0) {
 			RenderBatch& batch = opaqueBatches.emplace_front(opaqueBatches);
 			batch.iterator = opaqueBatches.begin();
-			ResourceManager& rResourceManager = GetGameState().GetEngine().GetResourceManager();
+			ResourceManager& rResourceManager = GetLayer().GetEngine().GetResourceManager();
 			auto pTexture = rResourceManager.GetResource<TextureResource>(id);
 			batch.pTexture = &pTexture->GetTexture();
 			itr = opaqueBatches.begin();
@@ -202,7 +202,7 @@ namespace Smasher {
 			if (translucentBatches.size() == 0) {
 				RenderBatch& batch = translucentBatches.emplace_front(translucentBatches);
 				batch.iterator = translucentBatches.begin();
-				ResourceManager& rResourceManager = GetGameState().GetEngine().GetResourceManager();
+				ResourceManager& rResourceManager = GetLayer().GetEngine().GetResourceManager();
 				auto pTexture = rResourceManager.GetResource<TextureResource>(id);
 				batch.pTexture = &pTexture->GetTexture();
 				itr = translucentBatches.begin();

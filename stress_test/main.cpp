@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
 	}
 
 	engine.GetResourceManager().SetResourceDirectory(Resources::Metadata::RESOURCES_DIRECTORY);
-	StressTestLayer& state = engine.AddState<StressTestLayer>(numEntities);
+	StressTestLayer& state = engine.PushLayer<StressTestLayer>(numEntities);
 
 	state.Activate();
 	engine.Run();

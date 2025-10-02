@@ -6,7 +6,7 @@
 
 int main() {
 	Smasher::Engine engine(640, 420);
-	Smasher::Layer& state = engine.AddState<SerializeLayer>();
+	Smasher::Layer& state = engine.PushLayer<SerializeLayer>();
 	state.Activate();
 	engine.Run();
 }

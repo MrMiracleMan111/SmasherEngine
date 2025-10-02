@@ -67,7 +67,7 @@ namespace Smasher {
 	Engine::~Engine()
 	{
 		if (m_Valid) {
-			m_GameStateByType.clear();
+			m_LayerByType.clear();
 			if (!m_Headless) {
 				m_EventManager.Unsubscribe(m_WindowCloseHandle); // Explicilty unsubscribe before EventManager is deconstructed
 			}
@@ -76,7 +76,7 @@ namespace Smasher {
 
 	Engine::Engine(Engine&& other) noexcept : 
 		m_Headless(other.m_Headless),
-		m_GameStateByType(std::move(other.m_GameStateByType)),
+		m_LayerByType(std::move(other.m_LayerByType)),
 		m_Window(std::move(other.m_Window)),
 		m_IsWindowOpen(other.m_IsWindowOpen),
 		m_EventManager(std::move(other.m_EventManager)),
@@ -161,16 +161,16 @@ namespace Smasher {
 	}
 
 	void Engine::Update(Millisecond delta) {
-		for (auto& [_, pGameState] : m_GameStateByType) {
+		for (auto& [_, pLayer] : m_LayerByType) {
 			m_UpdateTimestamp = std::chrono::system_clock::now();
-			if (pGameState->GetStatus() == GameStateStatus::ACTIVE) {
-				pGameState->PreUpdate(delta);
-				pGameState->PreUpdateComponentManagers(delta);
-				pGameState->Update(delta);
-				pGameState->UpdateComponentManagers(delta);
+			if (pLayer->GetStatus() == LayerStatus::ACTIVE) {
+				pLayer->PreUpdate(delta);
+				pLayer->PreUpdateComponentManagers(delta);
+				pLayer->Update(delta);
+				pLayer->UpdateComponentManagers(delta);
 			}
 			Millisecond diff = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - m_UpdateTimestamp);
-			pGameState->SetUpdateTime(diff);
+			pLayer->SetUpdateTime(diff);
 		}
 	}
 
@@ -178,16 +178,16 @@ namespace Smasher {
 		//rWindow.pushGLStates();
 		m_Window->clear();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear Screen And Depth Buffer
-		for (const auto& [_, pGameState] : m_GameStateByType) {
+		for (const auto& [_, pLayer] : m_LayerByType) {
 			m_RenderTimestamp = std::chrono::system_clock::now();
 
-			if (pGameState->GetStatus() == GameStateStatus::ACTIVE) {
-				pGameState->Render(rWindow);
-				pGameState->RenderComponentManagers(rWindow);
+			if (pLayer->GetStatus() == LayerStatus::ACTIVE) {
+				pLayer->Render(rWindow);
+				pLayer->RenderComponentManagers(rWindow);
 			}
 
 			Millisecond diff = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - m_RenderTimestamp);
-			pGameState->SetRenderTime(diff);
+			pLayer->SetRenderTime(diff);
 		}
 		m_Window->display();
 		//rWindow.popGLStates();

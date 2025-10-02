@@ -14,7 +14,7 @@ int main() {
 	static_assert(Smasher::HasRenderCapability<Smasher::DrawableComponentManager>, "Failed");
 
 	engine.GetResourceManager().SetResourceDirectory(Smasher::Resources::Metadata::RESOURCES_DIRECTORY);
-	ExampleResourcesGameState& state = engine.AddState<ExampleResourcesGameState>();
+	ExampleResourcesLayer& state = engine.PushLayer<ExampleResourcesLayer>();
 
 	std::shared_ptr<Smasher::ShaderResource> shader = engine.GetResourceManager().GetOrLoadResource<Smasher::Resources::Shaders::basic_texture_shader, Smasher::ShaderResource>();
 	sf::Vector2f windowSize = sf::Vector2f((float)engine.GetWindow().getSize().x , (float)engine.GetWindow().getSize().y);

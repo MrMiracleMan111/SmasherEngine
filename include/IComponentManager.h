@@ -16,15 +16,15 @@ namespace Smasher {
 	class IComponentManager {
 	public:
 		IComponentManager() = delete;
-		IComponentManager(Layer& state) : m_GameState(state) {}
+		IComponentManager(Layer& layer) : m_Layer(layer) {}
 		virtual void PreUpdate(Millisecond delta) {};
 		virtual void Update(Millisecond delta) {}; // Override this to enable component updating
 		virtual void Render(sf::RenderWindow& rWindow) {}; // Override this to enable component rendering
 		virtual void RemoveComponent(IComponent& component) = 0;
 
-		Layer& GetGameState() { return m_GameState; }
+		Layer& GetLayer() { return m_Layer; }
 
-		Layer& m_GameState;
+		Layer& m_Layer;
 	protected:
 		void SetComponentStatus(IComponent& rComponent, ComponentStatus status) { rComponent.SetStatus(status); }
 		void SetComponentEntity(IComponent& rComponent, Entity& rEntity) { rComponent.SetEntity(rEntity); }

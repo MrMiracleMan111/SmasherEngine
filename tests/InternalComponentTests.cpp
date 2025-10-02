@@ -3,9 +3,9 @@
 #include "BaseComponentManager.h"
 #include "Components/CameraComponent.h"
 
-class DummyGameState : public Smasher::Layer {
+class DummyLayer : public Smasher::Layer {
 public:
-	DummyGameState(Smasher::Engine& engine) : Smasher::Layer(engine) {}
+	DummyLayer(Smasher::Engine& engine) : Smasher::Layer(engine) {}
 };
 
 class SerializedComponent : public Smasher::IComponent, Smasher::ISerializeable {
@@ -49,7 +49,7 @@ protected:
 
 void EngineSetupFixture::SetUp() {
 	pEngine = std::make_unique<Smasher::Engine>(640, 420);
-	pState = &pEngine->AddState<DummyGameState>();
+	pState = &pEngine->PushLayer<DummyLayer>();
 	pEntity = &pState->AddEntity<Smasher::Entity>();
 }
 

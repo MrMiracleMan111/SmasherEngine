@@ -8,7 +8,7 @@
 namespace Smasher {
 	void CameraComponent::OnAddComponent()
 	{
-		EventManager& rEventManager = GetManager().GetGameState().GetEngine().GetEventManager();
+		EventManager& rEventManager = GetManager().GetLayer().GetEngine().GetEventManager();
 
 		m_ResizeHandle = rEventManager.Subscribe<Events::WindowResizeEvent>(&CameraComponent::OnWindowResize, this);
 	}

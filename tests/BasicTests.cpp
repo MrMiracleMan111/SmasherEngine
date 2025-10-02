@@ -7,14 +7,14 @@
 #include "ResourceManager.h"
 #include "Resources.h"
 
-class DummyGameState : public Smasher::Layer {
+class DummyLayer : public Smasher::Layer {
 public:
-	DummyGameState(Smasher::Engine& engine) : Smasher::Layer(engine) {}
+	DummyLayer(Smasher::Engine& engine) : Smasher::Layer(engine) {}
 };
 
-class InitTestGameState : public Smasher::Layer {
+class InitTestLayer : public Smasher::Layer {
 public:
-	InitTestGameState(Smasher::Engine& engine) : Smasher::Layer(engine) {}
+	InitTestLayer(Smasher::Engine& engine) : Smasher::Layer(engine) {}
 
 	void Init() override {
 		++m_Value;
@@ -25,9 +25,9 @@ private:
 	int m_Value = 0;
 };
 
-class ShutdownEngineGameState : public Smasher::Layer {
+class ShutdownEngineLayer : public Smasher::Layer {
 public:
-	ShutdownEngineGameState(Smasher::Engine& engine) : Smasher::Layer(engine) {}
+	ShutdownEngineLayer(Smasher::Engine& engine) : Smasher::Layer(engine) {}
 	void Update(Smasher::Millisecond delta) override {
 		ShutdownEngine();
 	};
@@ -122,7 +122,7 @@ public:
 
 	void Init() {
 		++m_Value;
-		GetGameState().RemoveEntity(GetUUID());
+		GetLayer().RemoveEntity(GetUUID());
 	}
 
 	int GetValue() const { return m_Value; }
@@ -132,49 +132,49 @@ private:
 
 TEST(EntityTest, AddEnttiy) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState& state = engine.AddState<DummyGameState>();
+	DummyLayer& state = engine.PushLayer<DummyLayer>();
 	EXPECT_NO_THROW({ Smasher::Entity & entity = state.AddEntity<Smasher::Entity>(); });
 }
 
 TEST(EntityTest, GetEntity) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState& state = engine.AddState<DummyGameState>();
+	DummyLayer& state = engine.PushLayer<DummyLayer>();
 	Smasher::Entity& entity = state.AddEntity<Smasher::Entity>();
 	EXPECT_NO_THROW({ state.GetEntity(entity.GetUUID()); });
 }
 
 TEST(EntityTest, InitEntity) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState& state = engine.AddState<DummyGameState>();
+	DummyLayer& state = engine.PushLayer<DummyLayer>();
 	InitEntityTest& entity = state.AddEntity<InitEntityTest>();
 	EXPECT_EQ(1, entity.GetValue());
 }
 
 TEST(EntityTest, InitRemoveEntity) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState& state = engine.AddState<DummyGameState>();
+	DummyLayer& state = engine.PushLayer<DummyLayer>();
 	InitRemoveEntityTest& entity = state.AddEntity<InitRemoveEntityTest>();
 	EXPECT_FALSE(state.HasEntity(entity.GetUUID()));
 }
 
 TEST(EntityTest, MissingEntity) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState& state = engine.AddState<DummyGameState>();
-	EXPECT_THROW({ state.GetEntity(Smasher::UUID{10}); }, Smasher::Exceptions::GameStateEntityNotFound);
+	DummyLayer& state = engine.PushLayer<DummyLayer>();
+	EXPECT_THROW({ state.GetEntity(Smasher::UUID{10}); }, Smasher::Exceptions::LayerEntityNotFound);
 	Smasher::Entity& entity = state.AddEntity<Smasher::Entity>();
-	EXPECT_THROW({ state.GetEntity(Smasher::UUID{entity.GetUUID() + 1});}, Smasher::Exceptions::GameStateEntityNotFound);
+	EXPECT_THROW({ state.GetEntity(Smasher::UUID{entity.GetUUID() + 1});}, Smasher::Exceptions::LayerEntityNotFound);
 }
 
 TEST(ComponentsTest, CreateComponent) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState& state = engine.AddState<DummyGameState>();
+	DummyLayer& state = engine.PushLayer<DummyLayer>();
 	TestComponent& test = state.AddEntity<Smasher::Entity>().AddComponent<TestComponent>(10);
 	EXPECT_EQ(10, test.GetValue());
 }
 
 TEST(ComponentsTest, DuplicateComponent) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState& state = engine.AddState<DummyGameState>();
+	DummyLayer& state = engine.PushLayer<DummyLayer>();
 	Smasher::Entity entity = state.AddEntity<Smasher::Entity>();
 	entity.AddComponent<TestComponent>(10);
 	EXPECT_THROW({
@@ -185,7 +185,7 @@ TEST(ComponentsTest, DuplicateComponent) {
 
 TEST(ComponentsTest, MissingComponent) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState& state = engine.AddState<DummyGameState>();
+	DummyLayer& state = engine.PushLayer<DummyLayer>();
 	Smasher::Entity entity = state.AddEntity<Smasher::Entity>();
 	entity.AddComponent<TestComponent>(10);
 	EXPECT_THROW({
@@ -195,7 +195,7 @@ TEST(ComponentsTest, MissingComponent) {
 
 TEST(ComponentsTest, RemoveComponent) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState& state = engine.AddState<DummyGameState>();
+	DummyLayer& state = engine.PushLayer<DummyLayer>();
 	Smasher::Entity entity = state.AddEntity<Smasher::Entity>();
 	entity.AddComponent<TestComponent>(10);
 	EXPECT_TRUE(entity.HasComponent<TestComponent>());
@@ -210,7 +210,7 @@ TEST(ComponentsTest, RemoveComponent) {
 
 TEST(ComponentsTest, RemoveComponentDataChange) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState& state = engine.AddState<DummyGameState>();
+	DummyLayer& state = engine.PushLayer<DummyLayer>();
 	state.Activate();
 	Smasher::Entity entity = state.AddEntity<Smasher::Entity>();
 	entity.AddComponent<DeleteTestComponent>();
@@ -224,8 +224,8 @@ TEST(ComponentsTest, RemoveComponentDataChange) {
 
 TEST(ComponentsTest, ExceptionRemoveComponentDataChange) {
 	Smasher::Engine engine(640, 420);
-	engine.AddState<DummyGameState>().Activate();
-	Smasher::Entity entity = engine.GetState<DummyGameState>().AddEntity<Smasher::Entity>();
+	engine.PushLayer<DummyLayer>().Activate();
+	Smasher::Entity entity = engine.GetLayer<DummyLayer>().AddEntity<Smasher::Entity>();
 	entity.AddComponent<SpicyDeleteTestComponent>();
 	EXPECT_TRUE(entity.HasComponent<SpicyDeleteTestComponent>());
 	EXPECT_NO_THROW({ engine.Update(Smasher::Millisecond{10}); });
@@ -270,7 +270,7 @@ void TestCallback(const Smasher::Events::DummyEvent& e) {};
 
 TEST(EventsTest, InvalidEventHandle) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState& state = engine.AddState<DummyGameState>();
+	DummyLayer& state = engine.PushLayer<DummyLayer>();
 
 
 	Smasher::EventManager& manager = state.GetEventManager();
@@ -289,14 +289,14 @@ TEST(EventsTest, InvalidEventHandle) {
 
 TEST(EventsTest, SubscribeEvent) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState& state = engine.AddState<DummyGameState>();
+	DummyLayer& state = engine.PushLayer<DummyLayer>();
 	Smasher::EventManager& manager = state.GetEventManager();
 	Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::Events::DummyEvent>(TestCallback);
 }
 
 TEST(EventsTest, SinglePublishEvent) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState& state = engine.AddState<DummyGameState>();
+	DummyLayer& state = engine.PushLayer<DummyLayer>();
 	Smasher::EventManager& manager = state.GetEventManager();
 
 	int triggered_count = 0;
@@ -313,7 +313,7 @@ TEST(EventsTest, SinglePublishEvent) {
 
 TEST(EventsTest, MultiplePublishEvent) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState& state = engine.AddState<DummyGameState>();
+	DummyLayer& state = engine.PushLayer<DummyLayer>();
 	Smasher::EventManager& manager = state.GetEventManager();
 
 	int triggered_count = 0;
@@ -334,7 +334,7 @@ TEST(EventsTest, MultiplePublishEvent) {
 
 TEST(EventsTest, SubscriptionLifetimeTest) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState& state = engine.AddState<DummyGameState>();
+	DummyLayer& state = engine.PushLayer<DummyLayer>();
 	Smasher::EventManager& manager = state.GetEventManager();
 
 	int triggered_count = 0;
@@ -360,7 +360,7 @@ TEST(EventsTest, SubscriptionLifetimeTest) {
 
 TEST(EventsTest, SubscriptionLifetimeHandoffTest) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState& state = engine.AddState<DummyGameState>();
+	DummyLayer& state = engine.PushLayer<DummyLayer>();
 	Smasher::EventManager& manager = state.GetEventManager();
 
 	int triggered_count = 0;
@@ -401,7 +401,7 @@ TEST(EventsTest, SubscriptionLifetimeHandoffTest) {
 
 TEST(EventsTest, SinglePublishUnsubscribeEvent) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState& state = engine.AddState<DummyGameState>();
+	DummyLayer& state = engine.PushLayer<DummyLayer>();
 	Smasher::EventManager& manager = state.GetEventManager();
 
 	int triggered_count = 0;
@@ -423,7 +423,7 @@ TEST(EventsTest, SinglePublishUnsubscribeEvent) {
 
 TEST(EventsTest, MultiplePublishMultipleSubscribeEvent) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState& state = engine.AddState<DummyGameState>();
+	DummyLayer& state = engine.PushLayer<DummyLayer>();
 	Smasher::EventManager& manager = state.GetEventManager();
 
 	int triggered_count_1 = 0;
@@ -503,7 +503,7 @@ TEST(EventsTest, MoveEventManagerAsync) {
 
 TEST(AsyncEventTest, SubscribeEvent) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState& state = engine.AddState<DummyGameState>();
+	DummyLayer& state = engine.PushLayer<DummyLayer>();
 	Smasher::EventManager& manager = state.GetEventManager();
 	Smasher::EventSubscriptionHandle handle = manager.SubscribeAsync<Smasher::Events::DummyEvent>(TestCallback);
 
@@ -511,7 +511,7 @@ TEST(AsyncEventTest, SubscribeEvent) {
 
 TEST(AsyncEventTest, PublishEvent) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState& state = engine.AddState<DummyGameState>();
+	DummyLayer& state = engine.PushLayer<DummyLayer>();
 	Smasher::EventManager& manager = state.GetEventManager();
 	int count = 10;
 	auto incrementFunc = [&count] (const Smasher::Events::DummyEvent&) {
@@ -528,7 +528,7 @@ TEST(AsyncEventTest, PublishEvent) {
 
 TEST(AsyncEventTest, MultiplePublishEvent) {
 	Smasher::Engine engine(640, 420);
-	DummyGameState& state = engine.AddState<DummyGameState>();
+	DummyLayer& state = engine.PushLayer<DummyLayer>();
 	Smasher::EventManager& manager = state.GetEventManager();
 	int count = 10;
 	auto incrementFunc = [&count](const Smasher::Events::DummyEvent&) {
@@ -561,7 +561,7 @@ TEST(EngineTest, HeadlessEngine) {
 		bool failed = false;
 		Smasher::Engine engine = Smasher::Engine::CreateHeadless();
 
-		ShutdownEngineGameState& state = engine.AddState<ShutdownEngineGameState>();
+		ShutdownEngineLayer& state = engine.PushLayer<ShutdownEngineLayer>();
 		state.Activate();
 
 		std::thread worker([&engine]() {
@@ -588,7 +588,7 @@ TEST(EngineTest, MoveHeadlessEngine) {
 		Smasher::Engine engine = Smasher::Engine::CreateHeadless();
 		Smasher::Engine tmp = std::move(engine);
 
-		ShutdownEngineGameState& state = tmp.AddState<ShutdownEngineGameState>();
+		ShutdownEngineLayer& state = tmp.PushLayer<ShutdownEngineLayer>();
 		state.Activate();
 
 		std::thread worker([&tmp]() {
@@ -613,7 +613,7 @@ TEST(EngineTest, NoShutdownEngine) {
 	bool passed = false;
 	Smasher::Engine engine(640, 420);
 
-	DummyGameState& state = engine.AddState<DummyGameState>();
+	DummyLayer& state = engine.PushLayer<DummyLayer>();
 	state.Activate();
 
 	engine.GetWindow().setActive(false);
@@ -636,7 +636,7 @@ TEST(EngineTest, ShutdownEngine) {
 	bool failed = false;
 	Smasher::Engine engine(640, 420);
 
-	ShutdownEngineGameState& state = engine.AddState<ShutdownEngineGameState>();
+	ShutdownEngineLayer& state = engine.PushLayer<ShutdownEngineLayer>();
 	state.Activate();
 
 	engine.GetWindow().setActive(false);
@@ -655,9 +655,9 @@ TEST(EngineTest, ShutdownEngine) {
 	}
 }
 
-TEST(GameStateTest, InitGameState) {
+TEST(LayerTest, InitLayer) {
 	Smasher::Engine engine(640, 420);
-	InitTestGameState& state = engine.AddState<InitTestGameState>();
+	InitTestLayer& state = engine.PushLayer<InitTestLayer>();
 	EXPECT_EQ(1, state.GetValue());
 	state.Activate();
 	engine.Update(Smasher::Millisecond{ 10 });
@@ -669,7 +669,7 @@ TEST(GameStateTest, InitGameState) {
 TEST(EngineTest, ExplicitDoubleShutdownEngine) {
 	bool failed = false;
 	Smasher::Engine engine(640, 420);
-	ShutdownEngineGameState& state = engine.AddState<ShutdownEngineGameState>();
+	ShutdownEngineLayer& state = engine.PushLayer<ShutdownEngineLayer>();
 	state.Activate();
 	engine.GetWindow().setActive(false);
 	std::thread worker([&engine]() {

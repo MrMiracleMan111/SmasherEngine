@@ -37,7 +37,7 @@ namespace Smasher {
 	Entity& Layer::GetEntity(UUID uuid) {
 		auto itr = m_EntityMap.find(uuid);
 		if (itr == m_EntityMap.end()) {
-			throw Exceptions::GameStateEntityNotFound(std::format("Could not find entity with UUID: {}", (uint64_t)uuid));
+			throw Exceptions::LayerEntityNotFound(std::format("Could not find entity with UUID: {}", (uint64_t)uuid));
 		}
 		return *itr->second;
 	}
@@ -48,7 +48,7 @@ namespace Smasher {
 
 	void Layer::RemoveEntity(UUID uuid) {
 		if (!HasEntity(uuid)) {
-			throw Exceptions::GameStateEntityNotFound(std::format("Could not find entity with UUID: {}", (uint64_t)uuid));
+			throw Exceptions::LayerEntityNotFound(std::format("Could not find entity with UUID: {}", (uint64_t)uuid));
 		}
 		m_EntityMap.erase(uuid);
 	}

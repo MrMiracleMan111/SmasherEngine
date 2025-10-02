@@ -1,9 +1,9 @@
 #include "ExampleResourcesLayer.h"
 
-void ExampleResourcesGameState::Init() {
+void ExampleResourcesLayer::Init() {
 
 }
 
-void ExampleResourcesGameState::Render(sf::RenderWindow& rWindow) {
+void ExampleResourcesLayer::Render(sf::RenderWindow& rWindow) {
 
 }

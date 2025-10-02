@@ -19,7 +19,7 @@ namespace Smasher {
 	class GenericComponentManager;
 
 
-	enum GameStateStatus {
+	enum LayerStatus {
 		ACTIVE,
 		PAUSED
 	};
@@ -48,8 +48,8 @@ namespace Smasher {
 		virtual void PreUpdate(Millisecond delta) {};
 		virtual void Update(Millisecond delta) {};
 
-		void Activate() { m_Status = GameStateStatus::ACTIVE; };
-		void Pause() { m_Status = GameStateStatus::PAUSED; };
+		void Activate() { m_Status = LayerStatus::ACTIVE; };
+		void Pause() { m_Status = LayerStatus::PAUSED; };
 		bool GetStatus() const { return m_Status; };
 		Entity& GetEntity(UUID uuid);
 		bool HasEntity(UUID uuid) const;
@@ -90,7 +90,7 @@ namespace Smasher {
 		std::unordered_map<std::type_index, std::unique_ptr<IComponentManager>> m_ComponentManagers;
 		std::vector<IComponentManager*> m_ComponentManagersWithRender; // Subset of component managers with Render(sf::Window&) capability
 		std::vector<IComponentManager*> m_ComponentManagersWithUpdate; // Subset of component managers with Update(Millisecond) capability
-		GameStateStatus m_Status = GameStateStatus::PAUSED;
+		LayerStatus m_Status = LayerStatus::PAUSED;
 		EventManager& m_EventManager;
 		ResourceManager& m_ResourceManager;
 		Engine& m_Engine;

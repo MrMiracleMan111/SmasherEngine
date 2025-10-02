@@ -18,14 +18,14 @@ namespace Smasher {
 
 	public:
 		Entity() = delete;
-		Entity(Layer& state, UUID uuid) : m_GameState(state), m_UUID(uuid), m_Engine(state.GetEngine()) {};
-		Entity(const Entity& other) : m_GameState(other.m_GameState), m_UUID(other.m_UUID), m_Engine(other.m_Engine) {};
-		Entity(Entity&& other) : m_GameState(other.m_GameState), m_UUID(other.m_UUID), m_Engine(other.m_Engine) {};
+		Entity(Layer& state, UUID uuid) : m_Layer(state), m_UUID(uuid), m_Engine(state.GetEngine()) {};
+		Entity(const Entity& other) : m_Layer(other.m_Layer), m_UUID(other.m_UUID), m_Engine(other.m_Engine) {};
+		Entity(Entity&& other) : m_Layer(other.m_Layer), m_UUID(other.m_UUID), m_Engine(other.m_Engine) {};
 		Entity& operator =(const Entity& other) = delete;
 		Entity& operator =(Entity&&) = delete;
 		virtual ~Entity();
 
-		Layer& GetGameState() { return m_GameState; };
+		Layer& GetLayer() { return m_Layer; };
 		Engine& GetEngine() { return m_Engine; };
 		UUID GetUUID() const { return m_UUID; };
 
@@ -55,7 +55,7 @@ namespace Smasher {
 
 	private:
 		const UUID m_UUID;
-		Layer& m_GameState;
+		Layer& m_Layer;
 		Engine& m_Engine;
 		std::unordered_map<std::type_index, std::reference_wrapper<IComponent>> m_ComponentsByType;
 	};

@@ -12,10 +12,10 @@ namespace Smasher {
 
 		if constexpr (HasStaticInstantiateManager<T>) {
 			// Use Custom Manager
-			using ManagerType = typename decltype(T::StaticInstantiateManager(m_GameState))::element_type;
+			using ManagerType = typename decltype(T::StaticInstantiateManager(m_Layer))::element_type;
 
 			
-			ManagerType& rManager = static_cast<ManagerType&>(m_GameState.GetComponentManager<T>());
+			ManagerType& rManager = static_cast<ManagerType&>(m_Layer.GetComponentManager<T>());
 			T& rComponent = rManager.AddComponent(*this, std::forward<Args>(componentArgs)...);
 			IComponent& rComponentInterface = static_cast<IComponent&>(rComponent);
 			m_ComponentsByType.emplace(std::type_index(typeid(T)), rComponentInterface);
@@ -24,7 +24,7 @@ namespace Smasher {
 		else {
 			// Use Generic
     		using ManagerType = GenericComponentManager<T>;
-            ManagerType& rManager = static_cast<ManagerType&>(m_GameState.GetComponentManager<T>());
+            ManagerType& rManager = static_cast<ManagerType&>(m_Layer.GetComponentManager<T>());
 			T& rComponent = rManager.AddComponent(*this, std::forward<Args>(componentArgs)...);
 			IComponent& rComponentInterface = static_cast<IComponent&>(rComponent);
 			m_ComponentsByType.emplace(std::type_index(typeid(T)), rComponentInterface);
@@ -40,7 +40,7 @@ namespace Smasher {
 		const std::type_index index = std::type_index(typeid(T));
 		std::reference_wrapper<IComponent>& rComponentPtr = m_ComponentsByType.at(index);
 
-		IComponentManager& manager = m_GameState.template GetComponentManager<T>();
+		IComponentManager& manager = m_Layer.template GetComponentManager<T>();
 		manager.RemoveComponent(rComponentPtr.get());
 		m_ComponentsByType.erase(index);
 	}
