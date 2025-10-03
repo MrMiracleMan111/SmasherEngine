@@ -67,7 +67,7 @@ namespace Smasher {
 	Engine::~Engine()
 	{
 		if (m_Valid) {
-			m_LayerByType.clear();
+			m_LayerStack.clear();
 			if (!m_Headless) {
 				m_EventManager.Unsubscribe(m_WindowCloseHandle); // Explicilty unsubscribe before EventManager is deconstructed
 			}
@@ -76,7 +76,7 @@ namespace Smasher {
 
 	Engine::Engine(Engine&& other) noexcept : 
 		m_Headless(other.m_Headless),
-		m_LayerByType(std::move(other.m_LayerByType)),
+		m_LayerStack(std::move(other.m_LayerStack)),
 		m_Window(std::move(other.m_Window)),
 		m_IsWindowOpen(other.m_IsWindowOpen),
 		m_EventManager(std::move(other.m_EventManager)),
@@ -161,7 +161,8 @@ namespace Smasher {
 	}
 
 	void Engine::Update(Millisecond delta) {
-		for (auto& [_, pLayer] : m_LayerByType) {
+		for (auto& itr : m_LayerStack) {
+			std::unique_ptr<Layer>& pLayer = itr.second;
 			m_UpdateTimestamp = std::chrono::system_clock::now();
 			if (pLayer->GetStatus() == LayerStatus::ACTIVE) {
 				pLayer->PreUpdate(delta);
@@ -178,7 +179,8 @@ namespace Smasher {
 		//rWindow.pushGLStates();
 		m_Window->clear();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear Screen And Depth Buffer
-		for (const auto& [_, pLayer] : m_LayerByType) {
+		for (auto& itr : m_LayerStack) {
+			std::unique_ptr<Layer>& pLayer = itr.second;
 			m_RenderTimestamp = std::chrono::system_clock::now();
 
 			if (pLayer->GetStatus() == LayerStatus::ACTIVE) {
@@ -189,6 +191,7 @@ namespace Smasher {
 			Millisecond diff = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - m_RenderTimestamp);
 			pLayer->SetRenderTime(diff);
 		}
+
 		m_Window->display();
 		//rWindow.popGLStates();
 
