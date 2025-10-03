@@ -34,6 +34,10 @@ namespace Smasher {
 		m_Engine.Shutdown();
 	}
 
+	Entity& Layer::AddEntity() {
+		return AddEntity<Entity>();
+	};
+
 	Entity& Layer::GetEntity(UUID uuid) {
 		auto itr = m_EntityMap.find(uuid);
 		if (itr == m_EntityMap.end()) {

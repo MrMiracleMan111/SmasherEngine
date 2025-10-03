@@ -60,6 +60,8 @@ namespace Smasher {
 		template <class T, typename... Args>
 		T& AddEntity(Args&&... componentArgs);
 
+		Entity& AddEntity();
+
 		void RemoveEntity(UUID uuid);
 
         // Component Type <T>
