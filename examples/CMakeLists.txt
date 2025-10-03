@@ -56,3 +56,14 @@ add_dependencies(BasicResourceLoadExample generate_manifest_BasicResourceLoadExa
 target_compile_features(BasicResourceLoadExample PUBLIC cxx_std_20)
 target_include_directories (BasicResourceLoadExample PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "basic_resource_load/include" "basic_resource_load/src")
 target_link_libraries( BasicResourceLoadExample PRIVATE SmasherEngine )
+
+# Multiple Layers Example
+add_custom_target(generate_manifest_MultipleLayersExample DEPENDS Manifest.h)
+add_executable (MultipleLayersExample "multiple_layers/main.cpp" "multiple_layers/src/TopLayer.cpp" "multiple_layers/src/MidLayer.cpp" "multiple_layers/src/BottomLayer.cpp")
+
+set_target_properties(MultipleLayersExample PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${SMASHER_ENGINE_OUTPUT_DIR}")
+set_target_properties(MultipleLayersExample PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${SMASHER_ENGINE_OUTPUT_DIR}")
+add_dependencies(MultipleLayersExample generate_manifest_MultipleLayersExample)
+target_compile_features(MultipleLayersExample PUBLIC cxx_std_20)
+target_include_directories (MultipleLayersExample PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "multiple_layers/include" "multiple_layers/src")
+target_link_libraries( MultipleLayersExample PRIVATE SmasherEngine )
