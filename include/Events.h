@@ -13,13 +13,17 @@ namespace Smasher {
 	using SMASHER_TIMESTAMP = std::chrono::time_point<std::chrono::system_clock>;
 
 	struct SMASHER_API Event {
+		friend class EventManager;
 		SMASHER_TIMESTAMP Timestamp;
 		virtual EventType GetEventType() const = 0;
 		virtual ~Event() {}
 		Event() = delete;
 
+		void StopPropagate() { Propagate = false; };
+
 	protected:
 		Event(SMASHER_TIMESTAMP timestamp) : Timestamp(timestamp) {}
+		bool Propagate = true; // When set to false, event subscriptions will stop handling this event
 	};
 
 	namespace Events {	

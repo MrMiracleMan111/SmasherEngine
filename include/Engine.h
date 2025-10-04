@@ -59,7 +59,7 @@ namespace Smasher {
 		void BENCHMARK_LogAccumulatedTime();
 #endif
 		Engine(bool headless); // Headless constructor
-		void OnWindowClose(const Events::WindowCloseEvent& event);
+		void OnWindowClose(Events::WindowCloseEvent& event);
 
 		bool m_Valid = true; // Becomes false if this object is moved
 		std::vector <std::pair<std::type_index, std::unique_ptr<Layer>>> m_LayerStack;

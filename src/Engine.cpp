@@ -221,7 +221,7 @@ namespace Smasher {
 	}
 #endif
 
-	void Engine::OnWindowClose(const Events::WindowCloseEvent& event) {
+	void Engine::OnWindowClose(Events::WindowCloseEvent& event) {
 		m_RunningAtomic = false;
 	}
 

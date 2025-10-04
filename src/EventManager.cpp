@@ -49,23 +49,27 @@ namespace Smasher {
 	}
 
 	void EventManager::Dispatch() {
-		for (const auto& pEvent : m_EventQueue ) {
+		for (auto& pEvent : m_EventQueue) {
 			std::size_t index = static_cast<std::size_t>(pEvent->GetEventType());
 			auto& subscriptionList = (*m_EventSubscriptionsByTypePtr)[index];
 			for (auto& subsription : subscriptionList) {
 				subsription.Callback(*pEvent.get());
+				if (!pEvent->Propagate)
+					break;
 			}
 		}
 		m_EventQueue.clear();
 	}
 
 	void EventManager::DispatchAsync() {
-		for (const auto& pEvent : m_AsyncEventQueue) {
+		for (auto& pEvent : m_AsyncEventQueue) {
 			std::scoped_lock lock(m_AsyncSubscriptionsMutex);
 			std::size_t index = static_cast<std::size_t>(pEvent->GetEventType());
 			auto& subscriptionList = (*m_AsyncEventSubscriptionsByTypePtr)[index];
 			for (auto& subsription : subscriptionList) {
 				subsription.Callback(*pEvent.get());
+				if (!pEvent->Propagate)
+					break;
 			}
 		}
 		m_AsyncEventQueue.clear();
