@@ -7,7 +7,7 @@ public:
 	SerializeLayer(Smasher::Engine& engine) : Smasher::Layer(engine) {}
 
 	void Init() override;
-	void OnClose(const Smasher::Events::WindowCloseEvent& e);
+	void OnClose(Smasher::Events::WindowCloseEvent& e);
 	Smasher::Entity& SpawnBouncingBall(sf::Vector2i position);
 
 private:

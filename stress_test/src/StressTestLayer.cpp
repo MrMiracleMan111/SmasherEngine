@@ -152,7 +152,7 @@ void StressTestLayer::Render(sf::RenderWindow& rWindow) {
 }
 
 // Spawn an entity at mouse position
-void StressTestLayer::OnMouseMove(const Smasher::Events::MouseMoveEvent& event) {
+void StressTestLayer::OnMouseMove(Smasher::Events::MouseMoveEvent& event) {
 	sf::Window& rWindow = GetEngine().GetWindow();
 	sf::Vector2i entityPos = sf::Vector2i(event.Position) - rWindow.getPosition();
 	Smasher::Entity& ball = SpawnBouncingBall(entityPos);

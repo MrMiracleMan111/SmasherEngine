@@ -13,7 +13,7 @@ namespace Smasher {
 		m_ResizeHandle = rEventManager.Subscribe<Events::WindowResizeEvent>(&CameraComponent::OnWindowResize, this);
 	}
 
-	void CameraComponent::OnWindowResize(const Events::WindowResizeEvent& event) {
+	void CameraComponent::OnWindowResize(Events::WindowResizeEvent& event) {
 		m_View.setSize((float)event.WindowSize.x, (float)event.WindowSize.y);
 	}
 

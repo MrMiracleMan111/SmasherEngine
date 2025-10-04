@@ -240,7 +240,7 @@ namespace Smasher {
 		}
 	}
 
-	void DrawableComponentManager::OnWindowClose(const Events::WindowCloseEvent& event) {
+	void DrawableComponentManager::OnWindowClose(Events::WindowCloseEvent& event) {
 		// Invalidate all Batch Contexts
 		for (auto& itr : m_Components) {
 			itr.m_OpaqueBatchContext.Invalidate(); // Invalidate it

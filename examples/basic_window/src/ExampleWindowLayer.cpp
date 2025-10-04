@@ -17,7 +17,7 @@ void ExampleWindowLayer::Render(sf::RenderWindow& window) {
 
 }
 
-void ExampleWindowLayer::OnKeyPress(const Smasher::Events::KeyboardEvent& e) {
+void ExampleWindowLayer::OnKeyPress(Smasher::Events::KeyboardEvent& e) {
 	std::string type = "NA";
 	switch (e.Type) {
 		case Smasher::Keyboard::KeyboardEventType::KEY_PRESS:

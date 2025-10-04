@@ -22,7 +22,7 @@ public:
 	void Render(sf::RenderWindow& rWindow) override;
 
 private:
-	void OnMouseMove(const Smasher::Events::MouseMoveEvent& event);
+	void OnMouseMove(Smasher::Events::MouseMoveEvent& event);
 	Smasher::Entity& SpawnBouncingBall(sf::Vector2i position);
 
 	Smasher::Millisecond m_UpdateTimeSum;

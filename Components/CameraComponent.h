@@ -25,7 +25,7 @@ namespace Smasher {
 
 
 		void OnAddComponent() override;
-		void OnWindowResize(const Events::WindowResizeEvent& event);
+		void OnWindowResize(Events::WindowResizeEvent& event);
 
 		const sf::View& GetView() const { return m_View; };
 		sf::Vector2f GetPosition() const { return m_View.getCenter(); };

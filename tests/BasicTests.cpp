@@ -265,7 +265,7 @@ TEST(ResourcesTest, OpenReleaseFileResource) {
 }
 
 
-void TestCallback(const Smasher::Events::DummyEvent& e) {};
+void TestCallback(Smasher::Events::DummyEvent& e) {};
 
 
 TEST(EventsTest, InvalidEventHandle) {
@@ -300,7 +300,7 @@ TEST(EventsTest, SinglePublishEvent) {
 	Smasher::EventManager& manager = state.GetEventManager();
 
 	int triggered_count = 0;
-	std::function<void(const Smasher::Events::DummyEvent&)> callback = [&triggered_count](const Smasher::Events::DummyEvent& event) {
+	std::function<void(Smasher::Events::DummyEvent&)> callback = [&triggered_count](Smasher::Events::DummyEvent& event) {
 		++triggered_count;
 	};
 	Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::Events::DummyEvent>(callback);
@@ -317,8 +317,8 @@ TEST(EventsTest, MultiplePublishEvent) {
 	Smasher::EventManager& manager = state.GetEventManager();
 
 	int triggered_count = 0;
-	std::function<void(const Smasher::Events::DummyEvent&)> callback =
-	[&triggered_count](const Smasher::Events::DummyEvent& event) {
+	std::function<void(Smasher::Events::DummyEvent&)> callback =
+	[&triggered_count](Smasher::Events::DummyEvent& event) {
 		triggered_count++;
 	};
 	Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::Events::DummyEvent>(callback);
@@ -338,8 +338,8 @@ TEST(EventsTest, SubscriptionLifetimeTest) {
 	Smasher::EventManager& manager = state.GetEventManager();
 
 	int triggered_count = 0;
-	std::function<void(const Smasher::Events::DummyEvent&)> callback =
-		[&triggered_count](const Smasher::Events::DummyEvent& event) {
+	std::function<void(Smasher::Events::DummyEvent&)> callback =
+		[&triggered_count](Smasher::Events::DummyEvent& event) {
 		triggered_count++;
 		};
 
@@ -364,8 +364,8 @@ TEST(EventsTest, SubscriptionLifetimeHandoffTest) {
 	Smasher::EventManager& manager = state.GetEventManager();
 
 	int triggered_count = 0;
-	std::function<void(const Smasher::Events::DummyEvent&)> callback =
-		[&triggered_count](const Smasher::Events::DummyEvent& event) {
+	std::function<void(Smasher::Events::DummyEvent&)> callback =
+		[&triggered_count](Smasher::Events::DummyEvent& event) {
 		triggered_count++;
 		};
 
@@ -405,7 +405,7 @@ TEST(EventsTest, SinglePublishUnsubscribeEvent) {
 	Smasher::EventManager& manager = state.GetEventManager();
 
 	int triggered_count = 0;
-	std::function<void(const Smasher::Events::DummyEvent&)> callback = [&triggered_count](const Smasher::Events::DummyEvent& event) {
+	std::function<void(Smasher::Events::DummyEvent&)> callback = [&triggered_count](Smasher::Events::DummyEvent& event) {
 		++triggered_count;
 		};
 	Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::Events::DummyEvent>(callback);
@@ -427,14 +427,14 @@ TEST(EventsTest, MultiplePublishMultipleSubscribeEvent) {
 	Smasher::EventManager& manager = state.GetEventManager();
 
 	int triggered_count_1 = 0;
-	std::function<void(const Smasher::Events::DummyEvent&)> callback1 =
-		[&triggered_count_1](const Smasher::Events::DummyEvent& event) {
+	std::function<void(Smasher::Events::DummyEvent&)> callback1 =
+		[&triggered_count_1](Smasher::Events::DummyEvent& event) {
 		triggered_count_1++;
 		};
 
 	int triggered_count_2 = 0;
-	std::function<void(const Smasher::Events::DummyEventExtra&)> callback2 =
-		[&triggered_count_2](const Smasher::Events::DummyEventExtra& event) {
+	std::function<void(Smasher::Events::DummyEventExtra&)> callback2 =
+		[&triggered_count_2](Smasher::Events::DummyEventExtra& event) {
 		triggered_count_2++;
 		};
 
@@ -457,7 +457,7 @@ TEST(EventsTest, MoveEventManagerSync) {
 	try {
 		Smasher::EventManager manager;
 		int count = 10;
-		auto incrementFunc = [&count](const Smasher::Events::DummyEvent&) {
+		auto incrementFunc = [&count](Smasher::Events::DummyEvent&) {
 			count += 5;
 		};
 
@@ -481,7 +481,7 @@ TEST(EventsTest, MoveEventManagerAsync) {
 	try {
 		Smasher::EventManager manager;
 		int count = 10;
-		auto incrementFunc = [&count](const Smasher::Events::DummyEvent&) {
+		auto incrementFunc = [&count](Smasher::Events::DummyEvent&) {
 			std::this_thread::sleep_for(std::chrono::seconds(1));
 			count += 5;
 		};
@@ -514,7 +514,7 @@ TEST(AsyncEventTest, PublishEvent) {
 	DummyLayer& state = engine.PushLayer<DummyLayer>();
 	Smasher::EventManager& manager = state.GetEventManager();
 	int count = 10;
-	auto incrementFunc = [&count] (const Smasher::Events::DummyEvent&) {
+	auto incrementFunc = [&count] (Smasher::Events::DummyEvent&) {
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 		count += 5;
 	};
@@ -531,7 +531,7 @@ TEST(AsyncEventTest, MultiplePublishEvent) {
 	DummyLayer& state = engine.PushLayer<DummyLayer>();
 	Smasher::EventManager& manager = state.GetEventManager();
 	int count = 10;
-	auto incrementFunc = [&count](const Smasher::Events::DummyEvent&) {
+	auto incrementFunc = [&count](Smasher::Events::DummyEvent&) {
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 		count += 5;
 	};

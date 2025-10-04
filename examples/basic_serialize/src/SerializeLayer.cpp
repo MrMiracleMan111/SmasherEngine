@@ -78,7 +78,7 @@ Smasher::Entity& SerializeLayer::SpawnBouncingBall(sf::Vector2i position)
 	return image;
 }
 
-void SerializeLayer::OnClose(const Smasher::Events::WindowCloseEvent& e)
+void SerializeLayer::OnClose(Smasher::Events::WindowCloseEvent& e)
 {
 	// Open save file
 	std::fstream saveFile("SaveFile.bin", std::ios_base::out | std::ios_base::binary);

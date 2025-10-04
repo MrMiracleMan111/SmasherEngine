@@ -11,6 +11,6 @@ public:
 	void Render(sf::RenderWindow& window) override;
 
 private:
-	void OnKeyPress(const Smasher::Events::KeyboardEvent& e);
+	void OnKeyPress(Smasher::Events::KeyboardEvent& e);
 	Smasher::EventSubscriptionHandle m_KeyPressSubscription;
 };
