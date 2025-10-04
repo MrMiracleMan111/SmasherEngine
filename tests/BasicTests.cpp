@@ -332,6 +332,39 @@ TEST(EventsTest, MultiplePublishEvent) {
 }
 
 
+TEST(EventsTest, StopPropagateEvent) {
+	Smasher::Engine engine(640, 420);
+	DummyLayer& state = engine.PushLayer<DummyLayer>();
+	Smasher::EventManager& manager = state.GetEventManager();
+
+	int triggered_count = 0;
+	std::function<void(Smasher::Events::DummyEvent&)> callback1 = [&triggered_count](Smasher::Events::DummyEvent& event) {
+		++triggered_count;
+	};
+	Smasher::EventSubscriptionHandle handle1 = manager.Subscribe<Smasher::Events::DummyEvent>(callback1);
+	Smasher::EventSubscriptionHandle handle2 = manager.Subscribe<Smasher::Events::DummyEvent>(callback1);
+
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
+	manager.Dispatch();
+	manager.Dispatch();
+	manager.Unsubscribe(handle1);
+	manager.Unsubscribe(handle2);
+	EXPECT_EQ(2, triggered_count);
+
+	triggered_count = 0;
+
+	std::function<void(Smasher::Events::DummyEvent&)> callback2 = [&triggered_count](Smasher::Events::DummyEvent& event) {
+		++triggered_count;
+		event.StopPropagate();
+	};
+	Smasher::EventSubscriptionHandle handle3 = manager.Subscribe<Smasher::Events::DummyEvent>(callback2);
+	Smasher::EventSubscriptionHandle handle4 = manager.Subscribe<Smasher::Events::DummyEvent>(callback2);
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
+	manager.Dispatch();
+	manager.Dispatch();
+	EXPECT_EQ(1, triggered_count);
+}
+
 TEST(EventsTest, SubscriptionLifetimeTest) {
 	Smasher::Engine engine(640, 420);
 	DummyLayer& state = engine.PushLayer<DummyLayer>();
