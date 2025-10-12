@@ -101,7 +101,8 @@ namespace Smasher {
 		ShaderResource(ResourceID id,
 			const ResourcePath* const relativePaths, const std::size_t numPaths,
 			const ResourcePath& resourcesDirectory) :
-			Resource(id, relativePaths, numPaths, resourcesDirectory) {
+			Resource(id, relativePaths, numPaths, resourcesDirectory),
+			m_ShaderType{sf::Shader::Type::Fragment}  {
 			
 			switch (numPaths) {
 			case 1:
@@ -126,7 +127,7 @@ namespace Smasher {
 
 	private:
 		sf::Shader m_Shader;
-		sf::Shader::Type m_ShaderType;
+		sf::Shader::Type m_ShaderType = sf::Shader::Type::Fragment;
 	};
 
 	class SMASHER_API FileResource : public Resource {
