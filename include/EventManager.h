@@ -62,8 +62,6 @@ namespace Smasher {
 		friend struct EventSubscriptionHandle;
 	public:
 		EventManager() :
-			m_EventSubscriptionsByTypePtr(std::make_unique<std::array<std::list<EventSubscription>, static_cast<std::size_t>(EventType::END)>>()),
-			m_AsyncEventSubscriptionsByTypePtr(std::make_unique<std::array<std::list<EventSubscription>, static_cast<std::size_t>(EventType::END)>>()),
 			m_AsyncEventConsumerThread(&EventManager::AsyncEventConsumer, this),
 			m_EventQueue(),
 			m_AsyncEventQueue() {}
@@ -77,13 +75,13 @@ namespace Smasher {
 		template<class T>
 		EventSubscriptionHandle Subscribe(std::function<void(T&)> callback) {
 			static_assert(std::is_base_of<Event, T>::value, "T must inherit from Event");
-			
-			constexpr std::size_t index = static_cast<std::size_t>(T::GetStaticEventType());
-			std::list<EventSubscription>& list = m_EventSubscriptionsByTypePtr->at(index);
-			
+
+			const std::type_index index = std::type_index(typeid(T));
+			std::list<EventSubscription>& list = m_EventSubscriptionsByType[index];
+
 			auto bound = [callback](Event& arg) {callback(static_cast<T&>(arg)); };
-			
 			list.push_back(EventSubscription{ bound });
+
 			return EventSubscriptionHandle{ list, std::prev(list.end()), *this };
 		}
 
@@ -105,12 +103,12 @@ namespace Smasher {
 			std::scoped_lock lock(m_AsyncEventSwapQueueMutex);
 			static_assert(std::is_base_of<Event, T>::value, "T must inherit from Event");
 
-			constexpr std::size_t index = static_cast<std::size_t>(T::GetStaticEventType());
-			std::list<EventSubscription>& list = m_AsyncEventSubscriptionsByTypePtr->at(index);
+			const std::type_index index = std::type_index(typeid(T));
+			std::list<EventSubscription>& list = m_AsyncEventSubscriptionsByType[index];
 
 			auto bound = [callback](Event& arg) {callback(static_cast<T&>(arg)); };
-
 			list.push_back(EventSubscription{ bound });
+
 			return EventSubscriptionHandle{ list, std::prev(list.end()), *this };
 		}
 
@@ -143,8 +141,8 @@ namespace Smasher {
 		void StopAsync(); // Stops async event thread
 
 	private:
-		std::unique_ptr<std::array<std::list<EventSubscription>, static_cast<std::size_t>(EventType::END)>> m_EventSubscriptionsByTypePtr;
-		std::unique_ptr<std::array<std::list<EventSubscription>, static_cast<std::size_t>(EventType::END)>> m_AsyncEventSubscriptionsByTypePtr;
+		std::unordered_map<std::type_index, std::list<EventSubscription>> m_EventSubscriptionsByType;
+		std::unordered_map<std::type_index, std::list<EventSubscription>> m_AsyncEventSubscriptionsByType;
 
 		std::vector<std::shared_ptr<Event>> m_EventQueue;
 		std::vector<std::shared_ptr<Event>> m_AsyncEventQueue; // Events currently being processed in async queue

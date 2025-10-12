@@ -6,12 +6,12 @@ namespace Smasher {
 	}
 
 	EventManager::EventManager(EventManager&& other) noexcept :
-		m_EventSubscriptionsByTypePtr(std::move(other.m_EventSubscriptionsByTypePtr)),
+		m_EventSubscriptionsByType(std::move(other.m_EventSubscriptionsByType)),
 		m_EventQueue(std::move(other.m_EventQueue)),
 		m_AsyncRunning(false)
 	{
 		other.StopAsync();
-		m_AsyncEventSubscriptionsByTypePtr = std::move(other.m_AsyncEventSubscriptionsByTypePtr);
+		m_AsyncEventSubscriptionsByType = std::move(other.m_AsyncEventSubscriptionsByType);
 		m_AsyncEventQueue = std::move(other.m_AsyncEventQueue);
 		m_AsyncEventSwapQueue = std::move(other.m_AsyncEventSwapQueue);
 		m_AsyncRunning = true;
@@ -27,8 +27,8 @@ namespace Smasher {
 			// Wait for async events to finish processing
 			other.StopAsync();
 
-			m_EventSubscriptionsByTypePtr = std::move(other.m_EventSubscriptionsByTypePtr);
-			m_AsyncEventSubscriptionsByTypePtr = std::move(other.m_AsyncEventSubscriptionsByTypePtr);
+			m_EventSubscriptionsByType = std::move(other.m_EventSubscriptionsByType);
+			m_AsyncEventSubscriptionsByType = std::move(other.m_AsyncEventSubscriptionsByType);
 			m_EventQueue = std::move(other.m_EventQueue);
 			m_AsyncEventQueue = std::move(other.m_AsyncEventQueue);
 			m_AsyncEventSwapQueue = std::move(other.m_AsyncEventSwapQueue);
@@ -50,8 +50,13 @@ namespace Smasher {
 
 	void EventManager::Dispatch() {
 		for (auto& pEvent : m_EventQueue) {
-			std::size_t index = static_cast<std::size_t>(pEvent->GetEventType());
-			auto& subscriptionList = (*m_EventSubscriptionsByTypePtr)[index];
+			const std::type_index index = pEvent->GetEventType();
+			//std::cout << index.name() << std::endl;
+			//std::cout << "Retrieve" << std::endl;
+			/*if (m_EventSubscriptionsByType.find(index) == m_EventSubscriptionsByType.end()) {
+				std::cout << "Generated new subscription list" << std::endl;
+			}*/
+			auto& subscriptionList = m_EventSubscriptionsByType[index];
 			for (auto& subsription : subscriptionList) {
 				subsription.Callback(*pEvent.get());
 				if (!pEvent->Propagate)
@@ -64,8 +69,9 @@ namespace Smasher {
 	void EventManager::DispatchAsync() {
 		for (auto& pEvent : m_AsyncEventQueue) {
 			std::scoped_lock lock(m_AsyncSubscriptionsMutex);
-			std::size_t index = static_cast<std::size_t>(pEvent->GetEventType());
-			auto& subscriptionList = (*m_AsyncEventSubscriptionsByTypePtr)[index];
+			const std::type_index index = pEvent->GetEventType();
+			std::string typeName = index.name();
+			auto& subscriptionList = m_AsyncEventSubscriptionsByType[index];
 			for (auto& subsription : subscriptionList) {
 				subsription.Callback(*pEvent.get());
 				if (!pEvent->Propagate)
