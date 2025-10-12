@@ -399,11 +399,11 @@ TEST(EventsTest, SubscriptionLifetimeHandoffTest) {
 	int triggered_count = 0;
 	std::function<void(Smasher::Events::DummyEvent&)> callback =
 		[&triggered_count](Smasher::Events::DummyEvent& event) {
-		triggered_count++;
+			triggered_count++;
 		};
 
 	{
-		// "handle" will be unsubscribed once it goes out of scope
+		// "tmp" will be unsubscribed once it goes out of scope
 		Smasher::EventSubscriptionHandle tmp;
 		manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
 		manager.Dispatch();
@@ -417,11 +417,11 @@ TEST(EventsTest, SubscriptionLifetimeHandoffTest) {
 			manager.Dispatch();
 			tmp = std::move(handle); // handoff
 		}
+
 		manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
 		manager.Dispatch();
 		manager.Dispatch();
 		manager.Dispatch();
-
 	}
 
 	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 2");
