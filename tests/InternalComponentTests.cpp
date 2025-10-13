@@ -29,7 +29,7 @@ public:
 	}
 
 	int GetData1() const { return m_Data1; }
-	int GetData2() const { return m_Data2; }
+	std::size_t GetData2() const { return m_Data2; }
 	const std::string& GetData3() const { return m_Data3; }
 
 private:
