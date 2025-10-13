@@ -22,11 +22,11 @@ namespace Smasher {
 		Engine(int width, int height, const sf::ContextSettings& settings);
 		~Engine();
 
-		// Non-Copyable
+		// non-copyable, moveable
 		Engine(const Engine&) = delete;
 		Engine(Engine&& other) noexcept;
 		Engine& operator =(const Engine&) = delete;
-		Engine& operator =(Engine&& other) = delete;
+		Engine& operator =(Engine&& other) noexcept;
 
 		static Engine CreateHeadless();
 
@@ -65,7 +65,7 @@ namespace Smasher {
 		std::vector <std::pair<std::type_index, std::unique_ptr<Layer>>> m_LayerStack;
 		std::unique_ptr<sf::RenderWindow> m_Window = nullptr;
 		std::atomic_bool m_RunningAtomic = true;
-		const bool m_Headless = false;
+		bool m_Headless = false;
 		bool m_IsWindowOpen = false; // Needed to prevent double delete on Window Context
 		std::mutex m_WindowMutex; // Prevent double delete on Window Context
 		EventManager m_EventManager;
