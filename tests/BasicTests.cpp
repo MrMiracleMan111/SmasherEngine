@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <fstream>
 #include <iostream>
+#include <type_traits>
 #include "Core.h"
 #include "BaseComponentManager.h"
 #include "Entity.h"
@@ -129,6 +130,45 @@ public:
 private:
 	int m_Value = 0;
 };
+
+TEST(TraitChecks, EngineTraits) {
+	// Engine should generally be non-copyable, moveable
+	static_assert(!std::is_copy_constructible_v<Smasher::Engine>);
+	static_assert(!std::is_copy_assignable_v<Smasher::Engine>);
+	static_assert(std::is_move_constructible_v<Smasher::Engine>);
+	static_assert(std::is_move_assignable_v<Smasher::Engine>);
+	EXPECT_TRUE(true);
+}
+
+TEST(TraitChecks, ManagerTraits) {
+	// Managers should generally be non-copyable, moveable
+	static_assert(!std::is_copy_constructible_v<Smasher::EventManager>);
+	static_assert(!std::is_copy_assignable_v<Smasher::EventManager>);
+	static_assert(std::is_move_constructible_v<Smasher::EventManager>);
+	static_assert(std::is_move_assignable_v<Smasher::EventManager>);
+
+	// ResourceManager is non-copyable, moveable
+	static_assert(!std::is_copy_constructible_v<Smasher::ResourceManager>);
+	static_assert(!std::is_copy_assignable_v<Smasher::ResourceManager>);
+	static_assert(std::is_move_constructible_v<Smasher::ResourceManager>);
+	static_assert(std::is_move_assignable_v<Smasher::ResourceManager>);
+	EXPECT_TRUE(true);
+}
+
+TEST(TraitChecks, EventSubscription) {
+	// EventSubscriptionHandle should be non-copyable, non-move-assignable, move-constructible
+	static_assert(!std::is_copy_constructible_v<Smasher::EventSubscription>);
+	static_assert(!std::is_copy_assignable_v<Smasher::EventSubscription>);
+	static_assert(std::is_move_constructible_v<Smasher::EventSubscription>);
+	static_assert(!std::is_move_assignable_v<Smasher::EventSubscription>);
+
+	// EventSubscriptionHandle should be non-copyable, move-assignable, move-constructible
+	static_assert(!std::is_copy_constructible_v<Smasher::EventSubscriptionHandle>);
+	static_assert(!std::is_copy_assignable_v<Smasher::EventSubscriptionHandle>);
+	static_assert(std::is_move_constructible_v<Smasher::EventSubscriptionHandle>);
+	static_assert(std::is_move_assignable_v<Smasher::EventSubscriptionHandle>);
+	EXPECT_TRUE(true);
+}
 
 TEST(EntityTest, AddEnttiy) {
 	Smasher::Engine engine(640, 420);
