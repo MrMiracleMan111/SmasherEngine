@@ -15,7 +15,7 @@ namespace Smasher {
 	class EventManager;
 
 	struct EventSubscription {
-		std::function<void(Event&)> Callback;
+		std::function<void(Event&)> Callback; // Event callback function
 		EventSubscription(std::function<void(Event&)> callback) : Callback(callback) {}
 		~EventSubscription() {};
 
