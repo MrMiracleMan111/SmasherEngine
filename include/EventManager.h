@@ -51,8 +51,8 @@ namespace Smasher {
 		void Invalidate() { m_Valid = false; }
 
 	private:
-		std::list<EventSubscription>* m_SubscriptionListPtr = nullptr;
-		std::list<EventSubscription>::iterator m_Itr;
+		std::list<EventSubscription>* m_SubscriptionListPtr = nullptr; // List containing this subscription
+		std::list<EventSubscription>::iterator m_Itr; // Location of this subscription within the list
 		EventManager* m_EventManagerPtr = nullptr;
 		bool m_Valid = false;
 	};
