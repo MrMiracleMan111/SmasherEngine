@@ -45,7 +45,7 @@ protected:
 	int m_Value;
 };
 
-struct CustomComponentManager;
+class CustomComponentManager;
 
 struct CustomComponent : public Smasher::IComponent {
 	SMASHER_USE_COMPONENT_MANAGER(CustomComponentManager)
