@@ -92,6 +92,27 @@ namespace Smasher {
 		other.m_Valid = false;
 	}
 
+	Engine& Engine::operator =(Engine&& other) noexcept
+	{
+		if (&other != this) {
+			m_Headless = other.m_Headless;
+			m_LayerStack = std::move(other.m_LayerStack);
+			m_Window = std::move(other.m_Window);
+			m_IsWindowOpen = other.m_IsWindowOpen;
+			m_EventManager = std::move(other.m_EventManager);
+			m_ResourceManager = std::move(other.m_ResourceManager);
+			m_WindowCloseHandle = std::move(other.m_WindowCloseHandle);
+			m_UpdateTimestamp = other.m_UpdateTimestamp;
+			m_RenderTimestamp = other.m_RenderTimestamp;
+			m_UpdateInterval = other.m_UpdateInterval;
+			m_RenderInterval = other.m_RenderInterval;
+			bool tmp = other.m_RunningAtomic;
+			m_RunningAtomic = tmp;
+			other.m_Valid = false;
+		}
+		return *this;
+	}
+
 	Engine Engine::CreateHeadless()
 	{
 		return Engine(true);
