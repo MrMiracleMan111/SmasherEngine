@@ -17,20 +17,8 @@ namespace Smasher {
 		};
 
 		IComponent& operator = (const IComponent& other) = delete;
-		IComponent& operator = (IComponent&& other) noexcept {
-			if (this != &other) {
-				m_Entity = other.m_Entity;
-				m_Status = other.m_Status;
-				m_Manager = other.m_Manager;
-				other.m_Status = ComponentStatus::INVALID;
-			}
-			return *this;
-		}
-		virtual ~IComponent() {
-			m_Entity = nullptr;
-			m_Manager = nullptr;
-			m_Status = ComponentStatus::INVALID;
-		};
+		IComponent& operator = (IComponent&& other) noexcept;
+		virtual ~IComponent();
 
 		ComponentStatus GetStatus() const { return m_Status; }
 		Entity& GetEntity() const { return *m_Entity; }
@@ -47,14 +35,12 @@ namespace Smasher {
 		virtual void SetEntity(Entity& pEntity) { m_Entity = &pEntity; }
 		void SetManager(IComponentManager& pManager) { m_Manager = &pManager; }
 		virtual void OnAddComponent() {}; // called when component has been initialiazed and added
+		
 		template<class T>
-		void SetIterator(typename plf::colony<T>::iterator* itrPtr) {
-			m_ItrPtr = itrPtr;
-		}
+		void SetIterator(typename plf::colony<T>::iterator* itrPtr) { m_ItrPtr = itrPtr; }
+
 		template<class T>
-		typename plf::colony<T>::iterator* GetIterator() {
-			return static_cast<typename plf::colony<T>::iterator*>(m_ItrPtr);
-		}
+		typename plf::colony<T>::iterator* GetIterator() { return static_cast<typename plf::colony<T>::iterator*>(m_ItrPtr); }
 
 	private:
 		void* m_ItrPtr = nullptr; // Taboo but necessary
