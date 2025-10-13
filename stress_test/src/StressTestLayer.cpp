@@ -24,7 +24,7 @@ Smasher::Entity& StressTestLayer::SpawnBouncingBall(sf::Vector2i position)
 	float depth = (float)(rand() % 100) / 100.0f;
 	Smasher::Entity& image = AddEntity<Smasher::Entity>();
 	image.AddComponent<Smasher::DrawableComponent>()
-		.SetPosition(sf::Vector2f(position.x, position.y))
+		.SetPosition(sf::Vector2f((float)position.x, (float)position.y))
 		.SetScale(sf::Vector2f(20.0f, 20.0f))
 		.SetDepth(depth)
 		.GetEntity()
@@ -36,7 +36,7 @@ Smasher::Entity& StressTestLayer::SpawnBouncingBall(sf::Vector2i position)
 void StressTestLayer::Init()
 {
 	std::shared_ptr<Smasher::ShaderResource> pShader = GetEngine().GetResourceManager().GetOrLoadResource<Smasher::Resources::Shaders::basic_texture_shader, Smasher::ShaderResource>();
-	sf::Vector2f windowSize = sf::Vector2f(GetEngine().GetWindow().getSize().x, GetEngine().GetWindow().getSize().y);
+	sf::Vector2f windowSize = sf::Vector2f((float)GetEngine().GetWindow().getSize().x, (float)GetEngine().GetWindow().getSize().y);
 	sf::Glsl::Mat4 viewProjectionMatrix = sf::Glsl::Mat4(GetEngine().GetWindow().getView().getTransform().getMatrix());
 	pShader->GetShader().setUniform("windowSize", windowSize);
 	pShader->GetShader().setUniform("ViewProjectionMatrix", viewProjectionMatrix);
@@ -85,8 +85,8 @@ void StressTestLayer::Init()
 	// Add camera and apply it to window
 	rCamera
 		.AddComponent<Smasher::CameraComponent>()
-			.SetSize(sf::Vector2f(GetEngine().GetWindow().getSize().x,
-								  GetEngine().GetWindow().getSize().y))
+			.SetSize(sf::Vector2f((float)GetEngine().GetWindow().getSize().x,
+								  (float)GetEngine().GetWindow().getSize().y))
 			.SetTarget(GetEngine().GetWindow())
 			.ApplyToTarget();
 
@@ -99,8 +99,8 @@ void StressTestLayer::Init()
 	// Half will have a non-alpha image
 	// Half will have image with alpha pixels
 	for (std::size_t i = 0; i < m_NumEntities; ++i) {
-		float positionX = (float)((rand() % 100) * 5);
-		float positionY = (float)((rand() % 100) * 5);
+		int positionX = int((rand() % 100) * 5);
+		int positionY = int((rand() % 100) * 5);
 		Smasher::Entity& image = SpawnBouncingBall(sf::Vector2i(positionX, positionY));
 
 		if (i % 2 == 0) {
