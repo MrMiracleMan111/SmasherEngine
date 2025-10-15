@@ -26,7 +26,7 @@ namespace Smasher {
 		BaseComponentManager<DrawableComponent>(state) {
 
 		EventManager& rEventManager = state.GetEngine().GetEventManager();
-		EventSubscriptionHandle handle = rEventManager.Subscribe<Events::WindowCloseEvent>(
+		EventSubscriptionHandle handle = GetLayer().Subscribe<Events::WindowCloseEvent>(
 			&DrawableComponentManager::OnWindowClose, this
 		);
 	}
