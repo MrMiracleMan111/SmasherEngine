@@ -38,16 +38,6 @@ namespace Smasher {
 		return *this;
 	}
 
-	void EventManager::Unsubscribe(EventSubscriptionHandle& handle) {
-		if (!handle.IsValid()) {
-			throw Exceptions::EventHandleInvalid("Handle is invalid");
-		}
-		handle.Invalidate();
-
-		std::scoped_lock lock(m_AsyncSubscriptionsMutex);
-		handle.m_SubscriptionListPtr->erase(handle.m_Itr);
-	}
-
 	void EventManager::Dispatch() {
 		for (auto& pEvent : m_EventQueue) {
 			const std::type_index index = pEvent->GetEventType();
@@ -101,6 +91,16 @@ namespace Smasher {
 			lock.unlock();
 			m_AsyncEventConsumerThread.join();
 		}
+	}
+
+	void EventSubscriptionHandle::Unsubscribe() {
+		if (!IsValid()) {
+			throw Exceptions::EventHandleInvalid("Handle is invalid");
+		}
+		Invalidate();
+
+		std::scoped_lock lock(m_EventManagerPtr->GetAsyncSubscriptionsMutex());
+		m_SubscriptionListPtr->erase(m_Itr);
 	}
 
 	EventSubscriptionHandle::~EventSubscriptionHandle()

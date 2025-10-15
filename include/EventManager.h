@@ -39,6 +39,8 @@ namespace Smasher {
 
 		bool IsValid() const { return m_Valid; }
 
+		void Unsubscribe();
+
 	// Only EventManagers should have privilege to instantiate EventSubscriptionHandles
 	protected:
 		EventSubscriptionHandle(std::list<EventSubscription>& list,
@@ -85,10 +87,6 @@ namespace Smasher {
 			return EventSubscriptionHandle{ list, std::prev(list.end()), *this };
 		}
 
-		// Manually unsubscribes an event handle
-		// EventSubscriptionHandles will automatically unsubscribe
-		// at the end of their lifetime
-		void Unsubscribe(EventSubscriptionHandle& handle);
 
 		// Overload for class memebr function ex:
 		// Subscribe<EventType>(&Class::MemberFunc, classInstancePointer);
