@@ -11,6 +11,7 @@ namespace Smasher {
 
 	struct SMASHER_API Event {
 		friend class EventManager;
+		friend class Layer;
 		SMASHER_TIMESTAMP Timestamp;
 		std::type_index GetEventType() const { return _GetEventType(); }
 
