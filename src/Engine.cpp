@@ -73,9 +73,8 @@ namespace Smasher {
 	Engine::~Engine()
 	{
 		if (m_Valid) {
-			m_LayerStack.clear();
 			if (!m_Headless) {
-				m_EventManager.Unsubscribe(m_WindowCloseHandle); // Explicilty unsubscribe before EventManager is deconstructed
+				m_WindowCloseHandle.Unsubscribe(); // Explicilty unsubscribe before EventManager is deconstructed
 			}
 			m_LayerStack.clear();
 		}
