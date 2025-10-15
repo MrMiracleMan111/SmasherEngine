@@ -1,5 +1,8 @@
 #include "EventManager.h"
 #include "Events.h"
+#include "Engine.h"
+#include "Layer.h"
+
 namespace Smasher {
 	EventManager::~EventManager() {
 		StopAsync();
@@ -8,7 +11,8 @@ namespace Smasher {
 	EventManager::EventManager(EventManager&& other) noexcept :
 		m_EventSubscriptionsByType(std::move(other.m_EventSubscriptionsByType)),
 		m_EventQueue(std::move(other.m_EventQueue)),
-		m_AsyncRunning(false)
+		m_AsyncRunning(false),
+		m_EngineRef(other.m_EngineRef)
 	{
 		other.StopAsync();
 		m_AsyncEventSubscriptionsByType = std::move(other.m_AsyncEventSubscriptionsByType);
@@ -27,6 +31,7 @@ namespace Smasher {
 			// Wait for async events to finish processing
 			other.StopAsync();
 
+			m_EngineRef = other.m_EngineRef;
 			m_EventSubscriptionsByType = std::move(other.m_EventSubscriptionsByType);
 			m_AsyncEventSubscriptionsByType = std::move(other.m_AsyncEventSubscriptionsByType);
 			m_EventQueue = std::move(other.m_EventQueue);
@@ -40,32 +45,22 @@ namespace Smasher {
 
 	void EventManager::Dispatch() {
 		for (auto& pEvent : m_EventQueue) {
-			const std::type_index index = pEvent->GetEventType();
-			//std::cout << index.name() << std::endl;
-			//std::cout << "Retrieve" << std::endl;
-			/*if (m_EventSubscriptionsByType.find(index) == m_EventSubscriptionsByType.end()) {
-				std::cout << "Generated new subscription list" << std::endl;
-			}*/
-			auto& subscriptionList = m_EventSubscriptionsByType[index];
-			for (auto& subsription : subscriptionList) {
-				subsription.Callback(*pEvent.get());
-				if (!pEvent->Propagate)
-					break;
+			auto itr = m_EngineRef.get().m_LayerStack.begin();
+			while (pEvent->Propagate && itr != m_EngineRef.get().m_LayerStack.end()) {
+				itr->second->ProcessEvent(*pEvent);
+				itr++;
 			}
 		}
 		m_EventQueue.clear();
 	}
 
-	void EventManager::DispatchAsync() {
+	void EventManager::DispatchAsync(Engine& engine) {
 		for (auto& pEvent : m_AsyncEventQueue) {
 			std::scoped_lock lock(m_AsyncSubscriptionsMutex);
-			const std::type_index index = pEvent->GetEventType();
-			std::string typeName = index.name();
-			auto& subscriptionList = m_AsyncEventSubscriptionsByType[index];
-			for (auto& subsription : subscriptionList) {
-				subsription.Callback(*pEvent.get());
-				if (!pEvent->Propagate)
-					break;
+			auto itr = engine.m_LayerStack.begin();
+			while (pEvent->Propagate && itr != engine.m_LayerStack.end()) {
+				itr->second->ProcessAsyncEvent(*pEvent);
+				itr++;
 			}
 		}
 		m_AsyncEventQueue.clear();
@@ -77,7 +72,7 @@ namespace Smasher {
 			m_AsyncEventsCV.wait(lock, [=] { return (m_AsyncEventSwapQueue.size() > 0 || !m_AsyncRunning); });
 			m_AsyncEventSwapQueueMutex.lock();
 			std::swap(m_AsyncEventSwapQueue, m_AsyncEventQueue);
-			DispatchAsync();
+			DispatchAsync(m_EngineRef.get());
 			m_AsyncEventSwapQueueMutex.unlock();
 		}
 	}

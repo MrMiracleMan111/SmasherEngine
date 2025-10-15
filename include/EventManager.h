@@ -13,6 +13,7 @@
 namespace Smasher {
 	struct Event;
 	class EventManager;
+	class Engine;
 
 	struct EventSubscription {
 		std::function<void(Event&)> Callback; // Event callback function
@@ -28,6 +29,7 @@ namespace Smasher {
 	// Event subscriptions last for the lifetime of EventSubscriptionHandle
 	struct SMASHER_API EventSubscriptionHandle {
 	friend class EventManager;
+	friend class Layer;
 	public:
 		EventSubscriptionHandle() = default;
 		~EventSubscriptionHandle();
@@ -62,8 +64,11 @@ namespace Smasher {
 	// Non-Copyable
 	class SMASHER_API EventManager final {
 		friend struct EventSubscriptionHandle;
+		friend class Layer;
 	public:
-		EventManager() :
+		EventManager() = delete;
+		EventManager(Engine& engine) :
+			m_EngineRef(engine),
 			m_AsyncEventConsumerThread(&EventManager::AsyncEventConsumer, this),
 			m_EventQueue(),
 			m_AsyncEventQueue() {}
@@ -73,59 +78,21 @@ namespace Smasher {
 		EventManager& operator= (EventManager&) = delete;
 		EventManager& operator= (EventManager&& other) noexcept;
 
-		// Subscribe to synchronous event handling (immediately after its called)
-		template<class T>
-		EventSubscriptionHandle Subscribe(std::function<void(T&)> callback) {
-			static_assert(std::is_base_of<Event, T>::value, "T must inherit from Event");
-
-			const std::type_index index = std::type_index(typeid(T));
-			std::list<EventSubscription>& list = m_EventSubscriptionsByType[index];
-
-			auto bound = [callback](Event& arg) {callback(static_cast<T&>(arg)); };
-			list.push_back(EventSubscription{ bound });
-
-			return EventSubscriptionHandle{ list, std::prev(list.end()), *this };
-		}
-
-
-		// Overload for class memebr function ex:
-		// Subscribe<EventType>(&Class::MemberFunc, classInstancePointer);
-		template<class T, class C>
-		EventSubscriptionHandle Subscribe(void (C::* method)(T&), C* instance) {
-			return Subscribe<T>(std::bind(method, instance, std::placeholders::_1));
-		}
-
-		// Subscribe to asynchronous event handling (uses separate Event thread)
-		template<class T>
-		EventSubscriptionHandle SubscribeAsync(std::function<void(T&)> callback) {
-			std::scoped_lock lock(m_AsyncEventSwapQueueMutex);
-			static_assert(std::is_base_of<Event, T>::value, "T must inherit from Event");
-
-			const std::type_index index = std::type_index(typeid(T));
-			std::list<EventSubscription>& list = m_AsyncEventSubscriptionsByType[index];
-
-			auto bound = [callback](Event& arg) {callback(static_cast<T&>(arg)); };
-			list.push_back(EventSubscription{ bound });
-
-			return EventSubscriptionHandle{ list, std::prev(list.end()), *this };
-		}
-
-		template<class T, class C>
-		EventSubscriptionHandle SubscribeAsync(void (C::* method)(T&), C* instance) {
-			return SubscribeAsync<T>(std::bind(method, instance, std::placeholders::_1));
-		}
-
 		// Defaults to Synchronous
 		template<class T, typename... Args>
 		void Publish(Args&&... eventArgs);
 
 		void Dispatch();
 
-		void DispatchAsync();
+		void DispatchAsync(Engine& engine);
 
 		void AsyncEventConsumer();
 
 		void StopAsync(); // Stops async event thread
+
+	protected:
+		std::mutex& GetAsyncSwapQueueMutex() { return m_AsyncEventSwapQueueMutex; };
+		std::mutex& GetAsyncSubscriptionsMutex() { return m_AsyncSubscriptionsMutex; };
 
 	private:
 		std::unordered_map<std::type_index, std::list<EventSubscription>> m_EventSubscriptionsByType;
@@ -142,5 +109,8 @@ namespace Smasher {
 		std::mutex m_AsyncSubscriptionsMutex;
 
 		std::thread m_AsyncEventConsumerThread;
+		std::reference_wrapper<Engine> m_EngineRef;
 	};
 }
+
+#include "EventManager.inl"
