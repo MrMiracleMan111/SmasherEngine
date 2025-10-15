@@ -5,6 +5,9 @@
 #include "Engine.h"
 
 namespace Smasher {
+
+	BaseLayer::BaseLayer(Smasher::Engine& engine) : Smasher::Layer(engine) {};
+
 	Layer::~Layer() {
 		m_EntityMap.clear();
 		m_ComponentManagersWithRender.clear();
