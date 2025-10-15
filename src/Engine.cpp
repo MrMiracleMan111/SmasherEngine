@@ -22,8 +22,11 @@
 
 namespace Smasher {
 
+#include "Core.h"
+
 	Engine::Engine() :
 		m_Headless(false),
+		m_EventManager(*this),
 		m_Window(
 			std::make_unique<sf::RenderWindow>(
 				sf::VideoMode(EngineConfig::WINDOW_WIDTH, EngineConfig::WINDOW_HEIGHT),
@@ -34,13 +37,14 @@ namespace Smasher {
 		Init();
 	}
 
-	Engine::Engine(bool headless) : m_Headless(true), m_Window(nullptr) {
+	Engine::Engine(bool headless) : m_Headless(true), m_Window(nullptr), m_EventManager(*this) {
 		assert(headless == true);
 		Init();
 	}
 
 	Engine::Engine(int width, int height, const sf::ContextSettings& settings) :
 		m_Headless(false),
+		m_EventManager(*this),
 		m_Window(
 			std::make_unique<sf::RenderWindow>(
 				sf::VideoMode(EngineConfig::WINDOW_WIDTH, EngineConfig::WINDOW_HEIGHT),
@@ -54,6 +58,7 @@ namespace Smasher {
 
 	Engine::Engine(int width, int height) :
 		m_Headless(false),
+		m_EventManager(*this),
 		m_Window(
 			std::make_unique<sf::RenderWindow>(
 				sf::VideoMode(width, height),
