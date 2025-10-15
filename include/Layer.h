@@ -24,6 +24,7 @@ namespace Smasher {
 		PAUSED
 	};
 
+
 	class SMASHER_API Layer {
 		friend class Engine;
 		friend class EventManager;
@@ -100,6 +101,9 @@ namespace Smasher {
 
 		void ShutdownEngine();
 
+		void ProcessEvent(Event& event);
+		void ProcessAsyncEvent(Event& event);
+
 		std::unordered_map<std::type_index, std::list<EventSubscription>>& GetEventSubscriptions() { return m_EventSubscriptionsByType; };
 		std::unordered_map<std::type_index, std::list<EventSubscription>>& GetAsyncEventSubscriptions() { return m_AsyncEventSubscriptionsByType; };
 	private:
@@ -117,6 +121,7 @@ namespace Smasher {
 
 		Millisecond m_UpdateTime;
 		Millisecond m_RenderTime;
+
 		std::unordered_map<std::type_index, std::list<EventSubscription>> m_EventSubscriptionsByType;
 		std::unordered_map<std::type_index, std::list<EventSubscription>> m_AsyncEventSubscriptionsByType;
 	};

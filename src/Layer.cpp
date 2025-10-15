@@ -34,6 +34,26 @@ namespace Smasher {
 		m_Engine.Shutdown();
 	}
 
+	void Layer::ProcessEvent(Event& event)
+	{
+		const std::type_index index = event.GetEventType();
+		std::string typeName = index.name();
+		auto& subscriptionList = m_EventSubscriptionsByType[index];
+		for (auto& subsription : subscriptionList) {
+			subsription.Callback(event);
+		}
+	}
+
+	void Layer::ProcessAsyncEvent(Event& event)
+	{
+		const std::type_index index = event.GetEventType();
+		std::string typeName = index.name();
+		auto& subscriptionList = m_AsyncEventSubscriptionsByType[index];
+		for (auto& subsription : subscriptionList) {
+			subsription.Callback(event);
+		}
+	}
+
 	Entity& Layer::AddEntity() {
 		return AddEntity<Entity>();
 	};
