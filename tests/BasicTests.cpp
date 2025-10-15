@@ -317,13 +317,13 @@ TEST(EventsTest, InvalidEventHandle) {
 	Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::Events::DummyEvent>(TestCallback);
 	Smasher::EventSubscriptionHandle other_handle = std::move(handle);
 	EXPECT_THROW({
-		manager.Unsubscribe(handle);
+		handle.Unsubscribe();
 		}, Smasher::Exceptions::EventHandleInvalid);
 
-	EXPECT_NO_THROW({ manager.Unsubscribe(other_handle); });
+	EXPECT_NO_THROW({ other_handle.Unsubscribe(); });
 
 	EXPECT_THROW({
-		manager.Unsubscribe(other_handle);
+		other_handle.Unsubscribe();
 		}, Smasher::Exceptions::EventHandleInvalid);
 }
 
@@ -387,8 +387,8 @@ TEST(EventsTest, StopPropagateEvent) {
 	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
 	manager.Dispatch();
 	manager.Dispatch();
-	manager.Unsubscribe(handle1);
-	manager.Unsubscribe(handle2);
+	handle1.Unsubscribe();
+	handle2.Unsubscribe();
 	EXPECT_EQ(2, triggered_count);
 
 	triggered_count = 0;
@@ -484,9 +484,9 @@ TEST(EventsTest, SinglePublishUnsubscribeEvent) {
 	Smasher::EventSubscriptionHandle handle = manager.Subscribe<Smasher::Events::DummyEvent>(callback);
 
 	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
-	manager.Unsubscribe(handle);
+	handle.Unsubscribe();
 	EXPECT_THROW({
-		manager.Unsubscribe(handle);
+		handle.Unsubscribe();
 	}, Smasher::Exceptions::EventHandleInvalid);
 	manager.Dispatch();
 	manager.Dispatch();
@@ -542,7 +542,7 @@ TEST(EventsTest, MoveEventManagerSync) {
 		Smasher::EventManager tmp = std::move(manager);
 		tmp.Dispatch();
 		EXPECT_EQ(15, count);
-		tmp.Unsubscribe(handle); // tmp would be deconstructed before "handle"
+		handle.Unsubscribe(); // tmp would be deconstructed before "handle"
 	}
 	catch (...) {
 		FAIL(); // No Throw is allowed
@@ -567,7 +567,7 @@ TEST(EventsTest, MoveEventManagerAsync) {
 		Smasher::EventManager tmp = std::move(manager);
 		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 		EXPECT_EQ(15, count);
-		tmp.Unsubscribe(handle); // tmp would be deconstructed before "handle"
+		handle.Unsubscribe(); // tmp would be deconstructed before "handle"
 	}
 	catch (...) {
 		FAIL(); // No Throw is allowed
