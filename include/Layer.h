@@ -125,6 +125,11 @@ namespace Smasher {
 		std::unordered_map<std::type_index, std::list<EventSubscription>> m_EventSubscriptionsByType;
 		std::unordered_map<std::type_index, std::list<EventSubscription>> m_AsyncEventSubscriptionsByType;
 	};
+
+	class SMASHER_API BaseLayer : public Layer {
+	public:
+		BaseLayer(Engine& engine);
+	};
 }
 
 #include "Layer.inl"
