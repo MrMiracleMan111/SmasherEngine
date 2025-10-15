@@ -192,8 +192,28 @@ namespace Smasher {
 		}
 	}
 
+	void Engine::HandleLayerTransitions() {
+		// TODO : Handle layer transistions (adding/removing layers)
+		for (auto& itr : m_LayerTransitions) {
+			switch (itr.type) {
+			case LayerTransitionType::ADD:
+				AddLayer(itr);
+				break;
+			case LayerTransitionType::REMOVE:
+				RemoveLayer(itr);
+				break;
+			default:
+				//Error
+				assert(false);
+			}
+		}
+		m_LayerTransitions.clear();
+	}
+
 	// Updates layers from top to bottom
 	void Engine::Update(Millisecond delta) {
+		HandleLayerTransitions();
+
 		for (auto& itr : m_LayerStack) {
 			std::unique_ptr<Layer>& pLayer = itr.second;
 			m_UpdateTimestamp = std::chrono::system_clock::now();
@@ -257,6 +277,18 @@ namespace Smasher {
 		m_RunningAtomic = false;
 	}
 
+	void Engine::AddLayer(LayerTransition& transition)
+	{
+		Layer& rLayer = *transition.pLayer;
+		std::type_index index = transition.addTransition.index;
+		m_LayerStack.emplace_back(index, std::move(transition.pLayer));
+		rLayer.Init();
+	}
+
+	void Engine::RemoveLayer(LayerTransition& transition)
+	{
+	}
+
 	void Engine::Shutdown() {
 		m_RunningAtomic = false;
 
@@ -265,6 +297,11 @@ namespace Smasher {
 			m_Window->close();
 			m_IsWindowOpen = false;
 		}
+	}
+
+	std::vector<std::pair<std::type_index, std::unique_ptr<Layer>>>::iterator Engine::TopLayerItr()
+	{
+		return m_LayerStack.begin();
 	}
 
 	sf::RenderWindow& Engine::GetWindow() { return *m_Window; }
