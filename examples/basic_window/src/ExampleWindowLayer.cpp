@@ -2,11 +2,11 @@
 
 ExampleWindowLayer::~ExampleWindowLayer()
 {
-	GetEngine().GetEventManager().Unsubscribe(m_KeyPressSubscription);
+	m_KeyPressSubscription.Unsubscribe();
 }
 
 void ExampleWindowLayer::Init() {
-	m_KeyPressSubscription = GetEngine().GetEventManager().Subscribe<Smasher::Events::KeyboardEvent>(&ExampleWindowLayer::OnKeyPress, this);
+	m_KeyPressSubscription = Subscribe<Smasher::Events::KeyboardEvent>(&ExampleWindowLayer::OnKeyPress, this);
 }
 
 void ExampleWindowLayer::Reset() {

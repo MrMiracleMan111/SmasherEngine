@@ -41,7 +41,7 @@ void StressTestLayer::Init()
 	pShader->GetShader().setUniform("windowSize", windowSize);
 	pShader->GetShader().setUniform("ViewProjectionMatrix", viewProjectionMatrix);
 
-	m_OnMouseMoveHandle = GetEngine().GetEventManager().Subscribe<Smasher::Events::MouseMoveEvent>(&StressTestLayer::OnMouseMove, this);
+	m_OnMouseMoveHandle = Subscribe<Smasher::Events::MouseMoveEvent>(&StressTestLayer::OnMouseMove, this);
 
 	auto& rCompManager = static_cast<Smasher::DrawableComponentManager&>(GetComponentManager<Smasher::DrawableComponent>());
 	rCompManager.SetShaderResource(pShader);

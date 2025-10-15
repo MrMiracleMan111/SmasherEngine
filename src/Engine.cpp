@@ -126,6 +126,8 @@ namespace Smasher {
 	}
 
 	void Engine::Init() {
+		BaseLayer& base = PushLayer<BaseLayer>(); // Base layer
+
 		if (!m_Headless) {
 			glewExperimental = GL_TRUE;
 			GLenum status = glewInit();
@@ -135,11 +137,13 @@ namespace Smasher {
 				throw Exceptions::GLEWInitFailed(message);
 			}
 
-			m_WindowCloseHandle = m_EventManager.Subscribe<Events::WindowCloseEvent>(&Engine::OnWindowClose, this);
+			m_WindowCloseHandle = base.Subscribe<Events::WindowCloseEvent>(&Engine::OnWindowClose, this);
 		}
 	}
 
 	void Engine::Run() {
+		m_RunningAtomic = true;
+
 		EventFeeder m_EventFeeder(m_EventManager);
 		try {
 			std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
