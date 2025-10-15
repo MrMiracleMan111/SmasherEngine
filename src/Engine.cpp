@@ -19,6 +19,7 @@
 #include "Exceptions.h"
 #include "EngineConfig.h"
 #include "EventFeeder.h"
+#include "Layer.h"
 
 namespace Smasher {
 
@@ -76,6 +77,7 @@ namespace Smasher {
 			if (!m_Headless) {
 				m_EventManager.Unsubscribe(m_WindowCloseHandle); // Explicilty unsubscribe before EventManager is deconstructed
 			}
+			m_LayerStack.clear();
 		}
 	}
 

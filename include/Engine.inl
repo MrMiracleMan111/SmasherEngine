@@ -1,19 +1,60 @@
+#pragma once
 #include <memory>
-#include "Engine.h"
-#include "Layer.h"
+//#include "Engine.h"
+//#include "Layer.h"
 
 namespace Smasher {
+	class Layer;
+	enum LayerTransitionType {
+		ADD,
+		REMOVE,
+		// MOVE (shifting layer up/down)
+	};
+	// Contains information about a layer transition
+	struct LayerTransition {
+		LayerTransition() = delete;
+		LayerTransition(LayerTransitionType type, std::unique_ptr<Layer> pLayer) :
+			type(type),
+			pLayer(std::move(pLayer)) {}
+		~LayerTransition() = default;
+		LayerTransition(LayerTransition&&) = default;
+		LayerTransition(const LayerTransition&) = delete;
+		LayerTransition& operator =(LayerTransition&&) = default;
+		LayerTransition& operator =(const LayerTransition&) = delete;
+
+		const LayerTransitionType type;
+		std::unique_ptr<Layer> pLayer;
+
+		struct LayerTransitionAdd {
+			std::type_index index;
+		};
+
+		struct LayerTransitionRemove { };
+
+		union {
+			LayerTransitionAdd addTransition;
+			LayerTransitionRemove removeTransition;
+		};
+	};
+
+
 	template<class T, typename... Args>
 	T& Engine::PushLayer(Args&&... componentArgs) {
 		if (HasLayer<T>()) {
 			std::string exceptionMessage = std::format("Engine already has State of type {}", typeid(T).name());
 			throw Exceptions::LayerDuplicate(exceptionMessage);
 		}
-		std::type_index index = std::type_index(typeid(T));
 		auto pLayer = std::make_unique<T>(*this, std::forward<Args>(componentArgs)...);
 		T& rLayer = *pLayer;
-		m_LayerStack.emplace(m_LayerStack.begin(), index, std::move(pLayer));
-		rLayer.Init();
+
+		LayerTransition& transition = m_LayerTransitions.emplace_back(LayerTransitionType::ADD, std::move(pLayer));
+		transition.addTransition.index = std::type_index(typeid(T));
+
+		// Immediately add layer if engine is not running
+		if (!m_RunningAtomic) {
+			HandleLayerTransitions();
+		}
+
 		return rLayer;
 	}
 
@@ -34,7 +75,7 @@ namespace Smasher {
 
 	template<class T>
 	bool Engine::HasLayer() const {
-		return std::find_if(m_LayerStack.begin(), m_LayerStack.end(),
+		return !m_LayerStack.empty() && std::find_if(m_LayerStack.begin(), m_LayerStack.end(),
 			[](auto& itr) {
 				return std::type_index(typeid(T)) == itr.first;
 			}) != m_LayerStack.end();
