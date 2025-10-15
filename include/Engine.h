@@ -18,6 +18,7 @@ namespace Smasher {
 
 	// Non-Copyable
 	class SMASHER_API Engine final {
+		friend class EventManager;
 	public:
 		Engine();
 		Engine(int width, int height);
@@ -38,6 +39,7 @@ namespace Smasher {
 		void Update(Millisecond delta);
 		void Render(sf::RenderWindow& rWindow);
 
+		// Creates layer and adds it to transition list
 		template<class T, typename... Args>
 		T& PushLayer(Args&&... componentArgs);
 
