@@ -6,14 +6,14 @@
 #include <SFML/Window.hpp>
 #include "Base.h"
 #include "UUID.h"
-#include "EventManager.h"
-#include "ResourceManager.h"
 #include "Engine.h"
 
 
 namespace Smasher {
 	class IComponentManager;
 	class Entity;
+	class EventManager;
+	class ResourceManager;
 
 	template <class T>
 	class GenericComponentManager;
@@ -26,7 +26,15 @@ namespace Smasher {
 
 	class SMASHER_API Layer {
 		friend class Engine;
+		friend class EventManager;
 	public:
+		Layer(Engine& engine) :
+			m_Engine(engine),
+			m_EventManager(engine.GetEventManager()),
+			m_ResourceManager(engine.GetResourceManager()),
+			m_UpdateTime(Millisecond::zero()),
+			m_RenderTime(Millisecond::zero()) {
+		}
 		virtual ~Layer();
 		Layer() = delete;
 		Layer(const Layer&) = delete;
@@ -70,13 +78,21 @@ namespace Smasher {
 
 		std::size_t EntityCount() { return m_EntityMap.size(); }
 
-	protected:
-		Layer(Engine& engine) :
-			m_Engine(engine),
-			m_EventManager(engine.GetEventManager()),
-			m_ResourceManager(engine.GetResourceManager()),
-			m_UpdateTime(Millisecond::zero()),
-			m_RenderTime(Millisecond::zero()){}
+		// Subscribe to synchronous event handling (immediately after its called)
+		template<class T>
+		EventSubscriptionHandle Subscribe(std::function<void(T&)> callback);
+
+		// Overload for class memebr function ex:
+		// Subscribe<EventType>(&Class::MemberFunc, classInstancePointer);
+		template<class T, class C>
+		EventSubscriptionHandle Subscribe(void (C::* method)(T&), C* instance);
+
+		// Subscribe to asynchronous event handling (uses separate Event thread)
+		template<class T>
+		EventSubscriptionHandle SubscribeAsync(std::function<void(T&)> callback);
+
+		template<class T, class C>
+		EventSubscriptionHandle SubscribeAsync(void (C::* method)(T&), C* instance);
 
 		void RenderComponentManagers(sf::RenderWindow& window);
 		void UpdateComponentManagers(Millisecond delta);
@@ -84,6 +100,8 @@ namespace Smasher {
 
 		void ShutdownEngine();
 
+		std::unordered_map<std::type_index, std::list<EventSubscription>>& GetEventSubscriptions() { return m_EventSubscriptionsByType; };
+		std::unordered_map<std::type_index, std::list<EventSubscription>>& GetAsyncEventSubscriptions() { return m_AsyncEventSubscriptionsByType; };
 	private:
 		template <class T>
 		void LoadComponentManager();
@@ -99,6 +117,8 @@ namespace Smasher {
 
 		Millisecond m_UpdateTime;
 		Millisecond m_RenderTime;
+		std::unordered_map<std::type_index, std::list<EventSubscription>> m_EventSubscriptionsByType;
+		std::unordered_map<std::type_index, std::list<EventSubscription>> m_AsyncEventSubscriptionsByType;
 	};
 }
 
