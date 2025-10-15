@@ -106,7 +106,7 @@ namespace Smasher {
 	EventSubscriptionHandle::~EventSubscriptionHandle()
 	{
 		if (IsValid()) {
-			m_EventManagerPtr->Unsubscribe(*this);
+			Unsubscribe();
 		}
 	}
 
@@ -122,7 +122,7 @@ namespace Smasher {
 	{
 		if (&other != this) {
 			if (IsValid()) {
-				m_EventManagerPtr->Unsubscribe(*this);
+				Unsubscribe();
 			}
 			m_EventManagerPtr = other.m_EventManagerPtr;
 			m_SubscriptionListPtr = other.m_SubscriptionListPtr;
