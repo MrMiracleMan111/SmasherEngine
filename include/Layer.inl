@@ -76,4 +76,45 @@ namespace Smasher {
 		}
 		return *m_ComponentManagers[std::type_index(typeid(ComponentType))].get();
 	}
+
+	// Subscribe to synchronous event handling (immediately after its called)
+	template<class T>
+	EventSubscriptionHandle Layer::Subscribe(std::function<void(T&)> callback) {
+		static_assert(std::is_base_of<Event, T>::value, "T must inherit from Event");
+
+		const std::type_index index = std::type_index(typeid(T));
+		std::list<EventSubscription>& list = m_EventSubscriptionsByType[index];
+
+		auto bound = [callback](Event& arg) {callback(static_cast<T&>(arg)); };
+		list.push_back(EventSubscription{ bound });
+
+		return EventSubscriptionHandle(list, std::prev(list.end()), GetEventManager());
+	}
+
+	// Overload for class memebr function ex:
+	// Subscribe<EventType>(&Class::MemberFunc, classInstancePointer);
+	template<class T, class C>
+	EventSubscriptionHandle Layer::Subscribe(void (C::* method)(T&), C* instance) {
+		return Subscribe<T>(std::bind(method, instance, std::placeholders::_1));
+	}
+
+	// Subscribe to asynchronous event handling (uses separate Event thread)
+	template<class T>
+	EventSubscriptionHandle Layer::SubscribeAsync(std::function<void(T&)> callback) {
+		std::scoped_lock lock(m_EventManager.GetAsyncSwapQueueMutex());
+		static_assert(std::is_base_of<Event, T>::value, "T must inherit from Event");
+
+		const std::type_index index = std::type_index(typeid(T));
+		std::list<EventSubscription>& list = m_AsyncEventSubscriptionsByType[index];
+
+		auto bound = [callback](Event& arg) {callback(static_cast<T&>(arg)); };
+		list.push_back(EventSubscription{ bound });
+
+		return EventSubscriptionHandle(list, std::prev(list.end()), GetEventManager());
+	}
+
+	template<class T, class C>
+	EventSubscriptionHandle Layer::SubscribeAsync(void (C::* method)(T&), C* instance) {
+		return SubscribeAsync<T>(std::bind(method, instance, std::placeholders::_1));
+	}
 }
