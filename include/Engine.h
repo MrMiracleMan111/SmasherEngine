@@ -13,6 +13,8 @@
 
 namespace Smasher {
 	class Layer;
+	struct LayerTransition;
+
 
 	// Non-Copyable
 	class SMASHER_API Engine final {
@@ -42,6 +44,8 @@ namespace Smasher {
 		template<class T>
 		T& GetLayer() const;
 
+		std::vector<std::pair<std::type_index, std::unique_ptr<Layer>>>::iterator TopLayerItr();
+
 		template<class T>
 		bool HasLayer() const;
 
@@ -54,6 +58,9 @@ namespace Smasher {
 		bool IsRunning() const { return m_RunningAtomic; }
 		bool IsHeadless() const { return m_Headless; }
 
+	protected:
+		std::vector<std::pair<std::type_index, std::unique_ptr<Layer>>> m_LayerStack;
+
 	private:
 #ifdef BENCHMARK
 		void BENCHMARK_LogAccumulatedTime();
@@ -61,10 +68,15 @@ namespace Smasher {
 		Engine(bool headless); // Headless constructor
 		void OnWindowClose(Events::WindowCloseEvent& event);
 
+		void AddLayer(LayerTransition& transition);
+		void RemoveLayer(LayerTransition& transition);
+
+		void HandleLayerTransitions(); // Handles all layer transitions
+
 		bool m_Valid = true; // Becomes false if this object is moved
-		std::vector <std::pair<std::type_index, std::unique_ptr<Layer>>> m_LayerStack;
+		std::vector<LayerTransition> m_LayerTransitions;
 		std::unique_ptr<sf::RenderWindow> m_Window = nullptr;
-		std::atomic_bool m_RunningAtomic = true;
+		std::atomic_bool m_RunningAtomic = false;
 		bool m_Headless = false;
 		bool m_IsWindowOpen = false; // Needed to prevent double delete on Window Context
 		std::mutex m_WindowMutex; // Prevent double delete on Window Context
