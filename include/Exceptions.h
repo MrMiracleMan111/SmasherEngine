@@ -20,6 +20,7 @@ namespace Smasher {
 		SMASHER_EXCEPTION(LayerNotFound)
 		SMASHER_EXCEPTION(LayerDuplicate)
 		SMASHER_EXCEPTION(LayerEntityNotFound)
+		SMASHER_EXCEPTION(CannotRemoveBaseLayer)
 
 		// ==== COMPONENT EXCEPTIONS ====
 		SMASHER_EXCEPTION(ComponentInvalid)
