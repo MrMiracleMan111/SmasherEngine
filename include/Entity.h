@@ -20,10 +20,10 @@ namespace Smasher {
 	public:
 		Entity() = delete;
 		Entity(Layer& state, UUID uuid) : m_LayerRef(state), m_UUID(uuid), m_Engine(state.GetEngine()) {};
-		Entity(const Entity& other) : m_LayerRef(other.m_LayerRef), m_UUID(other.m_UUID), m_Engine(other.m_Engine) {};
+		Entity(const Entity& other) = delete;
 		Entity(Entity&& other) noexcept : m_LayerRef(other.m_LayerRef), m_UUID(other.m_UUID), m_Engine(other.m_Engine) {};
 		Entity& operator =(const Entity& other) = delete;
-		Entity& operator =(Entity&&) = delete;
+		Entity& operator =(Entity&&) noexcept;
 		virtual ~Entity();
 
 		Layer& GetLayer() { return m_LayerRef.get(); };
