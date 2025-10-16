@@ -23,7 +23,7 @@ namespace Smasher {
 		Entity(const Entity& other) = delete;
 		Entity(Entity&& other) noexcept : m_LayerRef(other.m_LayerRef), m_UUID(other.m_UUID), m_Engine(other.m_Engine) {};
 		Entity& operator =(const Entity& other) = delete;
-		Entity& operator =(Entity&&) noexcept;
+		Entity& operator =(Entity&&) = delete; // No need for this so far and seems dangerous
 		virtual ~Entity();
 
 		Layer& GetLayer() { return m_LayerRef.get(); };
