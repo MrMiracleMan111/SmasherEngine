@@ -221,16 +221,32 @@ TEST(LayerTest, DuplicateLayer) {
 TEST(LayerTest, RemoveLayer) {
 	Smasher::Engine engine(640, 420);
 
+	// Add Layer
 	engine.PushLayer<DummyLayer>();
 
 	EXPECT_TRUE(engine.HasLayer<DummyLayer>());
 
+	// Remove Layer
 	EXPECT_NO_THROW({ engine.PopLayer<DummyLayer>(); });
 
 	EXPECT_TRUE(engine.HasLayer<Smasher::BaseLayer>());
 	EXPECT_FALSE(engine.HasLayer<DummyLayer>());
 
+	// Remove Layer
 	EXPECT_THROW({ engine.PopLayer<DummyLayer>(); }, Smasher::Exceptions::LayerNotFound);
+
+	EXPECT_TRUE(engine.HasLayer<Smasher::BaseLayer>());
+	EXPECT_FALSE(engine.HasLayer<DummyLayer>());
+
+
+	// Add layer back
+	EXPECT_NO_THROW({ engine.PushLayer<DummyLayer>(); });
+
+	EXPECT_TRUE(engine.HasLayer<Smasher::BaseLayer>());
+	EXPECT_TRUE(engine.HasLayer<DummyLayer>());
+
+	// Remove Layer
+	EXPECT_NO_THROW({ engine.PopLayer<DummyLayer>(); });
 
 	EXPECT_TRUE(engine.HasLayer<Smasher::BaseLayer>());
 	EXPECT_FALSE(engine.HasLayer<DummyLayer>());
@@ -248,6 +264,37 @@ TEST(LayerTest, RemoveBaseLayer) {
 
 	EXPECT_TRUE(engine.HasLayer<Smasher::BaseLayer>());
 	EXPECT_TRUE(engine.HasLayer<DummyLayer>());
+}
+
+TEST(LayerTest, RemoveLayerWithEvents) {
+	Smasher::Engine engine(640, 420);
+	DummyLayer& layer = engine.PushLayer<DummyLayer>();
+	Smasher::EventManager& manager = layer.GetEventManager();
+
+	int triggered_count = 0;
+	std::function<void(Smasher::Events::DummyEvent&)> callback = [&triggered_count](Smasher::Events::DummyEvent& event) {
+		++triggered_count;
+	};
+	Smasher::EventSubscriptionHandle handle = layer.Subscribe<Smasher::Events::DummyEvent>(callback);
+
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
+	manager.Dispatch();
+	manager.Dispatch();
+	EXPECT_EQ(1, triggered_count);
+
+	engine.PopLayer<DummyLayer>();
+
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
+	manager.Dispatch();
+	manager.Dispatch();
+	EXPECT_EQ(1, triggered_count);
+
+	engine.PushLayer<DummyLayer>();
+
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
+	manager.Dispatch();
+	manager.Dispatch();
+	EXPECT_EQ(1, triggered_count);
 }
 
 TEST(EntityTest, AddEntity) {
