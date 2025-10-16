@@ -27,6 +27,28 @@ namespace Smasher {
 		return rLayer;
 	}
 
+	// Creates layer and adds it to transition list
+	template<class T>
+	T& Engine::PopLayer() {
+		if (std::type_index(typeid(T)) == std::type_index(typeid(BaseLayer))) {
+			throw Exceptions::CannotRemoveBaseLayer("Removing BaseLayer is not permitted.");
+		}
+
+		if (!HasLayer<T>()) {
+			throw Exceptions::LayerNotFound("This layer is not on the stack");
+		}
+
+		// If LayerTransition takes ownership of the std::unique_ptr<Layer>,
+		// all future calls to GetLayer<T> for that layer will be messed up
+		LayerTransition& transition = m_LayerTransitions.emplace_back(LayerTransitionType::REMOVE, nullptr);
+		transition.removeTransition.index = std::type_index(typeid(T));
+
+		// Immediately add layer if engine is not running
+		if (!m_RunningAtomic) {
+			HandleLayerTransitions();
+		}
+	}
+
 	template<class T>
 	T& Engine::GetLayer() const {
 		auto itr = std::find_if(m_LayerStack.begin(), m_LayerStack.end(),

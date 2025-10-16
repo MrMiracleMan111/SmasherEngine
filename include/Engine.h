@@ -10,6 +10,7 @@
 #include "ResourceManager.h"
 #include "EventManager.h"
 #include "Events.h"
+#include "LayerTransition.h"
 
 namespace Smasher {
 	class Layer;
@@ -45,6 +46,10 @@ namespace Smasher {
 		// Creates layer and adds it to transition list
 		template<class T, typename... Args>
 		T& PushLayer(Args&&... componentArgs);
+
+		// Creates layer and adds it to transition list
+		template<class T>
+		T& PopLayer();
 
 		template<class T>
 		T& GetLayer() const;
