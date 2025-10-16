@@ -167,11 +167,11 @@ TEST(TraitChecks, UUID) {
 }
 
 TEST(TraitChecks, Entity) {
-	// Entity should be non-copyable, moveable
+	// Entity should be non-copyable, move constructible, non-move-assignable
 	static_assert(!std::is_copy_constructible_v<Smasher::Entity>);
 	static_assert(!std::is_copy_assignable_v<Smasher::Entity>);
 	static_assert(std::is_move_constructible_v<Smasher::Entity>);
-	static_assert(std::is_move_assignable_v<Smasher::Entity>);
+	static_assert(!std::is_move_assignable_v<Smasher::Entity>);
 	EXPECT_TRUE(true);
 }
 
