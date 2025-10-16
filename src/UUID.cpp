@@ -11,6 +11,12 @@ namespace Smasher {
 		other.m_UUID = UINT64_MAX;
 	}
 
+	UUID& UUID::operator=(const UUID& other)
+	{
+		m_UUID = other.m_UUID;
+		return *this;
+	}
+
 	UUID& UUID::operator=(UUID&& other) noexcept
 	{
 		if (&other != this) {
