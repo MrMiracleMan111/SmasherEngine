@@ -51,10 +51,7 @@ namespace Smasher {
 
 	template<class T>
 	T& Engine::GetLayer() const {
-		auto itr = std::find_if(m_LayerStack.begin(), m_LayerStack.end(),
-			[](auto& itr) {
-				return std::type_index(typeid(T)) == itr.first;
-			});
+		Engine::LayerStackConstItr itr = GetLayerItr(std::type_index(typeid(T)));
 
 		if (itr == m_LayerStack.end()) {
 			std::string exceptionMessage = std::format("Engine has no Layer of type {}", typeid(T).name());
@@ -66,9 +63,6 @@ namespace Smasher {
 
 	template<class T>
 	bool Engine::HasLayer() const {
-		return !m_LayerStack.empty() && std::find_if(m_LayerStack.begin(), m_LayerStack.end(),
-			[](auto& itr) {
-				return std::type_index(typeid(T)) == itr.first;
-			}) != m_LayerStack.end();
+		return GetLayerItr(std::type_index(typeid(T))) != m_LayerStack.end();
 	}
 }
