@@ -190,7 +190,67 @@ TEST(TraitChecks, EventSubscription) {
 	EXPECT_TRUE(true);
 }
 
-TEST(EntityTest, AddEnttiy) {
+TEST(LayerTest, GetLayer) {
+	EXPECT_NO_THROW({
+		Smasher::Engine engine(640, 420);
+		Smasher::Layer& layer = engine.GetLayer<Smasher::BaseLayer>();
+	});
+}
+
+TEST(LayerTest, AddLayer) {
+	Smasher::Engine engine(640, 420);
+
+	Smasher::Layer& pushLayer = engine.PushLayer<DummyLayer>();
+	Smasher::Layer& getLayer = engine.GetLayer<DummyLayer>();
+	Smasher::Layer& baseLayer = engine.GetLayer<Smasher::BaseLayer>();
+
+	EXPECT_TRUE(engine.HasLayer<DummyLayer>());
+	EXPECT_TRUE(engine.HasLayer<Smasher::BaseLayer>());
+	EXPECT_EQ(&pushLayer, &getLayer);
+	EXPECT_NE(&pushLayer, &baseLayer);
+}
+
+TEST(LayerTest, DuplicateLayer) {
+	Smasher::Engine engine(640, 420);
+
+	EXPECT_NO_THROW({ engine.PushLayer<DummyLayer>(); });
+	EXPECT_THROW({ engine.PushLayer<DummyLayer>(); }, Smasher::Exceptions::LayerDuplicate);
+	EXPECT_THROW({ engine.PushLayer<Smasher::BaseLayer>(); }, Smasher::Exceptions::LayerDuplicate);
+}
+
+TEST(LayerTest, RemoveLayer) {
+	Smasher::Engine engine(640, 420);
+
+	engine.PushLayer<DummyLayer>();
+
+	EXPECT_TRUE(engine.HasLayer<DummyLayer>());
+
+	EXPECT_NO_THROW({ engine.PopLayer<DummyLayer>(); });
+
+	EXPECT_TRUE(engine.HasLayer<Smasher::BaseLayer>());
+	EXPECT_FALSE(engine.HasLayer<DummyLayer>());
+
+	EXPECT_THROW({ engine.PopLayer<DummyLayer>(); }, Smasher::Exceptions::LayerNotFound);
+
+	EXPECT_TRUE(engine.HasLayer<Smasher::BaseLayer>());
+	EXPECT_FALSE(engine.HasLayer<DummyLayer>());
+}
+
+TEST(LayerTest, RemoveBaseLayer) {
+	Smasher::Engine engine(640, 420);
+
+	engine.PushLayer<DummyLayer>();
+
+	EXPECT_TRUE(engine.HasLayer<Smasher::BaseLayer>());
+	EXPECT_TRUE(engine.HasLayer<DummyLayer>());
+
+	EXPECT_THROW({ engine.PopLayer<Smasher::BaseLayer>(); }, Smasher::Exceptions::CannotRemoveBaseLayer);
+
+	EXPECT_TRUE(engine.HasLayer<Smasher::BaseLayer>());
+	EXPECT_TRUE(engine.HasLayer<DummyLayer>());
+}
+
+TEST(EntityTest, AddEntity) {
 	Smasher::Engine engine(640, 420);
 	Smasher::UUID entityUUID{ 0 };
 	DummyLayer& layer = engine.PushLayer<DummyLayer>();
