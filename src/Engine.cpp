@@ -296,6 +296,18 @@ namespace Smasher {
 
 	void Engine::RemoveLayer(LayerTransition& transition)
 	{
+		if (transition.removeTransition.index == std::type_index(typeid(BaseLayer))) {
+			throw Exceptions::CannotRemoveBaseLayer("Removing BaseLayer is not permitted.");
+		}
+
+		auto itr = GetLayerItr(transition.removeTransition.index);
+		bool hasLayer = (itr != m_LayerStack.end());
+
+		if (!hasLayer) {
+			throw Exceptions::LayerNotFound("Could not find layer to remove");
+		}
+
+		m_LayerStack.erase(itr);
 	}
 
 	void Engine::Shutdown() {
