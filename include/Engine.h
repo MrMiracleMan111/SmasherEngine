@@ -18,6 +18,9 @@ namespace Smasher {
 
 	// Non-Copyable
 	class SMASHER_API Engine final {
+		using LayerStackItr = std::vector<std::pair<std::type_index, std::unique_ptr<Layer>>>::iterator;
+		using LayerStackConstItr = std::vector<std::pair<std::type_index, std::unique_ptr<Layer>>>::const_iterator;
+
 		friend class EventManager;
 	public:
 		Engine();
@@ -74,6 +77,9 @@ namespace Smasher {
 		void RemoveLayer(LayerTransition& transition);
 
 		void HandleLayerTransitions(); // Handles all layer transitions
+
+
+		LayerStackConstItr GetLayerItr(std::type_index index) const;
 
 		bool m_Valid = true; // Becomes false if this object is moved
 		std::vector<LayerTransition> m_LayerTransitions;
