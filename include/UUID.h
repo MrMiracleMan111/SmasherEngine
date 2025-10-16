@@ -10,6 +10,9 @@ public:
 	static UUID GetUUID();
 	~UUID() {};
 	UUID(const UUID& other) : m_UUID(other.m_UUID) {};
+	UUID(UUID&& other) noexcept;
+	UUID& operator = (const UUID& other) = default;
+	UUID& operator = (UUID&& other) noexcept;
 	explicit UUID(uint64_t uuid) : m_UUID(uuid) {};
 	UUID() = delete;
 
