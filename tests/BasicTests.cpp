@@ -173,9 +173,17 @@ TEST(TraitChecks, EventSubscription) {
 
 TEST(EntityTest, AddEnttiy) {
 	Smasher::Engine engine(640, 420);
-	
+	Smasher::UUID entityUUID{ 0 };
 	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	EXPECT_NO_THROW({ Smasher::Entity & entity = layer.AddEntity<Smasher::Entity>(); });
+
+	EXPECT_FALSE(layer.HasEntity(entityUUID));
+
+	EXPECT_NO_THROW({
+		Smasher::Entity & entity = layer.AddEntity<Smasher::Entity>();
+		entityUUID = entity.GetUUID();
+	});
+
+	EXPECT_TRUE(layer.HasEntity(entityUUID));
 }
 
 TEST(EntityTest, GetEntity) {
@@ -206,6 +214,33 @@ TEST(EntityTest, MissingEntity) {
 	Smasher::Entity& entity = layer.AddEntity<Smasher::Entity>();
 	EXPECT_THROW({ layer.GetEntity(Smasher::UUID{entity.GetUUID() + 1});}, Smasher::Exceptions::LayerEntityNotFound);
 }
+
+TEST(EntityTest, MoveEntity) {
+	Smasher::Engine engine(640, 420);
+	Smasher::BaseLayer& baseLayer = engine.GetLayer<Smasher::BaseLayer>();
+	DummyLayer& layer = engine.PushLayer<DummyLayer>();
+	InitEntityTest& entity = layer.AddEntity<InitEntityTest>();
+	EXPECT_EQ(1, entity.GetValue());
+
+	EXPECT_FALSE(baseLayer.HasEntity(entity.GetUUID()));
+	EXPECT_TRUE(layer.HasEntity(entity.GetUUID()));
+
+	layer.MoveEntity(entity);
+
+	EXPECT_FALSE(baseLayer.HasEntity(entity.GetUUID()));
+	EXPECT_TRUE(layer.HasEntity(entity.GetUUID()));
+
+	baseLayer.MoveEntity(entity);
+
+	EXPECT_TRUE(baseLayer.HasEntity(entity.GetUUID()));
+	EXPECT_FALSE(layer.HasEntity(entity.GetUUID()));
+
+	baseLayer.MoveEntity(entity);
+
+	EXPECT_TRUE(baseLayer.HasEntity(entity.GetUUID()));
+	EXPECT_FALSE(layer.HasEntity(entity.GetUUID()));
+}
+
 
 TEST(ComponentsTest, CreateComponent) {
 	Smasher::Engine engine(640, 420);
