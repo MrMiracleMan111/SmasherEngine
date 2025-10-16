@@ -271,7 +271,7 @@ TEST(ComponentsTest, CreateComponent) {
 TEST(ComponentsTest, DuplicateComponent) {
 	Smasher::Engine engine(640, 420);
 	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::Entity entity = layer.AddEntity<Smasher::Entity>();
+	Smasher::Entity& entity = layer.AddEntity<Smasher::Entity>();
 	entity.AddComponent<TestComponent>(10);
 	EXPECT_THROW({
 			entity.AddComponent<TestComponent>(20);
@@ -282,7 +282,7 @@ TEST(ComponentsTest, DuplicateComponent) {
 TEST(ComponentsTest, MissingComponent) {
 	Smasher::Engine engine(640, 420);
 	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::Entity entity = layer.AddEntity<Smasher::Entity>();
+	Smasher::Entity& entity = layer.AddEntity<Smasher::Entity>();
 	entity.AddComponent<TestComponent>(10);
 	EXPECT_THROW({
 			entity.GetComponent<CustomComponent>();
@@ -292,7 +292,7 @@ TEST(ComponentsTest, MissingComponent) {
 TEST(ComponentsTest, RemoveComponent) {
 	Smasher::Engine engine(640, 420);
 	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::Entity entity = layer.AddEntity<Smasher::Entity>();
+	Smasher::Entity& entity = layer.AddEntity<Smasher::Entity>();
 	entity.AddComponent<TestComponent>(10);
 	EXPECT_TRUE(entity.HasComponent<TestComponent>());
 	EXPECT_NO_THROW({
@@ -308,7 +308,7 @@ TEST(ComponentsTest, RemoveComponentDataChange) {
 	Smasher::Engine engine(640, 420);
 	DummyLayer& layer = engine.PushLayer<DummyLayer>();
 	layer.Activate();
-	Smasher::Entity entity = layer.AddEntity<Smasher::Entity>();
+	Smasher::Entity& entity = layer.AddEntity<Smasher::Entity>();
 	entity.AddComponent<DeleteTestComponent>();
 	EXPECT_TRUE(entity.HasComponent<DeleteTestComponent>());
 	EXPECT_NO_THROW({ engine.Update(Smasher::Millisecond{10}); });
@@ -321,7 +321,7 @@ TEST(ComponentsTest, RemoveComponentDataChange) {
 TEST(ComponentsTest, ExceptionRemoveComponentDataChange) {
 	Smasher::Engine engine(640, 420);
 	engine.PushLayer<DummyLayer>().Activate();
-	Smasher::Entity entity = engine.GetLayer<DummyLayer>().AddEntity<Smasher::Entity>();
+	Smasher::Entity& entity = engine.GetLayer<DummyLayer>().AddEntity<Smasher::Entity>();
 	entity.AddComponent<SpicyDeleteTestComponent>();
 	EXPECT_TRUE(entity.HasComponent<SpicyDeleteTestComponent>());
 	EXPECT_NO_THROW({ engine.Update(Smasher::Millisecond{10}); });
