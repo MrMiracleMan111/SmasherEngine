@@ -156,6 +156,16 @@ TEST(TraitChecks, ManagerTraits) {
 	EXPECT_TRUE(true);
 }
 
+
+TEST(TraitChecks, UUID) {
+	// UUID should be copyable, moveable
+	static_assert(std::is_copy_constructible_v<Smasher::UUID>);
+	static_assert(std::is_copy_assignable_v<Smasher::UUID>);
+	static_assert(std::is_move_constructible_v<Smasher::UUID>);
+	static_assert(std::is_move_assignable_v<Smasher::UUID>);
+	EXPECT_TRUE(true);
+}
+
 TEST(TraitChecks, EventSubscription) {
 	// EventSubscriptionHandle should be non-copyable, non-move-assignable, move-constructible
 	static_assert(!std::is_copy_constructible_v<Smasher::EventSubscription>);
