@@ -5,38 +5,7 @@
 
 namespace Smasher {
 	class Layer;
-	enum LayerTransitionType {
-		ADD,
-		REMOVE,
-		// MOVE (shifting layer up/down)
-	};
-	// Contains information about a layer transition
-	struct LayerTransition {
-		LayerTransition() = delete;
-		LayerTransition(LayerTransitionType type, std::unique_ptr<Layer> pLayer) :
-			type(type),
-			pLayer(std::move(pLayer)) {}
-		~LayerTransition() = default;
-		LayerTransition(LayerTransition&&) = default;
-		LayerTransition(const LayerTransition&) = delete;
-		LayerTransition& operator =(LayerTransition&&) = default;
-		LayerTransition& operator =(const LayerTransition&) = delete;
-
-		const LayerTransitionType type;
-		std::unique_ptr<Layer> pLayer;
-
-		struct LayerTransitionAdd {
-			std::type_index index;
-		};
-
-		struct LayerTransitionRemove { };
-
-		union {
-			LayerTransitionAdd addTransition;
-			LayerTransitionRemove removeTransition;
-		};
-	};
-
+	class BaseLayer;
 
 	template<class T, typename... Args>
 	T& Engine::PushLayer(Args&&... componentArgs) {
