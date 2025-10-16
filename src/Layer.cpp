@@ -57,6 +57,24 @@ namespace Smasher {
 		}
 	}
 
+	Entity& Layer::MoveEntity(Entity& entity)
+	{
+		if (&entity.GetLayer() == this) {
+			return entity; // Can't move entity to this layer
+		}
+
+		assert(!HasEntity(entity.GetUUID())); // Entity UUID should not be taken in this layer
+		
+		auto itr = entity.GetLayer().m_EntityMap.find(entity.GetUUID());
+
+		std::unique_ptr<Entity> pEntity = std::move(itr->second);
+		entity.GetLayer().m_EntityMap.erase(entity.GetUUID());
+		m_EntityMap.insert({ entity.GetUUID(), std::move(pEntity) });
+		entity.SetLayer(*this);
+
+		return entity;
+	}
+
 	Entity& Layer::AddEntity() {
 		return AddEntity<Entity>();
 	};

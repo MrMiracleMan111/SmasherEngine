@@ -69,6 +69,9 @@ namespace Smasher {
 		template <class T, typename... Args>
 		T& AddEntity(Args&&... componentArgs);
 
+		// Move Entity to this layer
+		Entity& MoveEntity(Entity& entity);
+
 		Entity& AddEntity();
 
 		void RemoveEntity(UUID uuid);
