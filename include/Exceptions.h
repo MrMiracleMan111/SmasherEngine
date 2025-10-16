@@ -16,7 +16,7 @@ const std::string& m_Message; \
 
 namespace Smasher {
 	namespace Exceptions {
-		// ==== GAME STATE EXCEPTIONS ====
+		// ==== LAYER EXCEPTIONS ====
 		SMASHER_EXCEPTION(LayerNotFound)
 		SMASHER_EXCEPTION(LayerDuplicate)
 		SMASHER_EXCEPTION(LayerEntityNotFound)
