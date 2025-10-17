@@ -1,4 +1,3 @@
-#pragma once
 #include "RenderBatch.h"
 #include "Base.h"
 
