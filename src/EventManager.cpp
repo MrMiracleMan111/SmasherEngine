@@ -107,9 +107,10 @@ namespace Smasher {
 
 	EventSubscriptionHandle::EventSubscriptionHandle(EventSubscriptionHandle&& other) noexcept :
 		m_SubscriptionListPtr(other.m_SubscriptionListPtr),
+		m_SubscriptionPtr(other.m_SubscriptionPtr),
+		m_EventManagerPtr(other.m_EventManagerPtr),
 		m_Itr(other.m_Itr),
-		m_Valid(other.m_Valid),
-		m_EventManagerPtr(other.m_EventManagerPtr) {
+		m_Valid(other.m_Valid) {
 		other.Invalidate();
 	}
 
@@ -121,6 +122,7 @@ namespace Smasher {
 			}
 			m_EventManagerPtr = other.m_EventManagerPtr;
 			m_SubscriptionListPtr = other.m_SubscriptionListPtr;
+			m_SubscriptionPtr = other.m_SubscriptionPtr;
 			m_Itr = other.m_Itr;
 			m_Valid = other.m_Valid;
 			other.Invalidate();

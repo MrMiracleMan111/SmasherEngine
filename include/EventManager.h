@@ -39,15 +39,16 @@ namespace Smasher {
 		EventSubscriptionHandle& operator =(EventSubscriptionHandle&&) noexcept;
 
 
-		bool IsValid() const { return m_Valid; }
+		bool IsValid() const { return m_Valid && !m_SubscriptionPtr.expired(); }
 
 		void Unsubscribe();
 
 	// Only EventManagers should have privilege to instantiate EventSubscriptionHandles
 	protected:
-		EventSubscriptionHandle(std::list<EventSubscription>& list,
-			std::list<EventSubscription>::iterator itr, EventManager& rEventManager) :
+		EventSubscriptionHandle(std::list<std::shared_ptr<EventSubscription>>& list,
+			std::list<std::shared_ptr<EventSubscription>>::iterator itr, std::shared_ptr<EventSubscription>& subscriptionPtr, EventManager& rEventManager) :
 			m_SubscriptionListPtr(&list),
+			m_SubscriptionPtr(subscriptionPtr),
 			m_Itr(itr),
 			m_Valid(true),
 			m_EventManagerPtr(&rEventManager) {};
@@ -96,9 +97,6 @@ namespace Smasher {
 		std::mutex& GetAsyncSubscriptionsMutex() { return m_AsyncSubscriptionsMutex; };
 
 	private:
-		std::unordered_map<std::type_index, std::list<EventSubscription>> m_EventSubscriptionsByType;
-		std::unordered_map<std::type_index, std::list<EventSubscription>> m_AsyncEventSubscriptionsByType;
-
 		std::vector<std::shared_ptr<Event>> m_EventQueue;
 		std::vector<std::shared_ptr<Event>> m_AsyncEventQueue; // Events currently being processed in async queue
 
