@@ -1,5 +1,5 @@
 #include "MidLayer.h"
-#include "Components\TextComponent.h"
+#include "Components/TextComponent.h"
 #include "Manifest.h"
 
 MidLayer::~MidLayer() {

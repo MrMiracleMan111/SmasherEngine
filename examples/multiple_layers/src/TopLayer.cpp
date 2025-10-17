@@ -1,5 +1,5 @@
 #include "TopLayer.h"
-#include "Components\TextComponent.h"
+#include "Components/TextComponent.h"
 #include "Manifest.h"
 
 TopLayer::~TopLayer()
