@@ -83,12 +83,13 @@ namespace Smasher {
 		static_assert(std::is_base_of<Event, T>::value, "T must inherit from Event");
 
 		const std::type_index index = std::type_index(typeid(T));
-		std::list<EventSubscription>& list = m_EventSubscriptionsByType[index];
+		std::list<std::shared_ptr<EventSubscription>>& list = m_EventSubscriptionsByType[index];
 
-		auto bound = [callback](Event& arg) {callback(static_cast<T&>(arg)); };
-		list.push_back(EventSubscription{ bound });
+		auto bound = [callback](Event& arg) { callback(static_cast<T&>(arg)); };
+		std::shared_ptr<EventSubscription> subscriptionPtr = std::make_shared<EventSubscription>(bound);
+		list.push_back(subscriptionPtr);
 
-		return EventSubscriptionHandle(list, std::prev(list.end()), GetEventManager());
+		return EventSubscriptionHandle(list, std::prev(list.end()), subscriptionPtr, GetEventManager());
 	}
 
 	// Overload for class memebr function ex:
@@ -105,12 +106,13 @@ namespace Smasher {
 		static_assert(std::is_base_of<Event, T>::value, "T must inherit from Event");
 
 		const std::type_index index = std::type_index(typeid(T));
-		std::list<EventSubscription>& list = m_AsyncEventSubscriptionsByType[index];
+		std::list<std::shared_ptr<EventSubscription>>& list = m_AsyncEventSubscriptionsByType[index];
 
-		auto bound = [callback](Event& arg) {callback(static_cast<T&>(arg)); };
-		list.push_back(EventSubscription{ bound });
+		auto bound = [callback](Event& arg) { callback(static_cast<T&>(arg)); };
+		std::shared_ptr<EventSubscription> subscriptionPtr = std::make_shared<EventSubscription>(bound);
+		list.push_back(subscriptionPtr);
 
-		return EventSubscriptionHandle(list, std::prev(list.end()), GetEventManager());
+		return EventSubscriptionHandle(list, std::prev(list.end()), subscriptionPtr, GetEventManager());
 	}
 
 	template<class T, class C>

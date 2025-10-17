@@ -107,8 +107,8 @@ namespace Smasher {
 		void ProcessEvent(Event& event);
 		void ProcessAsyncEvent(Event& event);
 
-		std::unordered_map<std::type_index, std::list<EventSubscription>>& GetEventSubscriptions() { return m_EventSubscriptionsByType; };
-		std::unordered_map<std::type_index, std::list<EventSubscription>>& GetAsyncEventSubscriptions() { return m_AsyncEventSubscriptionsByType; };
+		std::unordered_map<std::type_index, std::list<std::shared_ptr<EventSubscription>>>& GetEventSubscriptions() { return m_EventSubscriptionsByType; };
+		std::unordered_map<std::type_index, std::list<std::shared_ptr<EventSubscription>>>& GetAsyncEventSubscriptions() { return m_AsyncEventSubscriptionsByType; };
 	private:
 		template <class T>
 		void LoadComponentManager();
@@ -125,8 +125,8 @@ namespace Smasher {
 		Millisecond m_UpdateTime;
 		Millisecond m_RenderTime;
 
-		std::unordered_map<std::type_index, std::list<EventSubscription>> m_EventSubscriptionsByType;
-		std::unordered_map<std::type_index, std::list<EventSubscription>> m_AsyncEventSubscriptionsByType;
+		std::unordered_map<std::type_index, std::list<std::shared_ptr<EventSubscription>>> m_EventSubscriptionsByType;
+		std::unordered_map<std::type_index, std::list<std::shared_ptr<EventSubscription>>> m_AsyncEventSubscriptionsByType;
 	};
 
 	class SMASHER_API BaseLayer final : public Layer {
