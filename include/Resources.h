@@ -29,9 +29,8 @@ namespace Smasher {
 
 			// Using std::min just in case there is some wacky issue
 			for (std::size_t i = 0; i < std::min(numPaths, m_Paths.size()); i++) {
-				ResourcePath& path = m_Paths[i];
-				path += resourcesDirectory;
-				path += relativePaths[i];
+				m_Paths[i] += resourcesDirectory;
+				m_Paths[i] += relativePaths[i];
 			}
 		}
 
