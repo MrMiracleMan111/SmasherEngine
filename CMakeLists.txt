@@ -105,6 +105,10 @@ endif()
 
 find_package(Doxygen)
 if(GENERATE_DOCS)
+    if (NOT EXISTS "${CMAKE_SOURCE_DIR}/doc")
+        file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/doc")
+    endif()
+
     if(DOXYGEN_FOUND)
         set(DOXYGEN_INPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
         set(DOXYGEN_OUTPUT_DIR "${CMAKE_SOURCE_DIR}/doc")
