@@ -56,7 +56,7 @@ namespace Smasher {
 
 	void EventManager::DispatchAsync(Engine& engine) {
 		for (auto& pEvent : m_AsyncEventQueue) {
-			std::scoped_lock lock(m_AsyncSubscriptionsMutex);
+			std::scoped_lock lock(m_AsyncSubscriptionsMutex, engine.m_LayerTransitionMutex);
 			auto itr = engine.m_LayerStack.begin();
 			while (pEvent->Propagate && itr != engine.m_LayerStack.end()) {
 				itr->second->ProcessAsyncEvent(*pEvent);

@@ -296,6 +296,7 @@ namespace Smasher {
 
 	void Engine::RemoveLayer(LayerTransition& transition)
 	{
+		std::scoped_lock lock(m_LayerTransitionMutex);
 		if (transition.removeTransition.index == std::type_index(typeid(BaseLayer))) {
 			throw Exceptions::CannotRemoveBaseLayer("Removing BaseLayer is not permitted.");
 		}
