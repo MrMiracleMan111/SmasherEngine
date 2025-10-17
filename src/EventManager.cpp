@@ -9,13 +9,11 @@ namespace Smasher {
 	}
 
 	EventManager::EventManager(EventManager&& other) noexcept :
-		m_EventSubscriptionsByType(std::move(other.m_EventSubscriptionsByType)),
 		m_EventQueue(std::move(other.m_EventQueue)),
 		m_AsyncRunning(false),
 		m_EngineRef(other.m_EngineRef)
 	{
 		other.StopAsync();
-		m_AsyncEventSubscriptionsByType = std::move(other.m_AsyncEventSubscriptionsByType);
 		m_AsyncEventQueue = std::move(other.m_AsyncEventQueue);
 		m_AsyncEventSwapQueue = std::move(other.m_AsyncEventSwapQueue);
 		m_AsyncRunning = true;
@@ -32,8 +30,6 @@ namespace Smasher {
 			other.StopAsync();
 
 			m_EngineRef = other.m_EngineRef;
-			m_EventSubscriptionsByType = std::move(other.m_EventSubscriptionsByType);
-			m_AsyncEventSubscriptionsByType = std::move(other.m_AsyncEventSubscriptionsByType);
 			m_EventQueue = std::move(other.m_EventQueue);
 			m_AsyncEventQueue = std::move(other.m_AsyncEventQueue);
 			m_AsyncEventSwapQueue = std::move(other.m_AsyncEventSwapQueue);
