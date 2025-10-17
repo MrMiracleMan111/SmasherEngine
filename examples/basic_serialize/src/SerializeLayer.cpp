@@ -54,7 +54,7 @@ void SerializeLayer::Init()
 	std::cout << "Updated " << count << " component(s) from save file" << std::endl;
 
 	saveFile.close();
-	m_OnCloseSubscription = GetEngine().GetEventManager().Subscribe<Smasher::Events::WindowCloseEvent>(&SerializeLayer::OnClose, this);
+	m_OnCloseSubscription = Subscribe<Smasher::Events::WindowCloseEvent>(&SerializeLayer::OnClose, this);
 }
 
 Smasher::Entity& SerializeLayer::SpawnBouncingBall(sf::Vector2i position)
