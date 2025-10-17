@@ -1,5 +1,6 @@
 #include <numbers>
 #include <iostream>
+#include <cmath>
 #include "Base.h"
 #include "SerializeLayer.h"
 #include "Layer.h"
