@@ -29,7 +29,7 @@ namespace Smasher {
 
 	// Creates layer and adds it to transition list
 	template<class T>
-	T& Engine::PopLayer() {
+	void Engine::PopLayer() {
 		if (std::type_index(typeid(T)) == std::type_index(typeid(BaseLayer))) {
 			throw Exceptions::CannotRemoveBaseLayer("Removing BaseLayer is not permitted.");
 		}

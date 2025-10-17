@@ -49,7 +49,7 @@ namespace Smasher {
 
 		// Creates layer and adds it to transition list
 		template<class T>
-		T& PopLayer();
+		void PopLayer();
 
 		template<class T>
 		T& GetLayer() const;
