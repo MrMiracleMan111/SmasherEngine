@@ -5,13 +5,13 @@
 #include "Smasher_export.h"
 #define SMASHER_API SMASHERENGINE_EXPORT
 
-#define SMASHER_EXCEPTION(name) class SMASHER_API name : public std::exception { \
+#define SMASHER_EXCEPTION(name) class name : public std::exception { \
 public: \
 explicit name() : m_Message("") {} \
 explicit name(const std::string& msg) : m_Message(msg) {} \
 const char *what() const noexcept {return m_Message.c_str();} \
 private: \
-const std::string& m_Message; \
+std::string m_Message; \
 }; \
 
 namespace Smasher {
