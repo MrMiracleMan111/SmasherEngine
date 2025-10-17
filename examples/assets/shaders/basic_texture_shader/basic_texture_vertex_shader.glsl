@@ -1,12 +1,12 @@
 #version 330 core
 precision highp int;
-layout(location = 0) in vec2 aPos; // the position variable has attribute position 0
-layout(location = 1) in vec2 aTexCoord; // the color variable has attribute position 1
-layout(location = 2) in vec3 aWorldPos; // the color variable has attribute position 1
-layout(location = 3) in vec2 aWorldScale; // the color variable has attribute position 1
+layout(location = 0) in vec2 aPos;
+layout(location = 1) in vec2 aTexCoord;
+layout(location = 2) in vec3 aWorldPos;
+layout(location = 3) in vec2 aWorldScale;
 layout(location = 4) in mat3 texMatrix;
-layout(location = 7) in uint aColorCode; // the color variable has attribute position 1
-layout(location = 8) in float aWorldRotation; // the color variable has attribute position 1
+layout(location = 7) in uint aColorCode;
+layout(location = 8) in float aWorldRotation;
 
 out vec4 vertexColor;
 out vec2 texCoord;
