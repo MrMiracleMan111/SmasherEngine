@@ -19,8 +19,8 @@ namespace Smasher {
 
 	// Non-Copyable
 	class SMASHER_API Engine final {
-		using LayerStackItr = std::vector<std::pair<std::type_index, std::unique_ptr<Layer>>>::iterator;
-		using LayerStackConstItr = std::vector<std::pair<std::type_index, std::unique_ptr<Layer>>>::const_iterator;
+		using LayerStackItr = std::list<std::pair<std::type_index, std::unique_ptr<Layer>>>::iterator;
+		using LayerStackConstItr = std::list<std::pair<std::type_index, std::unique_ptr<Layer>>>::const_iterator;
 
 		friend class EventManager;
 	public:
@@ -54,7 +54,7 @@ namespace Smasher {
 		template<class T>
 		T& GetLayer() const;
 
-		std::vector<std::pair<std::type_index, std::unique_ptr<Layer>>>::iterator TopLayerItr();
+		LayerStackItr TopLayerItr();
 
 		template<class T>
 		bool HasLayer() const;
@@ -69,7 +69,8 @@ namespace Smasher {
 		bool IsHeadless() const { return m_Headless; }
 
 	protected:
-		std::vector<std::pair<std::type_index, std::unique_ptr<Layer>>> m_LayerStack;
+		std::list<std::pair<std::type_index, std::unique_ptr<Layer>>> m_LayerStack;
+		std::mutex m_LayerTransitionMutex;
 
 	private:
 #ifdef BENCHMARK

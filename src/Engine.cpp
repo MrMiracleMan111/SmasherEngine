@@ -320,7 +320,7 @@ namespace Smasher {
 		}
 	}
 
-	std::vector<std::pair<std::type_index, std::unique_ptr<Layer>>>::iterator Engine::TopLayerItr()
+	Engine::LayerStackItr Engine::TopLayerItr()
 	{
 		return m_LayerStack.begin();
 	}
