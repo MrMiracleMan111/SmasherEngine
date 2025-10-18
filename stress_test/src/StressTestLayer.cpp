@@ -35,16 +35,7 @@ Smasher::Entity& StressTestLayer::SpawnBouncingBall(sf::Vector2i position)
 
 void StressTestLayer::Init()
 {
-	std::shared_ptr<Smasher::ShaderResource> pShader = GetEngine().GetResourceManager().GetOrLoadResource<Smasher::Resources::Shaders::basic_texture_shader, Smasher::ShaderResource>();
-	sf::Vector2f windowSize = sf::Vector2f((float)GetEngine().GetWindow().getSize().x, (float)GetEngine().GetWindow().getSize().y);
-	sf::Glsl::Mat4 viewProjectionMatrix = sf::Glsl::Mat4(GetEngine().GetWindow().getView().getTransform().getMatrix());
-	pShader->GetShader().setUniform("windowSize", windowSize);
-	pShader->GetShader().setUniform("ViewProjectionMatrix", viewProjectionMatrix);
-
 	m_OnMouseMoveHandle = Subscribe<Smasher::Events::MouseMoveEvent>(&StressTestLayer::OnMouseMove, this);
-
-	auto& rCompManager = static_cast<Smasher::DrawableComponentManager&>(GetComponentManager<Smasher::DrawableComponent>());
-	rCompManager.SetShaderResource(pShader);
 
 	Smasher::Entity& rUpdateTracker = AddEntity<Smasher::Entity>();
 	Smasher::Entity& rRenderTracker = AddEntity<Smasher::Entity>();

@@ -19,16 +19,6 @@ void SerializeLayer::Init()
 		throw std::runtime_error("Couldn't open SaveFile.bin");
 	}
 
-	GetEngine().GetResourceManager().SetResourceDirectory(Smasher::Resources::Metadata::RESOURCES_DIRECTORY);
-	std::shared_ptr<Smasher::ShaderResource> shader = GetEngine().GetResourceManager().GetOrLoadResource<Smasher::Resources::Shaders::basic_texture_shader, Smasher::ShaderResource>();
-	sf::Glsl::Mat4 viewProjectionMatrix = sf::Glsl::Mat4(GetEngine().GetWindow().getView().getTransform().getMatrix());
-	shader->GetShader().setUniform("ViewProjectionMatrix", viewProjectionMatrix);
-
-	// TODO: FIND A BETTER SOLUTION
-	// I shouldn't have to worry about loading DrawableComponentManager after drawable component
-	Smasher::DrawableComponentManager& rCompManager = static_cast<Smasher::DrawableComponentManager&>(GetComponentManager<Smasher::DrawableComponent>());
-	rCompManager.SetShaderResource(shader);
-
 	const size_t DIMENSION = 100;
 	const size_t SPACING = 5;
 	for (size_t i = 0; i < DIMENSION; i++) {
