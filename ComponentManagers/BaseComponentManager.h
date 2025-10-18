@@ -46,7 +46,7 @@ namespace Smasher {
 		template<typename... Args>
 		T& AddComponent(Entity& rEntity, Args&&... args);
 
-		void RemoveComponent(IComponent& rComponentInterface);
+		virtual void RemoveComponent(IComponent& rComponentInterface);
 
 	protected:
 		plf::colony<T> m_Components;
