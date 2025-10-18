@@ -29,6 +29,5 @@ private:
 	sf::Vector2f m_Velocity;
 	sf::IntRect m_Collider;
 	Smasher::DrawableComponent* m_DrawableComponentPtr = nullptr;
-
 	Smasher::CameraComponent* m_CameraComponentPtr = nullptr;
 };
