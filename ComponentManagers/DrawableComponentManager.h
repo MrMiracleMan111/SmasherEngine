@@ -53,3 +53,5 @@ namespace Smasher {
 		std::shared_ptr<ShaderResource> m_ShaderResource; // Solely for preventing destruction of resource object
 	};
 }
+
+#include "DrawableComponentManager.inl"
