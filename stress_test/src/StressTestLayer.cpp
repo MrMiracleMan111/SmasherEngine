@@ -88,6 +88,7 @@ void StressTestLayer::Init()
 
 	// Half of the entities will have a non-alpha image
 	// Half of the entities will have image with alpha pixels
+	// The camera will follow the 10th entity
 	for (std::size_t i = 0; i < m_NumEntities; ++i) {
 		int positionX = int((rand() % 100) * 5);
 		int positionY = int((rand() % 100) * 5);
