@@ -87,13 +87,13 @@ namespace Resources {
 
 ```c++
 #include "Core.h"
-#include "Components/Transform2DComponent.h"
+# include "Components/TextComponent.h"
 
 int main() {
 	Smasher::Engine engine(640, 420);
-	Smasher::GameState& state = engine.AddState<Smasher::GameState>();
-    state.Activate();
-	Smasher::Entity entity = state.AddEntity<Smasher::Entity>();
+	Smasher::Layer& layer = engine.AddLayer<Smasher::GameState>();
+    layer.Activate();
+	Smasher::Entity entity = layer.AddEntity<Smasher::Entity>();
 	entity
     .AddComponent<TextComponent>()
         .SetString("Hello World!")
