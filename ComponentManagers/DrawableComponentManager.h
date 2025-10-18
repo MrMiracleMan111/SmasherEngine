@@ -30,6 +30,7 @@ namespace Smasher {
 //////////////////////////////////////////////////////////////////////////////////////////////////
 	class SMASHER_API DrawableComponentManager : public BaseComponentManager<DrawableComponent> {
 	public:
+		DrawableComponentManager() = delete;
 		DrawableComponentManager(Layer& state);
 		DrawableComponentManager(const DrawableComponentManager&) = default;
 		~DrawableComponentManager() = default;
