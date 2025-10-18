@@ -14,7 +14,7 @@
 using namespace Smasher;
 int main(int argc, char **argv) {
 	Smasher::Engine engine(640, 420);
-	std::size_t numEntities = 20;// 100000;
+	std::size_t numEntities = 20; // 100000;
 	engine.GetResourceManager().SetResourceDirectory(Smasher::Resources::Metadata::RESOURCES_DIRECTORY);
 
 
@@ -22,7 +22,6 @@ int main(int argc, char **argv) {
 		numEntities = std::size_t{ std::stoull(argv[1]) };
 	}
 
-	engine.GetResourceManager().SetResourceDirectory(Resources::Metadata::RESOURCES_DIRECTORY);
 	StressTestLayer& state = engine.PushLayer<StressTestLayer>(numEntities);
 
 	state.Activate();
