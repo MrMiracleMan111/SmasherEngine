@@ -192,7 +192,6 @@ namespace Smasher {
 	}
 
 	void Engine::HandleLayerTransitions() {
-		// TODO : Handle layer transistions (adding/removing layers)
 		for (auto& itr : m_LayerTransitions) {
 			switch (itr.type) {
 			case LayerTransitionType::ADD:
