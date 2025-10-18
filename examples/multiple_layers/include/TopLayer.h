@@ -6,5 +6,6 @@ public:
 	~TopLayer();
 
 	void Init() override;
+	void Update(Smasher::Millisecond delta) override { std::cout << "Top\n----" << std::endl; }
 private:
 };

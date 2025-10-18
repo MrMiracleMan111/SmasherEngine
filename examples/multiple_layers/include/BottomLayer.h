@@ -6,5 +6,6 @@ public:
 	~BottomLayer();
 
 	void Init() override;
+	void Update(Smasher::Millisecond delta) override { std::cout << "----\nBottom" << std::endl; }
 private:
 };
