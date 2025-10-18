@@ -144,7 +144,8 @@ target_link_libraries(SmasherEngine PUBLIC
 "sfml-network"
 "sfml-system"
 ${GLEW_TARGET}
-OpenGL::GL)
+OpenGL::GL
+OpenGL::GLU)
 
 target_compile_features(SmasherEngine PUBLIC cxx_std_20)
 
