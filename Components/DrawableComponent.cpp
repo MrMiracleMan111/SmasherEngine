@@ -6,13 +6,13 @@
 #include "ComponentManagers/DrawableComponentManager.h"
 
 namespace Smasher {
-    inline DrawableComponent::DrawableComponent() : IComponent(), Transform2DWrapper(*this, m_Transformable),
+    DrawableComponent::DrawableComponent() : IComponent(), Transform2DWrapper(*this, m_Transformable),
         m_OpaqueBatchContext(nullptr, SIZE_MAX),
         m_TranslucentBatchContext(nullptr, SIZE_MAX) {
         SetScale(sf::Vector2f(100.0f, 100.0f));
     }
 
-    inline DrawableComponent::DrawableComponent(
+    DrawableComponent::DrawableComponent(
         std::shared_ptr<TextureResource> texturePtr,
         std::shared_ptr<ShaderResource> shaderPtr) : IComponent(), Transform2DWrapper(*this, m_Transformable),
         m_ShaderResource(shaderPtr),
