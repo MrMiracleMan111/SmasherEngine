@@ -86,9 +86,8 @@ void StressTestLayer::Init()
 	m_BallCounterPtr = &rBallCounter;
 	m_CameraPtr = &rCamera;
 
-	// Create 10 entites
-	// Half will have a non-alpha image
-	// Half will have image with alpha pixels
+	// Half of the entities will have a non-alpha image
+	// Half of the entities will have image with alpha pixels
 	for (std::size_t i = 0; i < m_NumEntities; ++i) {
 		int positionX = int((rand() % 100) * 5);
 		int positionY = int((rand() % 100) * 5);
