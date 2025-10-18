@@ -219,7 +219,7 @@ namespace Smasher {
 		return m_LayerStack.end();
 	}
 
-	// Updates layers from top to bottom
+	// Updates layers from bottom to top
 	void Engine::Update(Millisecond delta) {
 		HandleLayerTransitions();
 
@@ -244,7 +244,7 @@ namespace Smasher {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear Screen And Depth Buffer
 
 		// Render in reverse order
-		for (auto& itr : std::views::reverse(m_LayerStack)) {
+		for (auto& itr : m_LayerStack) {
 			std::unique_ptr<Layer>& pLayer = itr.second;
 			m_RenderTimestamp = std::chrono::system_clock::now();
 
