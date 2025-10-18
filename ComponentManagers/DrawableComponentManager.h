@@ -37,6 +37,9 @@ namespace Smasher {
 
 		void Render(sf::RenderWindow& rWindow) override;
 
+		template<typename... Args>
+		DrawableComponent& AddComponent(Entity& entity, Args&&... args);
+
 		// Sets component batch index and render batch pointer
 		void OnComponentChangeData(DrawableComponent& rComponent);
 		void OnComponentSetTexture(DrawableComponent& rComponent, ResourceID id, bool transulcent);
