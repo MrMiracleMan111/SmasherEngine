@@ -50,6 +50,9 @@ namespace Smasher {
 		template <class T>
 		std::shared_ptr<T> GetResource(ResourceID resourceID);
 
+		// Generates shader from string
+		std::shared_ptr<Smasher::ShaderResource> LoadVertFragShaderResource(const std::string& vert, const std::string& frag);
+
 		// Remove internal internally, resource object will be deleted once all objects using it free it
 		void ReleaseResource(ResourceID resourceID) {
 			m_ResourceMap.erase(resourceID);
