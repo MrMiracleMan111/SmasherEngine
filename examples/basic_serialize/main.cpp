@@ -6,6 +6,8 @@
 
 int main() {
 	Smasher::Engine engine(640, 420);
+	engine.GetResourceManager().SetResourceDirectory(Smasher::Resources::Metadata::RESOURCES_DIRECTORY);
+
 	Smasher::Layer& state = engine.PushLayer<SerializeLayer>();
 	state.Activate();
 	engine.Run();
