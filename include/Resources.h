@@ -34,6 +34,9 @@ namespace Smasher {
 			}
 		}
 
+		// Constructor for resources with no paths (ex. shaders generated from std::string)
+		Resource(ResourceID id) : m_ID(id), m_Paths(), m_Loaded(true) {}
+
 	protected:
 		bool m_Loaded = false;
 		ResourceID m_ID;
@@ -120,6 +123,11 @@ namespace Smasher {
 				throw Smasher::Exceptions::ResourceInvalidNumPaths("numPaths is invalid");
 				assert(false); // Never should be reached
 			}
+		}
+
+		ShaderResource(ResourceID id, const std::string& vert, const std::string& frag) :
+			Resource(id), m_ShaderType(sf::Shader::Type::Geometry) {
+			m_Shader.loadFromMemory(vert, frag);
 		}
 
 		sf::Shader& GetShader() { return m_Shader; }
