@@ -45,12 +45,15 @@ namespace Smasher {
 
 		void OnWindowClose(Events::WindowCloseEvent& event);
 
+		std::shared_ptr<ShaderResource> GetDefaultShader() const { return m_DefaultShader; }
+
 	private:
 		void DrawBatch(RenderBatch& rRenderBatch);
 		std::map<ResourceID, std::list<RenderBatch>> m_OpaqueBatches; // Linked List of Batches
 		std::map<ResourceID, std::list<RenderBatch>> m_TranslucentBatches;// Linked List of Batches
 
 		std::shared_ptr<ShaderResource> m_ShaderResource; // Solely for preventing destruction of resource object
+		std::shared_ptr<ShaderResource> m_DefaultShader; // Shader loaded from EngineConfig.h
 	};
 }
 
