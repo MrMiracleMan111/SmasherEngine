@@ -218,7 +218,7 @@ namespace Smasher {
 
 	Engine::LayerStackConstItr Engine::GetLayerItr(std::type_index index) const
 	{
-		for (auto itr = m_LayerStack.begin(); itr != m_LayerStack.end(); itr++) {
+		for (auto itr = m_LayerStack.begin(); itr != m_LayerStack.end(); ++itr) {
 			if (index == itr->first) {
 				return itr;
 			}
