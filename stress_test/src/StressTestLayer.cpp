@@ -145,8 +145,10 @@ void StressTestLayer::Render(sf::RenderWindow& rWindow) {
 // Spawn an entity at mouse position
 void StressTestLayer::OnMouseMove(Smasher::Events::MouseMoveEvent& event) {
 	sf::Window& rWindow = GetEngine().GetWindow();
-	sf::Vector2i entityPos = sf::Vector2i(event.Position) - rWindow.getPosition();
-	Smasher::Entity& ball = SpawnBouncingBall(entityPos);
-	ball.GetComponent<Smasher::DrawableComponent>()
-		.SetTextureAsset<Smasher::Resources::Textures::alpha_test>({});
+	sf::Rect<int> windowRect(0, 0, (int)rWindow.getSize().x, (int)rWindow.getSize().y);
+	if (windowRect.contains(event.Position.x, event.Position.y)) {
+		Smasher::Entity& ball = SpawnBouncingBall(event.Position);
+		ball.GetComponent<Smasher::DrawableComponent>()
+			.SetTextureAsset<Smasher::Resources::Textures::alpha_test>({});
+	}
 }
