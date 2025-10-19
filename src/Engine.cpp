@@ -34,7 +34,9 @@ namespace Smasher {
 				EngineConfig::TITLE, sf::Style::Default,
 				EngineConfig::DEFAULT_SETTINGS
 			)
-		) {
+		),
+		m_WindowView(sf::FloatRect(0.f, 0.f, (float)m_Window->getSize().x, (float)m_Window->getSize().y))
+	{
 		Init();
 	}
 
@@ -53,7 +55,9 @@ namespace Smasher {
 				sf::Style::Default,
 				settings
 			)
-		) {
+		),
+		m_WindowView(sf::FloatRect(0.f, 0.f, (float)m_Window->getSize().x, (float)m_Window->getSize().y))
+	{
 		Init();
 	}
 
@@ -66,7 +70,9 @@ namespace Smasher {
 				EngineConfig::TITLE,
 				sf::Style::Default, EngineConfig::DEFAULT_SETTINGS
 			)
-		) {
+		),
+		m_WindowView(sf::FloatRect(0.f, 0.f, (float)m_Window->getSize().x, (float)m_Window->getSize().y))
+	{
 		Init();
 	}
 
@@ -75,6 +81,7 @@ namespace Smasher {
 		if (m_Valid) {
 			if (!m_Headless) {
 				m_WindowCloseHandle.Unsubscribe(); // Explicilty unsubscribe before EventManager is deconstructed
+				m_WindowResizeHandle.Unsubscribe();
 			}
 			m_LayerStack.clear();
 		}
@@ -137,6 +144,7 @@ namespace Smasher {
 			}
 
 			m_WindowCloseHandle = base.Subscribe<Events::WindowCloseEvent>(&Engine::OnWindowClose, this);
+			m_WindowResizeHandle = base.Subscribe<Events::WindowResizeEvent>(&Engine::OnWindowResize, this);
 		}
 	}
 
@@ -284,6 +292,12 @@ namespace Smasher {
 	void Engine::OnWindowClose(Events::WindowCloseEvent& event) {
 		m_RunningAtomic = false;
 	}
+
+	void Engine::OnWindowResize(Events::WindowResizeEvent& event) {
+		m_WindowView.setSize(sf::Vector2f(event.WindowSize.x, event.WindowSize.y));
+		m_Window->setView(m_WindowView);
+	}
+
 
 	void Engine::AddLayer(LayerTransition& transition)
 	{

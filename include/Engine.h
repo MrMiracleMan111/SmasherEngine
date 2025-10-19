@@ -78,6 +78,7 @@ namespace Smasher {
 #endif
 		Engine(bool headless); // Headless constructor
 		void OnWindowClose(Events::WindowCloseEvent& event);
+		void OnWindowResize(Events::WindowResizeEvent& event);
 
 		void AddLayer(LayerTransition& transition);
 		void RemoveLayer(LayerTransition& transition);
@@ -96,6 +97,7 @@ namespace Smasher {
 		std::mutex m_WindowMutex; // Prevent double delete on Window Context
 		EventManager m_EventManager;
 		ResourceManager m_ResourceManager;
+		sf::View m_WindowView; // Default window view (used for resizing events)
 		Millisecond m_UpdateInterval = EngineConfig::UPDATE_INTERVAL;
 		Millisecond m_RenderInterval = EngineConfig::RENDER_INTERVAL;
 
@@ -105,6 +107,7 @@ namespace Smasher {
 
 		// Handles must be deconstructed first
 		EventSubscriptionHandle m_WindowCloseHandle;
+		EventSubscriptionHandle m_WindowResizeHandle;
 	};
 }
 
