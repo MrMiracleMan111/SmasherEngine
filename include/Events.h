@@ -92,8 +92,8 @@ namespace Smasher {
 		};
 
 		struct SMASHER_API WindowResizeEvent : public Event {
-			sf::Vector2i WindowSize;
-				WindowResizeEvent(SMASHER_TIMESTAMP timestamp, sf::Vector2i size) :
+			sf::Vector2u WindowSize;
+				WindowResizeEvent(SMASHER_TIMESTAMP timestamp, sf::Vector2u size) :
 				Event(timestamp), WindowSize(size) {}
 		};
 	}

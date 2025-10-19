@@ -151,7 +151,7 @@ namespace Smasher {
 	void Engine::Run() {
 		m_RunningAtomic = true;
 
-		EventFeeder m_EventFeeder(m_EventManager);
+		EventFeeder m_EventFeeder(m_EventManager, *this);
 		try {
 			std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
 			Millisecond updateTimer{ 0 };

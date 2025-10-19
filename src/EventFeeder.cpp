@@ -1,7 +1,9 @@
 #include "EventFeeder.h"
 #include "EventManager.h"
+#include "Layer.h"
+#include "Engine.h"
 
-Smasher::EventFeeder::EventFeeder(EventManager& eventManager) : m_EventManager(eventManager)
+Smasher::EventFeeder::EventFeeder(EventManager& eventManager, Engine& engine) : m_EventManager(eventManager), m_Engine(engine)
 {
 	m_KeyboardState.fill(false);
 }
@@ -32,13 +34,20 @@ void Smasher::EventFeeder::ForwardSFMLEvent(const sf::Event& event)
 		m_EventManager.Publish<Events::MouseButtonEvent>(Mouse::MouseEventType::BUTTON_RELEASE, event.mouseButton.button, sf::Mouse::getPosition());
 		break;
 	case sf::Event::MouseMoved:
-		m_EventManager.Publish<Events::MouseMoveEvent>(Mouse::MouseEventType::MOUSE_MOVE, sf::Vector2i(event.mouseMove.x, event.mouseMove.y), sf::Mouse::getPosition());
+		if (!m_Engine.IsHeadless()) {
+			sf::Vector2i windowPos = sf::Mouse::getPosition(m_Engine.GetWindow());
+			sf::Vector2f localPos = m_Engine.GetWindow().mapPixelToCoords(windowPos);
+			m_EventManager.Publish<Events::MouseMoveEvent>(Mouse::MouseEventType::MOUSE_MOVE, sf::Vector2i(event.mouseMove.x, event.mouseMove.y), sf::Vector2i(localPos));
+		}
+		else {
+			m_EventManager.Publish<Events::MouseMoveEvent>(Mouse::MouseEventType::MOUSE_MOVE, sf::Vector2i(event.mouseMove.x, event.mouseMove.y), sf::Mouse::getPosition());
+		}
 		break;
 	case sf::Event::MouseWheelScrolled:
 		m_EventManager.Publish<Events::MouseScrollWheelEvent>(Mouse::MouseEventType::SCROLL, event.mouseWheelScroll.delta,  sf::Mouse::getPosition());
 		break;
 	case sf::Event::Resized:
-		m_EventManager.Publish<Events::WindowResizeEvent>(sf::Vector2i(event.size.width, event.size.height));
+		m_EventManager.Publish<Events::WindowResizeEvent>(sf::Vector2u(event.size.width, event.size.height));
 		break;
 	default:
 		break;
