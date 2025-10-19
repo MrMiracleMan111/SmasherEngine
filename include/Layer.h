@@ -113,6 +113,9 @@ namespace Smasher {
 		template <class T>
 		void LoadComponentManager();
 
+		std::unordered_map<std::type_index, std::list<std::shared_ptr<EventSubscription>>> m_EventSubscriptionsByType;
+		std::unordered_map<std::type_index, std::list<std::shared_ptr<EventSubscription>>> m_AsyncEventSubscriptionsByType;
+
 		std::unordered_map<UUID, std::unique_ptr<Entity>> m_EntityMap;
 		std::unordered_map<std::type_index, std::unique_ptr<IComponentManager>> m_ComponentManagers;
 		std::vector<IComponentManager*> m_ComponentManagersWithRender; // Subset of component managers with Render(sf::Window&) capability
@@ -124,9 +127,6 @@ namespace Smasher {
 
 		Millisecond m_UpdateTime;
 		Millisecond m_RenderTime;
-
-		std::unordered_map<std::type_index, std::list<std::shared_ptr<EventSubscription>>> m_EventSubscriptionsByType;
-		std::unordered_map<std::type_index, std::list<std::shared_ptr<EventSubscription>>> m_AsyncEventSubscriptionsByType;
 	};
 
 	class SMASHER_API BaseLayer final : public Layer {
