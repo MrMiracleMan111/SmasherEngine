@@ -6,6 +6,6 @@ public:
 	~MidLayer();
 
 	void Init() override;
-	void Update(Smasher::Millisecond delta) override { std::cout << "Middle" << std::endl; }
+	//void Update(Smasher::Millisecond delta) override { std::cout << "Middle" << std::endl; }
 private:
 };
