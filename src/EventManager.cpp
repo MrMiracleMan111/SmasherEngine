@@ -41,10 +41,10 @@ namespace Smasher {
 
 	void EventManager::Dispatch() {
 		for (auto& pEvent : m_EventQueue) {
-			auto itr = m_EngineRef.get().m_LayerStack.begin();
-			while (pEvent->Propagate && itr != m_EngineRef.get().m_LayerStack.end()) {
+			auto itr = m_EngineRef.get().m_LayerStack.rbegin();
+			while (pEvent->Propagate && itr != m_EngineRef.get().m_LayerStack.rend()) {
 				itr->second->ProcessEvent(*pEvent);
-				itr++;
+				++itr;
 			}
 		}
 		m_EventQueue.clear();
@@ -53,10 +53,10 @@ namespace Smasher {
 	void EventManager::DispatchAsync(Engine& engine) {
 		for (auto& pEvent : m_AsyncEventQueue) {
 			std::scoped_lock lock(m_AsyncSubscriptionsMutex, engine.m_LayerTransitionMutex);
-			auto itr = engine.m_LayerStack.begin();
-			while (pEvent->Propagate && itr != engine.m_LayerStack.end()) {
+			auto itr = engine.m_LayerStack.rbegin();
+			while (pEvent->Propagate && itr != engine.m_LayerStack.rend()) {
 				itr->second->ProcessAsyncEvent(*pEvent);
-				itr++;
+				++itr;
 			}
 		}
 		m_AsyncEventQueue.clear();
@@ -77,9 +77,9 @@ namespace Smasher {
 	{
 		m_AsyncRunning = false;
 		if (m_AsyncEventConsumerThread.joinable()) {
-			std::unique_lock lock(m_AsyncEventsMutex);
+			//std::unique_lock lock(m_AsyncEventsMutex);
 			m_AsyncEventsCV.notify_all();
-			lock.unlock();
+			//lock.unlock();
 			m_AsyncEventConsumerThread.join();
 		}
 	}
