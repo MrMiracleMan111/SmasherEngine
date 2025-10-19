@@ -48,17 +48,15 @@ namespace Smasher {
 
 		virtual void RemoveComponent(IComponent& rComponentInterface);
 
+		void PreUpdate(Millisecond delta);
+		void Update(Millisecond delta);
+		void Render(sf::RenderWindow& rWindow);
+
 	protected:
 		plf::colony<T> m_Components;
 
 	private:
 		void RemoveMarkedComponents();
-
-		void PreUpdate(Millisecond delta);
-
-		void Update(Millisecond delta);
-
-		void Render(sf::RenderWindow& rWindow);
 
 		std::vector<typename plf::colony<T>::iterator*> m_ComponentsToRemove; // Components to be removed
 	};
