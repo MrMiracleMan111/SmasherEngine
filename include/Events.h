@@ -23,7 +23,8 @@ namespace Smasher {
 	protected:
 		Event(SMASHER_TIMESTAMP timestamp) : Timestamp(timestamp) {}
 		bool Propagate = true; // When set to false, event subscriptions will stop handling this event
-	
+		bool Blocked = false; // Used to inform subscribers that event was blocked by another subscription, this DOES NOT stop the event from propagating
+							  // For example, with UI Panels, 
 	private:
 		// Retrieve derived Event type
 		virtual std::type_index _GetEventType() const final {
