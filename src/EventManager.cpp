@@ -42,7 +42,7 @@ namespace Smasher {
 	void EventManager::Dispatch() {
 		for (auto& pEvent : m_EventQueue) {
 			auto itr = m_EngineRef.get().m_LayerStack.rbegin();
-			while (pEvent->Propagate && itr != m_EngineRef.get().m_LayerStack.rend()) {
+			while (pEvent->CanPropagate() && itr != m_EngineRef.get().m_LayerStack.rend()) {
 				itr->second->ProcessEvent(*pEvent);
 				++itr;
 			}
@@ -52,9 +52,10 @@ namespace Smasher {
 
 	void EventManager::DispatchAsync(Engine& engine) {
 		for (auto& pEvent : m_AsyncEventQueue) {
+			// Layers and Asyc Subscriptions may change in between processing Async Events
 			std::scoped_lock lock(m_AsyncSubscriptionsMutex, engine.m_LayerTransitionMutex);
 			auto itr = engine.m_LayerStack.rbegin();
-			while (pEvent->Propagate && itr != engine.m_LayerStack.rend()) {
+			while (pEvent->CanPropagate() && itr != engine.m_LayerStack.rend()) {
 				itr->second->ProcessAsyncEvent(*pEvent);
 				++itr;
 			}
