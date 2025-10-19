@@ -19,17 +19,22 @@ namespace Smasher {
 		Event() = delete;
 
 		void StopPropagate() { Propagate = false; };
+		bool CanPropagate() const { return Propagate; }
+		void Block() { Blocked = true; };
+		bool IsBlocked() const { return Blocked; }
 
 	protected:
 		Event(SMASHER_TIMESTAMP timestamp) : Timestamp(timestamp) {}
-		bool Propagate = true; // When set to false, event subscriptions will stop handling this event
-		bool Blocked = false; // Used to inform subscribers that event was blocked by another subscription, this DOES NOT stop the event from propagating
-							  // For example, with UI Panels, 
+
 	private:
 		// Retrieve derived Event type
 		virtual std::type_index _GetEventType() const final {
 			return std::type_index(typeid(*this));
 		}
+
+		bool Propagate = true; // When set to false, event subscriptions will stop handling this event
+		bool Blocked = false; // Used to inform subscribers that event was blocked by another subscription, this DOES NOT stop the event from propagating
+		// For example, with UI Panels, 
 	};
 
 	namespace Events {	
