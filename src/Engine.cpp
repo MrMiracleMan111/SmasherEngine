@@ -301,6 +301,7 @@ namespace Smasher {
 
 	void Engine::AddLayer(LayerTransition& transition)
 	{
+		std::scoped_lock lock(m_LayerTransitionMutex);
 		Layer& rLayer = *transition.pLayer;
 		std::type_index index = transition.addTransition.index;
 		m_LayerStack.emplace_back(index, std::move(transition.pLayer));
