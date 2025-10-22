@@ -77,7 +77,7 @@ namespace Smasher {
 				std::cerr << "Exception thrown: " << e.what() << std::endl;
 			}
 			catch (...) {
-				std::cerr << "Unknown Exception thrown" << std::endl;
+				std::cerr << "Unknown Exception thrown inside EventManager::DispatchAsync" << std::endl;
 			}
 			m_AsyncEventSwapQueueMutex.unlock();
 		}
