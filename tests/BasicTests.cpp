@@ -297,6 +297,36 @@ TEST(LayerTest, RemoveLayerWithEvents) {
 	EXPECT_EQ(1, triggered_count);
 }
 
+TEST(LayerTest, RemoveLayerWithAsyncEvents) {
+	Smasher::Engine engine(640, 420);
+	DummyLayer& layer = engine.PushLayer<DummyLayer>();
+	Smasher::EventManager& manager = layer.GetEventManager();
+
+	int triggered_count = 0;
+	std::function<void(Smasher::Events::DummyEvent&)> callback = [&triggered_count](Smasher::Events::DummyEvent& event) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(250));
+		++triggered_count;
+	};
+	Smasher::EventSubscriptionHandle handle = layer.SubscribeAsync<Smasher::Events::DummyEvent>(callback);
+
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
+	std::this_thread::sleep_for(std::chrono::milliseconds(50));
+	engine.PopLayer<DummyLayer>();
+	std::this_thread::sleep_for(std::chrono::milliseconds(500));
+	EXPECT_EQ(1, triggered_count);
+
+
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
+	std::this_thread::sleep_for(std::chrono::milliseconds(500));
+	EXPECT_EQ(1, triggered_count);
+
+	engine.PushLayer<DummyLayer>();
+
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
+	std::this_thread::sleep_for(std::chrono::milliseconds(500));
+	EXPECT_EQ(1, triggered_count);
+}
+
 TEST(EntityTest, AddEntity) {
 	Smasher::Engine engine(640, 420);
 	Smasher::UUID entityUUID{ 0 };
@@ -784,6 +814,27 @@ TEST(AsyncEventTest, MultiplePublishEvent) {
 	std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 	EXPECT_EQ(15, count);
 	std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+	EXPECT_EQ(20, count);
+}
+
+TEST(AsyncEventTest, PublishWhileProcessingEvent) {
+	// Publish Async Event while another async event is processing
+	Smasher::Engine engine(640, 420);
+	DummyLayer& layer = engine.PushLayer<DummyLayer>();
+	Smasher::EventManager& manager = layer.GetEventManager();
+	int count = 10;
+	auto incrementFunc = [&count](Smasher::Events::DummyEvent&) {
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+		count += 5;
+	};
+
+	Smasher::EventSubscriptionHandle handle = layer.SubscribeAsync<Smasher::Events::DummyEvent>(incrementFunc);
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
+	EXPECT_EQ(10, count);
+	std::this_thread::sleep_for(std::chrono::milliseconds(500));
+	manager.Publish<Smasher::Events::DummyEvent>("Dummy Event 1");
+	EXPECT_EQ(15, count);
+	std::this_thread::sleep_for(std::chrono::milliseconds(2500));
 	EXPECT_EQ(20, count);
 }
 
