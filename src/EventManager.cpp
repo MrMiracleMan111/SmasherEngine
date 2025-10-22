@@ -66,6 +66,7 @@ namespace Smasher {
 	void EventManager::AsyncEventConsumer() {
 		std::unique_lock lock(m_AsyncEventsMutex);
 		while (m_AsyncRunning) {
+			// Need to keep !m_AsyncRunning so that loop can shutdown when m_AsyncRunning = false
 			m_AsyncEventsCV.wait(lock, [this] { return (m_AsyncEventSwapQueue.size() > 0 || !m_AsyncRunning); });
 			m_AsyncEventSwapQueueMutex.lock();
 			std::swap(m_AsyncEventSwapQueue, m_AsyncEventQueue);
