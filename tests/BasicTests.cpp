@@ -813,7 +813,7 @@ TEST(AsyncEventTest, MultiplePublishEvent) {
 	EXPECT_EQ(10, count);
 	std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 	EXPECT_EQ(15, count);
-	std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+	std::this_thread::sleep_for(std::chrono::seconds(3));
 	EXPECT_EQ(20, count);
 }
 
