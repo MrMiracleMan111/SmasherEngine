@@ -87,9 +87,9 @@ namespace Smasher {
 	{
 		m_AsyncRunning = false;
 		if (m_AsyncEventConsumerThread.joinable()) {
-			//std::unique_lock lock(m_AsyncEventsMutex);
+			std::unique_lock lock(m_AsyncEventsMutex);
 			m_AsyncEventsCV.notify_all();
-			//lock.unlock();
+			lock.unlock();
 			m_AsyncEventConsumerThread.join();
 		}
 	}
