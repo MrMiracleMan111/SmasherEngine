@@ -69,7 +69,15 @@ namespace Smasher {
 			m_AsyncEventsCV.wait(lock, [this] { return (m_AsyncEventSwapQueue.size() > 0 || !m_AsyncRunning); });
 			m_AsyncEventSwapQueueMutex.lock();
 			std::swap(m_AsyncEventSwapQueue, m_AsyncEventQueue);
-			DispatchAsync(m_EngineRef.get());
+			try {
+				DispatchAsync(m_EngineRef.get());
+			}
+			catch (std::exception& e) {
+				std::cerr << "Exception thrown: " << e.what() << std::endl;
+			}
+			catch (...) {
+				std::cerr << "Unknown Exception thrown" << std::endl;
+			}
 			m_AsyncEventSwapQueueMutex.unlock();
 		}
 	}

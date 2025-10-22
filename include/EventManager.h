@@ -109,6 +109,12 @@ namespace Smasher {
 
 		std::thread m_AsyncEventConsumerThread;
 		std::reference_wrapper<Engine> m_EngineRef;
+
+		// Async Event Queues should be move constructible and move assignable
+		static_assert(std::is_nothrow_move_constructible_v<decltype(m_AsyncEventQueue)>);
+		static_assert(std::is_nothrow_move_assignable_v<decltype(m_AsyncEventQueue)>);
+		static_assert(std::is_nothrow_move_constructible_v<decltype(m_AsyncEventSwapQueue)>);
+		static_assert(std::is_nothrow_move_assignable_v<decltype(m_AsyncEventSwapQueue)>);
 	};
 }
 
