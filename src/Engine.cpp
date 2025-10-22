@@ -95,6 +95,7 @@ namespace Smasher {
 		m_EventManager(std::move(other.m_EventManager)),
 		m_ResourceManager(std::move(other.m_ResourceManager)),
 		m_WindowCloseHandle(std::move(other.m_WindowCloseHandle)),
+		m_WindowResizeHandle(std::move(other.m_WindowResizeHandle)),
 		m_UpdateTimestamp(other.m_UpdateTimestamp),
 		m_RenderTimestamp(other.m_RenderTimestamp),
 		m_UpdateInterval(other.m_UpdateInterval),
