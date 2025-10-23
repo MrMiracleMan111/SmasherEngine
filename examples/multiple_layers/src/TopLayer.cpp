@@ -1,5 +1,5 @@
 #include "TopLayer.h"
-#include "Components/TextComponent.h"
+#include "Smasher/Components/TextComponent.h"
 #include "Smasher/UI.h"
 #include "Manifest.h"
 

@@ -4,7 +4,7 @@
 #include "Manifest.h"
 #include "ExampleResourcesLayer.h"
 #include "Components/Transform2DComponent.h"
-#include "Components/TextComponent.h"
+#include "Smasher/Components/TextComponent.h"
 #include "ComponentManagers/DrawableComponentManager.h"
 #include "Smasher/Components/DrawableComponent.h"
 

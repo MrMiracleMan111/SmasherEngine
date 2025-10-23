@@ -87,7 +87,7 @@ namespace Resources {
 
 ```c++
 #include "Core.h"
-# include "Components/TextComponent.h"
+# include "Smasher/Components/TextComponent.h"
 
 int main() {
 	Smasher::Engine engine(640, 420);

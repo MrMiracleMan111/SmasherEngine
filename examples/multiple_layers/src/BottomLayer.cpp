@@ -1,5 +1,5 @@
 #include "BottomLayer.h"
-#include "Components/TextComponent.h"
+#include "Smasher/Components/TextComponent.h"
 #include "Manifest.h"
 BottomLayer::~BottomLayer()
 {
