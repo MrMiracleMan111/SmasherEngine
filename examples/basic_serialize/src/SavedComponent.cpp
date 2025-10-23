@@ -2,7 +2,7 @@
 #include "Smasher/ISerializeable.h"
 #include "BallComponent.h"
 #include "Smasher/Entity.h"
-#include "Components/DrawableComponent.h"
+#include "Smasher/Components/DrawableComponent.h"
 
 void SavedComponent::Serialize(Smasher::OutputArchive& out) {
 	SaveState();

@@ -6,7 +6,7 @@
 #include "Components/Transform2DComponent.h"
 #include "Components/TextComponent.h"
 #include "ComponentManagers/DrawableComponentManager.h"
-#include "Components/DrawableComponent.h"
+#include "Smasher/Components/DrawableComponent.h"
 #include "Smasher/Components/CameraComponent.h"
 #include "Smasher/Resources.h"
 #include "BallComponent.h"

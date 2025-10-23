@@ -14,7 +14,7 @@
 #include "Smasher/Resources.h"
 
 #include "ComponentManagers/DrawableComponentManager.h"
-#include "Components/DrawableComponent.h"
+#include "Smasher/Components/DrawableComponent.h"
 #include "Smasher/Layer.h"
 #include "Smasher/ResourceManager.h"
 #include "RenderBatch.h"

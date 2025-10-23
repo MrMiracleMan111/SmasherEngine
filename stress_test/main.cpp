@@ -5,7 +5,7 @@
 #include "Components/Transform2DComponent.h"
 #include "Components/TextComponent.h"
 #include "ComponentManagers/DrawableComponentManager.h"
-#include "Components/DrawableComponent.h"
+#include "Smasher/Components/DrawableComponent.h"
 #include "Smasher/Entity.h"
 
 #include "StressTestLayer.h"
