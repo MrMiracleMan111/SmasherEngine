@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include "plf_colony.h"
+#include "Smasher/plf_colony.h"
 #include <SFML/Window.hpp>
 #include "Smasher/IComponent.h"
 #include "Smasher/Base.h"
