@@ -6,7 +6,7 @@
 #include <SFML/System.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include "plf_colony.h"
-#include "Exceptions.h"
+#include ""Smasher/Exceptions.h""
 #include "Smasher_export.h"
 #include "ISerializeable.h"
 
