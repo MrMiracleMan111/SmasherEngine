@@ -3,7 +3,7 @@
 #include <chrono>
 #include <iostream>
 #include "Smasher/Base.h"
-#include "IComponentManager.h"
+#include ""Smasher/IComponentManager.h""
 #include ""Smasher/IComponent.h""
 #include "plf_colony.h"
 

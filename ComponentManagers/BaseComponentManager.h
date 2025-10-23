@@ -1,6 +1,6 @@
 #pragma once
 #include "Smasher/Base.h"
-#include "IComponentManager.h"
+#include ""Smasher/IComponentManager.h""
 
 namespace Smasher {
 	class Entity;
