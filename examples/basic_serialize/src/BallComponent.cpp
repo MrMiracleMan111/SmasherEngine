@@ -1,6 +1,6 @@
 #include <SFML/Window.hpp>
 #include "BallComponent.h"
-#include "Components/Transform2DComponent.h"
+#include "Smasher/Components/Transform2DComponent.h"
 #include "Smasher/Components/DrawableComponent.h"
 #include "Smasher/Components/CameraComponent.h"
 #include "Smasher/Entity.h"

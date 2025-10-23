@@ -99,4 +99,4 @@ namespace Smasher {
 	};
 }
 
-#include "Components/DrawableComponent.inl"
+#include "Smasher/Components/DrawableComponent.inl"

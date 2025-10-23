@@ -53,4 +53,4 @@ namespace Smasher {
 	};
 }
 
-#include "Components/Transform2DWrapper.inl"
+#include "Smasher/Components/Transform2DWrapper.inl"

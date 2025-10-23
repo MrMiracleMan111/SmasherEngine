@@ -1,6 +1,6 @@
 #include "Core.h"
 #include "ExampleWindowLayer.h"
-#include "Components/Transform2DComponent.h"
+#include "Smasher/Components/Transform2DComponent.h"
 int main() {
 	Smasher::Engine engine(640, 420);
 	ExampleWindowLayer& state = engine.PushLayer<ExampleWindowLayer>();

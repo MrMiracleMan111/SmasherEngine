@@ -101,4 +101,4 @@ namespace Smasher {
 	};
 }
 
-#include "Components/UIPanelComponent.inl"
+#include "Smasher/Components/UIPanelComponent.inl"

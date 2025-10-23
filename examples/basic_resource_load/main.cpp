@@ -3,7 +3,7 @@
 #include "Core.h"
 #include "Manifest.h"
 #include "ExampleResourcesLayer.h"
-#include "Components/Transform2DComponent.h"
+#include "Smasher/Components/Transform2DComponent.h"
 #include "Smasher/Components/TextComponent.h"
 #include "ComponentManagers/DrawableComponentManager.h"
 #include "Smasher/Components/DrawableComponent.h"
