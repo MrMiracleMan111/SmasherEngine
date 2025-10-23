@@ -1,5 +1,5 @@
 #include "RenderBatch.h"
-#include "Base.h"
+#include "Smasher/Base.h"
 
 #include <iostream>
 #include <GL/glew.h>

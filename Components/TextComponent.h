@@ -1,5 +1,5 @@
 #pragma once
-#include "Base.h"
+#include "Smasher/Base.h"
 #include "IComponent.h"
 #include "ResourceManager.h"
 #include "EngineConfig.h"

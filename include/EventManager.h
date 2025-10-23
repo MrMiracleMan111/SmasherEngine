@@ -8,7 +8,7 @@
 #include <condition_variable>
 #include <thread>
 #include <mutex>
-#include "Base.h"
+#include "Smasher/Base.h"
 
 namespace Smasher {
 	struct Event;

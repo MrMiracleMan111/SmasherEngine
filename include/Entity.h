@@ -5,7 +5,7 @@
 #include <typeindex>
 #include <format>
 #include <SFML/Window.hpp>
-#include "Base.h"
+#include "Smasher/Base.h"
 #include "UUID.h"
 #include "Layer.h"
 

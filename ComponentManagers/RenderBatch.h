@@ -11,7 +11,7 @@
 #include <OpenGL/gl.h>
 #endif
 #include <array>
-#include "Base.h"
+#include "Smasher/Base.h"
 
 namespace Smasher {
 	struct BatchContext;

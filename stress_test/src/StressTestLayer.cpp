@@ -2,7 +2,7 @@
 #include <cmath>
 #include "StressTestLayer.h"
 #include "Manifest.h"
-#include "Base.h"
+#include "Smasher/Base.h"
 #include "Components/Transform2DComponent.h"
 #include "Components/TextComponent.h"
 #include "ComponentManagers/DrawableComponentManager.h"

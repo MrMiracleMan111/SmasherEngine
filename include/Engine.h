@@ -5,7 +5,7 @@
 #include <atomic>
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
-#include "Base.h"
+#include "Smasher/Base.h"
 #include "EngineConfig.h"
 #include "ResourceManager.h"
 #include "EventManager.h"

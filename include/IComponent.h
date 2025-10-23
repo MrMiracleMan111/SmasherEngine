@@ -1,7 +1,7 @@
 #pragma once
 #include <iostream>
 #include "plf_colony.h"
-#include "Base.h"
+#include "Smasher/Base.h"
 
 namespace Smasher {
 	class IComponentManager;

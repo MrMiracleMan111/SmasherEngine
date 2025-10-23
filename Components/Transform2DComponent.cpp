@@ -1,4 +1,4 @@
-#include "Base.h"
+#include "Smasher/Base.h"
 #include "Transform2DComponent.h"
 
 namespace Smasher {

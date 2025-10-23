@@ -1,6 +1,6 @@
 #pragma once
 #include <chrono>
-#include "Base.h"
+#include "Smasher/Base.h"
 #include "IComponent.h"
 #include "ComponentManagers/DrawableComponentManager.h"
 

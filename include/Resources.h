@@ -5,7 +5,7 @@
 #include <SFML/Graphics/Shader.hpp>
 #include <SFML/Audio.hpp>
 
-#include "Base.h"
+#include "Smasher/Base.h"
 
 #define SMASHER_RESOURCE_TYPE(type) ResourceType GetType() const { return GetStaticType();} \
 static constexpr ResourceType GetStaticType() { return type; } \

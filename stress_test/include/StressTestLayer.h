@@ -1,7 +1,7 @@
 #pragma once
 #include <chrono>
 #include <SFML/Window.hpp>
-#include "Base.h"
+#include "Smasher/Base.h"
 #include "Layer.h"
 
 class StressTestLayer : public Smasher::Layer {

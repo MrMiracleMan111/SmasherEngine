@@ -111,7 +111,7 @@ def GenerateHeaders(data, out_path, resource_dir=None):
             out.write(
 """
 #pragma once
-#include "Base.h"
+#include "Smasher/Base.h"
 
 namespace Smasher {
 """)

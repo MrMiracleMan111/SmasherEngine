@@ -1,4 +1,4 @@
-#include "Base.h"
+#include "Smasher/Base.h"
 #include "ResourceManager.h"
 
 namespace Smasher {

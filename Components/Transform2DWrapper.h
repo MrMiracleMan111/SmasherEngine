@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/Graphics/Transformable.hpp>
-#include "Base.h"
+#include "Smasher/Base.h"
 
 namespace Smasher {
 	template <class T>

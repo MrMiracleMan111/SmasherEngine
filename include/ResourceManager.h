@@ -4,7 +4,7 @@
 #include <filesystem>
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-#include "Base.h"
+#include "Smasher/Base.h"
 #include "Resources.h"
 
 /**

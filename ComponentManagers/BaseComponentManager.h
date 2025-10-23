@@ -1,5 +1,5 @@
 #pragma once
-#include "Base.h"
+#include "Smasher/Base.h"
 #include "IComponentManager.h"
 
 namespace Smasher {

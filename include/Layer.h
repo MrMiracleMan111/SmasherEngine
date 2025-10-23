@@ -4,7 +4,7 @@
 #include <type_traits>
 #include <typeindex>
 #include <SFML/Window.hpp>
-#include "Base.h"
+#include "Smasher/Base.h"
 #include "UUID.h"
 #include "Engine.h"
 

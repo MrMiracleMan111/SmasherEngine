@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Base.h"
+#include "Smasher/Base.h"
 #include "IComponent.h"
 #include "ISerializeable.h"
 

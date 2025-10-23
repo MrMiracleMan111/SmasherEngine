@@ -4,7 +4,7 @@
 #include <typeindex>
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
-#include "Base.h"
+#include "Smasher/Base.h"
 
 namespace Smasher {
 	using SMASHER_TIMESTAMP = std::chrono::time_point<std::chrono::system_clock>;

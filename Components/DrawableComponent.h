@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
-#include "Base.h"
+#include "Smasher/Base.h"
 #include "Resources.h"
 #include "IComponent.h"
 #include "RenderBatch.h"

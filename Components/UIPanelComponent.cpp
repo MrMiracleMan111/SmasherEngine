@@ -1,6 +1,6 @@
 #include "UIPanelComponentManager.h"
 #include "UIPanelComponent.h"
-#include "Base.h"
+#include "Smasher/Base.h"
 #include "Entity.h"
 #include "Events.h"
 

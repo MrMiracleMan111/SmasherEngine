@@ -10,7 +10,7 @@
 #elif defined(__APPLE__)
 #include <OpenGL/gl.h>
 #endif
-#include "Base.h"
+#include "Smasher/Base.h"
 #include "Resources.h"
 
 #include "ComponentManagers/DrawableComponentManager.h"

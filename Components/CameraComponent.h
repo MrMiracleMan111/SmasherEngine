@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/System.hpp>
-#include "Base.h"
+#include "Smasher/Base.h"
 #include "IComponent.h"
 #include "Components/Transform2DWrapper.h"
 #include "EventManager.h"

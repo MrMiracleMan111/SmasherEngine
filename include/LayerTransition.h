@@ -1,5 +1,5 @@
 #include <typeindex>
-#include "Base.h"
+#include "Smasher/Base.h"
 
 namespace Smasher {
 	class Layer;
