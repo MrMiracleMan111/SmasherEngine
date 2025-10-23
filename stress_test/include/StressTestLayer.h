@@ -2,7 +2,7 @@
 #include <chrono>
 #include <SFML/Window.hpp>
 #include "Smasher/Base.h"
-#include "Layer.h"
+#include "Smasher/Layer.h"
 
 class StressTestLayer : public Smasher::Layer {
 public:

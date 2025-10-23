@@ -1,6 +1,6 @@
 #pragma once
 #include "Smasher/EventManager.h"
-#include "Layer.h"
+#include "Smasher/Layer.h"
 
 class ExampleWindowLayer : public Smasher::Layer {
 public:

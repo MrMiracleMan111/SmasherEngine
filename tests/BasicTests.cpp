@@ -7,7 +7,7 @@
 #include "Smasher/Entity.h"
 #include "ResourceManager.h"
 #include "Resources.h"
-#include "Layer.h"
+#include "Smasher/Layer.h"
 
 class DummyLayer : public Smasher::Layer {
 public:

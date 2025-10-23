@@ -7,7 +7,7 @@
 #include <SFML/Window.hpp>
 #include "Smasher/Base.h"
 #include "UUID.h"
-#include "Layer.h"
+#include "Smasher/Layer.h"
 
 namespace Smasher {
 

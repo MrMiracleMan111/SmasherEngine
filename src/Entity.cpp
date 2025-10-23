@@ -1,6 +1,6 @@
 #include <unordered_map>
 #include "Smasher/Entity.h"
-#include "Layer.h"
+#include "Smasher/Layer.h"
 
 namespace Smasher {
 	Entity::~Entity() {

@@ -15,7 +15,7 @@
 
 #include "ComponentManagers/DrawableComponentManager.h"
 #include "Components/DrawableComponent.h"
-#include "Layer.h"
+#include "Smasher/Layer.h"
 #include "ResourceManager.h"
 #include "RenderBatch.h"
 #include "Smasher/EventManager.h"

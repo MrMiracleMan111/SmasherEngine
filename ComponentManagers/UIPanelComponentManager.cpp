@@ -1,5 +1,5 @@
 #include "UIPanelComponentManager.h"
-#include "Layer.h"
+#include "Smasher/Layer.h"
 
 namespace Smasher {
 	UIPanelComponentManager::UIPanelComponentManager(Layer& layer) :

@@ -1,7 +1,7 @@
 #include "Smasher/EventManager.h"
 #include "Smasher/Events.h"
 #include "Smasher/Engine.h"
-#include "Layer.h"
+#include "Smasher/Layer.h"
 
 namespace Smasher {
 	EventManager::~EventManager() {

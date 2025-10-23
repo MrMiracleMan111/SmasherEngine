@@ -1,6 +1,6 @@
 #include "Smasher/EventFeeder.h"
 #include "Smasher/EventManager.h"
-#include "Layer.h"
+#include "Smasher/Layer.h"
 #include "Smasher/Engine.h"
 
 Smasher::EventFeeder::EventFeeder(EventManager& eventManager, Engine& engine) : m_EventManager(eventManager), m_Engine(engine)

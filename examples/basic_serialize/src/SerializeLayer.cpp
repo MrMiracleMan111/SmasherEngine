@@ -3,7 +3,7 @@
 #include <cmath>
 #include "Smasher/Base.h"
 #include "SerializeLayer.h"
-#include "Layer.h"
+#include "Smasher/Layer.h"
 #include "Manifest.h"
 #include "ComponentManagers/DrawableComponentManager.h"
 #include "SavedComponent.h"

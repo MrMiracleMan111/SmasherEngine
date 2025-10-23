@@ -1,6 +1,6 @@
 #pragma once
 #include "Smasher/Entity.h"
-#include "Layer.h"
+#include "Smasher/Layer.h"
 namespace Smasher {
 	template<IComponentType T, typename... Args>
 	T& Entity::AddComponent(Args&&... componentArgs) {

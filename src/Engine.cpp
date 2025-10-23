@@ -19,7 +19,7 @@
 #include "Smasher/Exceptions.h"
 #include "Smasher/EngineConfig.h"
 #include "Smasher/EventFeeder.h"
-#include "Layer.h"
+#include "Smasher/Layer.h"
 
 namespace Smasher {
 
