@@ -1,2 +1,2 @@
 #include "Smasher/Components/UIPanelComponent.h"
-#include "ComponentManagers/UIPanelComponentManager.h"
+#include "Smasher/ComponentManagers/UIPanelComponentManager.h"
