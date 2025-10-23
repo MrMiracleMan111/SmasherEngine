@@ -1,5 +1,5 @@
 #include <iostream>
-#include "CameraComponent.h"
+#include "Smasher/Components/CameraComponent.h"
 #include "Smasher/IComponentManager.h"
 #include "Smasher/Layer.h"
 #include "Smasher/Events.h"

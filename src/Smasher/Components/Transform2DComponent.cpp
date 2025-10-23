@@ -1,5 +1,5 @@
 #include "Smasher/Base.h"
-#include "Transform2DComponent.h"
+#include "Smasher/Components/Transform2DComponent.h"
 
 namespace Smasher {
 	Transform2DComponent& Transform2DComponent::SetPosition(sf::Vector2f position) {

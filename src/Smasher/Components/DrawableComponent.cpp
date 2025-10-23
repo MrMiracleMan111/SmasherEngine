@@ -1,6 +1,6 @@
 #include <cmath>
 #include <chrono>
-#include "DrawableComponent.h"
+#include "Smasher/Components/DrawableComponent.h"
 #include "Smasher/IComponent.h"
 #include "Smasher/Entity.h"
 #include "Smasher/ComponentManagers/DrawableComponentManager.h"

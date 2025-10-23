@@ -37,7 +37,7 @@ set(SMASHER_ENGINE_OUTPUT_DIR ${CMAKE_BINARY_DIR})
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Compile Engine
-add_library(SmasherEngine SHARED "Core.cpp" "Core.h" "include/Smasher/Layer.h" "include/Smasher/UUID.h" "src/UUID.cpp" "include/Smasher/Base.h" "src/Layer.cpp" "include/Smasher/Engine.h" "src/Engine.cpp" "include/Smasher/Exceptions.h" "include/Smasher/EventManager.h" "src/EventManager.cpp" "include/Smasher/Events.h"  "include/Smasher/ComponentManagers/GenericComponentManager.h" "include/Smasher/IComponent.h"  "include/Smasher/Entity.h" "src/Entity.cpp"   "include/Smasher/Components/Transform2DComponent.h" "include/Smasher/EngineConfig.h"   "include/Smasher/ResourceManager.h" "src/ResourceManager.cpp" "include/Smasher/IComponentManager.h" "include/Smasher/ComponentManagers/BaseComponentManager.h"  "include/Smasher/Components/DrawableComponent.h" "include/Smasher/Components/DrawableComponent.cpp" "include/Smasher/Resources.h" "include/Smasher/Components/TextComponent.h" "include/Smasher/Components/TextComponent.cpp" "include/Smasher/ComponentManagers/DrawableComponentManager.h" "include/Smasher/ComponentManagers/DrawableComponentManager.cpp" "include/Smasher/ComponentManagers/RenderBatch.h" "include/Smasher/ComponentManagers/RenderBatch.cpp" "src/Base.cpp" "include/Smasher/Components/Transform2DComponent.cpp" "include/Smasher/Components/Transform2DWrapper.h"  "include/Smasher/Components/Transform2DWrapper.inl" "include/Smasher/EventFeeder.h" "src/EventFeeder.cpp" "include/Smasher/Components/CameraComponent.h" "include/Smasher/Components/CameraComponent.cpp" "include/Smasher/ComponentManagers/GenericComponentManager.inl" "include/Smasher/ISerializeable.h" "include/Smasher/Components/UIPanelComponent.h" "include/Smasher/Components/UIPanelComponent.cpp"  "src/IComponent.cpp" "include/Smasher/LayerTransition.h" "include/Smasher/ComponentManagers/UIPanelComponentManager.h" "include/Smasher/ComponentManagers/UIPanelComponentManager.cpp")
+add_library(SmasherEngine SHARED "Core.cpp" "Core.h" "include/Smasher/Layer.h" "include/Smasher/UUID.h" "src/Smasher/UUID.cpp" "include/Smasher/Base.h" "src/Smasher/Layer.cpp" "include/Smasher/Engine.h" "src/Smasher/Engine.cpp" "include/Smasher/Exceptions.h" "include/Smasher/EventManager.h" "src/Smasher/EventManager.cpp" "include/Smasher/Events.h"  "include/Smasher/ComponentManagers/GenericComponentManager.h" "include/Smasher/IComponent.h"  "include/Smasher/Entity.h" "src/Smasher/Entity.cpp"   "include/Smasher/Components/Transform2DComponent.h" "include/Smasher/EngineConfig.h"   "include/Smasher/ResourceManager.h" "src/Smasher/ResourceManager.cpp" "include/Smasher/IComponentManager.h" "include/Smasher/ComponentManagers/BaseComponentManager.h"  "include/Smasher/Components/DrawableComponent.h" "src/Smasher/Components/DrawableComponent.cpp" "include/Smasher/Resources.h" "include/Smasher/Components/TextComponent.h" "src/Smasher/Components/TextComponent.cpp" "include/Smasher/ComponentManagers/DrawableComponentManager.h" "src/Smasher/ComponentManagers/DrawableComponentManager.cpp" "include/Smasher/ComponentManagers/RenderBatch.h" "src/Smasher/ComponentManagers/RenderBatch.cpp" "src/Smasher/Base.cpp" "src/Smasher/Components/Transform2DComponent.cpp" "include/Smasher/Components/Transform2DWrapper.h"  "include/Smasher/Components/Transform2DWrapper.inl" "include/Smasher/EventFeeder.h" "src/Smasher/EventFeeder.cpp" "include/Smasher/Components/CameraComponent.h" "src/Smasher/Components/CameraComponent.cpp" "include/Smasher/ComponentManagers/GenericComponentManager.inl" "include/Smasher/ISerializeable.h" "include/Smasher/Components/UIPanelComponent.h" "src/Smasher/Components/UIPanelComponent.cpp"  "src/Smasher/IComponent.cpp" "include/Smasher/LayerTransition.h" "include/Smasher/ComponentManagers/UIPanelComponentManager.h" "src/Smasher/ComponentManagers/UIPanelComponentManager.cpp")
 
 # Try to include machine-specific config if it exists
 if(EXISTS "${CMAKE_SOURCE_DIR}/local.cmake")
@@ -78,10 +78,16 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/include")
     message(SEND_ERROR "Could not find include subdirectory")
 endif()
 
-if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/ComponentManagers")
-    message(SEND_ERROR "Could not find ComponentManagers")
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include/Smasher/ComponentManagers")
+    message(SEND_ERROR "Could not find ComponentManagers include directory")
 else()
-    message(STATUS "Found ComponentManagers Directory: ${CMAKE_CURRENT_SOURCE_DIR}/ComponentManagers")
+    message(STATUS "Found ComponentManagers Directory: ${CMAKE_CURRENT_SOURCE_DIR}/include/Smasher/ComponentManagers")
+endif()
+
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/include/Smasher/ComponentManagers")
+    message(SEND_ERROR "Could not find ComponentManagers include directory")
+else()
+    message(STATUS "Found ComponentManagers Directory: ${CMAKE_CURRENT_SOURCE_DIR}/include/Smasher/ComponentManagers")
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

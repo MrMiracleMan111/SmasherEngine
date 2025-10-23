@@ -1,4 +1,4 @@
-#include "UIPanelComponentManager.h"
+#include "Smasher/ComponentManagers/UIPanelComponentManager.h"
 #include "Smasher/Layer.h"
 
 namespace Smasher {

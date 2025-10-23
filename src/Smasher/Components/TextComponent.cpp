@@ -1,4 +1,4 @@
-#include "TextComponent.h"
+#include "Smasher/Components/TextComponent.h"
 #include "Smasher/Entity.h"
 
 namespace Smasher {
