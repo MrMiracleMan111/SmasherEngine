@@ -10,7 +10,7 @@
 #include "ResourceManager.h"
 #include "Smasher/EventManager.h"
 #include "Smasher/Events.h"
-#include "LayerTransition.h"
+#include "Smasher/LayerTransition.h"
 
 namespace Smasher {
 	class Layer;
