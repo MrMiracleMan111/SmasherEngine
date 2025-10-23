@@ -5,7 +5,7 @@
 #include <typeindex>
 #include <SFML/Window.hpp>
 #include "Smasher/Base.h"
-#include "UUID.h"
+#include "Smasher/UUID.h"
 #include "Smasher/Engine.h"
 
 
