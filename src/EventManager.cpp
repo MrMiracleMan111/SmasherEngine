@@ -1,6 +1,6 @@
 #include "EventManager.h"
 #include "Events.h"
-#include "Engine.h"
+#include "Smasher/Engine.h"
 #include "Layer.h"
 
 namespace Smasher {

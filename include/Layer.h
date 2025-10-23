@@ -6,7 +6,7 @@
 #include <SFML/Window.hpp>
 #include "Smasher/Base.h"
 #include "UUID.h"
-#include "Engine.h"
+#include "Smasher/Engine.h"
 
 
 namespace Smasher {

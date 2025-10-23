@@ -1,7 +1,5 @@
 #pragma once
 #include <memory>
-//#include "Engine.h"
-//#include "Layer.h"
 
 namespace Smasher {
 	class Layer;

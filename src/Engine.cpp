@@ -15,7 +15,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <SFML/Window.hpp>
-#include "Engine.h"
+#include "Smasher/Engine.h"
 #include "Exceptions.h"
 #include "EngineConfig.h"
 #include "EventFeeder.h"
