@@ -1,7 +1,7 @@
 #include "MidLayer.h"
 #include "Components/TextComponent.h"
 #include "Manifest.h"
-#include "UI.h"
+#include "Smasher/UI.h"
 
 MidLayer::~MidLayer() {
 
