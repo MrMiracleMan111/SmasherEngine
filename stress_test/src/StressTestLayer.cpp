@@ -8,7 +8,7 @@
 #include "ComponentManagers/DrawableComponentManager.h"
 #include "Components/DrawableComponent.h"
 #include "Components/CameraComponent.h"
-#include "Resources.h"
+#include "Smasher/Resources.h"
 #include "BallComponent.h"
 #include "Smasher/Entity.h"
 

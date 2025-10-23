@@ -2,7 +2,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include "Smasher/Base.h"
-#include "Resources.h"
+#include "Smasher/Resources.h"
 #include "Smasher/IComponent.h"
 #include "RenderBatch.h"
 #include "Components/Transform2DWrapper.h"

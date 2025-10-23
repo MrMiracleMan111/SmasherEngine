@@ -11,7 +11,7 @@
 #include <OpenGL/gl.h>
 #endif
 #include "Smasher/Base.h"
-#include "Resources.h"
+#include "Smasher/Resources.h"
 
 #include "ComponentManagers/DrawableComponentManager.h"
 #include "Components/DrawableComponent.h"
