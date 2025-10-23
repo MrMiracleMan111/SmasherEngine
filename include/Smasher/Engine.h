@@ -6,7 +6,7 @@
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
 #include "Smasher/Base.h"
-#include "EngineConfig.h"
+#include "Smasher/EngineConfig.h"
 #include "ResourceManager.h"
 #include "EventManager.h"
 #include "Events.h"

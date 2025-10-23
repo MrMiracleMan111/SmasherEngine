@@ -2,7 +2,7 @@
 #include "Smasher/Base.h"
 #include "IComponent.h"
 #include "ResourceManager.h"
-#include "EngineConfig.h"
+#include "Smasher/EngineConfig.h"
 #include "Transform2DWrapper.h"
 
 namespace Smasher {

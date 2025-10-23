@@ -17,7 +17,7 @@
 #include <SFML/Window.hpp>
 #include "Smasher/Engine.h"
 #include "Exceptions.h"
-#include "EngineConfig.h"
+#include "Smasher/EngineConfig.h"
 #include "EventFeeder.h"
 #include "Layer.h"
 
