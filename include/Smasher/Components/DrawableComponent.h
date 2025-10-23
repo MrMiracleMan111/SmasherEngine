@@ -5,7 +5,7 @@
 #include "Smasher/Resources.h"
 #include "Smasher/IComponent.h"
 #include "RenderBatch.h"
-#include "Components/Transform2DWrapper.h"
+#include "Smasher/Components/Transform2DWrapper.h"
 
 namespace Smasher {
 	class DrawableComponentManager;
