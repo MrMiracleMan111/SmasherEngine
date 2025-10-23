@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Smasher/Base.h"
-#include "IComponent.h"
+#include ""Smasher/IComponent.h""
 #include "ISerializeable.h"
 
 class SavedComponent : public Smasher::IComponent, public Smasher::ISerializeable {

@@ -2,7 +2,7 @@
 #include <memory>
 #include "plf_colony.h"
 #include <SFML/Window.hpp>
-#include "IComponent.h"
+#include ""Smasher/IComponent.h""
 #include "Smasher/Base.h"
 
 namespace Smasher {

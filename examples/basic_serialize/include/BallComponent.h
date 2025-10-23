@@ -1,7 +1,7 @@
 #pragma once
 #include <chrono>
 #include "Smasher/Base.h"
-#include "IComponent.h"
+#include ""Smasher/IComponent.h""
 #include "ComponentManagers/DrawableComponentManager.h"
 
 namespace Smasher {

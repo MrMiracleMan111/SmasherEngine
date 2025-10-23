@@ -1,5 +1,5 @@
 #include "Smasher/Base.h"
-#include "IComponent.h"
+#include ""Smasher/IComponent.h""
 
 namespace Smasher {
 	IComponent& IComponent::operator = (IComponent&& other) noexcept {

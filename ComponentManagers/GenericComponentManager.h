@@ -3,7 +3,7 @@
 #include <iostream>
 #include "Smasher/Base.h"
 #include "IComponentManager.h"
-#include "IComponent.h"
+#include ""Smasher/IComponent.h""
 #include "plf_colony.h"
 
 namespace Smasher {
