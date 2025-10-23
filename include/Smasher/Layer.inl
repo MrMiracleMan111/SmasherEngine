@@ -1,7 +1,7 @@
 #pragma once
 #include "Smasher/Layer.h"
 #include "Smasher/IComponentManager.h"
-#include "GenericComponentManager.h"
+#include "Smasher/ComponentManagers/GenericComponentManager.h"
 #include "Smasher/Entity.h"
 
 

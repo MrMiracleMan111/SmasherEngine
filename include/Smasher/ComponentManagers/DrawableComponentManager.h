@@ -14,7 +14,7 @@
 #include <SFML/Window.hpp>
 #include "Smasher/Base.h"
 #include "Smasher/ComponentManagers/BaseComponentManager.h"
-#include "RenderBatch.h"
+#include "Smasher/ComponentManagers/RenderBatch.h"
 #include "Smasher/Components/DrawableComponent.h"
 #include "Smasher/Events.h"
 

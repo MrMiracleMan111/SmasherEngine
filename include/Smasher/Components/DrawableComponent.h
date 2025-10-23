@@ -4,7 +4,7 @@
 #include "Smasher/Base.h"
 #include "Smasher/Resources.h"
 #include "Smasher/IComponent.h"
-#include "RenderBatch.h"
+#include "Smasher/ComponentManagers/RenderBatch.h"
 #include "Smasher/Components/Transform2DWrapper.h"
 
 namespace Smasher {

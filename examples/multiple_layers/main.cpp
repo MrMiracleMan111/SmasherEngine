@@ -3,7 +3,7 @@
 #include "MidLayer.h"
 #include "BottomLayer.h"
 #include "Manifest.h"
-#include "DrawableComponentManager.h"
+#include "Smasher/ComponentManagers/DrawableComponentManager.h"
 
 int main() {
 	Smasher::Engine engine(640, 420);

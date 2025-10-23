@@ -62,4 +62,4 @@ namespace Smasher {
 	};
 }
 
-#include "ComponentManagers/BaseComponentManager.inl"
+#include "Smasher/ComponentManagers/BaseComponentManager.inl"

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <type_traits>
 #include "Core.h"
-#include "BaseComponentManager.h"
+#include "Smasher/ComponentManagers/BaseComponentManager.h"
 #include "Smasher/Entity.h"
 #include "Smasher/ResourceManager.h"
 #include "Smasher/Resources.h"
