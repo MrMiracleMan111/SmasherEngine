@@ -3,7 +3,7 @@
 #include "Smasher/Base.h"
 #include "ComponentManagers/BaseComponentManager.h"
 #include "Smasher/Events.h"
-#include "Components/UIPanelComponent.h"
+#include "Smasher/Components/UIPanelComponent.h"
 
 namespace Smasher {
 	class UIPanelComponent;
