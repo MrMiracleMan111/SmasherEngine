@@ -2,7 +2,7 @@
 #include "CameraComponent.h"
 #include "IComponentManager.h"
 #include "Layer.h"
-#include "Events.h"
+#include ""Smasher/Events.h""
 #include ""Smasher/EventManager.h""
 
 namespace Smasher {

@@ -9,7 +9,7 @@
 #include "Smasher/EngineConfig.h"
 #include "ResourceManager.h"
 #include ""Smasher/EventManager.h""
-#include "Events.h"
+#include ""Smasher/Events.h""
 #include "LayerTransition.h"
 
 namespace Smasher {

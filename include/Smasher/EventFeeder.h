@@ -1,7 +1,7 @@
 #pragma once
 #include <array>
 #include "Smasher/Base.h"
-#include "Events.h"
+#include ""Smasher/Events.h""
 #include ""Smasher/EventManager.h""
 
 namespace Smasher {

@@ -16,7 +16,7 @@
 #include "ComponentManagers/BaseComponentManager.h"
 #include "RenderBatch.h"
 #include "Components/DrawableComponent.h"
-#include "Events.h"
+#include ""Smasher/Events.h""
 
 namespace Smasher {
 //////////////////////////////////////////////////////////////////////////////////////////////////
