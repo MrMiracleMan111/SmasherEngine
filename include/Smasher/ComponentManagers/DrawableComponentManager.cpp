@@ -13,7 +13,7 @@
 #include "Smasher/Base.h"
 #include "Smasher/Resources.h"
 
-#include "ComponentManagers/DrawableComponentManager.h"
+#include "Smasher/ComponentManagers/DrawableComponentManager.h"
 #include "Smasher/Components/DrawableComponent.h"
 #include "Smasher/Layer.h"
 #include "Smasher/ResourceManager.h"

@@ -2,7 +2,7 @@
 #include <chrono>
 #include "Smasher/Base.h"
 #include "Smasher/IComponent.h"
-#include "ComponentManagers/DrawableComponentManager.h"
+#include "Smasher/ComponentManagers/DrawableComponentManager.h"
 
 namespace Smasher {
 	class Transform2DComponent;

@@ -5,7 +5,7 @@
 #include "Smasher/Base.h"
 #include "Smasher/Components/Transform2DComponent.h"
 #include "Smasher/Components/TextComponent.h"
-#include "ComponentManagers/DrawableComponentManager.h"
+#include "Smasher/ComponentManagers/DrawableComponentManager.h"
 #include "Smasher/Components/DrawableComponent.h"
 #include "Smasher/Components/CameraComponent.h"
 #include "Smasher/Resources.h"

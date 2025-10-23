@@ -4,7 +4,7 @@
 #include "Manifest.h"
 #include "Smasher/Components/Transform2DWrapper.h"
 #include "Smasher/Components/TextComponent.h"
-#include "ComponentManagers/DrawableComponentManager.h"
+#include "Smasher/ComponentManagers/DrawableComponentManager.h"
 #include "Smasher/Components/DrawableComponent.h"
 #include "Smasher/Entity.h"
 

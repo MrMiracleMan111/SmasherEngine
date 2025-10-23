@@ -5,7 +5,7 @@
 #include "SerializeLayer.h"
 #include "Smasher/Layer.h"
 #include "Manifest.h"
-#include "ComponentManagers/DrawableComponentManager.h"
+#include "Smasher/ComponentManagers/DrawableComponentManager.h"
 #include "SavedComponent.h"
 #include "BallComponent.h"
 

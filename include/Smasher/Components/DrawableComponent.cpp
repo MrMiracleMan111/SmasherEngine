@@ -3,7 +3,7 @@
 #include "DrawableComponent.h"
 #include "Smasher/IComponent.h"
 #include "Smasher/Entity.h"
-#include "ComponentManagers/DrawableComponentManager.h"
+#include "Smasher/ComponentManagers/DrawableComponentManager.h"
 
 namespace Smasher {
     DrawableComponent::DrawableComponent() : IComponent(), Transform2DWrapper(*this, m_Transformable),
