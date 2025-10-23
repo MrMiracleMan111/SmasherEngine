@@ -10,7 +10,7 @@
 #include "Components/CameraComponent.h"
 #include "Resources.h"
 #include "BallComponent.h"
-#include "Entity.h"
+#include "Smasher/Entity.h"
 
 Smasher::Entity& StressTestLayer::SpawnBouncingBall(sf::Vector2i position)
 {

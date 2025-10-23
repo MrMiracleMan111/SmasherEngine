@@ -6,7 +6,7 @@
 #include "Components/TextComponent.h"
 #include "ComponentManagers/DrawableComponentManager.h"
 #include "Components/DrawableComponent.h"
-#include "Entity.h"
+#include "Smasher/Entity.h"
 
 #include "StressTestLayer.h"
 #include "BallComponent.h"

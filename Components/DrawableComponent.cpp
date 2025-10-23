@@ -2,7 +2,7 @@
 #include <chrono>
 #include "DrawableComponent.h"
 #include "IComponent.h"
-#include "Entity.h"
+#include "Smasher/Entity.h"
 #include "ComponentManagers/DrawableComponentManager.h"
 
 namespace Smasher {

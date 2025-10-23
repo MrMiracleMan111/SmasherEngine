@@ -4,7 +4,7 @@
 #include <type_traits>
 #include "Core.h"
 #include "BaseComponentManager.h"
-#include "Entity.h"
+#include "Smasher/Entity.h"
 #include "ResourceManager.h"
 #include "Resources.h"
 #include "Layer.h"

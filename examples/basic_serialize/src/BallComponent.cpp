@@ -3,7 +3,7 @@
 #include "Components/Transform2DComponent.h"
 #include "Components/DrawableComponent.h"
 #include "Components/CameraComponent.h"
-#include "Entity.h"
+#include "Smasher/Entity.h"
 
 void BallComponent::SetEntity(Smasher::Entity& rEntity)
 {

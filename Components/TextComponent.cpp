@@ -1,5 +1,5 @@
 #include "TextComponent.h"
-#include "Entity.h"
+#include "Smasher/Entity.h"
 
 namespace Smasher {
 	void TextComponent::StaticRenderComponent(TextComponent& self, sf::RenderWindow& rWindow) {

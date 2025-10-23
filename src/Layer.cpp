@@ -1,7 +1,7 @@
 #include <optional>
 #include <unordered_map>
 #include "Layer.h"
-#include "Entity.h"
+#include "Smasher/Entity.h"
 #include "Smasher/Engine.h"
 
 namespace Smasher {

@@ -1,7 +1,7 @@
 #include "SavedComponent.h"
 #include "ISerializeable.h"
 #include "BallComponent.h"
-#include "Entity.h"
+#include "Smasher/Entity.h"
 #include "Components/DrawableComponent.h"
 
 void SavedComponent::Serialize(Smasher::OutputArchive& out) {

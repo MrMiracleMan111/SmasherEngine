@@ -1,5 +1,5 @@
 #pragma once
-#include "Entity.h"
+#include "Smasher/Entity.h"
 #include "Layer.h"
 namespace Smasher {
 	template<IComponentType T, typename... Args>

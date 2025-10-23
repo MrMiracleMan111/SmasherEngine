@@ -1,5 +1,5 @@
 #include <unordered_map>
-#include "Entity.h"
+#include "Smasher/Entity.h"
 #include "Layer.h"
 
 namespace Smasher {

@@ -2,7 +2,7 @@
 #include "Layer.h"
 #include "IComponentManager.h"
 #include "GenericComponentManager.h"
-#include "Entity.h"
+#include "Smasher/Entity.h"
 
 
 namespace Smasher {

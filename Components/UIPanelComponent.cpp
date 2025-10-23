@@ -1,7 +1,7 @@
 #include "UIPanelComponentManager.h"
 #include "UIPanelComponent.h"
 #include "Smasher/Base.h"
-#include "Entity.h"
+#include "Smasher/Entity.h"
 #include "Events.h"
 
 namespace Smasher {
