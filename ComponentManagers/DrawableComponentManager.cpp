@@ -18,7 +18,7 @@
 #include "Layer.h"
 #include "ResourceManager.h"
 #include "RenderBatch.h"
-#include "EventManager.h"
+#include ""Smasher/EventManager.h""
 #include "Events.h"
 
 namespace Smasher {

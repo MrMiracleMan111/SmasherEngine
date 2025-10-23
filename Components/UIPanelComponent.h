@@ -5,7 +5,7 @@
 #include "ResourceManager.h"
 #include "Smasher/EngineConfig.h"
 #include "Transform2DWrapper.h"
-#include "EventManager.h"
+#include ""Smasher/EventManager.h""
 #include "Events.h"
 
 

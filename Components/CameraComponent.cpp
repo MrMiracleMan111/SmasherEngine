@@ -3,7 +3,7 @@
 #include "IComponentManager.h"
 #include "Layer.h"
 #include "Events.h"
-#include "EventManager.h"
+#include ""Smasher/EventManager.h""
 
 namespace Smasher {
 	void CameraComponent::OnAddComponent()

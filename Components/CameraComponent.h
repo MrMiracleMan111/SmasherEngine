@@ -3,7 +3,7 @@
 #include "Smasher/Base.h"
 #include "IComponent.h"
 #include "Components/Transform2DWrapper.h"
-#include "EventManager.h"
+#include ""Smasher/EventManager.h""
 
 namespace Smasher {
 

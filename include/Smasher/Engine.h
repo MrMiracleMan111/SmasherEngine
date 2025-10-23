@@ -8,7 +8,7 @@
 #include "Smasher/Base.h"
 #include "Smasher/EngineConfig.h"
 #include "ResourceManager.h"
-#include "EventManager.h"
+#include ""Smasher/EventManager.h""
 #include "Events.h"
 #include "LayerTransition.h"
 
