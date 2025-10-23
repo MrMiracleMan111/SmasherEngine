@@ -1,9 +1,9 @@
 #pragma once
 #include <SFML/System.hpp>
 #include "Smasher/Base.h"
-#include ""Smasher/IComponent.h""
+#include "Smasher/IComponent.h"
 #include "Components/Transform2DWrapper.h"
-#include ""Smasher/EventManager.h""
+#include "Smasher/EventManager.h"
 
 namespace Smasher {
 

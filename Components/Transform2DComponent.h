@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/Graphics/Transformable.hpp>
 #include "Smasher/Base.h"
-#include ""Smasher/IComponent.h""
+#include "Smasher/IComponent.h"
 
 namespace Smasher {
 	class SMASHER_API Transform2DComponent : public IComponent, private sf::Transformable {

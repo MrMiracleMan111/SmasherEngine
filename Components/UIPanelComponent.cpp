@@ -2,7 +2,7 @@
 #include "UIPanelComponent.h"
 #include "Smasher/Base.h"
 #include "Smasher/Entity.h"
-#include ""Smasher/Events.h""
+#include "Smasher/Events.h"
 
 namespace Smasher {
 	UIPanelComponent::UIPanelComponent() : m_DebugSprite(sf::Vector2f(1.0f, 1.0f)), IComponent(), Transform2DWrapper(*this, m_Transformable)

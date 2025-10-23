@@ -1,8 +1,8 @@
 #pragma once
 #include <array>
 #include "Smasher/Base.h"
-#include ""Smasher/Events.h""
-#include ""Smasher/EventManager.h""
+#include "Smasher/Events.h"
+#include "Smasher/EventManager.h"
 
 namespace Smasher {
 	class Engine;

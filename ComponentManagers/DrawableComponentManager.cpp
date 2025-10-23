@@ -18,8 +18,8 @@
 #include "Layer.h"
 #include "ResourceManager.h"
 #include "RenderBatch.h"
-#include ""Smasher/EventManager.h""
-#include ""Smasher/Events.h""
+#include "Smasher/EventManager.h"
+#include "Smasher/Events.h"
 
 namespace Smasher {
 	DrawableComponentManager::DrawableComponentManager(Layer& state) :

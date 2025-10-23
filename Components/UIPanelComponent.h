@@ -1,12 +1,12 @@
 #pragma once
 #include <functional>
 #include "Smasher/Base.h"
-#include ""Smasher/IComponent.h""
+#include "Smasher/IComponent.h"
 #include "ResourceManager.h"
 #include "Smasher/EngineConfig.h"
 #include "Transform2DWrapper.h"
-#include ""Smasher/EventManager.h""
-#include ""Smasher/Events.h""
+#include "Smasher/EventManager.h"
+#include "Smasher/Events.h"
 
 
 namespace Smasher {

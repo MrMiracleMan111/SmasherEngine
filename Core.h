@@ -2,7 +2,7 @@
 // or project specific include files.
 
 #pragma once
-#include ""Smasher/EventManager.h""
+#include "Smasher/EventManager.h"
 #include "Smasher/Engine.h"
-#include ""Smasher/Events.h""
+#include "Smasher/Events.h"
 #include "Layer.h"

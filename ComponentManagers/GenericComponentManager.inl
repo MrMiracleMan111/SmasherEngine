@@ -3,8 +3,8 @@
 #include <chrono>
 #include <iostream>
 #include "Smasher/Base.h"
-#include ""Smasher/IComponentManager.h""
-#include ""Smasher/IComponent.h""
+#include "Smasher/IComponentManager.h"
+#include "Smasher/IComponent.h"
 #include "plf_colony.h"
 
 namespace Smasher {

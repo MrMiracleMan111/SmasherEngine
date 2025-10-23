@@ -16,9 +16,9 @@
 #include <iostream>
 #include <SFML/Window.hpp>
 #include "Smasher/Engine.h"
-#include ""Smasher/Exceptions.h""
+#include "Smasher/Exceptions.h"
 #include "Smasher/EngineConfig.h"
-#include ""Smasher/EventFeeder.h""
+#include "Smasher/EventFeeder.h"
 #include "Layer.h"
 
 namespace Smasher {
