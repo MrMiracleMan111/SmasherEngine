@@ -8,7 +8,7 @@
 #include "plf_colony.h"
 #include ""Smasher/Exceptions.h""
 #include "Smasher_export.h"
-#include "ISerializeable.h"
+#include ""Smasher/ISerializeable.h""
 
 #define SMASHER_API SMASHERENGINE_EXPORT
 
