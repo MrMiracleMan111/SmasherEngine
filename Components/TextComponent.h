@@ -1,7 +1,7 @@
 #pragma once
 #include "Smasher/Base.h"
 #include "Smasher/IComponent.h"
-#include "ResourceManager.h"
+#include "Smasher/ResourceManager.h"
 #include "Smasher/EngineConfig.h"
 #include "Transform2DWrapper.h"
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "ResourceManager.h"
+#include "Smasher/ResourceManager.h"
 
 namespace Smasher {
 	// Lazily Loads Resource

@@ -5,7 +5,7 @@
 #include "Core.h"
 #include "BaseComponentManager.h"
 #include "Smasher/Entity.h"
-#include "ResourceManager.h"
+#include "Smasher/ResourceManager.h"
 #include "Resources.h"
 #include "Smasher/Layer.h"
 

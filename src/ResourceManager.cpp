@@ -1,5 +1,5 @@
 #include "Smasher/Base.h"
-#include "ResourceManager.h"
+#include "Smasher/ResourceManager.h"
 
 namespace Smasher {
 	std::shared_ptr<Smasher::ShaderResource> ResourceManager::LoadVertFragShaderResource(const std::string& vert, const std::string& frag)

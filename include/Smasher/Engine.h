@@ -7,7 +7,7 @@
 #include <SFML/Window.hpp>
 #include "Smasher/Base.h"
 #include "Smasher/EngineConfig.h"
-#include "ResourceManager.h"
+#include "Smasher/ResourceManager.h"
 #include "Smasher/EventManager.h"
 #include "Smasher/Events.h"
 #include "Smasher/LayerTransition.h"
