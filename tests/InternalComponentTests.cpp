@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "Core.h"
 #include "BaseComponentManager.h"
-#include "Components/CameraComponent.h"
+#include "Smasher/Components/CameraComponent.h"
 
 class DummyLayer : public Smasher::Layer {
 public:
