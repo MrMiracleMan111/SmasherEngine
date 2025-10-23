@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Smasher/Base.h"
-#include "ComponentManagers/BaseComponentManager.h"
+#include "Smasher/ComponentManagers/BaseComponentManager.h"
 #include "Smasher/Events.h"
 #include "Smasher/Components/UIPanelComponent.h"
 
