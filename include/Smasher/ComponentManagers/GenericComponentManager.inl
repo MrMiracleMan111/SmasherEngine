@@ -1,5 +1,5 @@
 #pragma once
-#include "ComponentManagers/GenericComponentManager.h"
+#include "Smasher/ComponentManagers/GenericComponentManager.h"
 #include <chrono>
 #include <iostream>
 #include "Smasher/Base.h"
