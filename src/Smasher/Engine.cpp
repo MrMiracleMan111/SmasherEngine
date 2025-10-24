@@ -23,7 +23,7 @@
 
 namespace Smasher {
 
-#include "Core.h"
+#include "Smasher/Core.h"
 
 	Engine::Engine() :
 		m_Headless(false),

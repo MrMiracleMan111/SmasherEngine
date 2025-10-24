@@ -1,4 +1,4 @@
-#include "Core.h"
+#include "Smasher/Core.h"
 #include "SavedComponent.h"
 #include "SerializeLayer.h"
 #include "Manifest.h"

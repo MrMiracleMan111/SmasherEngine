@@ -1,5 +1,5 @@
 #pragma once
-#include "Core.h"
+#include "Smasher/Core.h"
 
 class ExampleResourcesLayer : public Smasher::Layer {
 public:

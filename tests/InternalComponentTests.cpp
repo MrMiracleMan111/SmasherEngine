@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "Core.h"
+#include "Smasher/Core.h"
 #include "Smasher/ComponentManagers/BaseComponentManager.h"
 #include "Smasher/Components/CameraComponent.h"
 

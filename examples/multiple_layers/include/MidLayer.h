@@ -1,4 +1,4 @@
-#include "Core.h"
+#include "Smasher/Core.h"
 
 class MidLayer : public Smasher::Layer {
 public:

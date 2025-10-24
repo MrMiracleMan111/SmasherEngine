@@ -1,4 +1,4 @@
-#include "Core.h"
+#include "Smasher/Core.h"
 #include "TopLayer.h"
 #include "MidLayer.h"
 #include "BottomLayer.h"

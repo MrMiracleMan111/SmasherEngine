@@ -1,4 +1,4 @@
-#include "Core.h"
+#include "Smasher/Core.h"
 #include "ExampleWindowLayer.h"
 #include "Smasher/Components/Transform2DComponent.h"
 int main() {

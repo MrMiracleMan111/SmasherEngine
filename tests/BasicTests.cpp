@@ -2,7 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <type_traits>
-#include "Core.h"
+#include "Smasher/Core.h"
 #include "Smasher/ComponentManagers/BaseComponentManager.h"
 #include "Smasher/Entity.h"
 #include "Smasher/ResourceManager.h"

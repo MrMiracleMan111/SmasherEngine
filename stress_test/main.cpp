@@ -1,6 +1,6 @@
 #include <numbers>
 #include <SFML/Window.hpp>
-#include "Core.h"
+#include "Smasher/Core.h"
 #include "Manifest.h"
 #include "Smasher/Components/Transform2DWrapper.h"
 #include "Smasher/Components/TextComponent.h"
