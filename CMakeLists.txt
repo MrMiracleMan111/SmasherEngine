@@ -7,6 +7,7 @@ set (GENERATE_DOCS TRUE CACHE BOOL "Generate Doxygen Documentation Files")
 set (SMASHER_EXAMPLES TRUE CACHE BOOL "Should examples be compiled")
 set (SMASHER_STRESS_TEST TRUE CACHE BOOL "Should stress test be compiled")
 set (SMASHER_TESTS TRUE CACHE BOOL "Should unit tests be compiled")
+set (SMASHER_BENCHMARK FALSE CACHE BOOL "Should benchmarking info be logged")
 set(MANIFEST_GENERATOR "${CMAKE_SOURCE_DIR}/scripts/ManifestHeaderGenerator.py")
 set(SMASHER_ENGINE_OUTPUT_DIR ${CMAKE_BINARY_DIR})
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -165,20 +166,20 @@ endif()
 
 # Compile Examples
 
-if(DEFINED SMASHER_EXAMPLES)
+if(SMASHER_EXAMPLES)
     add_subdirectory("examples")
 endif()
 
-if(DEFINED SMASHER_STRESS_TEST)
+if(SMASHER_STRESS_TEST)
     add_subdirectory("stress_test")
 endif()
 
 # Compile Tests
 
-if(DEFINED SMASHER_TESTS)
+if(SMASHER_TESTS)
     add_subdirectory("tests")
 endif()
 
-if(DEFINED SMASHER_BENCHMARK)
+if(SMASHER_BENCHMARK)
     target_compile_definitions(SmasherEngine PUBLIC BENCHMARK)
 endif()
