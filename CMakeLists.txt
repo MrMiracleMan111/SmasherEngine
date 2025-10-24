@@ -2,17 +2,28 @@
 project ("SmasherEngine")
 include(GenerateExportHeader)
 include(FetchContent)
-FetchContent_Declare(
-    googletest
-    GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG v1.17.0
-)
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
-include(GoogleTest)
 
-enable_testing()
+set (GENERATE_DOCS TRUE CACHE BOOL "Generate Doxygen Documentation Files")
+set (SMASHER_EXAMPLES TRUE CACHE BOOL "Should examples be compiled")
+set (SMASHER_STRESS_TEST TRUE CACHE BOOL "Should stress test be compiled")
+set (SMASHER_TESTS TRUE CACHE BOOL "Should unit tests be compiled")
+set(MANIFEST_GENERATOR "${CMAKE_SOURCE_DIR}/scripts/ManifestHeaderGenerator.py")
+set(SMASHER_ENGINE_OUTPUT_DIR ${CMAKE_BINARY_DIR})
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+if(SMASHER_TESTS)
+    FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG v1.17.0
+    )
+    # For Windows: Prevent overriding the parent project's compiler/linker settings
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(googletest)
+    include(GoogleTest)
+
+    enable_testing()
+endif()
 
 # GoogleTest requires at least C++17
 set(CMAKE_CXX_STANDARD 20)
@@ -26,15 +37,6 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 else()
     message(STATUS "You will need to modify the CMakeLists.txt to add compiler flags for exception handling.")
 endif()
-
-set (GENERATE_DOCS TRUE CACHE BOOL "Generate Doxygen Documentation Files")
-set (SMASHER_EXAMPLES TRUE CACHE BOOL "Should examples be compiled")
-set (SMASHER_STRESS_TEST TRUE CACHE BOOL "Should stress test be compiled")
-set (SMASHER_TESTS TRUE CACHE BOOL "Should unit tests be compiled")
-set(MANIFEST_GENERATOR "${CMAKE_SOURCE_DIR}/scripts/ManifestHeaderGenerator.py")
-set(SMASHER_ENGINE_OUTPUT_DIR ${CMAKE_BINARY_DIR})
-
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Compile Engine
 add_library(SmasherEngine SHARED "src/Smasher/Core.cpp" "include/Smasher/Core.h" "include/Smasher/Layer.h" "include/Smasher/UUID.h" "src/Smasher/UUID.cpp" "include/Smasher/Base.h" "src/Smasher/Layer.cpp" "include/Smasher/Engine.h" "src/Smasher/Engine.cpp" "include/Smasher/Exceptions.h" "include/Smasher/EventManager.h" "src/Smasher/EventManager.cpp" "include/Smasher/Events.h"  "include/Smasher/ComponentManagers/GenericComponentManager.h" "include/Smasher/IComponent.h"  "include/Smasher/Entity.h" "src/Smasher/Entity.cpp"   "include/Smasher/Components/Transform2DComponent.h" "include/Smasher/EngineConfig.h"   "include/Smasher/ResourceManager.h" "src/Smasher/ResourceManager.cpp" "include/Smasher/IComponentManager.h" "include/Smasher/ComponentManagers/BaseComponentManager.h"  "include/Smasher/Components/DrawableComponent.h" "src/Smasher/Components/DrawableComponent.cpp" "include/Smasher/Resources.h" "include/Smasher/Components/TextComponent.h" "src/Smasher/Components/TextComponent.cpp" "include/Smasher/ComponentManagers/DrawableComponentManager.h" "src/Smasher/ComponentManagers/DrawableComponentManager.cpp" "include/Smasher/ComponentManagers/RenderBatch.h" "src/Smasher/ComponentManagers/RenderBatch.cpp" "src/Smasher/Base.cpp" "src/Smasher/Components/Transform2DComponent.cpp" "include/Smasher/Components/Transform2DWrapper.h"  "include/Smasher/Components/Transform2DWrapper.inl" "include/Smasher/EventFeeder.h" "src/Smasher/EventFeeder.cpp" "include/Smasher/Components/CameraComponent.h" "src/Smasher/Components/CameraComponent.cpp" "include/Smasher/ComponentManagers/GenericComponentManager.inl" "include/Smasher/ISerializeable.h" "include/Smasher/Components/UIPanelComponent.h" "src/Smasher/Components/UIPanelComponent.cpp"  "src/Smasher/IComponent.cpp" "include/Smasher/LayerTransition.h" "include/Smasher/ComponentManagers/UIPanelComponentManager.h" "src/Smasher/ComponentManagers/UIPanelComponentManager.cpp")
@@ -109,8 +111,8 @@ else()
     message(SEND_ERROR "Delete this CMake line and copy over the SFML shared libraries manually")
 endif()
 
-find_package(Doxygen)
 if(GENERATE_DOCS)
+    find_package(Doxygen)
     if (NOT EXISTS "${CMAKE_SOURCE_DIR}/doc")
         file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/doc")
     endif()
