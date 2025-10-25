@@ -1,3 +1,4 @@
+#include <cmath>
 #include "Smasher/ComponentManagers/UIPanelComponentManager.h"
 #include "Smasher/Components/UIPanelComponent.h"
 #include "Smasher/Base.h"
