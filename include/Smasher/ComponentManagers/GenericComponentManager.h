@@ -77,4 +77,4 @@ namespace Smasher {
 	};
 }
 
-#include "ComponentManagers/GenericComponentManager.inl"
+#include "Smasher/ComponentManagers/GenericComponentManager.inl"
