@@ -8,6 +8,7 @@ namespace Smasher {
 	public:
 		Transform2DWrapper(T& caller, sf::Transformable& rTransformable) :
 			m_Transformable(rTransformable), m_Caller(caller) {}
+		virtual ~Transform2DWrapper() = default;
 
 		T& SetPosition(sf::Vector2f position);
 
