@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES 1
 #include <cmath>
 #include "Smasher/ComponentManagers/UIPanelComponentManager.h"
 #include "Smasher/Components/UIPanelComponent.h"
@@ -26,10 +27,10 @@ namespace Smasher {
 		float height = m_Transformable.getScale().y;
 		sf::Vector2f pos((float)x, (float)y);
 		pos = m_Transformable.getPosition() - pos;
-		float angle = std::atan2(pos.y, pos.x);
+		Smasher::Radians radians = std::atan2(pos.y, pos.x);
 		float dist = std::sqrt(pos.x * pos.x + pos.y * pos.y);
-		float inversePanelAngle = -m_Transformable.getRotation();
-		float finalAngle = angle + inversePanelAngle; // Radians
+		Smasher::Radians inversePanelRadians = -m_Transformable.getRotation() * (M_PI / 180.f);
+		Smasher::Radians finalAngle = radians + inversePanelRadians;
 		pos.x = std::cos(finalAngle) * dist;
 		pos.y = std::sin(finalAngle) * dist;
 
