@@ -115,7 +115,7 @@ def GenerateHeaders(data, out_path, resource_dir=None):
 
 namespace Smasher {
 """)
-            RecursiveParse(data, "Resources", out, 1, resource_dir)
+            RecursiveParse(data, "Manifest", out, 1, resource_dir)
             out.write("}\n");
             out.close()
     except Exception as e:

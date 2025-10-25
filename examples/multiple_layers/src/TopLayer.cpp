@@ -17,7 +17,7 @@ void TopLayer::Init()
 		.SetString("Top Layer")
 		.SetFillColor(sf::Color::Red)
 		.SetPosition(160.0f, 200.0f)
-		.SetFontAsset<Smasher::Resources::Fonts::arial>();
+		.SetFontAsset<Smasher::Manifest::Fonts::arial>();
 
 
 	Smasher::UIPanelComponent& panel = uiPanel.AddComponent<Smasher::UIPanelComponent>()

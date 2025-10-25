@@ -47,7 +47,7 @@ void StressTestLayer::Init()
 			.SetPosition(10.0f, 10.0f)
 			.SetScale(1.0f, 1.0f)
 			.UseDefaults()
-			.SetFontAsset<Smasher::Resources::Fonts::arial>()
+			.SetFontAsset<Smasher::Manifest::Fonts::arial>()
 			.SetFillColor(sf::Color::White)
 			.SetOutlineThickness(5.0f)
 			.SetOutlineColor(sf::Color::Black);
@@ -57,7 +57,7 @@ void StressTestLayer::Init()
 			.SetPosition(10.0f, 50.0f)
 			.SetScale(1.0f, 1.0f)
 			.UseDefaults()
-			.SetFontAsset<Smasher::Resources::Fonts::arial>()
+			.SetFontAsset<Smasher::Manifest::Fonts::arial>()
 			.SetFillColor(sf::Color::White)
 			.SetOutlineThickness(5.0f)
 			.SetOutlineColor(sf::Color::Black);
@@ -67,7 +67,7 @@ void StressTestLayer::Init()
 			.SetPosition(10.0f, 100.0f)
 			.SetScale(1.0f, 1.0f)
 			.UseDefaults()
-			.SetFontAsset<Smasher::Resources::Fonts::arial>()
+			.SetFontAsset<Smasher::Manifest::Fonts::arial>()
 			.SetFillColor(sf::Color::White)
 			.SetOutlineThickness(5.0f)
 			.SetOutlineColor(sf::Color::Black)
@@ -96,11 +96,11 @@ void StressTestLayer::Init()
 
 		if (i % 2 == 0) {
 			image.GetComponent<Smasher::DrawableComponent>()
-				.SetTextureAsset<Smasher::Resources::Textures::alpha_test>({});
+				.SetTextureAsset<Smasher::Manifest::Textures::alpha_test>({});
 		}
 		else {
 			image.GetComponent<Smasher::DrawableComponent>()
-				.SetTextureAsset<Smasher::Resources::Textures::small_art>({});
+				.SetTextureAsset<Smasher::Manifest::Textures::small_art>({});
 		}
 
 		if (i == 10) {
@@ -149,6 +149,6 @@ void StressTestLayer::OnMouseMove(Smasher::Events::MouseMoveEvent& event) {
 	if (windowRect.contains(event.Position.x, event.Position.y)) {
 		Smasher::Entity& ball = SpawnBouncingBall(event.Position);
 		ball.GetComponent<Smasher::DrawableComponent>()
-			.SetTextureAsset<Smasher::Resources::Textures::alpha_test>({});
+			.SetTextureAsset<Smasher::Manifest::Textures::alpha_test>({});
 	}
 }

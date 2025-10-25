@@ -26,7 +26,7 @@ void SerializeLayer::Init()
 			Smasher::Entity& ball = SpawnBouncingBall(sf::Vector2i(10, 10));
 			ball.GetComponent<Smasher::DrawableComponent>()
 				.SetPosition((float)(i * SPACING), (float)(j * SPACING))
-				.SetTextureAsset<Smasher::Resources::Textures::small_art>({});
+				.SetTextureAsset<Smasher::Manifest::Textures::small_art>({});
 			ball.GetComponent<BallComponent>()
 				.SetVelocity(ball.GetComponent<BallComponent>().GetVelocity() * 0.01f);
 			ball.AddComponent<SavedComponent>();

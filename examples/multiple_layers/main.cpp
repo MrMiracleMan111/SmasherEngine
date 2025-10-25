@@ -8,7 +8,7 @@
 int main() {
 	Smasher::Engine engine(640, 420);
 
-	engine.GetResourceManager().SetResourceDirectory(Smasher::Resources::Metadata::RESOURCES_DIRECTORY);
+	engine.GetResourceManager().SetResourceDirectory(Smasher::Manifest::Metadata::RESOURCES_DIRECTORY);
 
 	BottomLayer& bottomLayer = engine.PushLayer<BottomLayer>();
 	MidLayer& midLayer = engine.PushLayer<MidLayer>();

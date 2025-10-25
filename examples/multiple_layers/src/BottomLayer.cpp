@@ -14,5 +14,5 @@ void BottomLayer::Init()
 		.SetString("Bottom Layer")
 		.SetFillColor(sf::Color::White)
 		.SetPosition(100.0f, 200.0f)
-		.SetFontAsset<Smasher::Resources::Fonts::arial>();
+		.SetFontAsset<Smasher::Manifest::Fonts::arial>();
 }

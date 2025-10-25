@@ -9,6 +9,7 @@ MidLayer::~MidLayer() {
 
 void MidLayer::Init()
 {
+	std::shared_ptr<Smasher::ShaderResource> pShader = GetEngine().GetResourceManager().GetOrLoadResource<Smasher::Mani>();
 	Smasher::Entity& entity = AddEntity();
 
 	entity.AddComponent<Smasher::TextComponent>()
@@ -16,7 +17,7 @@ void MidLayer::Init()
 		.SetString("Mid Layer")
 		.SetFillColor(sf::Color::Magenta)
 		.SetPosition(130.0f, 200.0f)
-		.SetFontAsset<Smasher::Resources::Fonts::arial>();
+		.SetFontAsset<Smasher::Manifest::Fonts::arial>();
 
 	Smasher::Entity& uiPanel = AddEntity();
 

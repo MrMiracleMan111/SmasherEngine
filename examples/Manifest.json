@@ -15,6 +15,7 @@
     "arial": "assets/fonts/arial.ttf"
   },
   "Shaders": {
+    "basic_ui_shader": "assets/shaders/basic_texture_shader/basic_ui_frag_shader.glsl",
     "basic_texture_shader": [ "assets/shaders/basic_texture_shader/basic_texture_vertex_shader.glsl", "assets/shaders/basic_texture_shader/basic_texture_fragment_shader.glsl" ]
   }
 }

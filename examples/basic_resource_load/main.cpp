@@ -10,7 +10,7 @@
 
 int main() {
 	Smasher::Engine engine(640, 420);
-	engine.GetResourceManager().SetResourceDirectory(Smasher::Resources::Metadata::RESOURCES_DIRECTORY);
+	engine.GetResourceManager().SetResourceDirectory(Smasher::Manifest::Metadata::RESOURCES_DIRECTORY);
 
 	ExampleResourcesLayer& state = engine.PushLayer<ExampleResourcesLayer>();
 
@@ -18,7 +18,7 @@ int main() {
 	image.AddComponent<Smasher::DrawableComponent>()
 		.SetPosition(sf::Vector2f(500.0f, 300.0f))
 		.SetScale(sf::Vector2f(400.0f, 400.0f))
-		.SetTextureAsset<Smasher::Resources::Textures::small_art>({}) // Default texture options
+		.SetTextureAsset<Smasher::Manifest::Textures::small_art>({}) // Default texture options
 		//.SetClipRect(sf::IntRect{ 0, 0, 64, 64 })
 		.SetClipRotation(Smasher::Degrees{ 30 })
 		.SetDepth(0.2f);
@@ -41,11 +41,11 @@ int main() {
 
 		if (i % 2 == 0) {
 			image.GetComponent<Smasher::DrawableComponent>()
-				.SetTextureAsset<Smasher::Resources::Textures::alpha_test>({});
+				.SetTextureAsset<Smasher::Manifest::Textures::alpha_test>({});
 		}
 		else {
 			image.GetComponent<Smasher::DrawableComponent>()
-				.SetTextureAsset<Smasher::Resources::Textures::small_art>({});
+				.SetTextureAsset<Smasher::Manifest::Textures::small_art>({});
 		}
 
 	}
@@ -55,7 +55,7 @@ int main() {
 	window1.AddComponent<Smasher::DrawableComponent>()
 		.SetPosition(sf::Vector2f(400, 200))
 		.SetScale(sf::Vector2f(150.0f, 150.0f))
-		.SetTextureAsset<Smasher::Resources::Textures::window>({.transluscent = true})
+		.SetTextureAsset<Smasher::Manifest::Textures::window>({.transluscent = true})
 		.SetClipRect(sf::IntRect{ 10, 0, 64, 64 })
 		.SetClipRotation(Smasher::Degrees{ 30 })
 		.SetDepth(0.6f);
@@ -64,7 +64,7 @@ int main() {
 	window2.AddComponent<Smasher::DrawableComponent>()
 		.SetPosition(sf::Vector2f(420, 220))
 		.SetScale(sf::Vector2f(150.0f, 150.0f))
-		.SetTextureAsset<Smasher::Resources::Textures::window>({.transluscent = true})
+		.SetTextureAsset<Smasher::Manifest::Textures::window>({.transluscent = true})
 		//.SetClipRect(sf::IntRect{ 0, 0, 64, 64 })
 		.SetDepth(0.5);
 
@@ -72,7 +72,7 @@ int main() {
 	inWindowEntity.AddComponent<Smasher::DrawableComponent>()
 		.SetPosition(sf::Vector2f(410, 210))
 		.SetScale(sf::Vector2f(100.0f, 100.0f))
-		.SetTextureAsset<Smasher::Resources::Textures::alpha_test>({.transluscent = true})
+		.SetTextureAsset<Smasher::Manifest::Textures::alpha_test>({.transluscent = true})
 		.SetClipRotation(Smasher::Degrees{ 30 })
 		.SetDepth(0.55f);
 
@@ -82,7 +82,7 @@ int main() {
 	message.AddComponent<Smasher::TextComponent>()
 		.SetString("Hello World")
 		.UseDefaults()
-		.SetFontAsset<Smasher::Resources::Fonts::arial>();
+		.SetFontAsset<Smasher::Manifest::Fonts::arial>();
 
  	state.Activate();
 	engine.Run();

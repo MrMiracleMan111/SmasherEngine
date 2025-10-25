@@ -25,12 +25,12 @@ namespace Smasher {
 /// (ex. a window pane) the @ref TextureOptions::transluscent should be set to `true` like so:
 /// 
 /// @code
-/// GetEngine().GetResourceManager().GetOrLoadResource<Resources::Textures::Potrait, TextureResource>();
+/// GetEngine().GetResourceManager().GetOrLoadResource<Manifest::Textures::Potrait, TextureResource>();
 /// Entity& image = state.AddEntity<Entity>();
 /// image.AddComponent<DrawableComponent>()
 ///			.SetPosition(sf::Vector2f(100.0f, 50.0f))
 /// 		.SetScale(sf::Vector2f(20.0f, 20.0f))
-///			.SetTextureAsset<Resources::Textures::Portrait>({.transluscent = true});
+///			.SetTextureAsset<Manifest::Textures::Portrait>({.transluscent = true});
 /// @endcode
 /// 
 /// In this example, the texture is loaded using the filepath instead of the Manifest Object.
