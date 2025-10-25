@@ -30,9 +30,9 @@ namespace Smasher {
 		Smasher::Radians radians = std::atan2(pos.y, pos.x);
 		float dist = std::sqrt(pos.x * pos.x + pos.y * pos.y);
 		Smasher::Radians inversePanelRadians = -m_Transformable.getRotation() * (M_PI / 180.f);
-		Smasher::Radians finalAngle = radians + inversePanelRadians;
-		pos.x = std::cos(finalAngle) * dist;
-		pos.y = std::sin(finalAngle) * dist;
+		Smasher::Radians finalRadians = radians + inversePanelRadians;
+		pos.x = std::cos(finalRadians) * dist;
+		pos.y = std::sin(finalRadians) * dist;
 
 		return (std::abs(pos.x) <= (width / 2)) && (std::abs(pos.y) <= (height / 2));
 	}
