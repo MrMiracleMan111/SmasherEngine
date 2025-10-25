@@ -16,6 +16,7 @@ namespace Smasher {
 	class IComponentManager {
 	public:
 		IComponentManager() = delete;
+		virtual ~IComponentManager() {};
 		IComponentManager(Layer& layer) : m_Layer(layer) {}
 		virtual void PreUpdate(Millisecond delta) {};
 		virtual void Update(Millisecond delta) {}; // Override this to enable component updating
