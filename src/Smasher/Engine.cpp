@@ -78,6 +78,7 @@ namespace Smasher {
 
 	Engine::~Engine()
 	{
+		m_EventManager.StopAsync();
 		if (m_Valid) {
 			if (!m_Headless) {
 				m_WindowCloseHandle.Unsubscribe(); // Explicilty unsubscribe before EventManager is deconstructed
