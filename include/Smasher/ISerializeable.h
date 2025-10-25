@@ -54,6 +54,7 @@ namespace Smasher {
 	// Serializeable Interface
 	class ISerializeable {
 	public:
+		virtual ~ISerializeable() = default;
 		virtual void Serialize(OutputArchive& out) = 0;
 		virtual void Deserialize(InputArchive& in) = 0;
 	};
