@@ -26,7 +26,9 @@ namespace Smasher {
 		EventSubscription& operator=(EventSubscription&&) = delete;
 	};
 
-	// Event subscriptions last for the lifetime of EventSubscriptionHandle
+	// EventSubscription instances last for the lifetime of EventSubscriptionHandle.
+	// Every EventSubscription SHOULD only have ONE EventSubscriptionHandle referring
+	// to it.
 	struct SMASHER_API EventSubscriptionHandle {
 	friend class EventManager;
 	friend class Layer;
@@ -38,7 +40,13 @@ namespace Smasher {
 		EventSubscriptionHandle& operator =(EventSubscriptionHandle&) = delete;
 		EventSubscriptionHandle& operator =(EventSubscriptionHandle&&) noexcept;
 
-
+		// Need to cover three cases
+		// 1. Layer is active but EventSubscription was unsubscribed
+		// 2. Layer was destroyed but handle is still in scope
+		// 3. EventSubscriptionHandle transfers ownership (move) to another handle
+		//
+		// !m_SubscriptionPtr.expired()   covers case 2 
+		// m_Valid						  covers case 1, 3
 		bool IsValid() const { return m_Valid && !m_SubscriptionPtr.expired(); }
 
 		void Unsubscribe();
