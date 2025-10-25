@@ -26,7 +26,7 @@ namespace Smasher {
 		float height = m_Transformable.getScale().y;
 		sf::Vector2f pos((float)x, (float)y);
 		pos = m_Transformable.getPosition() - pos;
-		float angle = std::atan2f(pos.y, pos.x);
+		float angle = std::atan2(pos.y, pos.x);
 		float dist = std::sqrt(pos.x * pos.x + pos.y * pos.y);
 		float inversePanelAngle = -m_Transformable.getRotation();
 		float finalAngle = angle + inversePanelAngle; // Radians
