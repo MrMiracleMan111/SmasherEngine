@@ -13,6 +13,8 @@ namespace Smasher {
 		m_ComponentManagersWithRender.clear();
 		m_ComponentManagersWithUpdate.clear();
 		m_ComponentManagers.clear();
+		m_EventSubscriptionsByType.clear();
+		m_AsyncEventSubscriptionsByType.clear();
 	}
 
 	void Layer::RenderComponentManagers(sf::RenderWindow& window) {
