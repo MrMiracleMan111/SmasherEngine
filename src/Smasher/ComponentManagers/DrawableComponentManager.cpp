@@ -43,6 +43,10 @@ namespace Smasher {
 		SetShaderResource(shader);
 	}
 
+	DrawableComponentManager::~DrawableComponentManager()
+	{
+		m_Components.clear();
+	}
 
 
 	void DrawableComponentManager::Render(sf::RenderWindow& rWindow) {

@@ -32,7 +32,7 @@ namespace Smasher {
 		DrawableComponentManager() = delete;
 		DrawableComponentManager(Layer& state);
 		DrawableComponentManager(const DrawableComponentManager&) = default;
-		~DrawableComponentManager() = default;
+		~DrawableComponentManager();
 
 		void Render(sf::RenderWindow& rWindow) override;
 
