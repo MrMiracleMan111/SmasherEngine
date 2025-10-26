@@ -62,6 +62,8 @@ namespace Smasher {
 
 		void InitGLObjects();
 
+		// Add model to RenderBatch and updates BatchContext instance
+		// to refer to that model
 		void AddModel(BatchContext& context);
 
 		void RemoveModel(BatchContext& context);
