@@ -128,7 +128,7 @@ namespace Smasher {
 		glBindVertexArray(0);
 	}
 
-	inline void DrawableComponentManager::OnComponentChangeData(DrawableComponent& rComponent) {
+	void DrawableComponentManager::OnComponentChangeData(DrawableComponent& rComponent) {
 		if (!rComponent.m_TextureLoaded) {
 			return;
 		}
