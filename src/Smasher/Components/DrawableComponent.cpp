@@ -7,8 +7,8 @@
 
 namespace Smasher {
     DrawableComponent::DrawableComponent() : IComponent(), Transform2DWrapper(*this, m_Transformable),
-        m_OpaqueBatchContext(nullptr, SIZE_MAX),
-        m_TranslucentBatchContext(nullptr, SIZE_MAX) {
+        m_OpaqueBatchContext() /* Invalid State */,
+        m_TranslucentBatchContext() /* Invalid State */ {
         SetScale(sf::Vector2f(100.0f, 100.0f));
     }
 
@@ -17,8 +17,8 @@ namespace Smasher {
         std::shared_ptr<ShaderResource> shaderPtr) : IComponent(), Transform2DWrapper(*this, m_Transformable),
         m_ShaderResource(shaderPtr),
         m_TextureResource(texturePtr),
-        m_OpaqueBatchContext(nullptr, SIZE_MAX),
-        m_TranslucentBatchContext(nullptr, SIZE_MAX) {
+        m_OpaqueBatchContext() /* Invalid State */,
+        m_TranslucentBatchContext() /* Invalid State */ {
         SetScale(sf::Vector2f(100.0f, 100.0f));
 
         auto& rCompManager = static_cast<DrawableComponentManager&>(GetManager());
