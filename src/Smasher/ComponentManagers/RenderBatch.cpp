@@ -44,9 +44,12 @@ namespace Smasher {
 	};
 
 	void RenderBatch::InitGLObjects() {
+		// Cache the current GL_VERTEX_ARRAY_BINDING, GL_ARRAY_BUFFER_BINDING values
+		// so that they can be restored after, InitGLObjects
 		GLint currentVAO, currentVBO;
 		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &currentVAO);
 		glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &currentVBO);
+
 		glGenVertexArrays(1, &instanceVAO);
 		glGenBuffers(1, &instanceVBO);
 		glGenBuffers(1, &quadVBO);
