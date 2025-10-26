@@ -14,7 +14,11 @@
 #endif
 
 namespace Smasher {
-	RenderBatch::RenderBatch(std::list<RenderBatch>& list) : ownerBatchList(list) {
+	RenderBatch::RenderBatch(std::list<RenderBatch>& list, GLuint quadVBO, GLuint quadEBO) :
+		ownerBatchList(list),
+		quadVBO(quadVBO),
+		quadEBO(quadEBO)
+	{
 		InitGLObjects();
 	}
 
@@ -25,7 +29,10 @@ namespace Smasher {
 		glDeleteBuffers(1, &quadVBO);
 	}
 
-	RenderBatch::RenderBatch(RenderBatch&& other) : ownerBatchList(other.ownerBatchList) {
+	RenderBatch::RenderBatch(RenderBatch&& other) :
+		ownerBatchList(other.ownerBatchList),
+		quadVBO(other.quadVBO),
+		quadEBO(other.quadEBO) {
 		models = other.models;
 		pTexture = other.pTexture;
 		dirty = true; // Has the render batch or any elemnts inside changed?
@@ -34,6 +41,8 @@ namespace Smasher {
 		InitGLObjects();
 	};
 	RenderBatch& RenderBatch::operator = (RenderBatch&& other) {
+		quadVBO = other.quadVBO;
+		quadEBO = other.quadEBO;
 		models = other.models;
 		pTexture = other.pTexture;
 		dirty = true; // Has the render batch or any elemnts inside changed?
@@ -52,12 +61,12 @@ namespace Smasher {
 
 		glGenVertexArrays(1, &instanceVAO);
 		glGenBuffers(1, &instanceVBO);
-		glGenBuffers(1, &quadVBO);
-		glGenBuffers(1, &quadEBO);
+		//glGenBuffers(1, &quadVBO);
+		//glGenBuffers(1, &quadEBO);
 
 		glBindVertexArray(instanceVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(RenderBatch::StaticVertices), RenderBatch::StaticVertices, GL_STATIC_DRAW);
+		//glBufferData(GL_ARRAY_BUFFER, sizeof(RenderBatch::StaticVertices), RenderBatch::StaticVertices, GL_STATIC_DRAW);
 
 		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)0);
 		glEnableVertexAttribArray(0);
@@ -65,7 +74,7 @@ namespace Smasher {
 		glEnableVertexAttribArray(1);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadEBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(RenderBatch::StaticIndices), RenderBatch::StaticIndices, GL_STATIC_DRAW);
+		//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(RenderBatch::StaticIndices), RenderBatch::StaticIndices, GL_STATIC_DRAW);
 		glBindVertexArray(0);
 
 		glBindVertexArray(instanceVAO);

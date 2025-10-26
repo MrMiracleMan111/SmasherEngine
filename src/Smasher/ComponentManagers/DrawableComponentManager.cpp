@@ -31,6 +31,10 @@ namespace Smasher {
 			&DrawableComponentManager::OnWindowClose, this
 		);
 
+		if (!engine.IsHeadless()) {
+			InitQuadGLBuffers();
+		}
+
 		// Load the basic shader 
 		static_assert(Smasher::HasRenderCapability<Smasher::DrawableComponentManager>, "DrawableComponentManager should have the render capability");
 
@@ -46,6 +50,26 @@ namespace Smasher {
 	DrawableComponentManager::~DrawableComponentManager()
 	{
 		m_Components.clear();
+	}
+
+	void DrawableComponentManager::InitQuadGLBuffers() {
+		// Cache the current GL_VERTEX_ARRAY_BINDING, GL_ARRAY_BUFFER_BINDING values
+		// so that they can be restored after, InitGLObjects
+		GLint currentVAO, currentVBO;
+		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &currentVAO);
+		glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &currentVBO);
+
+		glGenBuffers(1, &m_QuadVBO);
+		glGenBuffers(1, &m_QuadEBO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, m_QuadVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(RenderBatch::StaticVertices), RenderBatch::StaticVertices, GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_QuadEBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(RenderBatch::StaticIndices), RenderBatch::StaticIndices, GL_STATIC_DRAW);
+
+		glBindVertexArray(currentVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, currentVBO);
 	}
 
 
@@ -184,7 +208,7 @@ namespace Smasher {
 		// Assume front of list is empty
 		auto itr = opaqueBatches.begin();
 		if (opaqueBatches.size() == 0) {
-			RenderBatch& batch = opaqueBatches.emplace_front(opaqueBatches);
+			RenderBatch& batch = opaqueBatches.emplace_front(opaqueBatches, m_QuadVBO, m_QuadEBO);
 			batch.iterator = opaqueBatches.begin();
 			ResourceManager& rResourceManager = GetLayer().GetEngine().GetResourceManager();
 			auto pTexture = rResourceManager.GetResource<TextureResource>(id);
@@ -201,7 +225,7 @@ namespace Smasher {
 
 			// Everything was full, add a new RenderBatch
 			if (itr == opaqueBatches.end()) {
-				RenderBatch& batch = opaqueBatches.emplace_front(opaqueBatches);
+				RenderBatch& batch = opaqueBatches.emplace_front(opaqueBatches, m_QuadVBO, m_QuadEBO);
 				batch.iterator = opaqueBatches.begin();
 				batch.pTexture = opaqueBatches.back().pTexture;
 				itr = opaqueBatches.begin();
@@ -216,7 +240,7 @@ namespace Smasher {
 			// Assume front of list is empty
 			auto itr = translucentBatches.begin();
 			if (translucentBatches.size() == 0) {
-				RenderBatch& batch = translucentBatches.emplace_front(translucentBatches);
+				RenderBatch& batch = translucentBatches.emplace_front(translucentBatches, m_QuadVBO, m_QuadEBO);
 				batch.iterator = translucentBatches.begin();
 				ResourceManager& rResourceManager = GetLayer().GetEngine().GetResourceManager();
 				auto pTexture = rResourceManager.GetResource<TextureResource>(id);
@@ -233,7 +257,7 @@ namespace Smasher {
 
 				// Everything was full, add a new RenderBatch
 				if (itr == translucentBatches.end()) {
-					RenderBatch& batch = translucentBatches.emplace_front(translucentBatches);
+					RenderBatch& batch = translucentBatches.emplace_front(translucentBatches, m_QuadVBO, m_QuadEBO);
 					batch.iterator = translucentBatches.begin();
 					batch.pTexture = translucentBatches.back().pTexture;
 					itr = translucentBatches.begin();

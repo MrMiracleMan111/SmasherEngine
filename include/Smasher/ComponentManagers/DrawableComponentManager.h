@@ -49,13 +49,21 @@ namespace Smasher {
 
 		std::shared_ptr<ShaderResource> GetDefaultShader() const { return m_DefaultShader; }
 
+		GLuint GetQuadVBO() const { return m_QuadVBO; }
+		GLuint GetQuadEBO() const { return m_QuadEBO; }
+
 	private:
 		void DrawBatch(RenderBatch& rRenderBatch);
+		void InitQuadGLBuffers();
 		std::map<ResourceID, std::list<RenderBatch>> m_OpaqueBatches; // Linked List of Batches
 		std::map<ResourceID, std::list<RenderBatch>> m_TranslucentBatches;// Linked List of Batches
 
 		std::shared_ptr<ShaderResource> m_ShaderResource; // Solely for preventing destruction of resource object
 		std::shared_ptr<ShaderResource> m_DefaultShader; // Shader loaded from EngineConfig.h
+	
+		// Quad instanced used by all DrawableComponent
+		GLuint m_QuadVBO;
+		GLuint m_QuadEBO;
 	};
 }
 

@@ -28,7 +28,7 @@ namespace Smasher {
 	// Models will use 2D plane
 	struct SMASHER_API RenderBatch {
 		RenderBatch() = delete;
-		RenderBatch(std::list<RenderBatch>& list);
+		RenderBatch(std::list<RenderBatch>& list, GLuint quadVBO, GLuint quadEBO);
 		~RenderBatch();
 		RenderBatch(const RenderBatch& other) = delete;
 		RenderBatch(RenderBatch&&);
@@ -45,8 +45,8 @@ namespace Smasher {
 		std::size_t modelCount = 0; // Keeps accurate track of model count
 		GLuint instanceVAO;
 		GLuint instanceVBO;
-		GLuint quadVBO;
-		GLuint quadEBO;
+		GLuint quadVBO; // Quad mesh data (buffers are created DrawableComponentManager)
+		GLuint quadEBO; // Quad mesh data (buffers are created DrawableComponentManager)
 		static inline const GLubyte StaticIndices[6]{
 			0, 1, 2,   // first triangle
 			2, 3, 0    // second triangle
