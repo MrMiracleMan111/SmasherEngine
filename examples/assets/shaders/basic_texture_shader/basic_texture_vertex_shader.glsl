@@ -32,10 +32,10 @@ void main()
     mat4 model = GetTransform(aWorldPos, aWorldScale, aWorldRotation);
 
     vertexColor = vec4(
-        float((aColorCode >> 0) & 255u) / 255.0f,
-        float((aColorCode >> 8) & 255u) / 255.0f,
-        float((aColorCode >> 16) & 255u) / 255.0f,
-        float((aColorCode >> 24) & 255u) / 255.0f
+        float((aColorCode >> 24) & 255u) / 255.0,  // R from highest byte
+        float((aColorCode >> 16) & 255u) / 255.0,  // G
+        float((aColorCode >> 8)  & 255u) / 255.0,  // B
+        float((aColorCode >> 0)  & 255u) / 255.0   // A from lowest byte
     );
 
     // transform the vertex position
