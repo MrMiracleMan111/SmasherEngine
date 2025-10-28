@@ -8,4 +8,5 @@ public:
 	void Init() override;
 	//void Update(Smasher::Millisecond delta) override { std::cout << "Middle" << std::endl; }
 private:
+	Smasher::EventSubscriptionHandle m_OnMouseMove;
 };

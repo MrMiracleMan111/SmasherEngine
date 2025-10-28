@@ -9,6 +9,14 @@ TopLayer::~TopLayer()
 
 void TopLayer::Init()
 {
+	std::shared_ptr<Smasher::ShaderResource> pShader = GetEngine().GetResourceManager().GetOrLoadResource<Smasher::Manifest::Shaders::basic_ui_shader, Smasher::ShaderResource>();
+	Smasher::UIPanelComponentManager& rUIManager = static_cast<Smasher::UIPanelComponentManager&>(GetComponentManager<Smasher::UIPanelComponent>());
+	sf::Vector2f windowSize = sf::Vector2f((float)GetEngine().GetWindow().getSize().x, (float)GetEngine().GetWindow().getSize().y);
+	sf::Glsl::Mat4 viewProjectionMatrix = sf::Glsl::Mat4(GetEngine().GetWindow().getView().getTransform().getMatrix());
+	pShader->GetShader().setUniform("windowSize", windowSize);
+	pShader->GetShader().setUniform("ViewProjectionMatrix", viewProjectionMatrix);
+	rUIManager.SetShaderResource(pShader);
+
 	Smasher::Entity& entity = AddEntity();
 	Smasher::Entity& uiPanel = AddEntity();
 
@@ -24,6 +32,7 @@ void TopLayer::Init()
 		.SetColor(sf::Color::Yellow)
 		.SetPosition(160.0f, 100.0f)
 		.SetScale(100.0f, 100.0f)
+		.SetDepth(0.5f)
 		.SetPanelSettings(Smasher::UIPanelSettings::BLOCK_MOUSE_MOVE);
 	panel.SetOnHoverCallback([&panel](Smasher::Events::MouseMoveEvent& event) {
 		if ((bool)(panel.GetPanelState() & Smasher::UIPanelState::HOVERED)) {
