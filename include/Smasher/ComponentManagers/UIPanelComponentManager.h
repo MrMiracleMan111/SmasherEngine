@@ -6,21 +6,29 @@
 #include "Smasher/Components/UIPanelComponent.h"
 
 namespace Smasher {
+	class Entity;
 	class UIPanelComponent;
-	class SMASHER_API UIPanelComponentManager : public BaseComponentManager<UIPanelComponent> {
+	class UIPanelComponentManager : public BaseComponentManager<UIPanelComponent> {
 	public:
 		UIPanelComponentManager() = delete;
 		UIPanelComponentManager(Layer& state);
 		UIPanelComponentManager(const UIPanelComponentManager&) = default;
 		~UIPanelComponentManager() = default;
 
+		template<typename... Args>
+		UIPanelComponent& AddComponent(Entity& entity, Args&&... args);
+
 		void RenderComponents(sf::RenderWindow& rWindow) override;
 
 		void OnMouseMove(Events::MouseMoveEvent& event);
 		void OnMouseButton(Events::MouseButtonEvent& event);
+		void SetShaderResource(std::shared_ptr<ShaderResource> pShaderResource) { m_ShaderResource = pShaderResource; }
 
 	private:
 		EventSubscriptionHandle m_MouseMoveSubscription;
 		EventSubscriptionHandle m_MouseButtonSubscription;
+		std::shared_ptr<ShaderResource> m_ShaderResource;
 	};
 }
+
+#include "Smasher/ComponentManagers/UIPanelComponentManager.inl"

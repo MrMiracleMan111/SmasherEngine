@@ -1,5 +1,15 @@
 #include "Smasher/ComponentManagers/UIPanelComponentManager.h"
 #include "Smasher/Layer.h"
+#include <GL/glew.h>
+#if defined(_WIN32)
+#define NOMINMAX
+#include <windows.h>
+#include <GL/gl.h>
+#elif defined(__linux__)
+#include <GL/gl.h>
+#elif defined(__APPLE__)
+#include <OpenGL/gl.h>
+#endif
 
 namespace Smasher {
 	UIPanelComponentManager::UIPanelComponentManager(Layer& layer) :
@@ -21,9 +31,55 @@ namespace Smasher {
 
 	void UIPanelComponentManager::RenderComponents(sf::RenderWindow& rWindow)
 	{
+		/*for (auto& itr : m_Components) {
+			itr.m_DebugSprite.setPosition(itr.m_Transformable.getPosition());
+			itr.m_DebugSprite.setRotation(itr.m_Transformable.getRotation());
+			itr.m_DebugSprite.setScale(itr.m_Transformable.getScale());
+			rWindow.draw(itr.GetShape());
+		}*/
+
+		GLint currentVAO, currentVBO;
+		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &currentVAO);
+		glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &currentVBO);
+
+		sf::Glsl::Mat4 ViewProjectionMatrix(rWindow.getView().getTransform().getMatrix());
+		sf::Shader::bind(&m_ShaderResource->GetShader());
+		static_assert(std::is_same_v<std::shared_ptr<ShaderResource>, decltype(m_ShaderResource)>, "fail");
+		m_ShaderResource->GetShader().setUniform("ViewProjectionMatrix", ViewProjectionMatrix);
+		m_ShaderResource->GetShader().setUniform("translucentPass", false);
+
+		glEnable(GL_DEPTH_TEST);
+		glDepthMask(GL_TRUE);
+		glDepthFunc(GL_LESS);
+		glDepthRange(1.0f, -1.0f); // top = 1, bottom = 0
+		glDisable(GL_BLEND);
+
 		for (auto& itr : m_Components) {
-			UIPanelComponent::StaticRenderComponent(itr, rWindow);
+			if (itr.GetTextureRef()) {
+				sf::Texture::bind(&itr.GetTexture()->GetTexture(), sf::Texture::Pixels);
+			}
+			itr.DrawPanel();
 		}
+
+		m_ShaderResource->GetShader().setUniform("translucentPass", true);
+		glDepthMask(GL_FALSE); // Disable depth writes
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		for (auto& itr : m_Components) {
+			itr.DrawPanel();
+		}
+
+		glDisable(GL_DEPTH_TEST);
+		glDepthMask(GL_TRUE);
+		glDepthFunc(GL_ALWAYS);
+		glDepthRange(1.0f, -1.0f); // top = 1, bottom = 0
+
+		sf::Texture::bind(NULL);
+		sf::Shader::bind(NULL);
+		glBindVertexArray(currentVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, currentVBO);
+		rWindow.resetGLStates();
 	}
 
 	void UIPanelComponentManager::OnMouseMove(Events::MouseMoveEvent& event) {

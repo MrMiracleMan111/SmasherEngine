@@ -1,5 +1,15 @@
 #pragma once
 #include <functional>
+#include <GL/glew.h>
+#if defined(_WIN32)
+#define NOMINMAX
+#include <windows.h>
+#include <GL/gl.h>
+#elif defined(__linux__)
+#include <GL/gl.h>
+#elif defined(__APPLE__)
+#include <OpenGL/gl.h>
+#endif
 #include "Smasher/Base.h"
 #include "Smasher/IComponent.h"
 #include "Smasher/ResourceManager.h"
@@ -11,6 +21,27 @@
 
 namespace Smasher {
 	class UIPanelComponentManager;
+
+	struct UIPanelData {
+		float position_rotation[4] = { 0 }; //x, y, z
+		float scale_borderThickness[3] = { 0 }; // x, y, z
+		Mat3 texTransform = Mat3{};
+		uint32_t color = 0;
+		uint32_t borderColor = 0;
+		float borderRadius[4] = { 0.0f }; // top left, top right, bottom right, bottom left
+		uint32_t hasTexture = (uint32_t)false;
+	};
+
+	enum class UIPanelCorner : unsigned char {
+		TOP_LEFT = 1,
+		TOP_RIGHT = 1 << 2,
+		BOTTOM_RIGHT = 1 << 3,
+		BOTTOM_LEFT = 1 << 4,
+		BOTTOM = BOTTOM_RIGHT | BOTTOM_LEFT,
+		TOP = TOP_RIGHT | TOP_LEFT,
+		LEFT = TOP_LEFT | BOTTOM_LEFT,
+		RIGHT = TOP_RIGHT | BOTTOM_RIGHT
+	};
 
 	enum class UIPanelSettings : unsigned char {
 		NONE = 0,			// Base state
@@ -71,7 +102,35 @@ namespace Smasher {
 		// Checks if window coordinate intersects the panel
 		bool IntersectsPanel(int x, int y);
 
+		UIPanelComponent& SetClipRect(sf::IntRect clipRect);
+
+		UIPanelComponent& SetClipRotation(Degrees angle);
+
 		UIPanelComponent& SetColor(const sf::Color& color);
+
+		UIPanelComponent& SetBorderRadius(float radius);
+
+		UIPanelComponent& SetBorderRadius(UIPanelCorner corner, float radius);
+
+		UIPanelComponent& SetBorderThickness(float thickness);
+
+		UIPanelComponent& SetBorderColor(const sf::Color& color);
+
+		UIPanelComponent& SetDepth(float depth);
+
+		sf::Color GetColor() const { return m_Color; }
+		float GetDepth() const { return m_Depth; }
+		float const* const GetBorderRadius() const { return m_BorderRadius; }
+		float GetBorderRadius(const UIPanelCorner corner) const;
+		float GetBorderThickness() const { return m_BorderThickness; }
+		sf::Color GetBorderColor() const { return m_BorderColor; }
+		std::shared_ptr<Smasher::TextureResource> GetTexture() const { return m_TexturePtr; };
+		const std::shared_ptr<Smasher::TextureResource>& GetTextureRef() const { return m_TexturePtr; };
+		const sf::IntRect& GetClipRect() const { return m_ClipRect; }
+		Degrees GetClipRotation() const { return m_ClipRotation; }
+		const sf::Transform& GetClipTransform();
+
+		UIPanelComponent& SetTexture(std::shared_ptr<Smasher::TextureResource> pTexture);
 
 		const UIPanelState& GetPanelState() const { return m_PanelState; };
 		void SetPanelState(UIPanelState state) { m_PanelState = state; }
@@ -90,14 +149,49 @@ namespace Smasher {
 	protected:
 		void OnHoverEvent(Events::MouseMoveEvent& event);
 		void OnPressEvent(Events::MouseButtonEvent& event);
+		void DrawPanel();
+		sf::Shape& GetShape() { return m_DebugSprite; };
+
+		GLuint instanceVAO = std::numeric_limits<GLuint>::max();
+		GLuint instanceVBO = std::numeric_limits<GLuint>::max();
+		GLuint quadVBO = std::numeric_limits<GLuint>::max();
+		GLuint quadEBO = std::numeric_limits<GLuint>::max();
+
+		static inline const GLubyte StaticIndices[6]{
+			0, 1, 2,   // first triangle
+			2, 3, 0    // second triangle
+		};
+
+		static inline const float StaticVertices[24]{
+			//   Position       Tex Coord
+			   -0.5f, -0.5f,     0.0, 0.0,   // bottom left
+				0.5f, -0.5f,     1.0, 0.0,   // bottom right
+				0.5f,  0.5f,     1.0, 1.0,   // top right
+			   -0.5f,  0.5f,     0.0, 1.0,   // top left
+		};
 
 	private:
+		void InitGLObjects();
+		void UpdateGLBufferData();
+
+		float m_BorderRadius[4] = { 0.0f };
+		float m_BorderThickness = 0.0f;
+		float m_Depth = 0.0f;
 		UIPanelState m_PanelState = UIPanelState::NONE;
+		UIPanelData m_PanelRenderData;
 		UIPanelSettings m_PanelSettings = UIPanelSettings::NONE;
 		sf::RectangleShape m_DebugSprite;
 		sf::Transformable m_Transformable;
+		sf::IntRect m_ClipRect{ 0, 0, 0, 0 };
+		sf::Transform m_ClipTransform;
+		Degrees m_ClipRotation = 0.0f;
 		std::function<void(Events::MouseMoveEvent&)> m_MouseMoveCallback;
 		std::function<void(Events::MouseButtonEvent&)> m_MousePressCallback;
+		std::shared_ptr<Smasher::TextureResource> m_TexturePtr;
+		sf::Color m_Color = sf::Color::White;
+		sf::Color m_BorderColor = sf::Color::Red;
+		bool m_Changed = false;
+		bool m_ClipChanged = false;
 	};
 }
 
