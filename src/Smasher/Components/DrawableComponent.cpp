@@ -85,7 +85,7 @@ namespace Smasher {
 
         m_ClipTransform
             .translate(initialX / dimensions.x, initialY / dimensions.y) // Center the clip at 0,0
-            .rotate((float)m_ClipRotation)
+            .rotate((float)-m_ClipRotation)
             .scale(m_ClipRect.width / dimensions.x, m_ClipRect.height / dimensions.y)
             .translate(left / dimensions.x, top / dimensions.y);
 
