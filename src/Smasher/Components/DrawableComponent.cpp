@@ -59,7 +59,7 @@ namespace Smasher {
         return *this;
     }
 
-    DrawableComponent& DrawableComponent::SetClipRotation(Degrees angle) {
+    explicit DrawableComponent& DrawableComponent::SetClipRotation(Degrees angle) {
         m_ClipChanged = true;
         m_ClipRotation = angle;
         return *this;
