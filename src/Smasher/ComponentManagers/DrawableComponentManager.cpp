@@ -142,9 +142,9 @@ namespace Smasher {
 		glDepthRange(1.0f, -1.0f); // top = 1, bottom = 0
 
 		sf::Shader::bind(NULL);
-
 		glBindVertexArray(currentVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, currentVBO);
+		rWindow.resetGLStates();
 	}
 
 	void DrawableComponentManager::DrawBatch(RenderBatch& rRenderBatch) {
