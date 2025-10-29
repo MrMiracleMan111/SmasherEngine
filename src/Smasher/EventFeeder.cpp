@@ -28,10 +28,24 @@ void Smasher::EventFeeder::ForwardSFMLEvent(const sf::Event& event)
 		m_EventManager.Publish<Events::KeyboardEvent>(Keyboard::KeyboardEventType::KEY_RELEASE, event.key.code);
 		break;
 	case sf::Event::MouseButtonPressed:
-		m_EventManager.Publish<Events::MouseButtonEvent>(Mouse::MouseEventType::BUTTON_PRESS, event.mouseButton.button, sf::Mouse::getPosition());
+		if (!m_Engine.IsHeadless()) {
+			sf::Vector2i windowPos = sf::Mouse::getPosition(m_Engine.GetWindow());
+			sf::Vector2f localPos = m_Engine.GetWindow().mapPixelToCoords(windowPos);
+			m_EventManager.Publish<Events::MouseButtonEvent>(Mouse::MouseEventType::BUTTON_PRESS, event.mouseButton.button, sf::Vector2i(localPos));
+		}
+		else {
+			m_EventManager.Publish<Events::MouseButtonEvent>(Mouse::MouseEventType::BUTTON_PRESS, event.mouseButton.button, sf::Mouse::getPosition());
+		}
 		break;
 	case sf::Event::MouseButtonReleased:
-		m_EventManager.Publish<Events::MouseButtonEvent>(Mouse::MouseEventType::BUTTON_RELEASE, event.mouseButton.button, sf::Mouse::getPosition());
+		if (!m_Engine.IsHeadless()) {
+			sf::Vector2i windowPos = sf::Mouse::getPosition(m_Engine.GetWindow());
+			sf::Vector2f localPos = m_Engine.GetWindow().mapPixelToCoords(windowPos);
+			m_EventManager.Publish<Events::MouseButtonEvent>(Mouse::MouseEventType::BUTTON_RELEASE, event.mouseButton.button, sf::Vector2i(localPos));
+		}
+		else {
+			m_EventManager.Publish<Events::MouseButtonEvent>(Mouse::MouseEventType::BUTTON_RELEASE, event.mouseButton.button, sf::Mouse::getPosition());
+		}
 		break;
 	case sf::Event::MouseMoved:
 		if (!m_Engine.IsHeadless()) {
@@ -44,7 +58,14 @@ void Smasher::EventFeeder::ForwardSFMLEvent(const sf::Event& event)
 		}
 		break;
 	case sf::Event::MouseWheelScrolled:
-		m_EventManager.Publish<Events::MouseScrollWheelEvent>(Mouse::MouseEventType::SCROLL, event.mouseWheelScroll.delta,  sf::Mouse::getPosition());
+		if (!m_Engine.IsHeadless()) {
+			sf::Vector2i windowPos = sf::Mouse::getPosition(m_Engine.GetWindow());
+			sf::Vector2f localPos = m_Engine.GetWindow().mapPixelToCoords(windowPos);
+			m_EventManager.Publish<Events::MouseScrollWheelEvent>(Mouse::MouseEventType::SCROLL, event.mouseWheelScroll.delta, sf::Vector2i(localPos));
+		}
+		else {
+			m_EventManager.Publish<Events::MouseScrollWheelEvent>(Mouse::MouseEventType::SCROLL, event.mouseWheelScroll.delta, sf::Mouse::getPosition());
+		}
 		break;
 	case sf::Event::Resized:
 		m_EventManager.Publish<Events::WindowResizeEvent>(sf::Vector2u(event.size.width, event.size.height));
