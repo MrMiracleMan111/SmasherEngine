@@ -9,7 +9,6 @@ MidLayer::~MidLayer() {
 }
 
 void MidLayer::Update(Smasher::Millisecond delta) {
-	std::this_thread::sleep_for(std::chrono::milliseconds(5));
 	if (m_UIPanelPtr != nullptr) {
 		m_UIPanelPtr->SetPosition(m_PanelPosition.get());
 	}
