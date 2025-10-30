@@ -36,8 +36,14 @@ namespace Smasher {
 // r.y = roundness boottom-right
 // r.z = roundness top-left
 // r.w = roundness bottom-left
-	float sdRoundBox(sf::Vector2f p, sf::Vector2f b, std::array<float, 4> r)
+	float sdRoundBox(sf::Vector2f p, sf::Vector2f b, std::array<float, 4> borderRadius)
 	{
+		float r[4] = {
+			borderRadius[3], // Bottom left corner
+			borderRadius[0], // top left corner
+			borderRadius[2], // Bottom right corner
+			borderRadius[1], // Top right corner
+		};
 		if (p.x <= 0.0f) { r[0] = r[2]; r[1] = r[3]; }
 		if (p.y <= 0.0f) { r[0] = r[1]; }
 		sf::Vector2f q = sf::Vector2f{ std::abs(p.x), std::abs(p.y) } - b + sf::Vector2f{ r[0], r[0] };
@@ -171,16 +177,16 @@ namespace Smasher {
 		m_Changed = true;
 		char tmp = (char)corner;
 		if (tmp & (char)UIPanelCorner::BOTTOM_RIGHT) {
-			m_BorderRadius[2] = radius;
+			m_BorderRadius[1] = radius;
 		}
 		if (tmp & (char)UIPanelCorner::BOTTOM_LEFT) {
-			m_BorderRadius[3] = radius;
-		}
-		if (tmp & (char)UIPanelCorner::TOP_LEFT) {
 			m_BorderRadius[0] = radius;
 		}
+		if (tmp & (char)UIPanelCorner::TOP_LEFT) {
+			m_BorderRadius[3] = radius; //
+		}
 		if (tmp & (char)UIPanelCorner::TOP_RIGHT) {
-			m_BorderRadius[1] = radius;
+			m_BorderRadius[2] = radius; //
 		}
 		return *this;
 	}
@@ -193,8 +199,41 @@ namespace Smasher {
 
 	UIPanelComponent& UIPanelComponent::SetBorderColor(const sf::Color& color) {
 		m_Changed = true;
-		m_BorderColor = color;
+		return SetBorderColor(UIPanelCorner::ALL, color);
+	}
+
+	UIPanelComponent& UIPanelComponent::SetBorderColor(UIPanelCorner corner, const sf::Color& color) {
+		m_Changed = true;
+		char tmp = (char)corner;
+		if (tmp & (char)UIPanelCorner::BOTTOM_RIGHT) {
+			m_BorderColors[0] = color;
+		}
+		if (tmp & (char)UIPanelCorner::BOTTOM_LEFT) {
+			m_BorderColors[1] = color;
+		}
+		if (tmp & (char)UIPanelCorner::TOP_LEFT) {
+			m_BorderColors[2] = color;
+		}
+		if (tmp & (char)UIPanelCorner::TOP_RIGHT) {
+			m_BorderColors[3] = color;
+		}
 		return *this;
+	}
+
+	sf::Color UIPanelComponent::GetBorderColor(const UIPanelCorner corner) {
+		switch (corner) {
+		case UIPanelCorner::TOP_LEFT:
+			return m_BorderColors[0];
+		case UIPanelCorner::TOP_RIGHT:
+			return m_BorderColors[1];
+		case UIPanelCorner::BOTTOM_RIGHT:
+			return m_BorderColors[2];
+		case UIPanelCorner::BOTTOM_LEFT:
+			return m_BorderColors[3];
+		default:
+			assert(false, "Invalid UIPanelCorner type in GetBorderRadius, must use specific corner (ie. TOP_LEFT)");
+			return sf::Color::Transparent;
+		}
 	}
 
 	UIPanelComponent& UIPanelComponent::SetDepth(float depth) {
@@ -233,8 +272,23 @@ namespace Smasher {
 			{ GetScale().x, GetScale().y,  GetBorderThickness()}, // scale (vec2), border thickness (float)
 			Mat3{ GetClipTransform() }, // texTransform (Mat3)
 			(uint32_t)GetColor().toInteger(), // color (uint32_t)
-			(uint32_t)GetBorderColor().toInteger(),
-			{ GetBorderRadius()[1], GetBorderRadius()[2], GetBorderRadius()[0], GetBorderRadius()[3] },
+
+			// 0 bottom left
+			// 1 bottom right
+			// 2 top right
+			// 3 top left
+			{	(uint32_t)GetBorderColor(UIPanelCorner::BOTTOM_RIGHT).toInteger(),
+				(uint32_t)GetBorderColor(UIPanelCorner::BOTTOM_LEFT).toInteger(),
+				(uint32_t)GetBorderColor(UIPanelCorner::TOP_LEFT).toInteger(),
+				(uint32_t)GetBorderColor(UIPanelCorner::TOP_RIGHT).toInteger()
+			},
+			{
+				m_BorderRadius[1], // Top right corner
+				m_BorderRadius[2], // Bottom right corner
+				m_BorderRadius[0], // top left corner
+				m_BorderRadius[3]  // Bottom left corner
+			},
+
 			(uint32_t)((bool)m_TexturePtr)
 		};
 
@@ -303,7 +357,7 @@ namespace Smasher {
 		glVertexAttribIPointer(6, 1, GL_UNSIGNED_INT, sizeof(UIPanelData), (GLvoid*)(offsetof(UIPanelData, color)));
 
 		// Border Color Code
-		glVertexAttribIPointer(7, 1, GL_UNSIGNED_INT, sizeof(UIPanelData), (GLvoid*)(offsetof(UIPanelData, borderColor)));
+		glVertexAttribIPointer(7, 4, GL_UNSIGNED_INT, sizeof(UIPanelData), (GLvoid*)(offsetof(UIPanelData, borderColors)));
 
 		// Border Radius Vec4 (4 corners)
 		glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, sizeof(UIPanelData), (GLvoid*)(offsetof(UIPanelData, borderRadius)));
@@ -328,7 +382,7 @@ namespace Smasher {
 		glVertexAttribDivisor(4, 1);  // Instance attribute
 		glVertexAttribDivisor(5, 1);  // Instance attribute
 		glVertexAttribDivisor(6, 1);  // Instance attribute
-		glVertexAttribDivisor(7, 1);  // Instance attribute
+		glVertexAttribDivisor(7, 1);  // Instance attribute (should be vertex attribute)
 		glVertexAttribDivisor(8, 1);  // Instance attribute
 		glVertexAttribDivisor(9, 1);  // Instance attribute
 
