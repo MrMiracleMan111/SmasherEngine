@@ -16,7 +16,7 @@ namespace Smasher {
 
 			
 			ManagerType& rManager = static_cast<ManagerType&>(m_LayerRef.get().GetComponentManager<T>());
-			T& rComponent = rManager.AddComponent(*this, std::forward<Args>(componentArgs)...);
+			T& rComponent = rManager.ManagerType::AddComponent(*this, std::forward<Args>(componentArgs)...);
 			IComponent& rComponentInterface = static_cast<IComponent&>(rComponent);
 			m_ComponentsByType.emplace(std::type_index(typeid(T)), rComponentInterface);
 			return rComponent;
