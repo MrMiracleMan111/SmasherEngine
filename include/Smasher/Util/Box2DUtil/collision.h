@@ -626,12 +626,46 @@ B2_API b2Manifold b2CollideChainSegmentAndPolygon(const b2ChainSegment* segmentA
  * @{
  */
 
+ // A node in the dynamic tree.
+typedef struct b2TreeNode
+{
+	// The node bounding box
+	b2AABB aabb; // 16
+
+	// Category bits for collision filtering
+	uint64_t categoryBits; // 8
+
+	union
+	{
+		// Children (internal node)
+		struct
+		{
+			int32_t child1, child2;
+		} children;
+
+		/// User data (leaf node)
+		uint64_t userData;
+	}; // 8
+
+	union
+	{
+		/// The node parent index (allocated node)
+		int32_t parent;
+
+		/// The node freelist next index (free node)
+		int32_t next;
+	}; // 4
+
+	uint16_t height; // 2
+	uint16_t flags;	 // 2
+} b2TreeNode;
+
  /// The dynamic tree structure. This should be considered private data.
  /// It is placed here for performance reasons.
 typedef struct b2DynamicTree
 {
 	/// The tree nodes
-	struct b2TreeNode* nodes;
+	b2TreeNode* nodes;
 
 	/// The root index
 	int root;

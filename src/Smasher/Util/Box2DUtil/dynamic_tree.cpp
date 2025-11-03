@@ -14,40 +14,6 @@
 
 // todo externalize this to visualize internal nodes and speed up FindPairs
 
-// A node in the dynamic tree.
-typedef struct b2TreeNode
-{
-	// The node bounding box
-	b2AABB aabb; // 16
-
-	// Category bits for collision filtering
-	uint64_t categoryBits; // 8
-
-	union
-	{
-		// Children (internal node)
-		struct
-		{
-			int32_t child1, child2;
-		} children;
-
-		/// User data (leaf node)
-		uint64_t userData;
-	}; // 8
-
-	union
-	{
-		/// The node parent index (allocated node)
-		int32_t parent;
-
-		/// The node freelist next index (free node)
-		int32_t next;
-	}; // 4
-
-	uint16_t height; // 2
-	uint16_t flags;	 // 2
-} b2TreeNode;
-
 static b2TreeNode b2_defaultTreeNode = {
 	.aabb = { { 0.0f, 0.0f }, { 0.0f, 0.0f } },
 	.categoryBits = B2_DEFAULT_CATEGORY_BITS,
