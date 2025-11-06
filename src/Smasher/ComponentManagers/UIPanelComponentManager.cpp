@@ -23,7 +23,7 @@ namespace Smasher {
 		// Load the basic shader 
 		static_assert(Smasher::HasRenderCapability<Smasher::UIPanelComponentManager>, "UIPanelComponentManager should have the render capability");
 
-		std::shared_ptr<Smasher::ShaderResource> shader = engine.GetResourceManager().LoadVertFragShaderResource(EngineConfig::DRAWABLE_COMPONENT_VERT_SHADER, EngineConfig::DRAWABLE_COMPONENT_FRAG_SHADER);
+		std::shared_ptr<Smasher::ShaderResource> shader = engine.GetResourceManager().LoadVertFragShaderResource(EngineConfig::UI_PANEL_COMPONENT_VERT_SHADER, EngineConfig::UI_PANEL_COMPONENT_FRAG_SHADER);
 		sf::Glsl::Mat4 viewProjectionMatrix = sf::Glsl::Mat4(engine.GetWindow().getView().getTransform().getMatrix());
 		shader->GetShader().setUniform("ViewProjectionMatrix", viewProjectionMatrix);
 		SetShaderResource(shader);
