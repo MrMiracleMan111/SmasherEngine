@@ -37,7 +37,7 @@ namespace Smasher {
 		BaseComponentManager(BaseComponentManager&&) = delete;
 		BaseComponentManager& operator=(const BaseComponentManager&) = delete;
 		BaseComponentManager& operator=(BaseComponentManager&&) = delete;
-		virtual ~BaseComponentManager() = default;
+		virtual ~BaseComponentManager();
 
 		virtual void PreUpdateComponents() {};
 		virtual void UpdateComponents(Millisecond delta) {};

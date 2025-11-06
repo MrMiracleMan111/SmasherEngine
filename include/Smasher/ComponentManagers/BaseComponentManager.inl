@@ -5,6 +5,11 @@ namespace Smasher {
 		m_ComponentsToRemove.reserve(64); // Arbitrary can be improved upon later
 	}
 
+	template<typename T>
+	BaseComponentManager<T>::~BaseComponentManager() {
+		m_Components.clear();
+	}
+
 	template<class T>
 	template<typename... Args>
 	T& BaseComponentManager<T>::AddComponent(Entity& rEntity, Args&&... args) {
