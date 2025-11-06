@@ -15,8 +15,18 @@ namespace Smasher {
 	UIPanelComponentManager::UIPanelComponentManager(Layer& layer) :
 		BaseComponentManager<UIPanelComponent>(layer)
 	{
+		Engine& engine = GetLayer().GetEngine();
+
 		m_MouseMoveSubscription = layer.Subscribe<Events::MouseMoveEvent>(&UIPanelComponentManager::OnMouseMove, this);
 		m_MouseButtonSubscription = layer.Subscribe<Events::MouseButtonEvent>(&UIPanelComponentManager::OnMouseButton, this);
+	
+		// Load the basic shader 
+		static_assert(Smasher::HasRenderCapability<Smasher::UIPanelComponentManager>, "UIPanelComponentManager should have the render capability");
+
+		std::shared_ptr<Smasher::ShaderResource> shader = engine.GetResourceManager().LoadVertFragShaderResource(EngineConfig::DRAWABLE_COMPONENT_VERT_SHADER, EngineConfig::DRAWABLE_COMPONENT_FRAG_SHADER);
+		sf::Glsl::Mat4 viewProjectionMatrix = sf::Glsl::Mat4(engine.GetWindow().getView().getTransform().getMatrix());
+		shader->GetShader().setUniform("ViewProjectionMatrix", viewProjectionMatrix);
+		SetShaderResource(shader);
 	}
 
 	UIPanelComponent& UIPanelComponent::SetOnHoverCallback(std::function<void(Events::MouseMoveEvent&)> callback) {
