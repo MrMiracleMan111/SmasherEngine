@@ -13,6 +13,11 @@ namespace Smasher {
 		m_ComponentsToRemove.reserve(64); // Arbitrary can be improved upon later
 	}
 
+	template<typename T>
+	GenericComponentManager<T>::~GenericComponentManager() {
+		m_Components.clear();
+	}
+
 	template<class T>
 	void GenericComponentManager<T>::PreUpdate(Millisecond delta) {
 		RemoveMarkedComponents();

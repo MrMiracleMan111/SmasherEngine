@@ -34,7 +34,7 @@ namespace Smasher {
 		GenericComponentManager(GenericComponentManager&&) = delete;
 		GenericComponentManager& operator=(const GenericComponentManager&) = delete;
 		GenericComponentManager& operator= (GenericComponentManager&&) = default;
-		virtual ~GenericComponentManager() = default;
+		virtual ~GenericComponentManager();
 
 		void PreUpdate(Millisecond delta) override;
 
