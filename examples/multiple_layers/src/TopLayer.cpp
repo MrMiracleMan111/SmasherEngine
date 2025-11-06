@@ -11,9 +11,7 @@ void TopLayer::Init()
 {
 	std::shared_ptr<Smasher::ShaderResource> pShader = GetEngine().GetResourceManager().GetOrLoadResource<Smasher::Manifest::Shaders::basic_ui_shader, Smasher::ShaderResource>();
 	Smasher::UIPanelComponentManager& rUIManager = static_cast<Smasher::UIPanelComponentManager&>(GetComponentManager<Smasher::UIPanelComponent>());
-	sf::Vector2f windowSize = sf::Vector2f((float)GetEngine().GetWindow().getSize().x, (float)GetEngine().GetWindow().getSize().y);
 	sf::Glsl::Mat4 viewProjectionMatrix = sf::Glsl::Mat4(GetEngine().GetWindow().getView().getTransform().getMatrix());
-	pShader->GetShader().setUniform("windowSize", windowSize);
 	pShader->GetShader().setUniform("ViewProjectionMatrix", viewProjectionMatrix);
 	rUIManager.SetShaderResource(pShader);
 

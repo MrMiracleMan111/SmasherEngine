@@ -39,9 +39,7 @@ namespace Smasher {
 		static_assert(Smasher::HasRenderCapability<Smasher::DrawableComponentManager>, "DrawableComponentManager should have the render capability");
 
 		std::shared_ptr<Smasher::ShaderResource> shader = engine.GetResourceManager().LoadVertFragShaderResource(EngineConfig::DRAWABLE_COMPONENT_VERT_SHADER, EngineConfig::DRAWABLE_COMPONENT_FRAG_SHADER);
-		sf::Vector2f windowSize = sf::Vector2f((float)engine.GetWindow().getSize().x, (float)engine.GetWindow().getSize().y);
 		sf::Glsl::Mat4 viewProjectionMatrix = sf::Glsl::Mat4(engine.GetWindow().getView().getTransform().getMatrix());
-		shader->GetShader().setUniform("windowSize", windowSize);
 		shader->GetShader().setUniform("ViewProjectionMatrix", viewProjectionMatrix);
 		m_DefaultShader = shader;
 		SetShaderResource(shader);
