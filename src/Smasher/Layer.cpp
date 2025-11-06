@@ -29,6 +29,13 @@ namespace Smasher {
 		}
 	}
 
+	void Layer::PostUpdateComponentManagers(Millisecond delta) {
+		for (auto& [key, pManager] : m_ComponentManagers) {
+			pManager->PostUpdate(delta);
+		}
+	}
+
+
 	void Layer::UpdateComponentManagers(Millisecond delta) {
 		for (auto pManager : m_ComponentManagersWithUpdate) {
 			pManager->Update(delta);

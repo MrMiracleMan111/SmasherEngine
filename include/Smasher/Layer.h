@@ -56,6 +56,7 @@ namespace Smasher {
 		virtual void Render(sf::RenderWindow& window) {};
 		virtual void PreUpdate(Millisecond delta) {};
 		virtual void Update(Millisecond delta) {};
+		virtual void PostUpdate(Millisecond delta) {};
 
 		void Activate() { m_Status = LayerStatus::ACTIVE; };
 		void Pause() { m_Status = LayerStatus::PAUSED; };
@@ -101,6 +102,7 @@ namespace Smasher {
 		void RenderComponentManagers(sf::RenderWindow& window);
 		void UpdateComponentManagers(Millisecond delta);
 		void PreUpdateComponentManagers(Millisecond delta);
+		void PostUpdateComponentManagers(Millisecond delta);
 
 		void ShutdownEngine();
 

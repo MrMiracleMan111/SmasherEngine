@@ -240,6 +240,8 @@ namespace Smasher {
 				pLayer->PreUpdateComponentManagers(delta);
 				pLayer->Update(delta);
 				pLayer->UpdateComponentManagers(delta);
+				pLayer->PostUpdate(delta);
+				pLayer->PostUpdateComponentManagers(delta);
 			}
 			Millisecond diff = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - m_UpdateTimestamp);
 			pLayer->SetUpdateTime(diff);
