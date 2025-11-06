@@ -41,7 +41,7 @@ namespace Smasher {
 		TOP = TOP_RIGHT | TOP_LEFT,
 		LEFT = TOP_LEFT | BOTTOM_LEFT,
 		RIGHT = TOP_RIGHT | BOTTOM_RIGHT,
-		ALL = TOP_RIGHT | TOP_LEFT | TOP_LEFT | BOTTOM_LEFT
+		ALL = TOP_RIGHT | TOP_LEFT | BOTTOM_RIGHT | BOTTOM_LEFT
 	};
 
 	enum class UIPanelSettings : unsigned char {
