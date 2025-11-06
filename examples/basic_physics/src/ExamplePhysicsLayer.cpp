@@ -28,8 +28,8 @@ void ExamplePhysicsLayer::Init() {
 	moveBox.AddComponent<Smasher::AABBPhysicsComponent>()
 		.MakeDynamic()
 		.SetPosition(sf::Vector2f(400.0f, 250.0f))
-		.SetScale(sf::Vector2f(100.0f, 100.0f));
-		//.SetAcceleration(sf::Vector2f(-10.0f, 0.0f));
+		.SetScale(sf::Vector2f(100.0f, 100.0f))
+		.SetAcceleration(sf::Vector2f(-50.0f, 0.0f));
 	moveBox.AddComponent<Smasher::DrawableComponent>()
 		.SetPosition(box.GetComponent<Smasher::AABBPhysicsComponent>().GetPosition())
 		.SetScale(box.GetComponent<Smasher::AABBPhysicsComponent>().GetScale())
