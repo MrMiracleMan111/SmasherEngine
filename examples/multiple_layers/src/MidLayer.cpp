@@ -29,11 +29,6 @@ void MidLayer::Init()
 {
 	m_PanelPosition.useCurve(Smasher::InterpolationType::EASE_OUT);
 	m_PanelPosition.SetDuration(Smasher::Millisecond{ 1000 });
-	std::shared_ptr<Smasher::ShaderResource> pShader = GetEngine().GetResourceManager().GetOrLoadResource<Smasher::Manifest::Shaders::basic_ui_shader, Smasher::ShaderResource>();
-	Smasher::UIPanelComponentManager& rUIManager = static_cast<Smasher::UIPanelComponentManager&>(GetComponentManager<Smasher::UIPanelComponent>());
-	sf::Glsl::Mat4 viewProjectionMatrix = sf::Glsl::Mat4(GetEngine().GetWindow().getView().getTransform().getMatrix());
-	pShader->GetShader().setUniform("ViewProjectionMatrix", viewProjectionMatrix);
-	rUIManager.SetShaderResource(pShader);
 
 	Smasher::Entity& entity = AddEntity();
 	Smasher::Entity& fpsTracker = AddEntity();
