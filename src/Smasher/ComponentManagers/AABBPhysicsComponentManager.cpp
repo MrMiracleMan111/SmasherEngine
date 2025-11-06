@@ -51,11 +51,11 @@ namespace Smasher {
 			if (component.GetAcceleration().x != 0.f || component.GetAcceleration().y != 0.f) {
 				sf::Vector2f change = (component.GetVelocity() * timeStep) + ((0.5f * timeStep * timeStep) * component.GetAcceleration());
 				component.SetVelocity(component.GetVelocity() + (component.GetAcceleration() * timeStep));
-				//component.Move(change);
+				component.Move(change);
 			}
 			else if (component.GetVelocity().x != 0.f || component.GetVelocity().y != 0.f) {
 				sf::Vector2f change = (component.GetVelocity() * timeStep);
-				//component.Move(change);
+				component.Move(change);
 			}
 
 
