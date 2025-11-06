@@ -164,6 +164,8 @@ namespace Smasher {
 		float length = b2Distance(context.oldPosition, context.position);
 		invNormal = b2Abs(invNormal);
 		context.position = contactPoint + (1.0f - percentDist) * length * b2Mul(invNormal, dir);
+		context.velocity = b2Mul(context.velocity, invNormal);
+		component.SetVelocity(sf::Vector2f(context.velocity.x , context.velocity.y));
 		component.MoveTo(sf::Vector2f(context.position.x, context.position.y));
 		//component.SetPosition(sf::Vector2f(contactPoint.x, contactPoint.y));
 	}
