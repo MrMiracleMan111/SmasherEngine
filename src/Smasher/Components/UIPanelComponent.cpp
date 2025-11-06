@@ -167,7 +167,7 @@ namespace Smasher {
 		case UIPanelCorner::BOTTOM_LEFT:
 			return m_BorderRadius[3];
 		default:
-			assert(false, "Invalid UIPanelCorner type in GetBorderRadius, must use specific corner (ie. TOP_LEFT)");
+			assert(false); // Invalid UIPanelCorner type in GetBorderRadius, must use specific corner (ie. TOP_LEFT)
 			return -1.0f;
 		}
 	}
@@ -231,7 +231,7 @@ namespace Smasher {
 		case UIPanelCorner::BOTTOM_LEFT:
 			return m_BorderColors[3];
 		default:
-			assert(false, "Invalid UIPanelCorner type in GetBorderRadius, must use specific corner (ie. TOP_LEFT)");
+			assert(false); // Invalid UIPanelCorner type in GetBorderRadius, must use specific corner (ie. TOP_LEFT)
 			return sf::Color::Transparent;
 		}
 	}
