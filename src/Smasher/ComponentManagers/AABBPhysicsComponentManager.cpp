@@ -20,8 +20,9 @@ namespace Smasher {
 	}
 
 	AABBPhysicsComponentManager::~AABBPhysicsComponentManager() {
-		b2DestroyArenaAllocator(&m_b2Allocator);
+		m_Components.clear();
 		b2DynamicTree_Destroy(&m_b2BVH);
+		b2DestroyArenaAllocator(&m_b2Allocator);
 	}
 
 
