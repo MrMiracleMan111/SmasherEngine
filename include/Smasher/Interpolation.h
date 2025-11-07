@@ -35,7 +35,7 @@ namespace Smasher {
 		T Get();
 
 		void Set(const T& endValue);
-		void UseCurve(InterpolationType type) { m_Curve = type; }
+		void SetCurve(InterpolationType type) { m_Curve = type; }
 		Interpolated& operator=(const T&);
 	private:
 		T calculateValue();
