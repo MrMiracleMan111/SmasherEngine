@@ -154,7 +154,9 @@ namespace Smasher {
 		m_RunningAtomic = true;
 
 		EventFeeder m_EventFeeder(m_EventManager, *this);
+#ifdef CATCH_EXCEPTIONS
 		try {
+#endif
 			std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
 			Millisecond updateTimer{ 0 };
 			Millisecond renderTimer{ 0 };
@@ -195,11 +197,14 @@ namespace Smasher {
 			}
 			Shutdown();
 		}
+#ifdef CATCH_EXCEPTIONS
 		catch (const std::exception& e) {
 			std::cerr << "Exception Thrown: " << e.what() << std::endl;
 			throw e;
 		}
 	}
+#endif
+
 
 	void Engine::HandleLayerTransitions() {
 		for (auto& itr : m_LayerTransitions) {
