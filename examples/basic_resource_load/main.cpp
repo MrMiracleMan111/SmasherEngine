@@ -36,16 +36,17 @@ int main() {
 		image.AddComponent<Smasher::DrawableComponent>()
 			.SetPosition(sf::Vector2f((float)(i * separation + offset), (float)(i * separation + offset)))
 			.SetScale(sf::Vector2f(100.0f, 100.0f))
-			.SetClipRect(sf::IntRect{ 0, 0, 30, 20 })
 			.SetDepth(depth);
 
 		if (i % 2 == 0) {
 			image.GetComponent<Smasher::DrawableComponent>()
-				.SetTextureAsset<Smasher::Manifest::Textures::alpha_test>({});
+				.SetTextureAsset<Smasher::Manifest::Textures::alpha_test>({})
+				.SetClipRect(sf::IntRect{ 0, 0, 30, 20 });
 		}
 		else {
 			image.GetComponent<Smasher::DrawableComponent>()
-				.SetTextureAsset<Smasher::Manifest::Textures::small_art>({});
+				.SetTextureAsset<Smasher::Manifest::Textures::small_art>({})
+				.SetClipRect(sf::IntRect{ 0, 0, 30, 20 });
 		}
 
 	}
