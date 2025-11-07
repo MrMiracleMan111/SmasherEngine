@@ -25,10 +25,10 @@ namespace Smasher {
 	Interpolated<T>::operator T() { return calculateValue(); }
 
 	template<typename T>
-	T Interpolated<T>::get() { return calculateValue(); }
+	T Interpolated<T>::Get() { return calculateValue(); }
 
 	template<typename T>
-	void Interpolated<T>::set(const T& endValue) {
+	void Interpolated<T>::Set(const T& endValue) {
 		m_StartValue = calculateValue();
 		m_StartTime = std::chrono::system_clock::now();
 		m_EndValue = endValue;

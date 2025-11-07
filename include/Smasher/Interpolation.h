@@ -32,10 +32,10 @@ namespace Smasher {
 		void SetDuration(Smasher::Millisecond duration) { m_Duration = duration; };
 
 		operator T();
-		T get();
+		T Get();
 
-		void set(const T& endValue);
-		void useCurve(InterpolationType type) { m_Curve = type; }
+		void Set(const T& endValue);
+		void UseCurve(InterpolationType type) { m_Curve = type; }
 		Interpolated& operator=(const T&);
 	private:
 		T calculateValue();
