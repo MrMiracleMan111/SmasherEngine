@@ -27,6 +27,7 @@ void MidLayer::Update(Smasher::Millisecond delta) {
 
 void MidLayer::Init()
 {
+	m_PanelPosition.Set(sf::Vector2f(0.f, 0.f));
 	m_PanelPosition.SetCurve(Smasher::InterpolationType::EASE_OUT);
 	m_PanelPosition.SetDuration(Smasher::Millisecond{ 1000 });
 

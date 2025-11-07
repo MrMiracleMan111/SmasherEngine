@@ -35,7 +35,7 @@ namespace Smasher {
 		T Get();
 
 		// Set the value without interpolation
-		void Set(const T& endValue);
+		void Set(const T& value);
 		void SetCurve(InterpolationType type) { m_Curve = type; }
 		Interpolated& operator=(const T&);
 	private:
