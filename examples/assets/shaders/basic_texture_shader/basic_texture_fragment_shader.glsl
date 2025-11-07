@@ -4,6 +4,7 @@ precision highp int;
 
 in vec4 vertexColor;
 in vec2 texCoord;
+flat in uint hasTextureUint;
 
 out vec4 FragColor;
 
@@ -15,7 +16,11 @@ uniform bool translucentPass;
 void main()
 {
     // lookup the pixel in the texture
-    vec4 pixel = texture2D(texture, texCoord);
+    vec4 pixel = vec4(1.f);
+    
+    if (hasTextureUint != 0u) {
+        pixel = texture2D(texture, texCoord);
+    }
 
     // Discard transparent stuff during Opaque pass 
     if (!translucentPass && (pixel.a <= 0.95f)) {

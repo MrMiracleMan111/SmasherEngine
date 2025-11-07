@@ -10,9 +10,11 @@ layout(location = 8) in float aWorldRotation;
 
 out vec4 vertexColor;
 out vec2 texCoord;
+flat out uint hasTextureUint;
 
 uniform mat4 ViewProjectionMatrix;
 uniform ivec2 textureSize;
+uniform bool hasTexture;
 
 // Copied from SFML Transformable::getTransform() defition
 mat4 GetTransform(vec3 position, vec2 scale, float rotation) {
@@ -29,6 +31,11 @@ mat4 GetTransform(vec3 position, vec2 scale, float rotation) {
 
 void main()
 {
+    hasTextureUint = 0u;
+    if (hasTexture) {
+        hasTextureUint = 1u;
+    }
+
     mat4 model = GetTransform(aWorldPos, aWorldScale, aWorldRotation);
 
     vertexColor = vec4(
