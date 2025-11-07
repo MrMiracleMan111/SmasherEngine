@@ -23,6 +23,16 @@ int main() {
 		.SetClipRotation(Smasher::Degrees{ 30 })
 		.SetDepth(0.2f);
 
+	// Create drawable component instance without texture
+	Smasher::Entity& shape = state.AddEntity<Smasher::Entity>();
+	shape.AddComponent<Smasher::DrawableComponent>()
+		.SetPosition(sf::Vector2f(50.0f, 300.0f))
+		.SetScale(sf::Vector2f(100.0f, 100.0f))
+		//.SetClipRect(sf::IntRect{ 0, 0, 64, 64 })
+		.SetColor(sf::Color::Magenta)
+		//.SetClipRotation(Smasher::Degrees{ 30 })
+		.SetDepth(0.25f);
+
 	// Create 10 entites
 	// Half will have a non-alpha image
 	// Half will have image with alpha pixels
