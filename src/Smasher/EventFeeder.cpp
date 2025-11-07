@@ -17,6 +17,10 @@ void Smasher::EventFeeder::ForwardSFMLEvent(const sf::Event& event)
 		break;
 	case sf::Event::KeyPressed:
 	{
+		// case of sf::Key::Unkown
+		if (event.key.code < 0) {
+			break;
+		}
 		bool& keyState = m_KeyboardState.at(event.key.code);
 		Keyboard::KeyboardEventType keyEventType = keyState ? Keyboard::KeyboardEventType::KEY_HOLD : Keyboard::KeyboardEventType::KEY_PRESS;
 		keyState = true;
@@ -24,6 +28,10 @@ void Smasher::EventFeeder::ForwardSFMLEvent(const sf::Event& event)
 		break;
 	}
 	case sf::Event::KeyReleased:
+		// case of sf::Key::Unkown
+		if (event.key.code < 0) {
+			break;
+		}
 		m_KeyboardState.at(event.key.code) = false;
 		m_EventManager.Publish<Events::KeyboardEvent>(Keyboard::KeyboardEventType::KEY_RELEASE, event.key.code);
 		break;
