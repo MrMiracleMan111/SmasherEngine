@@ -10,7 +10,7 @@ MidLayer::~MidLayer() {
 
 void MidLayer::Update(Smasher::Millisecond delta) {
 	if (m_UIPanelPtr != nullptr) {
-		m_UIPanelPtr->SetPosition(m_PanelPosition.get());
+		m_UIPanelPtr->SetPosition(m_PanelPosition.Get());
 	}
 
 	++m_UpdateTimeSampleCount;
@@ -27,7 +27,7 @@ void MidLayer::Update(Smasher::Millisecond delta) {
 
 void MidLayer::Init()
 {
-	m_PanelPosition.useCurve(Smasher::InterpolationType::EASE_OUT);
+	m_PanelPosition.UseCurve(Smasher::InterpolationType::EASE_OUT);
 	m_PanelPosition.SetDuration(Smasher::Millisecond{ 1000 });
 
 	Smasher::Entity& entity = AddEntity();
