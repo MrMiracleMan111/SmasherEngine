@@ -59,12 +59,14 @@ namespace Smasher {
     }
 
     DrawableComponent& DrawableComponent::SetClipRect(sf::IntRect clipRect) {
+        assert(m_TextureLoaded);
         m_ClipChanged = true;
         m_ClipRect = clipRect;
         return *this;
     }
 
     DrawableComponent& DrawableComponent::SetClipRotation(Degrees angle) {
+        assert(m_TextureLoaded);
         m_ClipChanged = true;
         m_ClipRotation = angle;
         return *this;
@@ -72,7 +74,7 @@ namespace Smasher {
 
     const sf::Transform& DrawableComponent::GetClipTransform()
     {
-        //assert(m_TextureLoaded);
+        assert(m_TextureLoaded);
         if (!m_ClipChanged) {
             return m_ClipTransform;
         }

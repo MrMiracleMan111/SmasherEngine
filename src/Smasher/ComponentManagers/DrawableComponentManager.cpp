@@ -165,18 +165,26 @@ namespace Smasher {
 	}
 
 	void DrawableComponentManager::OnComponentChangeData(DrawableComponent& rComponent) {
-		//if (!rComponent.m_TextureLoaded) {
-		//	return;
-		//}
+		static const float clipTransformMatrixArr[] = {
+		  1.f, 0.f, 0.f,
+		  0.f, 1.f, 0.f,
+		  0.f, 0.f, 0.f
+		};
+
 		rComponent.m_TransformChanged = false;
 
-		uint32_t colorData = (uint32_t)rComponent.GetColor().toInteger();
+		Mat3 clipTransform{ clipTransformMatrixArr };
+		
+		if (rComponent.m_TextureLoaded) {
+			clipTransform = Mat3(rComponent.GetClipTransform());
+		}
 
+		uint32_t colorData = (uint32_t)rComponent.GetColor().toInteger();
 		Radians rotation = Radians{ (float)rComponent.GetRotation() * ((float)std::numbers::pi / 180.0f) };
 		ModelData data = ModelData{
 			{ rComponent.GetPosition().x, rComponent.GetPosition().y, rComponent.GetDepth() },
 			{ rComponent.GetScale().x, rComponent.GetScale().y },
-			Mat3(rComponent.GetClipTransform()),
+			clipTransform,
 			rotation,
 			colorData,
 			nullptr
@@ -202,14 +210,12 @@ namespace Smasher {
 			return;
 		}
 
-		//if (rComponent.m_TextureLoaded) {
-			if (rComponent.m_OpaqueBatchContext) {
-				rComponent.m_OpaqueBatchContext.batch->RemoveModel(rComponent.m_OpaqueBatchContext);
-			}
-			if (rComponent.m_TranslucentBatchContext) {
-				rComponent.m_TranslucentBatchContext.batch->RemoveModel(rComponent.m_TranslucentBatchContext);
-			}
-		//}
+		if (rComponent.m_OpaqueBatchContext) {
+			rComponent.m_OpaqueBatchContext.batch->RemoveModel(rComponent.m_OpaqueBatchContext);
+		}
+		if (rComponent.m_TranslucentBatchContext) {
+			rComponent.m_TranslucentBatchContext.batch->RemoveModel(rComponent.m_TranslucentBatchContext);
+		}
 
 		std::list<RenderBatch>& opaqueBatches = m_OpaqueBatches[id];
 		// Find batch that isn't full
@@ -285,10 +291,6 @@ namespace Smasher {
 	}
 
 	void DrawableComponentManager::OnComponentDelete(DrawableComponent& rComponent) {
-		//if (!rComponent.m_TextureLoaded) {
-		//	return;
-		//}
-
 		if (rComponent.m_OpaqueBatchContext) {
 			rComponent.m_OpaqueBatchContext.batch->RemoveModel(rComponent.m_OpaqueBatchContext);
 		}
