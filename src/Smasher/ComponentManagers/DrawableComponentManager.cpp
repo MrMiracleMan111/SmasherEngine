@@ -107,9 +107,14 @@ namespace Smasher {
 			std::list<RenderBatch>& batchList = itr.second;
 			if (!batchList.empty()) {
 				pTexture = batchList.back().pTexture;
-				assert(pTexture != nullptr);
 			}
-			sf::Texture::bind(pTexture, sf::Texture::Pixels);
+			bool hasTexture = pTexture != nullptr;
+			m_ShaderResource->GetShader().setUniform("hasTexture", hasTexture);
+
+			if (hasTexture) {
+				sf::Texture::bind(pTexture, sf::Texture::Pixels);
+			}
+
 			for (auto& batch : batchList) {
 				DrawBatch(batch);
 			}
@@ -125,9 +130,14 @@ namespace Smasher {
 			std::list<RenderBatch>& batchList = itr.second;
 			if (!batchList.empty()) {
 				pTexture = batchList.back().pTexture;
-				assert(pTexture != nullptr);
 			}
-			sf::Texture::bind(batchList.back().pTexture, sf::Texture::Pixels);
+			bool hasTexture = pTexture != nullptr;
+			m_ShaderResource->GetShader().setUniform("hasTexture", hasTexture);
+
+			if (hasTexture) {
+				sf::Texture::bind(batchList.back().pTexture, sf::Texture::Pixels);
+			}
+
 			for (auto& batch : batchList) {
 				DrawBatch(batch);
 			}
@@ -155,9 +165,9 @@ namespace Smasher {
 	}
 
 	void DrawableComponentManager::OnComponentChangeData(DrawableComponent& rComponent) {
-		if (!rComponent.m_TextureLoaded) {
-			return;
-		}
+		//if (!rComponent.m_TextureLoaded) {
+		//	return;
+		//}
 		rComponent.m_TransformChanged = false;
 
 		uint32_t colorData = (uint32_t)rComponent.GetColor().toInteger();
@@ -192,14 +202,14 @@ namespace Smasher {
 			return;
 		}
 
-		if (rComponent.m_TextureLoaded) {
+		//if (rComponent.m_TextureLoaded) {
 			if (rComponent.m_OpaqueBatchContext) {
 				rComponent.m_OpaqueBatchContext.batch->RemoveModel(rComponent.m_OpaqueBatchContext);
 			}
 			if (rComponent.m_TranslucentBatchContext) {
 				rComponent.m_TranslucentBatchContext.batch->RemoveModel(rComponent.m_TranslucentBatchContext);
 			}
-		}
+		//}
 
 		std::list<RenderBatch>& opaqueBatches = m_OpaqueBatches[id];
 		// Find batch that isn't full
@@ -208,9 +218,14 @@ namespace Smasher {
 		if (opaqueBatches.size() == 0) {
 			RenderBatch& batch = opaqueBatches.emplace_front(opaqueBatches, m_QuadVBO, m_QuadEBO);
 			batch.iterator = opaqueBatches.begin();
-			ResourceManager& rResourceManager = GetLayer().GetEngine().GetResourceManager();
-			auto pTexture = rResourceManager.GetResource<TextureResource>(id);
-			batch.pTexture = &pTexture->GetTexture();
+			
+			// Set texture pointer
+			if (id != DrawableComponentManager::EMPTY_TEXTURE_ID) {
+				ResourceManager& rResourceManager = GetLayer().GetEngine().GetResourceManager();
+				auto pTexture = rResourceManager.GetResource<TextureResource>(id);
+				batch.pTexture = &pTexture->GetTexture();
+			}
+
 			itr = opaqueBatches.begin();
 		}
 		else {
@@ -241,8 +256,12 @@ namespace Smasher {
 				RenderBatch& batch = translucentBatches.emplace_front(translucentBatches, m_QuadVBO, m_QuadEBO);
 				batch.iterator = translucentBatches.begin();
 				ResourceManager& rResourceManager = GetLayer().GetEngine().GetResourceManager();
-				auto pTexture = rResourceManager.GetResource<TextureResource>(id);
-				batch.pTexture = &pTexture->GetTexture();
+
+				// Set texture pointer
+				if (id != DrawableComponentManager::EMPTY_TEXTURE_ID) {
+					auto pTexture = rResourceManager.GetResource<TextureResource>(id);
+					batch.pTexture = &pTexture->GetTexture();
+				}
 				itr = translucentBatches.begin();
 			}
 			else {
@@ -266,9 +285,9 @@ namespace Smasher {
 	}
 
 	void DrawableComponentManager::OnComponentDelete(DrawableComponent& rComponent) {
-		if (!rComponent.m_TextureLoaded) {
-			return;
-		}
+		//if (!rComponent.m_TextureLoaded) {
+		//	return;
+		//}
 
 		if (rComponent.m_OpaqueBatchContext) {
 			rComponent.m_OpaqueBatchContext.batch->RemoveModel(rComponent.m_OpaqueBatchContext);

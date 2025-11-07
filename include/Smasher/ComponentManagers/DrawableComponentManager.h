@@ -52,6 +52,8 @@ namespace Smasher {
 		GLuint GetQuadVBO() const { return m_QuadVBO; }
 		GLuint GetQuadEBO() const { return m_QuadEBO; }
 
+		static const ResourceID EMPTY_TEXTURE_ID = 1;
+
 	private:
 		void DrawBatch(RenderBatch& rRenderBatch);
 		void InitQuadGLBuffers();

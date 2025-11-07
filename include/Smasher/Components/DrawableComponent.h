@@ -56,6 +56,8 @@ namespace Smasher {
 
 		~DrawableComponent();
 
+		void OnAddComponent() override;
+
 		template <class T>
 		DrawableComponent& SetTextureAsset(const TextureOptions& opts);
 

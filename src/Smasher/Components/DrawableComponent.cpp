@@ -30,6 +30,11 @@ namespace Smasher {
         rCompManager.OnComponentDelete(*this);
     }
 
+    void DrawableComponent::OnAddComponent() {
+        auto& rCompManager = static_cast<DrawableComponentManager&>(GetManager());
+        rCompManager.OnComponentSetTexture(*this, DrawableComponentManager::EMPTY_TEXTURE_ID, true);
+    }
+
     void DrawableComponent::SetEntity(Entity& pEntity) {
         IComponent::SetEntity(pEntity);
         m_TransformChanged = true;
@@ -67,7 +72,7 @@ namespace Smasher {
 
     const sf::Transform& DrawableComponent::GetClipTransform()
     {
-        assert(m_TextureLoaded);
+        //assert(m_TextureLoaded);
         if (!m_ClipChanged) {
             return m_ClipTransform;
         }

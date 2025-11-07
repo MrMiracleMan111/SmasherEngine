@@ -23,6 +23,7 @@ namespace Smasher {
 		Radians rotation = Radians{ 0 };
 		uint32_t color = 0;
 		BatchContext* ownerContext = nullptr;
+		bool hasTexture = false;
 	};
 
 	// Models will use 2D plane
