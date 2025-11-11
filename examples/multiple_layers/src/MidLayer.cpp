@@ -27,6 +27,14 @@ void MidLayer::Update(Smasher::Millisecond delta) {
 
 void MidLayer::Init()
 {
+	//GetEngine().GetResourceManager().SetResourceDirectory(Smasher::Manifest::Metadata::RESOURCES_DIRECTORY);
+	//std::shared_ptr<Smasher::ShaderResource> shader = GetEngine().GetResourceManager().GetOrLoadResource<Smasher::Manifest::Shaders::basic_ui_shader, Smasher::ShaderResource>();
+	//sf::Glsl::Mat4 viewProjectionMatrix = sf::Glsl::Mat4(GetEngine().GetWindow().getView().getTransform().getMatrix());
+	//shader->GetShader().setUniform("ViewProjectionMatrix", viewProjectionMatrix);
+
+	//Smasher::UIPanelComponentManager& rCompManager = static_cast<Smasher::UIPanelComponentManager&>(GetComponentManager<Smasher::UIPanelComponent>());
+	//rCompManager.SetShaderResource(shader);
+
 	m_PanelPosition.Set(sf::Vector2f(0.f, 0.f));
 	m_PanelPosition.SetCurve(Smasher::InterpolationType::EASE_OUT);
 	m_PanelPosition.SetDuration(Smasher::Millisecond{ 1000 });
@@ -55,7 +63,8 @@ void MidLayer::Init()
 	std::shared_ptr<Smasher::TextureResource> pTexture = GetEngine().GetResourceManager().GetOrLoadResource<Smasher::Manifest::Textures::small_art, Smasher::TextureResource>();
 
 	Smasher::UIPanelComponent& panel = uiPanel.AddComponent<Smasher::UIPanelComponent>()
-		.SetColor(sf::Color::Yellow)
+		.SetBackgroundColor(sf::Color::Yellow)
+		.SetBackgroundColor(Smasher::UIPanelCorner::LEFT, sf::Color::Blue)
 		.SetBorderRadius(Smasher::UIPanelCorner::TOP_LEFT, 60.f)
 		.SetBorderColor(sf::Color::Red)
 		.SetBorderColor(Smasher::UIPanelCorner::TOP_LEFT, sf::Color::Green)
@@ -73,12 +82,12 @@ void MidLayer::Init()
 		if ((bool)(panel.GetPanelState() & Smasher::UIPanelState::HOVERED)) {
 			sf::Color tmp = sf::Color::Cyan;
 			tmp.a = 40;
-			panel.SetColor(tmp);
+			panel.SetBackgroundColor(tmp);
 		}
 		else {
 			sf::Color tmp = sf::Color::Magenta;
 			tmp.a = 40;
-			panel.SetColor(tmp);
+			panel.SetBackgroundColor(tmp);
 		}
 	});
 

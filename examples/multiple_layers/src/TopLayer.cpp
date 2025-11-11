@@ -21,17 +21,17 @@ void TopLayer::Init()
 
 
 	Smasher::UIPanelComponent& panel = uiPanel.AddComponent<Smasher::UIPanelComponent>()
-		.SetColor(sf::Color::Yellow)
+		.SetBackgroundColor(sf::Color::Yellow)
 		.SetPosition(160.0f, 100.0f)
 		.SetScale(100.0f, 100.0f)
 		.SetDepth(0.5f)
 		.SetPanelSettings(Smasher::UIPanelSettings::BLOCK_MOUSE_MOVE);
 	panel.SetOnHoverCallback([&panel](Smasher::Events::MouseMoveEvent& event) {
 		if ((bool)(panel.GetPanelState() & Smasher::UIPanelState::HOVERED)) {
-			panel.SetColor(sf::Color::Cyan);
+			panel.SetBackgroundColor(sf::Color::Cyan);
 		}
 		else {
-			panel.SetColor(sf::Color::Magenta);
+			panel.SetBackgroundColor(sf::Color::Magenta);
 		}
 	});
 }
