@@ -4,7 +4,7 @@ layout(location = 0) in vec4  aPos_TexCoord; // position xy, texCoord zw
 layout(location = 1) in vec4  aWorldPos_WorldRotation; // World Position xyz, World Rotation w
 layout(location = 2) in vec3  aWorldScale_BorderThickness; // Word Scale (xy) Border Thickness (z)
 layout(location = 3) in mat3  texMatrix;
-layout(location = 6) in uint  aColorCode;
+layout(location = 6) in uvec4 aBackgroundColorCodes;
 layout(location = 7) in uvec4 aBorderColorCodes;
 layout(location = 8) in vec4  aBorderRadius;
 layout(location = 9) in uint  aHasTextureUint;
@@ -15,6 +15,7 @@ out vec4 texCoord_spriteCoord;
 out vec3 dimensions_borderThickness;
 out vec4 borderRadius;
 out vec4 borderColor;
+out vec4 backgroundColor;
 flat out uint hasTextureUint;
 
 uniform mat4 ViewProjectionMatrix;
@@ -57,9 +58,9 @@ void main()
 
     dimensions_borderThickness.xy = worldScale;
 
-    vertexColor = GetColorFromCode(aColorCode);
     uint borderIndex = uint(gl_VertexID) % 4u;
     borderColor = GetColorFromCode(aBorderColorCodes[gl_VertexID]);
+    backgroundColor = GetColorFromCode(aBackgroundColorCodes[gl_VertexID]);
 
     // transform the vertex position
     gl_Position = ViewProjectionMatrix * model * vec4(pos, 0.0, 1.0);

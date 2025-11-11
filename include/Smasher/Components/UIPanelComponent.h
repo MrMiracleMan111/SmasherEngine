@@ -26,7 +26,7 @@ namespace Smasher {
 		float position_rotation[4] = { 0 }; //x, y, z
 		float scale_borderThickness[3] = { 0 }; // x, y, z
 		Mat3 texTransform = Mat3{};
-		uint32_t color = 0;
+		uint32_t backgroundColors[4] = { 0 };
 		uint32_t borderColors[4] = { 0 };
 		float borderRadius[4] = { 0.0f }; // top left, top right, bottom right, bottom left
 		uint32_t hasTexture = (uint32_t)false;
@@ -107,8 +107,6 @@ namespace Smasher {
 
 		UIPanelComponent& SetClipRotation(Degrees angle);
 
-		UIPanelComponent& SetColor(const sf::Color& color);
-
 		UIPanelComponent& SetBorderRadius(float radius);
 
 		UIPanelComponent& SetBorderRadius(UIPanelCorner corner, float radius);
@@ -119,13 +117,17 @@ namespace Smasher {
 
 		UIPanelComponent& SetBorderColor(UIPanelCorner corner, const sf::Color& color);
 
+		UIPanelComponent& SetBackgroundColor(const sf::Color& color);
+
+		UIPanelComponent& SetBackgroundColor(UIPanelCorner corner, const sf::Color& color);
+
 		UIPanelComponent& SetDepth(float depth);
 
-		sf::Color GetColor() const { return m_Color; }
 		float GetDepth() const { return m_Depth; }
 		float GetBorderRadius(const UIPanelCorner corner) const;
 		float GetBorderThickness() const { return m_BorderThickness; }
 		sf::Color GetBorderColor(const UIPanelCorner corner);
+		sf::Color GetBackgroundColor(const UIPanelCorner corner);
 		std::shared_ptr<Smasher::TextureResource> GetTexture() const { return m_TexturePtr; };
 		const std::shared_ptr<Smasher::TextureResource>& GetTextureRef() const { return m_TexturePtr; };
 		const sf::IntRect& GetClipRect() const { return m_ClipRect; }
@@ -190,7 +192,7 @@ namespace Smasher {
 		std::function<void(Events::MouseMoveEvent&)> m_MouseMoveCallback;
 		std::function<void(Events::MouseButtonEvent&)> m_MousePressCallback;
 		std::shared_ptr<Smasher::TextureResource> m_TexturePtr;
-		sf::Color m_Color = sf::Color::White;
+		sf::Color m_BackgroundColors[4] = { sf::Color::White, sf::Color::White, sf::Color::White, sf::Color::White };
 		sf::Color m_BorderColors[4] = { sf::Color::Transparent, sf::Color::Transparent, sf::Color::Transparent, sf::Color::Transparent };
 		bool m_Changed = false;
 		bool m_ClipChanged = false;

@@ -141,14 +141,6 @@ namespace Smasher {
 		return m_ClipTransform;
 	}
 
-	UIPanelComponent& UIPanelComponent::SetColor(const sf::Color& color)
-	{
-		m_Changed = true;
-		m_Color = color;
-		m_DebugSprite.setFillColor(color);
-		return *this;
-	}
-
 	UIPanelComponent& UIPanelComponent::SetBorderRadius(float radius)
 	{
 		m_Changed = true;
@@ -236,6 +228,46 @@ namespace Smasher {
 		}
 	}
 
+	UIPanelComponent& UIPanelComponent::SetBackgroundColor(const sf::Color& color) {
+		m_Changed = true;
+		return SetBackgroundColor(UIPanelCorner::ALL, color);
+	}
+
+	UIPanelComponent& UIPanelComponent::SetBackgroundColor(UIPanelCorner corner, const sf::Color& color) {
+		m_Changed = true;
+		char tmp = (char)corner;
+		if (tmp & (char)UIPanelCorner::BOTTOM_RIGHT) {
+			m_BackgroundColors[0] = color;
+		}
+		if (tmp & (char)UIPanelCorner::BOTTOM_LEFT) {
+			m_BackgroundColors[1] = color;
+		}
+		if (tmp & (char)UIPanelCorner::TOP_LEFT) {
+			m_BackgroundColors[2] = color;
+		}
+		if (tmp & (char)UIPanelCorner::TOP_RIGHT) {
+			m_BackgroundColors[3] = color;
+		}
+		return *this;
+	}
+
+	sf::Color UIPanelComponent::GetBackgroundColor(const UIPanelCorner corner) {
+		switch (corner) {
+		case UIPanelCorner::TOP_LEFT:
+			return m_BackgroundColors[0];
+		case UIPanelCorner::TOP_RIGHT:
+			return m_BackgroundColors[1];
+		case UIPanelCorner::BOTTOM_RIGHT:
+			return m_BackgroundColors[2];
+		case UIPanelCorner::BOTTOM_LEFT:
+			return m_BackgroundColors[3];
+		default:
+			assert(false); // Invalid UIPanelCorner type in GetBorderRadius, must use specific corner (ie. TOP_LEFT)
+			return sf::Color::Transparent;
+		}
+	}
+
+
 	UIPanelComponent& UIPanelComponent::SetDepth(float depth) {
 		m_Changed = true;
 		m_Depth = depth;
@@ -271,7 +303,15 @@ namespace Smasher {
 			{ GetPosition().x, GetPosition().y, GetDepth(), (float)(GetRotation() * ((float)std::numbers::pi / 180.f))}, // position xyz, rotation w (vec4)
 			{ GetScale().x, GetScale().y,  GetBorderThickness()}, // scale (vec2), border thickness (float)
 			Mat3{ GetClipTransform() }, // texTransform (Mat3)
-			(uint32_t)GetColor().toInteger(), // color (uint32_t)
+			// 0 bottom left
+			// 1 bottom right
+			// 2 top right
+			// 3 top left
+			{	(uint32_t)GetBackgroundColor(UIPanelCorner::BOTTOM_RIGHT).toInteger(),
+				(uint32_t)GetBackgroundColor(UIPanelCorner::BOTTOM_LEFT).toInteger(),
+				(uint32_t)GetBackgroundColor(UIPanelCorner::TOP_LEFT).toInteger(),
+				(uint32_t)GetBackgroundColor(UIPanelCorner::TOP_RIGHT).toInteger()
+			},
 
 			// 0 bottom left
 			// 1 bottom right
@@ -354,7 +394,7 @@ namespace Smasher {
 		glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, sizeof(UIPanelData), (GLvoid*)(offsetof(UIPanelData, texTransform) + (6 * sizeof(float))));
 
 		// Instance Color Code
-		glVertexAttribIPointer(6, 1, GL_UNSIGNED_INT, sizeof(UIPanelData), (GLvoid*)(offsetof(UIPanelData, color)));
+		glVertexAttribIPointer(6, 4, GL_UNSIGNED_INT, sizeof(UIPanelData), (GLvoid*)(offsetof(UIPanelData, backgroundColors)));
 
 		// Border Color Code
 		glVertexAttribIPointer(7, 4, GL_UNSIGNED_INT, sizeof(UIPanelData), (GLvoid*)(offsetof(UIPanelData, borderColors)));

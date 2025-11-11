@@ -3,7 +3,7 @@ precision mediump float;
 precision highp int;
 
 in vec3 dimensions_borderThickness;
-in vec4 vertexColor;
+in vec4 backgroundColor;
 in vec4 texCoord_spriteCoord;
 in vec4 borderRadius;
 in vec4 borderColor;
@@ -62,11 +62,11 @@ void main()
     vec2 spriteCoord = texCoord_spriteCoord.zw;
     float borderThickness = dimensions_borderThickness.z;
 
-    vec4 innerColor = vertexColor;
+    vec4 innerColor = backgroundColor;
     if (hasTexture) {
         // lookup the pixel in the texture
         vec4 pixel = texture2D(texture, texCoord);
-        innerColor = blend(pixel, vertexColor);
+        innerColor = blend(pixel, backgroundColor);
         //innerColor = vec4(spriteCoord.xy, 0.0, 1.0);
     }
 
