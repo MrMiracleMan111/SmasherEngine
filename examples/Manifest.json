@@ -3,6 +3,7 @@
     "small_art": "assets/textures/small_art.png",
     "alpha_test": "assets/textures/alpha_test.png",
     "window": "assets/textures/window.png",
+    "clip_test": "assets/textures/frame-crop-test.png",
     "texture_1": "assets/textures/pexels-steve-texture-1.jpg",
     "texture_2": "assets/textures/pexels-steve-texture-2.jpg",
     "textures": [ "assets/textures/pexels-steve-texture-1.jpg", "assets/textures/pexels-steve-texture-2.jpg" ]

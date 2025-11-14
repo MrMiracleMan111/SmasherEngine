@@ -23,6 +23,15 @@ int main() {
 		.SetClipRotation(Smasher::Degrees{ 30 })
 		.SetDepth(0.2f);
 
+	Smasher::Entity& clipTest = exampleLayer.AddEntity<Smasher::Entity>();
+	clipTest.AddComponent<Smasher::DrawableComponent>()
+		.SetPosition(sf::Vector2f(50.0f, 200.0f))
+		.SetScale(sf::Vector2f(100.0f, 75.0f))
+		.SetTextureAsset<Smasher::Manifest::Textures::clip_test>({}) // Default texture options
+		.SetClipRect(sf::IntRect{ 0, 0, 24, 18 })
+		//.SetClipRotation(Smasher::Degrees{ 30 })
+		.SetDepth(0.1f);
+
 	// Create drawable component instance without texture
 	Smasher::Entity& shape = exampleLayer.AddEntity<Smasher::Entity>();
 	shape.AddComponent<Smasher::DrawableComponent>()
