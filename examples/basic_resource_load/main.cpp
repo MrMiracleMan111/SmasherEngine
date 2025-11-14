@@ -12,9 +12,9 @@ int main() {
 	Smasher::Engine engine(640, 420);
 	engine.GetResourceManager().SetResourceDirectory(Smasher::Manifest::Metadata::RESOURCES_DIRECTORY);
 
-	ExampleResourcesLayer& state = engine.PushLayer<ExampleResourcesLayer>();
+	ExampleResourcesLayer& exampleLayer = engine.PushLayer<ExampleResourcesLayer>();
 
-	Smasher::Entity& image = state.AddEntity<Smasher::Entity>();
+	Smasher::Entity& image = exampleLayer.AddEntity<Smasher::Entity>();
 	image.AddComponent<Smasher::DrawableComponent>()
 		.SetPosition(sf::Vector2f(500.0f, 300.0f))
 		.SetScale(sf::Vector2f(400.0f, 400.0f))
@@ -24,7 +24,7 @@ int main() {
 		.SetDepth(0.2f);
 
 	// Create drawable component instance without texture
-	Smasher::Entity& shape = state.AddEntity<Smasher::Entity>();
+	Smasher::Entity& shape = exampleLayer.AddEntity<Smasher::Entity>();
 	shape.AddComponent<Smasher::DrawableComponent>()
 		.SetPosition(sf::Vector2f(50.0f, 300.0f))
 		.SetScale(sf::Vector2f(100.0f, 100.0f))
@@ -42,7 +42,7 @@ int main() {
 
 		int separation = 20;
 		int offset = 100;
-		Smasher::Entity& image = state.AddEntity<Smasher::Entity>();
+		Smasher::Entity& image = exampleLayer.AddEntity<Smasher::Entity>();
 		image.AddComponent<Smasher::DrawableComponent>()
 			.SetPosition(sf::Vector2f((float)(i * separation + offset), (float)(i * separation + offset)))
 			.SetScale(sf::Vector2f(100.0f, 100.0f))
@@ -62,7 +62,7 @@ int main() {
 	}
 
 	// Create a window
-	Smasher::Entity& window1 = state.AddEntity<Smasher::Entity>();
+	Smasher::Entity& window1 = exampleLayer.AddEntity<Smasher::Entity>();
 	window1.AddComponent<Smasher::DrawableComponent>()
 		.SetPosition(sf::Vector2f(400, 200))
 		.SetScale(sf::Vector2f(150.0f, 150.0f))
@@ -71,7 +71,7 @@ int main() {
 		.SetClipRotation(Smasher::Degrees{ 30 })
 		.SetDepth(0.6f);
 
-	Smasher::Entity& window2 = state.AddEntity<Smasher::Entity>();
+	Smasher::Entity& window2 = exampleLayer.AddEntity<Smasher::Entity>();
 	window2.AddComponent<Smasher::DrawableComponent>()
 		.SetPosition(sf::Vector2f(420, 220))
 		.SetScale(sf::Vector2f(150.0f, 150.0f))
@@ -79,7 +79,7 @@ int main() {
 		//.SetClipRect(sf::IntRect{ 0, 0, 64, 64 })
 		.SetDepth(0.5);
 
-	Smasher::Entity& inWindowEntity = state.AddEntity<Smasher::Entity>();
+	Smasher::Entity& inWindowEntity = exampleLayer.AddEntity<Smasher::Entity>();
 	inWindowEntity.AddComponent<Smasher::DrawableComponent>()
 		.SetPosition(sf::Vector2f(410, 210))
 		.SetScale(sf::Vector2f(100.0f, 100.0f))
@@ -89,13 +89,13 @@ int main() {
 
 
 
-	Smasher::Entity& message = state.AddEntity<Smasher::Entity>();
+	Smasher::Entity& message = exampleLayer.AddEntity<Smasher::Entity>();
 	message.AddComponent<Smasher::TextComponent>()
 		.SetString("Hello World")
 		.UseDefaults()
 		.SetFontAsset<Smasher::Manifest::Fonts::arial>();
 
- 	state.Activate();
+ 	exampleLayer.Activate();
 	engine.Run();
 	return 0;
 }
