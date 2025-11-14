@@ -22,6 +22,17 @@ namespace Smasher {
 	}
 
 	template<typename T>
+	Interpolated<T>::Interpolated(const T& value) :
+		m_StartValue(value),
+		m_EndValue(value),
+		m_StartTime(std::chrono::system_clock::now()),
+		m_Duration(Smasher::Millisecond{ 1000 }),
+		m_Curve(InterpolationType::EASE_IN)
+	{
+
+	}
+
+	template<typename T>
 	Interpolated<T>::operator T() { return calculateValue(); }
 
 	template<typename T>

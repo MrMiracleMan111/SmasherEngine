@@ -26,6 +26,7 @@ namespace Smasher {
 	class Interpolated {
 	public:
 		Interpolated();
+		Interpolated(const T& value);
 		Interpolated(const T& startValue, const T& endValue);
 
 		const Smasher::Millisecond& GetDuration() const { return m_Duration; };
