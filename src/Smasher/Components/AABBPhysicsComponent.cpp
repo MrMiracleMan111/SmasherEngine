@@ -82,7 +82,7 @@ namespace Smasher {
 		return *this;
 	}
 
-	AABBPhysicsComponent& AABBPhysicsComponent::SetOnCollisionCallback(std::function<void(AABBPhysicsComponent&)> callback) {
+	AABBPhysicsComponent& AABBPhysicsComponent::SetOnCollisionCallback(std::function<void(AABPPhysicsCollision)> callback) {
 		m_OnCollisionCallback = callback;
 		return *this;
 	}
@@ -118,12 +118,12 @@ namespace Smasher {
 		return aabb;
 	}
 
-	void AABBPhysicsComponent::OnCollide(AABBPhysicsComponent& other) {
+	void AABBPhysicsComponent::OnCollide(AABPPhysicsCollision& collision) {
 		if (!m_OnCollisionCallback) {
 			return;
 		}
 
-		m_OnCollisionCallback(other);
+		m_OnCollisionCallback(collision);
 	}
 
 }

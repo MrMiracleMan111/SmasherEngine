@@ -169,7 +169,12 @@ namespace Smasher {
 		component.MoveTo(sf::Vector2f(context.position.x, context.position.y));
 		//component.SetPosition(sf::Vector2f(contactPoint.x, contactPoint.y));
 
-		component.OnCollide(obstacle);
+		AABPPhysicsCollision collision{
+			obstacle,
+			sf::Vector2f(normal.x, normal.y)
+		};
+
+		component.OnCollide(collision);
 	}
 
 }

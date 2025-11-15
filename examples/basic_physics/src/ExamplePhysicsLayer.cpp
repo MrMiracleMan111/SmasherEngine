@@ -18,7 +18,7 @@ void ExamplePhysicsLayer::Init() {
 		.MakeStatic()
 		.SetPosition(sf::Vector2f(200.0f, 300.0f))
 		.SetScale(sf::Vector2f(100.0f, 100.0f))
-		.SetOnCollisionCallback([](Smasher::AABBPhysicsComponent& other) {
+		.SetOnCollisionCallback([](Smasher::AABPPhysicsCollision collision) {
 			std::cout << "Static Box hit something (this message should not appear)" << std::endl;
 		})
 		;
@@ -34,7 +34,7 @@ void ExamplePhysicsLayer::Init() {
 		.SetPosition(sf::Vector2f(400.0f, 250.0f))
 		.SetScale(sf::Vector2f(100.0f, 100.0f))
 		.SetAcceleration(sf::Vector2f(-50.0f, 0.0f))
-		.SetOnCollisionCallback([](Smasher::AABBPhysicsComponent& other) {
+		.SetOnCollisionCallback([](Smasher::AABPPhysicsCollision collision) {
 			std::cout << "Dynamic Box hit something" << std::endl;
 		});
 	moveBox.AddComponent<Smasher::DrawableComponent>()
