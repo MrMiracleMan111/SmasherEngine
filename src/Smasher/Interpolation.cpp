@@ -59,7 +59,7 @@ namespace Smasher {
 
 		float SMASHER_API easeInElastic(float x) {
 			float clamped = std::clamp(x, 0.f, 1.f);
-			const float c4 = (2.f * std::numbers::pi) / 3.f;
+			const float c4 = (2.f * (float)std::numbers::pi) / 3.f;
 
 			if (clamped == 0.f) {
 				return 0.f;
@@ -72,7 +72,7 @@ namespace Smasher {
 		
 		float SMASHER_API easeOutElastic(float x) {
 			float clamped = std::clamp(x, 0.f, 1.f);
-			const float c4 = (2.f * std::numbers::pi) / 3.f;
+			const float c4 = (2.f * (float)std::numbers::pi) / 3.f;
 
 			if (clamped == 0.f) {
 				return 0.f;
@@ -85,7 +85,7 @@ namespace Smasher {
 		
 		float SMASHER_API easeInOutElastic(float x) {
 			float clamped = std::clamp(x, 0.f, 1.f);
-			const float c5 = (2.f * std::numbers::pi) / 4.5f;
+			const float c5 = (2.f * (float)std::numbers::pi) / 4.5f;
 
 			if (clamped == 0.f) {
 				return 0.f;
