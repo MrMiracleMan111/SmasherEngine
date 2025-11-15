@@ -8,10 +8,8 @@ flat in uint hasTextureUint;
 
 out vec4 FragColor;
 
-//uniform float depth;
 uniform sampler2D texture;
 uniform bool translucentPass;
-//uniform vec2 windowSize;
 
 void main()
 {
@@ -19,6 +17,14 @@ void main()
     vec4 pixel = vec4(1.f);
     
     if (hasTextureUint != 0u) {
+        // Tex coord needs to be in bounds
+        if (clamp(texCoord.x, 0.0, 1.0) != texCoord.x ||
+            clamp(texCoord.y, 0.0, 1.0) != texCoord.y) {
+            FragColor = vec4(0.0);
+            //discard;
+            return;
+        }
+
         pixel = texture2D(texture, texCoord);
     }
 
