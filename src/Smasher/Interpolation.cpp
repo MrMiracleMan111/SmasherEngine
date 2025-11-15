@@ -49,7 +49,7 @@ namespace Smasher {
 
 		float easeOut(float x) {
 			float clamped = std::clamp(x, 0.f, 1.f);
-			return 1 - std::pow(1 - clamped, 3);
+			return 1.f - std::pow(1.f - clamped, 3.f);
 		}
 
 		float easeInOut(float x) {
