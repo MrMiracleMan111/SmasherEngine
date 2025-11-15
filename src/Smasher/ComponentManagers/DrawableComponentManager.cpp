@@ -165,7 +165,7 @@ namespace Smasher {
 	}
 
 	void DrawableComponentManager::OnComponentChangeData(DrawableComponent& rComponent) {
-		static const float clipTransformMatrixArr[] = {
+		static const float identityTransformMatrixArr[] = {
 		  1.f, 0.f, 0.f,
 		  0.f, 1.f, 0.f,
 		  0.f, 0.f, 0.f
@@ -173,19 +173,19 @@ namespace Smasher {
 
 		rComponent.m_TransformChanged = false;
 
-		Mat3 clipTransform{ clipTransformMatrixArr };
-		
+		Mat3 clipTransform{ identityTransformMatrixArr };
+
 		if (rComponent.m_TextureLoaded) {
 			clipTransform = Mat3(rComponent.GetClipTransform());
 		}
 
+		const Mat3& vertTransform = rComponent.GetTransform();
+
 		uint32_t colorData = (uint32_t)rComponent.GetColor().toInteger();
-		Radians rotation = Radians{ (float)rComponent.GetRotation() * ((float)std::numbers::pi / 180.0f) };
 		ModelData data = ModelData{
-			{ rComponent.GetPosition().x, rComponent.GetPosition().y, rComponent.GetDepth() },
-			{ rComponent.GetScale().x, rComponent.GetScale().y },
+			vertTransform,
 			clipTransform,
-			rotation,
+			rComponent.GetDepth(),
 			colorData,
 			nullptr
 		};

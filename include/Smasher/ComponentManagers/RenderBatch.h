@@ -17,10 +17,9 @@ namespace Smasher {
 	struct BatchContext;
 
 	struct SMASHER_API ModelData {
-		float position[3] = {0}; //x, y, z
-		float scale[2] = {0}; // x, y
+		Mat3 vertTransform = Mat3{};
 		Mat3 texTransform = Mat3{};
-		Radians rotation = Radians{ 0 };
+		float depth;
 		uint32_t color = 0;
 		BatchContext* ownerContext = nullptr;
 		bool hasTexture = false;
