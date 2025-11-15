@@ -76,7 +76,7 @@ namespace Smasher {
 		std::chrono::time_point<std::chrono::system_clock> BENCHMARK_now = std::chrono::system_clock::now();
 #endif
 		for (auto& itr : m_Components) {
-			if (!itr.m_TransformChanged)
+			if (!itr.m_TransformChanged && !itr.m_ClipChanged)
 				continue;
 			OnComponentChangeData(itr);
 		}

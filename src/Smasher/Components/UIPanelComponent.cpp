@@ -289,7 +289,7 @@ namespace Smasher {
 	}
 
 	void UIPanelComponent::UpdateGLBufferData() {
-		if (!m_TransformChanged && !m_Changed) {
+		if (!m_TransformChanged && !m_Changed && !m_ClipChanged) {
 			return;
 		}
 
