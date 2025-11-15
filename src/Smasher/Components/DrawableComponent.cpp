@@ -83,18 +83,17 @@ namespace Smasher {
         sf::Texture& pTexture = m_TextureResource->GetTexture();
         sf::Vector2f dimensions = sf::Vector2f((float)pTexture.getSize().x, (float)pTexture.getSize().y);
         
-        float initialX = 0.5f * m_ClipRect.width;
-        float initialY = 0.5f * m_ClipRect.height;
+        float left = m_ClipRect.left;
+        float top = m_ClipRect.top;
 
-        float left = m_ClipRect.left - initialX; // +std::copysign(1.0f, m_ClipRect.width) * -0.5f;
-        float top = m_ClipRect.top - initialY; //+std::copysign(1.0f, m_ClipRect.height) * -0.5f;
-
+        float scaleX = m_ClipRect.width / dimensions.x;
+        float scaleY = m_ClipRect.height / dimensions.y;
 
         m_ClipTransform
-            .translate(initialX / dimensions.x, initialY / dimensions.y) // Center the clip at 0,0
+            .scale(scaleX, scaleY)
             .rotate((float)-m_ClipRotation)
-            .scale(m_ClipRect.width / dimensions.x, m_ClipRect.height / dimensions.y)
-            .translate(left / dimensions.x, top / dimensions.y);
+            .translate(left / (dimensions.x * scaleX), top / (dimensions.y * scaleY)) // Center the clip at 0,0
+            ;
 
         m_ClipChanged = false;
         return m_ClipTransform;
