@@ -82,6 +82,11 @@ namespace Smasher {
 		return *this;
 	}
 
+	AABBPhysicsComponent& AABBPhysicsComponent::SetOnCollisionCallback(std::function<void(AABBPhysicsComponent&)> callback) {
+		m_OnCollisionCallback = callback;
+		return *this;
+	}
+
 
 	sf::Vector2f AABBPhysicsComponent::GetPosition() const {
 		return sf::Vector2f{ m_Position.x, m_Position.y };
@@ -112,4 +117,13 @@ namespace Smasher {
 		aabb.upperBound = pos + halfScale;
 		return aabb;
 	}
+
+	void AABBPhysicsComponent::OnCollide(AABBPhysicsComponent& other) {
+		if (!m_OnCollisionCallback) {
+			return;
+		}
+
+		m_OnCollisionCallback(other);
+	}
+
 }

@@ -44,6 +44,10 @@ namespace Smasher {
 
 		AABBPhysicsComponent& SetAcceleration(sf::Vector2f acceleration);
 
+		AABBPhysicsComponent& SetOnCollisionCallback(std::function<void(AABBPhysicsComponent&)> callback);
+		template<class T>
+		AABBPhysicsComponent& SetOnCollisionCallback(void (T::* method)(AABBPhysicsComponent&), T* instance);
+
 		bool IsStatic() const { return m_Static; };
 		sf::Vector2f GetPosition() const;
 		sf::Vector2f GetScale() const;
@@ -64,8 +68,10 @@ namespace Smasher {
 		bool HasPhysicsChanged() const { return m_PhysicsChanged; }
 		b2Vec2 Getb2OldPosition() const { return m_OldPosition; }
 		void Setb2OldPosition(b2Vec2 position) { m_OldPosition = position; }
+		void OnCollide(AABBPhysicsComponent& other);
 	private:
 		b2DynamicTree& m_b2BVHRef;
+		std::function<void(AABBPhysicsComponent&)> m_OnCollisionCallback;
 		b2Vec2 m_Scale;
 		b2Vec2 m_Position;
 		b2Vec2 m_OldPosition; // Used and set by manager
@@ -76,3 +82,5 @@ namespace Smasher {
 		bool m_Static = false; // Object doesn't move
 	};
 }
+
+#include "Smasher/Components/AABBPhysicsComponent.inl"

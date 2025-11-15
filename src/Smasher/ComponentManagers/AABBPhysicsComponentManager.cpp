@@ -168,6 +168,8 @@ namespace Smasher {
 		component.SetVelocity(sf::Vector2f(context.velocity.x , context.velocity.y));
 		component.MoveTo(sf::Vector2f(context.position.x, context.position.y));
 		//component.SetPosition(sf::Vector2f(contactPoint.x, contactPoint.y));
+
+		component.OnCollide(obstacle);
 	}
 
 }
