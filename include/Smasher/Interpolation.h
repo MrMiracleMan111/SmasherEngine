@@ -8,6 +8,9 @@ namespace Smasher {
 		EASE_IN,
 		EASE_OUT,
 		EASE_IN_OUT,
+		EASE_IN_ELASTIC,
+		EASE_OUT_ELASTIC,
+		EASE_IN_OUT_ELASTIC,
 		STEP,
 		INSTANT
 	};
@@ -18,6 +21,9 @@ namespace Smasher {
 		float SMASHER_API easeIn(float x);
 		float SMASHER_API easeOut(float x);
 		float SMASHER_API easeInOut(float x);
+		float SMASHER_API easeInElastic(float x);
+		float SMASHER_API easeOutElastic(float x);
+		float SMASHER_API easeInOutElastic(float x);
 		float SMASHER_API step(float x);
 		float SMASHER_API cubicBezier(float t, float p0, float p1, float p2, float p3);
 	};
