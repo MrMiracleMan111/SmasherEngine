@@ -14,7 +14,7 @@
 using namespace Smasher;
 int main(int argc, char **argv) {
 	Smasher::Engine engine(640, 420);
-	std::size_t numEntities = 20; // 100000;
+	std::size_t numEntities = 20; // 10000;
 	engine.GetResourceManager().SetResourceDirectory(Smasher::Manifest::Metadata::RESOURCES_DIRECTORY);
 
 
