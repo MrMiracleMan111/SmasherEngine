@@ -44,7 +44,7 @@ namespace Smasher {
 	void AABBPhysicsComponentManager::PostUpdate(Smasher::Millisecond delta) {
 		float timeStep = delta.count() / 1000.f;
 		for (auto& component : m_Components) {
-			if (component.IsStatic()) {
+			if (component.GetPhysicsType() == Smasher::AABBPhysicsType::STATIC) {
 				continue;
 			}
 

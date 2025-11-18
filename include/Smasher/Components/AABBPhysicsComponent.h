@@ -17,6 +17,12 @@ namespace Smasher {
 		sf::Vector2f normal; // surface normal
 	};
 
+	enum SMASHER_API AABBPhysicsType {
+		STATIC, // Does not move
+		KINEMATIC, // Ignores collision, affected by velocity and acceleration
+		DYNAMIC // Affected by collision, affected by velocity and acceleration
+	};
+
 	class SMASHER_API AABBPhysicsComponent : public IComponent {
 		friend class AABBPhysicsComponentManager;
 		SMASHER_USE_COMPONENT_MANAGER(AABBPhysicsComponentManager)
@@ -26,9 +32,7 @@ namespace Smasher {
 		~AABBPhysicsComponent();
 		AABBPhysicsComponent(b2DynamicTree& BVH, int b2TreeProxyId);
 
-		AABBPhysicsComponent& MakeStatic();
-
-		AABBPhysicsComponent& MakeDynamic();
+		AABBPhysicsComponent& SetPhysicsType(AABBPhysicsType type);
 
 		// Uses center point of rectangle for movement
 		// Follows collision rules
@@ -54,7 +58,7 @@ namespace Smasher {
 		template<class T>
 		AABBPhysicsComponent& SetOnCollisionCallback(void (T::* method)(AABPPhysicsCollision), T* instance);
 
-		bool IsStatic() const { return m_Static; };
+		AABBPhysicsType GetPhysicsType() { return m_PhysicsType; }
 		sf::Vector2f GetPosition() const;
 		sf::Vector2f GetScale() const;
 		sf::Vector2f GetOldPosition() const;
@@ -85,7 +89,7 @@ namespace Smasher {
 		b2Vec2 m_Acceleration; // Gravity vector
 		int m_b2TreeProxyId = -1;
 		bool m_PhysicsChanged = false;
-		bool m_Static = false; // Object doesn't move
+		AABBPhysicsType m_PhysicsType = AABBPhysicsType::STATIC;
 	};
 }
 

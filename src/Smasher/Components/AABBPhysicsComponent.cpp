@@ -8,8 +8,7 @@ namespace Smasher {
 		m_OldPosition(0, 0),
 		m_Position(0, 0),
 		m_Velocity(0, 0),
-		m_Acceleration(0, 0),
-		m_Static(false)
+		m_Acceleration(0, 0)
 	{
 		b2AABB tmp = AABBPhysicsComponent::DEFAULT_AABB;
 		b2Vec2 halfScale = tmp.upperBound - tmp.lowerBound;
@@ -25,13 +24,9 @@ namespace Smasher {
 		}
 	}
 
-	AABBPhysicsComponent& AABBPhysicsComponent::MakeStatic() {
-		m_Static = true;
-		return *this;
-	}
-
-	AABBPhysicsComponent& AABBPhysicsComponent::MakeDynamic() {
-		m_Static = false;
+	AABBPhysicsComponent& AABBPhysicsComponent::SetPhysicsType(AABBPhysicsType type) {
+		m_PhysicsType = type;
+		m_PhysicsChanged = true;
 		return *this;
 	}
 
