@@ -426,6 +426,16 @@ TEST(ComponentsTest, MissingComponent) {
 	}, Smasher::Exceptions::EntityComponentNotFound);
 }
 
+TEST(ComponentsTest, GetSiblingComponent) {
+	Smasher::Engine engine(640, 420);
+	DummyLayer& layer = engine.PushLayer<DummyLayer>();
+	Smasher::Entity& entity = layer.AddEntity<Smasher::Entity>();
+	TestComponent& testComponent = entity.AddComponent<TestComponent>(10);
+	CustomComponent& customComponent = entity.AddComponent<CustomComponent>(11);
+	EXPECT_EQ(&testComponent.GetSiblingComponent<CustomComponent>(), &customComponent);
+	EXPECT_EQ(&customComponent.GetSiblingComponent<TestComponent>(), &testComponent);
+}
+
 TEST(ComponentsTest, RemoveComponent) {
 	Smasher::Engine engine(640, 420);
 	DummyLayer& layer = engine.PushLayer<DummyLayer>();
