@@ -56,4 +56,9 @@ namespace Smasher {
 		}
 		return static_cast<T&>(itr->second.get());
 	}
+
+	template<class T>
+	T& IComponent::GetSiblingComponent() const {
+		return GetEntity().GetComponent<T>();
+	};
 }

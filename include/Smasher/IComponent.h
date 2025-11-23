@@ -20,6 +20,9 @@ namespace Smasher {
 		IComponent& operator = (IComponent&& other) noexcept;
 		virtual ~IComponent();
 
+		template<class T>
+		T& GetSiblingComponent() const;
+
 		ComponentStatus GetStatus() const { return m_Status; }
 		Entity& GetEntity() const { return *m_Entity; }
 		IComponentManager& GetManager() const { return *m_Manager; }
@@ -49,3 +52,5 @@ namespace Smasher {
 		ComponentStatus m_Status = ComponentStatus::INVALID; // Component not yet added to manager
 	};
 }
+
+#include "Smasher/IComponent.inl"
