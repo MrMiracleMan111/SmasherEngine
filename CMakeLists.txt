@@ -27,6 +27,21 @@ if(SMASHER_TESTS)
     enable_testing()
 endif()
 
+# Box2D v3.1.1
+FetchContent_Declare(
+    box2d
+    GIT_REPOSITORY https://github.com/erincatto/box2d.git
+    GIT_TAG 3a4f0da8374af61293a03021c9a0b3ebcfe67948
+)
+set(DBOX2D_BUILD_DOCS OFF)
+set(DGLFW_BUILD_WAYLAND OFF)
+FetchContent_MakeAvailable(box2d)
+
+# Verify it worked
+if(NOT TARGET box2d)
+    message(FATAL_ERROR "Failed to fetch/build Box2D")
+endif()
+
 # GoogleTest requires at least C++17
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -127,6 +142,8 @@ endif()
 find_package(OpenGL REQUIRED)
 find_package(SFML 2.6.2 COMPONENTS system network window graphics audio REQUIRED)
 find_package(GLEW NAMES glew GLEW QUIET)
+
+target_link_libraries(SmasherEngine PUBLIC box2d::box2d)
 
 if(GLEW_FOUND)
     if (TARGET GLEW::GLEW)
