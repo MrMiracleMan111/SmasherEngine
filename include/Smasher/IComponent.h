@@ -52,5 +52,3 @@ namespace Smasher {
 		ComponentStatus m_Status = ComponentStatus::INVALID; // Component not yet added to manager
 	};
 }
-
-#include "Smasher/IComponent.inl"
