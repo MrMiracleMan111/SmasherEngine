@@ -95,7 +95,7 @@ namespace Smasher {
 
 	bool raycastAABB(b2Vec2& contactPoint, b2Vec2& normal, float& percentDist, b2Vec2 start, b2Vec2 end, b2AABB collider) {
 		b2Vec2 dir = b2Normalize(end - start);
-
+		b2Vec2 normalMin, normalMax;
 		float t_min = -std::numeric_limits<float>::infinity();
 		float t_max = std::numeric_limits<float>::infinity();
 
@@ -109,9 +109,12 @@ namespace Smasher {
 
 			if (t_near > t_min) {
 				t_min = t_near;
-				normal = (t1 < t2) ? b2Vec2{ -1.f, 0.f } : b2Vec2{ 1.f, 0.f };
+				normalMin = (t1 < t2) ? b2Vec2{ -1.f, 0.f } : b2Vec2{ 1.f, 0.f };
 			}
-			t_max = std::min(t_max, t_far);
+			if (t_far < t_max) {
+				t_max = t_far;
+				normalMax = (t1 < t2) ? b2Vec2{ 1.f, 0.f } : b2Vec2{ -1.f, 0.f };
+			}
 		}
 
 		// Y axis
@@ -124,9 +127,12 @@ namespace Smasher {
 
 			if (t_near > t_min) {
 				t_min = t_near;
-				normal = (t1 < t2) ? b2Vec2{ 0.f, -1.f } : b2Vec2{ 0.f, 1.f };
+				normalMin = (t1 < t2) ? b2Vec2{ 0.f, -1.f } : b2Vec2{ 0.f, 1.f };
 			}
-			t_max = std::min(t_max, t_far);
+			if (t_far < t_max) {
+				t_max = t_far;
+				normalMax = (t1 < t2) ? b2Vec2{ 0.f, 1.f } : b2Vec2{ 0.f, -1.f };
+			}
 		}
 
 		// Check if ray actually hits
@@ -134,8 +140,18 @@ namespace Smasher {
 			return false;
 		}
 
-		// Clamp tmin to 0 only at the end
-		float tmp = std::max(0.f, t_min);
+		float tmp;
+
+		if (t_min < 0.f) {
+			tmp = t_max;
+			normal = normalMax;
+		}
+		else {
+			tmp = t_min;
+			normal = normalMin;
+		}
+
+
 		contactPoint = start + (dir * tmp);
 		float contactDist = b2Distance(contactPoint, start);
 		float length = b2Distance(start, end);
