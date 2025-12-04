@@ -38,7 +38,7 @@ set(DBOX2D_BUILD_DOCS OFF)
 set(DGLFW_BUILD_WAYLAND OFF)
 FetchContent_MakeAvailable(box2d)
 
-# Verify it worked
+# Verify box2D target exists
 if(NOT TARGET box2d)
     message(FATAL_ERROR "Failed to fetch/build Box2D")
 endif()
