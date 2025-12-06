@@ -44,7 +44,9 @@ namespace Smasher {
 	}
 
 	void PhysicsManager::Initialize() {
-		PhysicsManager::Initialize(b2DefaultWorldDef());
+		b2WorldDef world = b2DefaultWorldDef();
+		world.gravity = b2Vec2_zero;
+		PhysicsManager::Initialize(world);
 	}
 
 	void PhysicsManager::Step(Smasher::Millisecond delta) {
