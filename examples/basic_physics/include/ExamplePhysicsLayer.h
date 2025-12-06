@@ -14,4 +14,5 @@ private:
 	void OnKeyPress(Smasher::Events::KeyboardEvent& e);
 	Smasher::EventSubscriptionHandle m_KeyPressSubscription;
 	Smasher::EventSubscriptionHandle m_MousePressSubscription;
+	Smasher::EventSubscriptionHandle m_MouseMoveSubscription;
 };

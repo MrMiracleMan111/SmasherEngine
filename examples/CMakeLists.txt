@@ -69,12 +69,12 @@ target_include_directories (MultipleLayersExample PUBLIC "${CMAKE_CURRENT_SOURCE
 target_link_libraries( MultipleLayersExample PRIVATE SmasherEngine )
 
 # Basic AABB Physics Engine Example
-add_custom_target(generate_manifest_AABBPhysicsExample DEPENDS Manifest.h)
-add_executable (AABBPhysicsExample "basic_physics/main.cpp" "basic_physics/src/ExamplePhysicsLayer.cpp" "basic_physics/include/BoxControllerComponent.h" "basic_physics/src/BoxControllerComponent.cpp" )
+add_custom_target(generate_manifest_PhysicsExample DEPENDS Manifest.h)
+add_executable (PhysicsExample "basic_physics/main.cpp" "basic_physics/src/ExamplePhysicsLayer.cpp" "basic_physics/include/BoxControllerComponent.h" "basic_physics/src/BoxControllerComponent.cpp" )
 
-set_target_properties(AABBPhysicsExample PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${SMASHER_ENGINE_OUTPUT_DIR}")
-set_target_properties(AABBPhysicsExample PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${SMASHER_ENGINE_OUTPUT_DIR}")
-add_dependencies(AABBPhysicsExample generate_manifest_AABBPhysicsExample)
-target_compile_features(AABBPhysicsExample PUBLIC cxx_std_20)
-target_include_directories (AABBPhysicsExample PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "basic_physics/include" "basic_physics/src")
-target_link_libraries( AABBPhysicsExample PRIVATE SmasherEngine )
+set_target_properties(PhysicsExample PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${SMASHER_ENGINE_OUTPUT_DIR}")
+set_target_properties(PhysicsExample PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${SMASHER_ENGINE_OUTPUT_DIR}")
+add_dependencies(PhysicsExample generate_manifest_PhysicsExample)
+target_compile_features(PhysicsExample PUBLIC cxx_std_20)
+target_include_directories (PhysicsExample PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "basic_physics/include" "basic_physics/src")
+target_link_libraries( PhysicsExample PRIVATE SmasherEngine )

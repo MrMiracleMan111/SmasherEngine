@@ -1,5 +1,6 @@
+#include <cmath>
 #include "ExamplePhysicsLayer.h"
-#include "Smasher/AABBPhysics.h"
+#include "Smasher/Physics.h"
 #include "Smasher/Drawable.h"
 #include "BoxControllerComponent.h"
 #include "Manifest.h"
@@ -10,52 +11,59 @@ ExamplePhysicsLayer::~ExamplePhysicsLayer()
 }
 
 void ExamplePhysicsLayer::Init() {
+	GetEngine().GetPhysicsManager().Initialize();
 	m_KeyPressSubscription = Subscribe<Smasher::Events::KeyboardEvent>(&ExamplePhysicsLayer::OnKeyPress, this);
-
+	
 	Smasher::Entity& box = AddEntity();
 
-	box.AddComponent<Smasher::AABBPhysicsComponent>()
-		.SetPhysicsType(Smasher::AABBPhysicsType::STATIC)
-		.SetPosition(sf::Vector2f(200.0f, 300.0f))
-		.SetScale(sf::Vector2f(100.0f, 100.0f))
-		.SetOnCollisionCallback([](Smasher::AABPPhysicsCollision collision) {
+	box.AddComponent<Smasher::PhysicsComponent>()
+		.SetPhysicsType(Smasher::PhysicsType::STATIC)
+		.SetPosition(sf::Vector2f{ 200.0f, 300.0f })
+		.UseRectCollider(100.f, 100.f)
+		.SetOnCollisionCallback([](Smasher::PhysicsCollision collision) {
 			std::cout << "Static Box hit something (this message should not appear)" << std::endl;
 		})
 		;
 	box.AddComponent<Smasher::DrawableComponent>()
-		.SetPosition(box.GetComponent<Smasher::AABBPhysicsComponent>().GetPosition())
-		.SetScale(box.GetComponent<Smasher::AABBPhysicsComponent>().GetScale())
+		.SetPosition(box.GetComponent<Smasher::PhysicsComponent>().GetPosition())
 		.SetTextureAsset<Smasher::Manifest::Textures::small_art>({})
+		.SetScale(sf::Vector2f{ 100.f, 100.f })
 		.SetColor(sf::Color::Red);
 
 	Smasher::Entity& moveBox = AddEntity();
-	moveBox.AddComponent<Smasher::AABBPhysicsComponent>()
-		.SetPhysicsType(Smasher::AABBPhysicsType::DYNAMIC)
-		.SetPosition(sf::Vector2f(400.0f, 250.0f))
-		.SetScale(sf::Vector2f(100.0f, 100.0f))
-		.SetAcceleration(sf::Vector2f(-50.0f, 0.0f))
-		.SetOnCollisionCallback([](Smasher::AABPPhysicsCollision collision) {
+	moveBox.AddComponent<Smasher::PhysicsComponent>()
+		.SetPhysicsType(Smasher::PhysicsType::DYNAMIC)
+		.UseRectCollider(100.f, 100.f)
+		.SetPosition(sf::Vector2f{ 400.0f, 250.0f })
+		.SetOnCollisionCallback([](Smasher::PhysicsCollision collision) {
 			std::cout << "Dynamic Box hit something" << std::endl;
 		});
 	moveBox.AddComponent<Smasher::DrawableComponent>()
-		.SetPosition(box.GetComponent<Smasher::AABBPhysicsComponent>().GetPosition())
-		.SetScale(box.GetComponent<Smasher::AABBPhysicsComponent>().GetScale())
+		.SetPosition(box.GetComponent<Smasher::PhysicsComponent>().GetPosition())
 		.SetColor(sf::Color::Yellow)
+		.SetScale(sf::Vector2f{ 100.f, 100.f })
 		.SetTextureAsset<Smasher::Manifest::Textures::small_art>({});
 	moveBox.AddComponent<BoxControllerComponent>();
 
 	m_MousePressSubscription = Subscribe<Smasher::Events::MouseButtonEvent>(
 		[&moveBox](Smasher::Events::MouseButtonEvent& event) {
-			sf::Vector2f pos = moveBox.GetComponent<Smasher::AABBPhysicsComponent>().GetPosition();
-			/*moveBox.GetComponent<Smasher::AABBPhysicsComponent>()
-				.Move(sf::Vector2f(event.Position) - pos);*/
+			sf::Vector2f pos = moveBox.GetComponent<Smasher::PhysicsComponent>().GetPosition();
 
-			moveBox.GetComponent<Smasher::AABBPhysicsComponent>()
-				.MoveTo(sf::Vector2f(event.Position));
+			moveBox.GetComponent<Smasher::PhysicsComponent>()
+				.SetPosition(sf::Vector2f(event.Position));
 			
 			std::cout << "Mouse Click X: " << event.Position.x << " Y: " << event.Position.y << std::endl;
-			/*moveBox.GetComponent<Smasher::DrawableComponent>()
-				.SetPosition(sf::Vector2f(event.Position));*/
+		});
+
+	m_MouseMoveSubscription = Subscribe<Smasher::Events::MouseMoveEvent>(
+		[&moveBox](Smasher::Events::MouseMoveEvent& event) {
+			sf::Vector2f pos = moveBox.GetComponent<Smasher::PhysicsComponent>().GetPosition();
+			sf::Vector2f mousePos{ event.Position };
+
+			float length = std::sqrt(std::pow((mousePos.x - pos.x), 2) + std::pow((mousePos.y - pos.y), 2));
+			sf::Vector2f direction = (mousePos - pos) / length;
+			moveBox.GetComponent<Smasher::PhysicsComponent>()
+				.SetVelocity(BoxControllerComponent::VELOCITY * direction);
 		});
 }
 
