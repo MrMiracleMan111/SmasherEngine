@@ -5,12 +5,15 @@
 #include <atomic>
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
+#include "box2d/box2d.h"
 #include "Smasher/Base.h"
 #include "Smasher/EngineConfig.h"
+#include "Smasher/PhysicsManager.h"
 #include "Smasher/ResourceManager.h"
 #include "Smasher/EventManager.h"
 #include "Smasher/Events.h"
 #include "Smasher/LayerTransition.h"
+
 
 namespace Smasher {
 	class Layer;
@@ -62,6 +65,7 @@ namespace Smasher {
 		sf::RenderWindow& GetWindow();
 		EventManager& GetEventManager();
 		ResourceManager& GetResourceManager();
+		PhysicsManager& GetPhysicsManager();
 
 		void SetUpdateInterval(Millisecond interval) { m_UpdateInterval = interval; }
 		void SetRenderInterval(Millisecond interval) { m_RenderInterval = interval; }
@@ -95,6 +99,7 @@ namespace Smasher {
 		bool m_Headless = false;
 		bool m_IsWindowOpen = false; // Needed to prevent double delete on Window Context
 		std::mutex m_WindowMutex; // Prevent double delete on Window Context
+		PhysicsManager m_PhysicsManager;
 		EventManager m_EventManager;
 		ResourceManager m_ResourceManager;
 		sf::View m_WindowView; // Default window view (used for resizing events)

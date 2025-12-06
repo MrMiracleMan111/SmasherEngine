@@ -235,6 +235,10 @@ namespace Smasher {
 
 	// Updates layers from bottom to top
 	void Engine::Update(Millisecond delta) {
+		if (m_PhysicsManager.IsInitialized()) {
+			m_PhysicsManager.Step(delta);
+		}
+
 		HandleLayerTransitions();
 
 		for (auto& itr : m_LayerStack) {
@@ -352,5 +356,5 @@ namespace Smasher {
 	sf::RenderWindow& Engine::GetWindow() { return *m_Window; }
 	EventManager& Engine::GetEventManager() { return m_EventManager; };
 	ResourceManager& Engine::GetResourceManager() { return m_ResourceManager; };
-
+	PhysicsManager& Engine::GetPhysicsManager() { return m_PhysicsManager; };
 }
