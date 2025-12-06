@@ -128,8 +128,6 @@ find_package(OpenGL REQUIRED)
 find_package(SFML 2.6.2 COMPONENTS system network window graphics audio REQUIRED)
 find_package(GLEW NAMES glew GLEW QUIET)
 
-target_link_libraries(SmasherEngine PUBLIC box2d::box2d)
-
 if(GLEW_FOUND)
     if (TARGET GLEW::GLEW)
         message(STATUS "using GLEW::GLEW target")
@@ -232,7 +230,9 @@ target_link_libraries(SmasherEngine PUBLIC
 "sfml-system"
 ${GLEW_TARGET}
 OpenGL::GL
-OpenGL::GLU)
+OpenGL::GLU
+box2d::box2d)
+
 
 target_compile_features(SmasherEngine PUBLIC cxx_std_20)
 
