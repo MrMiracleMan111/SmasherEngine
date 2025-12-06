@@ -96,6 +96,11 @@ namespace Smasher {
 		{ T::StaticUpdateComponent(comp, arg) } -> std::same_as<void>;
 	};
 
+	template <typename T>
+	concept HasStaticUpdateComponentConst = requires(T & comp, const Smasher::Millisecond & arg) {
+		{ T::StaticUpdateComponent(comp, arg) } -> std::same_as<void>;
+	};
+
 
 	template <typename T>
 	concept HasRenderCapability = requires(T t, sf::RenderWindow & arg) {
