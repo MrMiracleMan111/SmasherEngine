@@ -19,7 +19,7 @@ namespace Smasher {
 	struct SMASHER_API ModelData {
 		Mat3 vertTransform = Mat3{};
 		Mat3 texTransform = Mat3{};
-		float depth;
+		float depth = 0.f;
 		uint32_t color = 0;
 		BatchContext* ownerContext = nullptr;
 		bool hasTexture = false;
