@@ -60,7 +60,7 @@ void ExamplePhysicsLayer::Init() {
 			sf::Vector2f pos = moveBox.GetComponent<Smasher::PhysicsComponent>().GetPosition();
 			sf::Vector2f mousePos{ event.Position };
 
-			float length = std::sqrt(std::pow((mousePos.x - pos.x), 2) + std::pow((mousePos.y - pos.y), 2));
+			float length = (float)std::sqrt(std::pow((mousePos.x - pos.x), 2) + std::pow((mousePos.y - pos.y), 2));
 			sf::Vector2f direction = (mousePos - pos) / length;
 			moveBox.GetComponent<Smasher::PhysicsComponent>()
 				.SetVelocity(BoxControllerComponent::VELOCITY * direction);
