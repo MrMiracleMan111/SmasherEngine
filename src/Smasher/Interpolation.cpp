@@ -1,3 +1,4 @@
+#include <cmath>
 #include <numbers>
 #include "Smasher/Base.h"
 #include "Smasher/Interpolation.h"
