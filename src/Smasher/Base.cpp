@@ -10,6 +10,9 @@ namespace Smasher {
 	}
 #endif
 
+	Degrees ToDegrees(Radians rad) { return rad * (180.f / (float)std::numbers::pi); };
+	Radians ToRadians(Degrees deg) { return deg * ((float)std::numbers::pi / 180.f); };
+
 	// Column major order Copy
 	template<>
 	void Matrix<3, 3>::CopyMatrix(const sf::Transform& transform) {

@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <chrono>
 #include <sstream>
+#include <numbers>
 #include <filesystem>
 #include <SFML/System.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -41,6 +42,9 @@ namespace Smasher {
 	using ResourcePath = std::filesystem::path;
 	using Degrees = float;
 	using Radians = float;
+
+	Degrees SMASHER_API ToDegrees(Radians rad);
+	Radians SMASHER_API ToRadians(Degrees deg);
 
 #ifdef BENCHMARK
 	namespace InternalTimers {
