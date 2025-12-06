@@ -92,14 +92,17 @@ namespace Smasher {
 	};
 
 	template <typename T>
-	concept HasStaticUpdateComponent = requires(T & comp, Smasher::Millisecond arg) {
+	concept HasStaticUpdateComponentCopy = requires(T & comp, Smasher::Millisecond arg) {
 		{ T::StaticUpdateComponent(comp, arg) } -> std::same_as<void>;
 	};
 
 	template <typename T>
-	concept HasStaticUpdateComponentConst = requires(T & comp, const Smasher::Millisecond & arg) {
+	concept HasStaticUpdateComponentConstRef = requires(T & comp, const Smasher::Millisecond & arg) {
 		{ T::StaticUpdateComponent(comp, arg) } -> std::same_as<void>;
 	};
+
+	template <typename T>
+	concept HasStaticUpdateComponent = HasStaticUpdateComponentCopy<T> || HasStaticUpdateComponentConstRef<T>;
 
 
 	template <typename T>

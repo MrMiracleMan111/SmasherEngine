@@ -25,7 +25,7 @@ namespace Smasher {
 
 	template<class T>
 	void GenericComponentManager<T>::Update(Millisecond delta) {
-		if constexpr (HasStaticUpdateComponent<T> || HasStaticUpdateComponentConst<T>) {
+		if constexpr (HasStaticUpdateComponent<T>) {
 			for (T& itr : m_Components) {
 				T::StaticUpdateComponent(itr, delta);
 			}
