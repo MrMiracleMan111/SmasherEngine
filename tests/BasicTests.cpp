@@ -8,6 +8,9 @@
 #include "Smasher/ResourceManager.h"
 #include "Smasher/Resources.h"
 #include "Smasher/Layer.h"
+#include "Smasher/Physics.h"
+#include "Smasher/Drawable.h"
+#include "Manifest.h"
 
 class DummyLayer : public Smasher::Layer {
 public:
@@ -45,6 +48,16 @@ public:
 
 protected:
 	int m_Value;
+};
+
+struct TestPhysicsImageCtrl : public Smasher::IComponent {
+public:
+	static void StaticUpdateComponent(TestPhysicsImageCtrl& self, Smasher::Millisecond delta) {
+		Smasher::PhysicsComponent& physicsComp = self.GetSiblingComponent<Smasher::PhysicsComponent>();
+		Smasher::DrawableComponent& drawableComp = self.GetSiblingComponent<Smasher::DrawableComponent>();
+		drawableComp.SetPosition(physicsComp.GetPosition());
+		drawableComp.SetRotation(physicsComp.GetRotation());
+	};
 };
 
 class CustomComponentManager;
@@ -153,6 +166,12 @@ TEST(TraitChecks, ManagerTraits) {
 	static_assert(!std::is_copy_assignable_v<Smasher::ResourceManager>);
 	static_assert(std::is_move_constructible_v<Smasher::ResourceManager>);
 	static_assert(std::is_move_assignable_v<Smasher::ResourceManager>);
+
+	// PhysicsManager is non-copyable, moveable
+	static_assert(!std::is_copy_constructible_v<Smasher::PhysicsManager>);
+	static_assert(!std::is_copy_assignable_v<Smasher::PhysicsManager>);
+	static_assert(std::is_move_constructible_v<Smasher::PhysicsManager>);
+	static_assert(std::is_move_assignable_v<Smasher::PhysicsManager>);
 	EXPECT_TRUE(true);
 }
 
@@ -172,6 +191,15 @@ TEST(TraitChecks, Entity) {
 	static_assert(!std::is_copy_assignable_v<Smasher::Entity>);
 	static_assert(std::is_move_constructible_v<Smasher::Entity>);
 	static_assert(!std::is_move_assignable_v<Smasher::Entity>);
+	EXPECT_TRUE(true);
+}
+
+TEST(TraitChecks, Component) {
+	// Components should be non-copyable, move constructible, move-assignable
+	static_assert(!std::is_copy_constructible_v<Smasher::IComponent>);
+	static_assert(!std::is_copy_assignable_v<Smasher::IComponent>);
+	static_assert(std::is_move_constructible_v<Smasher::IComponent>);
+	static_assert(std::is_move_assignable_v<Smasher::IComponent>);
 	EXPECT_TRUE(true);
 }
 
@@ -507,6 +535,128 @@ TEST(ResourcesTest, OpenReleaseFileResource) {
 	pFileResource->GetFileStream() << "message";
 }
 
+// Move Resource Manager
+TEST(ResourcesTest, MoveResourceManager) {
+	try {
+		Smasher::Engine engine(640, 420);
+		Smasher::ResourceManager& manager = engine.GetResourceManager();
+		std::ios_base::openmode flags = std::ios_base::out;
+		Smasher::ResourcePath paths[] = { Smasher::ResourcePath{"test_file"} };
+		auto pFileResource = manager.GetOrLoadResource<Smasher::FileResource>(Smasher::ResourceID{ 1 }, paths, size_t{ 1 }, flags);
+		pFileResource->GetFileStream() << "message";
+
+		Smasher::ResourceManager tmp = std::move(manager);
+	}
+	catch (...) {
+		FAIL(); // No Throw is allowed
+	}
+}
+
+TEST(PhysicsTest, DefaultInitializeManager) {
+	Smasher::Engine engine(640, 420);
+	Smasher::PhysicsManager& rPhysicsManager = engine.GetPhysicsManager();
+	DummyLayer& layer = engine.PushLayer<DummyLayer>();
+	layer.Activate();
+	b2WorldDef worldDef = b2DefaultWorldDef();
+	worldDef.gravity = b2Vec2{ 1.f, -10.f };
+	EXPECT_NO_THROW({ rPhysicsManager.Initialize(); });
+	EXPECT_THROW({ rPhysicsManager.Initialize(worldDef); }, Smasher::Exceptions::Box2DWorldAlreadyCreated);
+	EXPECT_THROW({ rPhysicsManager.Initialize(); }, Smasher::Exceptions::Box2DWorldAlreadyCreated);
+
+	Smasher::Entity& entity = layer.AddEntity();
+	entity.AddComponent<Smasher::PhysicsComponent>()
+		.UseCircleCollider(10.f)
+		.SetVelocity(sf::Vector2f{10.f, 0.f});
+}
+
+TEST(PhysicsTest, MovePhysicsManager) {
+	Smasher::Engine engine(640, 420);
+	Smasher::PhysicsManager& rManager = engine.GetPhysicsManager();
+	b2WorldDef worldDef = b2DefaultWorldDef();
+	worldDef.gravity = b2Vec2{ 1.f, -10.f };
+	rManager.Initialize(worldDef);
+
+	{
+		// engine physics manager now invalid
+		Smasher::PhysicsManager tmp = std::move(rManager);
+	}
+	// tmp is now invalid
+}
+
+TEST(PhysicsTest, CustomInitializeManager) {
+	Smasher::Engine engine(640, 420);
+	Smasher::PhysicsManager& rPhysicsManager = engine.GetPhysicsManager();
+	b2WorldDef worldDef = b2DefaultWorldDef();
+	worldDef.gravity = b2Vec2{ 1.f, -10.f };
+	EXPECT_NO_THROW({ rPhysicsManager.Initialize(worldDef); });
+	EXPECT_THROW({ rPhysicsManager.Initialize(worldDef); }, Smasher::Exceptions::Box2DWorldAlreadyCreated);
+	EXPECT_THROW({ rPhysicsManager.Initialize(); }, Smasher::Exceptions::Box2DWorldAlreadyCreated);
+}
+
+TEST(PhysicsTest, ChangeColliders) {
+	Smasher::Engine engine(640, 420);
+	engine.GetPhysicsManager().Initialize();
+	DummyLayer& layer = engine.PushLayer<DummyLayer>();
+	Smasher::Entity& entity = layer.AddEntity();
+	entity.AddComponent<Smasher::PhysicsComponent>()
+		.UseCircleCollider(10.f)
+		.SetVelocity(sf::Vector2f{ 10.f, 0.f });
+
+	EXPECT_NO_THROW({
+		entity.GetComponent<Smasher::PhysicsComponent>()
+		.UseRectCollider(10.f, 20.f);
+	});
+
+	EXPECT_NO_THROW({
+	entity.GetComponent<Smasher::PhysicsComponent>()
+		.UseCircleCollider(10.f);
+	});
+}
+
+TEST(PhysicsTest, PhysicsDemo) {
+	Smasher::Engine engine(640, 420);
+	engine.GetResourceManager().SetResourceDirectory(Smasher::Manifest::Metadata::RESOURCES_DIRECTORY);
+	Smasher::PhysicsManager& rPhysicsManager = engine.GetPhysicsManager();
+	DummyLayer& layer = engine.PushLayer<DummyLayer>();
+	layer.Activate();
+	b2WorldDef worldDef = b2DefaultWorldDef();
+	worldDef.gravity = b2Vec2{ 0.f, 50.f };
+	rPhysicsManager.Initialize(worldDef);
+	
+	Smasher::Entity& ball = layer.AddEntity();
+	ball.AddComponent<Smasher::PhysicsComponent>()
+		.UseCircleCollider(20.f)
+		.SetPosition(sf::Vector2f{ 300.f, 200.f })
+		.SetPhysicsType(Smasher::PhysicsType::DYNAMIC)
+		.SetVelocity(sf::Vector2f{ -50.f, 0.f });
+	ball.AddComponent<Smasher::DrawableComponent>()
+		.SetPosition(sf::Vector2f(0.f, 0.f))
+		.SetScale(sf::Vector2f(40.0f, 40.0f))
+		.SetDepth(1.f)
+		.SetTextureAsset<Smasher::Manifest::Textures::alpha_test>({});
+	ball.AddComponent<TestPhysicsImageCtrl>();
+
+	Smasher::Entity& floor = layer.AddEntity();
+	floor.AddComponent<Smasher::PhysicsComponent>()
+		.UseRectCollider(100.f, 20.f)
+		.SetPosition(sf::Vector2f{ 200.f, 300.f })
+		.SetRotation(Smasher::Degrees{ 20.f })
+		.SetPhysicsType(Smasher::PhysicsType::STATIC);
+	floor.AddComponent<Smasher::DrawableComponent>()
+		.SetPosition(sf::Vector2f(0.f, 0.f))
+		.SetScale(sf::Vector2f(100.0f, 20.0f))
+		.SetDepth(1.f)
+		.SetTextureAsset<Smasher::Manifest::Textures::small_art>({});
+	floor.AddComponent<TestPhysicsImageCtrl>();
+
+
+	std::thread worker([&engine]() {
+		std::this_thread::sleep_for(std::chrono::seconds(5));
+		engine.Shutdown();
+	});
+	engine.Run();
+	worker.join();
+}
 
 void TestCallback(Smasher::Events::DummyEvent& e) {};
 
