@@ -16,7 +16,7 @@ void BallComponent::SetEntity(Smasher::Entity& rEntity)
 	m_Collider.height = (int)m_DrawableComponentPtr->GetScale().y;
 }
 
-void BallComponent::StaticUpdateComponent(BallComponent& self, Smasher::Millisecond delta) {
+void BallComponent::StaticUpdateComponent(BallComponent& self, const Smasher::Millisecond& delta) {
 	sf::Vector2f position = self.m_DrawableComponentPtr->GetPosition();
 	sf::Vector2u windowSizeUint = self.GetEntity().GetEngine().GetWindow().getSize();
 	sf::Vector2f windowSize((float)windowSizeUint.x, (float)(windowSizeUint.y));

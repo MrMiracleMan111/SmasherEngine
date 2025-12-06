@@ -17,7 +17,7 @@ public:
 
 	void SetEntity(Smasher::Entity& rEntity) override;
 
-	static void StaticUpdateComponent(BallComponent& self, Smasher::Millisecond delta);
+	static void StaticUpdateComponent(BallComponent& self, const Smasher::Millisecond& delta);
 
 	BallComponent& SetVelocity(sf::Vector2f velocity);
 
