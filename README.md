@@ -61,25 +61,27 @@ python ManifestHeaderGenerator.py --files Mainfest.json
 #pragma once
 #include"ResourceUtils.h"
 
-namespace Resources {
-	namespace Textures {
-		namespace player_sprite {
-			constexpr ResourceID player_sprite_ID = hash_str("assets/textures/player.png");
-			ResourcePath player_sprite_PATH { "assets/textures/player.png" };
+namespace Smasher {
+	namespace Manifest {
+		namespace Textures {
+			namespace player_sprite {
+				constexpr ResourceID player_sprite_ID = hash_str("assets/textures/player.png");
+				ResourcePath player_sprite_PATH { "assets/textures/player.png" };
+			}
+			namespace enemy_sprite {
+				constexpr ResourceID enemy_sprite_ID = hash_str("assets/textures/enemy.png");
+				ResourcePath enemy_sprite_PATH { "assets/textures/enemy.png" };
+			}
 		}
-		namespace enemy_sprite {
-			constexpr ResourceID enemy_sprite_ID = hash_str("assets/textures/enemy.png");
-			ResourcePath enemy_sprite_PATH { "assets/textures/enemy.png" };
-		}
-	}
-	namespace Sounds {
-		namespace gunshot {
-			constexpr ResourceID gunshot_ID = hash_str("assets/audio/gunshot.wav");
-			ResourcePath gunshot_PATH { "assets/audio/gunshot.wav" };
-		}
-		namespace bg_music_1 {
-			constexpr ResourceID bg_music_1_ID = hash_str("assets/songs/bg1.wav");
-			ResourcePath bg_music_1_PATH { "assets/songs/bg1.wav" };
+		namespace Sounds {
+			namespace gunshot {
+				constexpr ResourceID gunshot_ID = hash_str("assets/audio/gunshot.wav");
+				ResourcePath gunshot_PATH { "assets/audio/gunshot.wav" };
+			}
+			namespace bg_music_1 {
+				constexpr ResourceID bg_music_1_ID = hash_str("assets/songs/bg1.wav");
+				ResourcePath bg_music_1_PATH { "assets/songs/bg1.wav" };
+			}
 		}
 	}
 }
