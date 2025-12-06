@@ -124,11 +124,11 @@ namespace Smasher {
 		sf::Texture& pTexture = m_TexturePtr->GetTexture();
 		sf::Vector2f dimensions = sf::Vector2f((float)pTexture.getSize().x, (float)pTexture.getSize().y);
 
-		float left = m_ClipRect.left;
-		float top = m_ClipRect.top;
+		float left = (float)m_ClipRect.left;
+		float top = (float)m_ClipRect.top;
 
-		float scaleX = m_ClipRect.width / dimensions.x;
-		float scaleY = m_ClipRect.height / dimensions.y;
+		float scaleX = (float)m_ClipRect.width / dimensions.x;
+		float scaleY = (float)m_ClipRect.height / dimensions.y;
 
 		m_ClipTransform
 			.scale(scaleX, scaleY)
