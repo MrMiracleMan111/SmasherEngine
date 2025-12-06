@@ -1069,14 +1069,16 @@ TEST(EngineTest, NoShutdownEngine) {
 	layer.Activate();
 
 	engine.GetWindow().setActive(false);
-	std::thread worker([&engine]() {
-		engine.GetWindow().setActive(true);
-		engine.Run(); // Engine should shutdown after first update
+	std::thread worker([&engine, &passed]() {
+		std::this_thread::sleep_for(std::chrono::seconds(3));
+		passed = engine.IsRunning();
+		engine.Shutdown();
 	});
 
-	std::this_thread::sleep_for(std::chrono::seconds(3));
-	passed = engine.IsRunning();
-	engine.Shutdown();
+
+	engine.GetWindow().setActive(true);
+	engine.Run(); // Engine should shutdown after first update
+
 	worker.join();
 
 	if (!passed) {
@@ -1091,15 +1093,16 @@ TEST(EngineTest, ShutdownEngine) {
 	ShutdownEngineLayer& layer = engine.PushLayer<ShutdownEngineLayer>();
 	layer.Activate();
 
-	engine.GetWindow().setActive(false);
-	std::thread worker([&engine]() {
-		engine.GetWindow().setActive(true);
-		engine.Run(); // Engine should shutdown after first update
-	});
+	std::thread worker([&engine, &failed]() {
+		std::this_thread::sleep_for(std::chrono::seconds(3));
+		engine.Shutdown();
+		failed = engine.IsRunning();
 
-	std::this_thread::sleep_for(std::chrono::seconds(3));
-	failed = engine.IsRunning();
-	engine.Shutdown();
+	});
+	engine.Run(); // Engine should shutdown after first update
+
+	failed = failed || engine.IsRunning();
+
 	worker.join();
 
 	if (failed) {
@@ -1121,18 +1124,17 @@ TEST(LayerTest, InitLayer) {
 TEST(EngineTest, ExplicitDoubleShutdownEngine) {
 	bool failed = false;
 	Smasher::Engine engine(640, 420);
+
 	ShutdownEngineLayer& layer = engine.PushLayer<ShutdownEngineLayer>();
 	layer.Activate();
-	engine.GetWindow().setActive(false);
-	std::thread worker([&engine]() {
-		engine.GetWindow().setActive(true);
-		engine.Run(); // Engine should shutdown after first update
+	std::thread worker([&engine, &failed]() {
+		std::this_thread::sleep_for(std::chrono::seconds(3));
+		failed = engine.IsRunning();
+		EXPECT_NO_THROW({ engine.Shutdown(); });
+		EXPECT_NO_THROW({ engine.Shutdown(); }); // Explicit second shutdown
 	});
 
-	std::this_thread::sleep_for(std::chrono::seconds(3));
-	failed = engine.IsRunning();
-	EXPECT_NO_THROW({ engine.Shutdown(); });
-	EXPECT_NO_THROW({ engine.Shutdown(); }); // Explicit second shutdown
+	engine.Run(); // Engine should shutdown after first update
 	worker.join();
 
 	if (failed) {
