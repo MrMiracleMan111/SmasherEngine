@@ -43,6 +43,10 @@ namespace Smasher {
 		SMASHER_EXCEPTION(ResourceAlreadyExists)
 		SMASHER_EXCEPTION(ResourceInvalidNumPaths)
 
+		// ==== PHYSICS EXCEPTIONS ====
+		SMASHER_EXCEPTION(Box2DWorldAlreadyCreated)
+		SMASHER_EXCEPTION(Box2DBodyIdInvalid)
+
 		// ==== OPENGL EXCEPTIONS ====
 		SMASHER_EXCEPTION(GLEWInitFailed)
 	}

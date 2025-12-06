@@ -109,30 +109,14 @@ add_library(SmasherEngine SHARED
 "src/Smasher/ComponentManagers/UIPanelComponentManager.cpp"
 "include/Smasher/Interpolation.h"
 "src/Smasher/Interpolation.cpp"
-"include/Smasher/ComponentManagers/AABBPhysicsComponentManager.h"
-
-"include/Smasher/Components/AABBPhysicsComponent.h"
- "src/Smasher/ComponentManagers/AABBPhysicsComponentManager.cpp"
-"src/Smasher/Components/AABBPhysicsComponent.cpp"
-"include/Smasher/Util/Box2DUtil/arena_allocator.h"
-"include/Smasher/Util/Box2DUtil/array.h"
-"src/Smasher/Util/Box2DUtil/arena_allocator.cpp"
-"src/Smasher/Util/Box2DUtil/array.cpp"
-"include/Smasher/Util/Box2DUtil/core.h"
-"src/Smasher/Util/Box2DUtil/core.cpp"
-"include/Smasher/Util/Box2DUtil/constants.h"
-"include/Smasher/Util/Box2DUtil/atomic.h"
-"include/Smasher/Util/Box2DUtil/base.h"
-"include/Smasher/Util/Box2DUtil/math_functions.h"
-"include/Smasher/Util/Box2DUtil/aabb.h"
-"include/Smasher/Util/Box2DUtil/types.h"
-"include/Smasher/Util/Box2DUtil/collision.h"
-"include/Smasher/Util/Box2DUtil/id.h"
-"src/Smasher/Util/Box2DUtil/dynamic_tree.cpp"
-"src/Smasher/Util/Box2DUtil/math_functions.cpp"
-"src/Smasher/Util/Box2DUtil/aabb.cpp"
-"include/Smasher/AABBPhysics.h"
-"include/Smasher/Drawable.h")
+"include/Smasher/Drawable.h"
+"include/Smasher/ComponentManagers/PhysicsComponentManager.h"
+"src/Smasher/ComponentManagers/PhysicsComponentManager.cpp"
+"include/Smasher/Components/PhysicsComponent.h"
+"src/Smasher/Components/PhysicsComponent.cpp"
+"include/Smasher/PhysicsManager.h"
+"src/Smasher/PhysicsManager.cpp"
+"include/Smasher/Physics.h")
 
 # Try to include machine-specific config if it exists
 if(EXISTS "${CMAKE_SOURCE_DIR}/local.cmake")
