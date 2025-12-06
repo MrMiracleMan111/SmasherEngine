@@ -12,6 +12,8 @@ namespace Smasher {
 		const inline static sf::Color DEFAULT_FONT_COLOR{ sf::Color::White };
 		const inline static Millisecond UPDATE_INTERVAL = Millisecond { (1000u / TARGET_UPDATE_RATE) };
 		const inline static Millisecond RENDER_INTERVAL = Millisecond{ (1000u / TARGET_FRAMERATE) };
+		const inline static int BOX2D_SUBSTEP_COUNT = 4; // Substeps per physics world step
+		const inline static float BOX2D_TIMESTEP = (1.f / 60.f); // Time in seconds per step
 		const inline static sf::ContextSettings DEFAULT_SETTINGS {
 			24, // depthBits  // Request a 24 bits depth buffer
 			8,  // stencilBits   // Request a 8 bits stencil buffer
