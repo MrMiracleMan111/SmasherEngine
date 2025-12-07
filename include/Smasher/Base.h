@@ -15,7 +15,7 @@
 
 #define SMASHER_USE_COMPONENT_MANAGER(managerType) \
 	public: \
-	static std::unique_ptr<managerType> StaticInstantiateManager(Smasher::Layer& state) { return std::make_unique<managerType>(state);} \
+	static std::unique_ptr<managerType> StaticInstantiateManager(Smasher::Layer &state) { return std::make_unique<managerType>(state);} \
 
 #define SMASHER_ADD_CAPABILITIES(args) \
 virtual static constexpr uint32_t GetStaticCapabilities() { \
@@ -23,7 +23,7 @@ virtual static constexpr uint32_t GetStaticCapabilities() { \
 }
 
 // using fnv1a_hash 
-constexpr uint64_t hash_str(const char* str) {
+constexpr uint64_t hash_str(const char *str) {
 	uint64_t hash = 14695981039346656037ULL; // FNV offset basis
 	while (*str) {
 		hash ^= static_cast<uint64_t>(*str++);
@@ -55,7 +55,7 @@ namespace Smasher {
 #endif
 
 	template <typename T, typename U>
-	concept ComponentManagerHasAddComponent = requires(T t, Entity & rEntity) {
+	concept ComponentManagerHasAddComponent = requires(T t, Entity &rEntity) {
 		{ t.AddComponent(rEntity) } -> std::same_as<U&>;
 	};
 
@@ -72,7 +72,7 @@ namespace Smasher {
 	concept IComponentType = std::is_base_of_v<IComponent, T>;
 
 	template <typename T>
-	concept ManifestItemHasResourceID = requires(T) {
+	concept ManifestItemHasResourceId = requires(T) {
 		T::Id; // Checks if 'member_name' is a valid member access
 	};
 
@@ -87,17 +87,17 @@ namespace Smasher {
 	};
 
 	template <typename T>
-	concept HasStaticRenderComponent = requires(T & comp, sf::RenderWindow & arg) {
+	concept HasStaticRenderComponent = requires(T &comp, sf::RenderWindow &arg) {
 		{ T::StaticRenderComponent(comp, arg) } -> std::same_as<void>;
 	};
 
 	template <typename T>
-	concept HasStaticUpdateComponentCopy = requires(T & comp, Smasher::Millisecond arg) {
+	concept HasStaticUpdateComponentCopy = requires(T &comp, Smasher::Millisecond arg) {
 		{ T::StaticUpdateComponent(comp, arg) } -> std::same_as<void>;
 	};
 
 	template <typename T>
-	concept HasStaticUpdateComponentConstRef = requires(T & comp, const Smasher::Millisecond & arg) {
+	concept HasStaticUpdateComponentConstRef = requires(T &comp, const Smasher::Millisecond &arg) {
 		{ T::StaticUpdateComponent(comp, arg) } -> std::same_as<void>;
 	};
 
@@ -106,12 +106,12 @@ namespace Smasher {
 
 
 	template <typename T>
-	concept HasRenderCapability = requires(T t, sf::RenderWindow & arg) {
+	concept HasRenderCapability = requires(T t, sf::RenderWindow &arg) {
 		t.Render(arg);
 	};
 
 	template <typename T>
-	concept HasUpdateCapability = requires(T t, Millisecond & arg) {
+	concept HasUpdateCapability = requires(T t, Millisecond &arg) {
 		t.Update(arg);
 	};
 
@@ -173,13 +173,13 @@ namespace Smasher {
 	};
 
 	struct SMASHER_API Vec2 {
-		Vec2(const Vec2& other) : data{ .x = other.data.x, .y = other.data.y } {}
-		Vec2& operator= (const Vec2& other) {
+		Vec2(const Vec2 &other) : data{ .x = other.data.x, .y = other.data.y } {}
+		Vec2& operator= (const Vec2 &other) {
 			data.x = other.data.x;
 			data.y = other.data.y;
 			return *this;
 		}
-		Vec2(const sf::Vector2f& vec) : data{ .x = vec.x, .y = vec.y } {}
+		Vec2(const sf::Vector2f &vec) : data{ .x = vec.x, .y = vec.y } {}
 		Vec2(float x, float y) : data{ .x = x, .y = y } {}
 		Vec2() : data{ .x = 0.f, .y = 0.f } {}
 
@@ -196,15 +196,15 @@ namespace Smasher {
 	};
 
 	struct SMASHER_API Vec3 {
-		Vec3(const sf::Vector3f& vec) : data{ .x = vec.x, .y = vec.y, .z = vec.z } {}
-		Vec3(const Vec3& other) : data{ .x = other.data.x, .y = other.data.y, .z = other.data.z} {}
-		Vec3& operator= (const Vec3& other) {
+		Vec3(const sf::Vector3f &vec) : data{ .x = vec.x, .y = vec.y, .z = vec.z } {}
+		Vec3(const Vec3 &other) : data{ .x = other.data.x, .y = other.data.y, .z = other.data.z} {}
+		Vec3& operator= (const Vec3 &other) {
 			data.x = other.data.x;
 			data.y = other.data.y;
 			data.z = other.data.z;
 			return *this;
 		}
-		Vec3(const sf::Vector2f& vec, float z) : data{ .x = vec.x, .y = vec.y, .z = z } {}
+		Vec3(const sf::Vector2f &vec, float z) : data{ .x = vec.x, .y = vec.y, .z = z } {}
 		Vec3(float x, float y, float z) : data{ .x = 0.f, .y = 0.f, .z = z } {}
 		Vec3() : data{ .x = 0.f, .y = 0.f, .z = 0.f} {}
 
@@ -226,12 +226,12 @@ namespace Smasher {
 	template <std::size_t Columns, std::size_t Rows>
 	struct SMASHER_API Matrix
 	{
-		void CopyMatrix(const float* source, std::size_t elements, float* dest)
+		void CopyMatrix(const float *pSource, std::size_t elements, float *pDest)
 		{
-			std::copy(source, source + elements, dest);
+			std::copy(pSource, pSource + elements, pDest);
 		}
 
-		void CopyMatrix(const sf::Transform& transform) {
+		void CopyMatrix(const sf::Transform &transform) {
 			static_assert("Not implemented for this matrix size");
 		}
 
@@ -251,22 +251,22 @@ namespace Smasher {
 
 		Matrix() = default;
 
-		explicit Matrix(const float* pointer)
+		explicit Matrix(const float *pSource)
 		{
-			CopyMatrix(pointer, Columns * Rows, array);
+			CopyMatrix(pSource, Columns * Rows, array);
 		}
 
-		Matrix(const Matrix& other)
+		Matrix(const Matrix &other)
 		{
 			CopyMatrix(other.array, Columns * Rows, array);
 		}
 
-		Matrix(const sf::Transform& transform)
+		Matrix(const sf::Transform &transform)
 		{
 			CopyMatrix(transform);
 		}
 
-		Matrix<Columns, Rows>& operator = (const Matrix& other)
+		Matrix<Columns, Rows>& operator = (const Matrix &other)
 		{
 			CopyMatrix(other.array, Columns * Rows, array);
 			return *this;
@@ -276,10 +276,10 @@ namespace Smasher {
 	};
 
 	template<>
-	void Matrix<3, 3>::CopyMatrix(const sf::Transform& transform);
+	void Matrix<3, 3>::CopyMatrix(const sf::Transform &transform);
 
 	template<>
-	void Matrix<4, 4>::CopyMatrix(const sf::Transform& transform);
+	void Matrix<4, 4>::CopyMatrix(const sf::Transform &transform);
 
 	using Mat4 = Matrix<4, 4>;
 	using Mat3 = Matrix<3, 3>;

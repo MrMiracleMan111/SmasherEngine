@@ -47,9 +47,9 @@ namespace Smasher {
 		};
 
 		struct SMASHER_API DummyEventExtra : public Event {
-			const char* Message;
+			const char *Message;
 			DummyEventExtra() = delete;
-			DummyEventExtra(SMASHER_TIMESTAMP timestamp, const char* message) :
+			DummyEventExtra(SMASHER_TIMESTAMP timestamp, const char *message) :
 				Event(timestamp), Message(message) {
 			};
 		};

@@ -17,30 +17,32 @@ namespace Smasher {
 	public:
 		IComponentManager() = delete;
 		virtual ~IComponentManager() {};
-		IComponentManager(Layer& layer) : m_Layer(layer) {}
+		IComponentManager(Layer &layer) : m_Layer(layer) {}
 		virtual void PreUpdate(Millisecond delta) {};
 		virtual void Update(Millisecond delta) {}; // Override this to enable component updating
 		virtual void PostUpdate(Millisecond delta) {}; // Override this to enable component updating
-		virtual void Render(sf::RenderWindow& rWindow) {}; // Override this to enable component rendering
-		virtual void RemoveComponent(IComponent& component) = 0;
+		virtual void Render(sf::RenderWindow &window) {}; // Override this to enable component rendering
+		virtual void RemoveComponent(IComponent &component) = 0;
 
 		Layer& GetLayer() { return m_Layer; }
 
-		Layer& m_Layer;
 	protected:
-		void SetComponentStatus(IComponent& rComponent, ComponentStatus status) { rComponent.SetStatus(status); }
-		void SetComponentEntity(IComponent& rComponent, Entity& rEntity) { rComponent.SetEntity(rEntity); }
-		void SetComponentManager(IComponent& rComponent, IComponentManager& rManager) { rComponent.SetManager(rManager); }
-		void CallOnAddComponent(IComponent& rComponent) { rComponent.OnAddComponent(); } // called when component has been initialiazed and added
+		void SetComponentStatus(IComponent &component, ComponentStatus status) { component.SetStatus(status); }
+		void SetComponentEntity(IComponent &component, Entity &entity) { component.SetEntity(entity); }
+		void SetComponentManager(IComponent &component, IComponentManager &manager) { component.SetManager(manager); }
+		void CallOnAddComponent(IComponent &component) { component.OnAddComponent(); } // called when component has been initialiazed and added
 
 		template<class T>
-		typename plf::colony<T>::iterator* GetComponentIterator(T& rComponent) {
-			return rComponent.template GetIterator<T>();
+		typename plf::colony<T>::iterator* GetComponentIterator(T& component) {
+			return component.template GetIterator<T>();
 		}
 
 		template<class T>
-		void SetComponentIterator(T& rComponent, typename plf::colony<T>::iterator* itrPtr) {
-			rComponent.template SetIterator<T>(itrPtr);
+		void SetComponentIterator(T& component, typename plf::colony<T>::iterator *itrPtr) {
+			component.template SetIterator<T>(itrPtr);
 		}
+
+	private:
+		Layer& m_Layer;
 	};
 }

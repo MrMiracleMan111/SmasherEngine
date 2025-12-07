@@ -24,19 +24,19 @@ namespace Smasher {
 			static_assert(std::derived_from<ManagerType, IComponentManager>, "StaticInstantiateManager return type must derive from IComponentManager");
 
 			m_ComponentManagers.emplace(std::type_index(typeid(ComponentType)), ComponentType::StaticInstantiateManager(*this));
-			auto& rManagerPtr = m_ComponentManagers[std::type_index(typeid(ComponentType))];
+			auto &pManager = m_ComponentManagers[std::type_index(typeid(ComponentType))];
 
 			// Was Update method overriden?
 			if constexpr (HasUpdateCapability<ManagerType>) {
 				if constexpr (!std::is_same<decltype(&ManagerType::Update), decltype(&IComponentManager::Update)>::value) {
-					m_ComponentManagersWithUpdate.push_back(rManagerPtr.get());
+					m_ComponentManagersWithUpdate.push_back(pManager.get());
 				}
 			}
 
 			// Was Render method overriden?
 			if constexpr (HasRenderCapability<ManagerType>) {
 				if constexpr (!std::is_same<decltype(&ManagerType::Render), decltype(&IComponentManager::Render)>::value) {
-					m_ComponentManagersWithRender.push_back(rManagerPtr.get());
+					m_ComponentManagersWithRender.push_back(pManager.get());
 				}
 			}
 		}
@@ -45,14 +45,14 @@ namespace Smasher {
 			// Move static_assert outside the class
 			m_ComponentManagers.emplace(std::type_index(typeid(ComponentType)), std::make_unique<GenericComponentManager<ComponentType>>(*this));
 			static_assert(ComponentManagerHasAddComponent<GenericComponentManager<ComponentType>, ComponentType>, "ComponentManager is missing AddComponent method");
-			auto& rManagerPtr = m_ComponentManagers[std::type_index(typeid(ComponentType))];
+			auto &pManager = m_ComponentManagers[std::type_index(typeid(ComponentType))];
 
 			if constexpr (HasStaticRenderComponent<ComponentType>) {
-				m_ComponentManagersWithRender.push_back(rManagerPtr.get());
+				m_ComponentManagersWithRender.push_back(pManager.get());
 			}
 
 			if constexpr (HasStaticUpdateComponent<ComponentType>) {
-				 m_ComponentManagersWithUpdate.push_back(rManagerPtr.get());
+				 m_ComponentManagersWithUpdate.push_back(pManager.get());
 			}
 		}
 	}
@@ -61,7 +61,7 @@ namespace Smasher {
 	T& Layer::AddEntity(Args&&... componentArgs) {
 		static_assert(std::is_base_of<Entity, T>::value, "T must inherit from Entity");
 		auto pEntity = std::make_unique<T>(*this, UUID::GetUUID(), std::forward<Args>(componentArgs)...);
-		T* pEntityObserver = pEntity.get();
+		T *pEntityObserver = pEntity.get();
 		UUID uuid = pEntity->GetUUID(); // To avoid possible invalidation during std::move(pEntity)
 		m_EntityMap.insert({ uuid, std::move(pEntity) });
 		pEntityObserver->Init();
@@ -83,7 +83,7 @@ namespace Smasher {
 		static_assert(std::is_base_of<Event, T>::value, "T must inherit from Event");
 
 		const std::type_index index = std::type_index(typeid(T));
-		std::list<std::shared_ptr<EventSubscription>>& list = m_EventSubscriptionsByType[index];
+		std::list<std::shared_ptr<EventSubscription>> &list = m_EventSubscriptionsByType[index];
 
 		auto bound = [callback](Event& arg) { callback(static_cast<T&>(arg)); };
 		std::shared_ptr<EventSubscription> subscriptionPtr = std::make_shared<EventSubscription>(bound);
@@ -95,8 +95,8 @@ namespace Smasher {
 	// Overload for class memebr function ex:
 	// Subscribe<EventType>(&Class::MemberFunc, classInstancePointer);
 	template<class T, class C>
-	EventSubscriptionHandle Layer::Subscribe(void (C::* method)(T&), C* instance) {
-		return Subscribe<T>(std::bind(method, instance, std::placeholders::_1));
+	EventSubscriptionHandle Layer::Subscribe(void (C:: *method)(T&), C *pInstance) {
+		return Subscribe<T>(std::bind(method, pInstance, std::placeholders::_1));
 	}
 
 	// Subscribe to asynchronous event handling (uses separate Event thread)
@@ -106,9 +106,9 @@ namespace Smasher {
 		static_assert(std::is_base_of<Event, T>::value, "T must inherit from Event");
 
 		const std::type_index index = std::type_index(typeid(T));
-		std::list<std::shared_ptr<EventSubscription>>& list = m_AsyncEventSubscriptionsByType[index];
+		std::list<std::shared_ptr<EventSubscription>> &list = m_AsyncEventSubscriptionsByType[index];
 
-		auto bound = [callback](Event& arg) { callback(static_cast<T&>(arg)); };
+		auto bound = [callback](Event &arg) { callback(static_cast<T&>(arg)); };
 		std::shared_ptr<EventSubscription> subscriptionPtr = std::make_shared<EventSubscription>(bound);
 		list.push_back(subscriptionPtr);
 
@@ -116,7 +116,7 @@ namespace Smasher {
 	}
 
 	template<class T, class C>
-	EventSubscriptionHandle Layer::SubscribeAsync(void (C::* method)(T&), C* instance) {
-		return SubscribeAsync<T>(std::bind(method, instance, std::placeholders::_1));
+	EventSubscriptionHandle Layer::SubscribeAsync(void (C:: *method)(T&), C *pInstance) {
+		return SubscribeAsync<T>(std::bind(method, pInstance, std::placeholders::_1));
 	}
 }

@@ -11,7 +11,7 @@ namespace Smasher {
 	};
 
 	template<typename T>
-	Interpolated<T>::Interpolated(const T& startValue, const T& endValue) :
+	Interpolated<T>::Interpolated(const T &startValue, const T &endValue) :
 		m_StartValue(startValue),
 		m_EndValue(endValue),
 		m_StartTime(std::chrono::system_clock::now()),
@@ -22,7 +22,7 @@ namespace Smasher {
 	}
 
 	template<typename T>
-	Interpolated<T>::Interpolated(const T& value) :
+	Interpolated<T>::Interpolated(const T &value) :
 		m_StartValue(value),
 		m_EndValue(value),
 		m_StartTime(std::chrono::system_clock::now()),
@@ -39,14 +39,14 @@ namespace Smasher {
 	T Interpolated<T>::Get() { return calculateValue(); }
 
 	template<typename T>
-	void Interpolated<T>::Set(const T& value) {
+	void Interpolated<T>::Set(const T &value) {
 		m_StartValue = value;
 		m_StartTime = std::chrono::system_clock::now();
 		m_EndValue = value;
 	}
 
 	template<typename T>
-	Interpolated<T>& Interpolated<T>::operator=(const T& endValue) {
+	Interpolated<T>& Interpolated<T>::operator=(const T &endValue) {
 		m_StartValue = calculateValue();
 		m_StartTime = std::chrono::system_clock::now();
 		m_EndValue = endValue;

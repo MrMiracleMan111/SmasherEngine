@@ -4,9 +4,9 @@
 
 namespace Smasher {
 	Entity::~Entity() {
-		for (auto& [index, rComponent] : m_ComponentsByType) {
-			IComponentManager& rManager = rComponent.get().GetManager();
-			rManager.RemoveComponent(rComponent);
+		for (auto &[index, component] : m_ComponentsByType) {
+			IComponentManager &manager = component.get().GetManager();
+			manager.RemoveComponent(component);
 		}
 		m_ComponentsByType.clear();
 	}

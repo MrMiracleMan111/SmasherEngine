@@ -92,10 +92,10 @@ namespace Smasher {
 		glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &currentVBO);
 
 		sf::Glsl::Mat4 viewProjectionMatrix{ window.getView().getTransform().getMatrix() };
-		sf::Shader::bind(&m_ShaderResource->GetShader());
-		static_assert(std::is_same_v<std::shared_ptr<ShaderResource>, decltype(m_ShaderResource)>, "fail");
-		m_ShaderResource->GetShader().setUniform("ViewProjectionMatrix", viewProjectionMatrix);
-		m_ShaderResource->GetShader().setUniform("translucentPass", false);
+		sf::Shader::bind(&m_ShaderResourcePtr->GetShader());
+		static_assert(std::is_same_v<std::shared_ptr<ShaderResource>, decltype(m_ShaderResourcePtr)>, "fail");
+		m_ShaderResourcePtr->GetShader().setUniform("ViewProjectionMatrix", viewProjectionMatrix);
+		m_ShaderResourcePtr->GetShader().setUniform("translucentPass", false);
 
 		glEnable(GL_DEPTH_TEST);
 		glDepthMask(GL_TRUE);
@@ -110,7 +110,7 @@ namespace Smasher {
 				pTexture = batchList.back().pTexture;
 			}
 			bool hasTexture = pTexture != nullptr;
-			m_ShaderResource->GetShader().setUniform("hasTexture", hasTexture);
+			m_ShaderResourcePtr->GetShader().setUniform("hasTexture", hasTexture);
 
 			if (hasTexture) {
 				sf::Texture::bind(pTexture, sf::Texture::Pixels);
@@ -122,7 +122,7 @@ namespace Smasher {
 			sf::Texture::bind(NULL);
 		}
 
-		m_ShaderResource->GetShader().setUniform("translucentPass", true);
+		m_ShaderResourcePtr->GetShader().setUniform("translucentPass", true);
 		glDepthMask(GL_FALSE);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -133,7 +133,7 @@ namespace Smasher {
 				pTexture = batchList.back().pTexture;
 			}
 			bool hasTexture = pTexture != nullptr;
-			m_ShaderResource->GetShader().setUniform("hasTexture", hasTexture);
+			m_ShaderResourcePtr->GetShader().setUniform("hasTexture", hasTexture);
 
 			if (hasTexture) {
 				sf::Texture::bind(batchList.back().pTexture, sf::Texture::Pixels);
@@ -205,8 +205,8 @@ namespace Smasher {
 	}
 
 	void DrawableComponentManager::OnComponentSetTexture(DrawableComponent &component, ResourceId textureId, bool translucent) {
-		if (component.m_TextureResource != nullptr &&
-			textureId == component.m_TextureResource->GetId()) {
+		if (component.m_TextureResourcePtr != nullptr &&
+			textureId == component.m_TextureResourcePtr->GetId()) {
 			return;
 		}
 

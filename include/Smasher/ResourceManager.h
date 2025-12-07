@@ -31,13 +31,13 @@ namespace Smasher {
 
 		// Lazily Loads Resource that requires multiple paths
 		template <class T, typename... Args>
-		std::shared_ptr<T> GetOrLoadResource(ResourceId id, const ResourcePath* paths, const std::size_t numPaths, Args&&... resourceArgs) {
+		std::shared_ptr<T> GetOrLoadResource(ResourceId id, const ResourcePath *paths, const std::size_t numPaths, Args&&... resourceArgs) {
 			return LoadResource<T>(id, paths, numPaths, resourceArgs...);
 		}
 
 		// Lazily Loads Resource from single path
 		template <class T, typename... Args>
-		std::shared_ptr<T> GetOrLoadResource(ResourceId id, const ResourcePath& path, Args&&... resourceArgs) {
+		std::shared_ptr<T> GetOrLoadResource(ResourceId id, const ResourcePath &path, Args&&... resourceArgs) {
 			return GetOrLoadResource<T>(id, &path, size_t{ 1 }, resourceArgs...);
 		}
 
@@ -48,14 +48,14 @@ namespace Smasher {
 
 
 		template <class T>
-		std::shared_ptr<T> GetResource(ResourceId resourceID);
+		std::shared_ptr<T> GetResource(ResourceId resourceId);
 
 		// Generates shader from string
-		std::shared_ptr<Smasher::ShaderResource> LoadVertFragShaderResource(const std::string& vert, const std::string& frag);
+		std::shared_ptr<Smasher::ShaderResource> LoadVertFragShaderResource(const std::string &vert, const std::string &frag);
 
 		// Remove internal internally, resource object will be deleted once all objects using it free it
-		void ReleaseResource(ResourceId resourceID) {
-			m_ResourceMap.erase(resourceID);
+		void ReleaseResource(ResourceId resourceId) {
+			m_ResourceMap.erase(resourceId);
 		};
 
 		void SetResourceDirectory(std::filesystem::path path) {
@@ -65,7 +65,7 @@ namespace Smasher {
 		const std::filesystem::path& GetResourceDirectory() { return m_ResourceDirectory; }
 	private:
 		template <class T, typename... Args>
-		std::shared_ptr<T> LoadResource(ResourceId resourceID, const ResourcePath* paths, const std::size_t numPaths, Args&&... resourceArgs);
+		std::shared_ptr<T> LoadResource(ResourceId resourceId, const ResourcePath *paths, const std::size_t numPaths, Args&&... resourceArgs);
 
 		std::unordered_map<ResourceId, std::shared_ptr<Resource>> m_ResourceMap;
 		std::filesystem::path m_ResourceDirectory;

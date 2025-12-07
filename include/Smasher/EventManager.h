@@ -36,7 +36,7 @@ namespace Smasher {
 		EventSubscriptionHandle() = default;
 		~EventSubscriptionHandle();
 		EventSubscriptionHandle(const EventSubscriptionHandle&) = delete;
-		EventSubscriptionHandle(EventSubscriptionHandle&& other) noexcept;
+		EventSubscriptionHandle(EventSubscriptionHandle &&other) noexcept;
 		EventSubscriptionHandle& operator =(EventSubscriptionHandle&) = delete;
 		EventSubscriptionHandle& operator =(EventSubscriptionHandle&&) noexcept;
 
@@ -54,20 +54,20 @@ namespace Smasher {
 	// Only EventManagers should have privilege to instantiate EventSubscriptionHandles
 	protected:
 		EventSubscriptionHandle(std::list<std::shared_ptr<EventSubscription>>& list,
-			std::list<std::shared_ptr<EventSubscription>>::iterator itr, std::shared_ptr<EventSubscription>& subscriptionPtr, EventManager& rEventManager) :
+			std::list<std::shared_ptr<EventSubscription>>::iterator itr, std::shared_ptr<EventSubscription> &subscriptionPtr, EventManager &eventManager) :
 			m_SubscriptionListPtr(&list),
 			m_SubscriptionPtr(subscriptionPtr),
 			m_Itr(itr),
 			m_Valid(true),
-			m_EventManagerPtr(&rEventManager) {};
+			m_EventManagerPtr(&eventManager) {};
 
 		void Invalidate() { m_Valid = false; }
 
 	private:
-		std::list<std::shared_ptr<EventSubscription>>* m_SubscriptionListPtr = nullptr; // List containing this subscription
+		std::list<std::shared_ptr<EventSubscription>> *m_SubscriptionListPtr = nullptr; // List containing this subscription
 		std::list<std::shared_ptr<EventSubscription>>::iterator m_Itr; // Location of this subscription within the list
 		std::weak_ptr<EventSubscription> m_SubscriptionPtr;
-		EventManager* m_EventManagerPtr = nullptr;
+		EventManager *m_EventManagerPtr = nullptr;
 		bool m_Valid = false;
 	};
 
@@ -77,16 +77,16 @@ namespace Smasher {
 		friend class Layer;
 	public:
 		EventManager() = delete;
-		EventManager(Engine& engine) :
+		EventManager(Engine &engine) :
 			m_EngineRef(engine),
 			m_AsyncEventConsumerThread(&EventManager::AsyncEventConsumer, this),
 			m_EventQueue(),
 			m_AsyncEventQueue() {}
 		~EventManager();
 		EventManager(EventManager&) = delete;
-		EventManager(EventManager&& other) noexcept;
+		EventManager(EventManager &&other) noexcept;
 		EventManager& operator= (EventManager&) = delete;
-		EventManager& operator= (EventManager&& other) noexcept;
+		EventManager& operator= (EventManager &&other) noexcept;
 
 		// Defaults to Synchronous
 		template<class T, typename... Args>
@@ -94,7 +94,7 @@ namespace Smasher {
 
 		void Dispatch();
 
-		void DispatchAsync(Engine& engine);
+		void DispatchAsync(Engine &engine);
 
 		void AsyncEventConsumer();
 

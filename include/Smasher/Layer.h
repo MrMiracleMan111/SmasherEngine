@@ -71,7 +71,7 @@ namespace Smasher {
 		T& AddEntity(Args&&... componentArgs);
 
 		// Move Entity to this layer
-		Entity& MoveEntity(Entity& entity);
+		Entity& MoveEntity(Entity &entity);
 
 		Entity& AddEntity();
 
@@ -90,14 +90,14 @@ namespace Smasher {
 		// Overload for class memebr function ex:
 		// Subscribe<EventType>(&Class::MemberFunc, classInstancePointer);
 		template<class T, class C>
-		EventSubscriptionHandle Subscribe(void (C::* method)(T&), C* instance);
+		EventSubscriptionHandle Subscribe(void (C:: *method)(T&), C *pInstance);
 
 		// Subscribe to asynchronous event handling (uses separate Event thread)
 		template<class T>
 		EventSubscriptionHandle SubscribeAsync(std::function<void(T&)> callback);
 
 		template<class T, class C>
-		EventSubscriptionHandle SubscribeAsync(void (C::* method)(T&), C* instance);
+		EventSubscriptionHandle SubscribeAsync(void (C:: *method)(T&), C *pInstance);
 
 		void RenderComponentManagers(sf::RenderWindow& window);
 		void UpdateComponentManagers(Millisecond delta);
@@ -106,8 +106,8 @@ namespace Smasher {
 
 		void ShutdownEngine();
 
-		void ProcessEvent(Event& event);
-		void ProcessAsyncEvent(Event& event);
+		void ProcessEvent(Event &event);
+		void ProcessAsyncEvent(Event &event);
 
 		std::unordered_map<std::type_index, std::list<std::shared_ptr<EventSubscription>>>& GetEventSubscriptions() { return m_EventSubscriptionsByType; };
 		std::unordered_map<std::type_index, std::list<std::shared_ptr<EventSubscription>>>& GetAsyncEventSubscriptions() { return m_AsyncEventSubscriptionsByType; };
@@ -123,9 +123,9 @@ namespace Smasher {
 		std::vector<IComponentManager*> m_ComponentManagersWithRender; // Subset of component managers with Render(sf::Window&) capability
 		std::vector<IComponentManager*> m_ComponentManagersWithUpdate; // Subset of component managers with Update(Millisecond) capability
 		LayerStatus m_Status = LayerStatus::PAUSED;
-		EventManager& m_EventManager;
-		ResourceManager& m_ResourceManager;
-		Engine& m_Engine;
+		EventManager &m_EventManager;
+		ResourceManager &m_ResourceManager;
+		Engine &m_Engine;
 
 		Millisecond m_UpdateTime;
 		Millisecond m_RenderTime;
@@ -133,7 +133,7 @@ namespace Smasher {
 
 	class SMASHER_API BaseLayer final : public Layer {
 	public:
-		BaseLayer(Engine& engine);
+		BaseLayer(Engine &engine);
 	};
 }
 

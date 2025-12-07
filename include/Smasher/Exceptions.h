@@ -8,7 +8,7 @@
 #define SMASHER_EXCEPTION(name) class name : public std::exception { \
 public: \
 explicit name() : m_Message("") {} \
-explicit name(const std::string& msg) : m_Message(msg) {} \
+explicit name(const std::string &msg) : m_Message(msg) {} \
 const char *what() const noexcept {return m_Message.c_str();} \
 private: \
 std::string m_Message; \

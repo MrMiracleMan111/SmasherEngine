@@ -6,22 +6,22 @@ namespace Smasher {
 		return UUID{ s_count };
 	}
 
-	UUID::UUID(UUID&& other) noexcept : m_UUID(other.m_UUID)
+	UUID::UUID(UUID &&other) noexcept : m_Uuid(other.m_Uuid)
 	{
-		other.m_UUID = UINT64_MAX;
+		other.m_Uuid = UINT64_MAX;
 	}
 
-	UUID& UUID::operator=(const UUID& other)
+	UUID& UUID::operator=(const UUID &other)
 	{
-		m_UUID = other.m_UUID;
+		m_Uuid = other.m_Uuid;
 		return *this;
 	}
 
-	UUID& UUID::operator=(UUID&& other) noexcept
+	UUID& UUID::operator=(UUID &&other) noexcept
 	{
 		if (&other != this) {
-			m_UUID = other.m_UUID;
-			other.m_UUID = UINT64_MAX;
+			m_Uuid = other.m_Uuid;
+			other.m_Uuid = UINT64_MAX;
 		}
 		return *this;
 	}

@@ -5,7 +5,7 @@ namespace Smasher {
 	// Lazily Loads Resource
 	template <class ManifestData, class T, typename... Args>
 	std::shared_ptr<T> ResourceManager::GetOrLoadResource(Args&&... resourceArgs) {
-		static_assert(ManifestItemHasResourceID<ManifestData>, "Manifest item must have an Id");
+		static_assert(ManifestItemHasResourceId<ManifestData>, "Manifest item must have an Id");
 		static_assert(std::is_class_v<ManifestData>, "Manifest item T must be a struct or class");
 		static_assert(std::is_same_v<typename std::decay<decltype(ManifestData::Id)>::type, ResourceId>, "Manifest item Id must be of type ResourceId");
 		static_assert(std::is_base_of<Resource, T>::value, "Resource type must inherit from Resource");
@@ -27,7 +27,7 @@ namespace Smasher {
 	// Retrieves resources
 	template <class ManifestData, class T>
 	std::shared_ptr<T> ResourceManager::GetResource() {
-		static_assert(ManifestItemHasResourceID<ManifestData>, "Manifest item must have an ID");
+		static_assert(ManifestItemHasResourceId<ManifestData>, "Manifest item must have an ID");
 		static_assert(ManifestItemHasResourcePath<ManifestData>, "Manifest item must have an PATH");
 		static_assert(std::is_class_v<ManifestData>, "Manifest item T must be a struct or class");
 		static_assert(std::is_same_v<typename std::decay<decltype(ManifestData::Id)>::type, ResourceId>, "Manifest item ID must be of type ResourceID");
@@ -43,24 +43,24 @@ namespace Smasher {
 	}
 
 	template <class T>
-	std::shared_ptr<T> ResourceManager::GetResource(ResourceId resourceID) {
+	std::shared_ptr<T> ResourceManager::GetResource(ResourceId resourceId) {
 		static_assert(std::is_base_of<Resource, T>::value, "T must inherit from Resource");
 
-		if (m_ResourceMap.find(resourceID) == m_ResourceMap.end()) {
-			throw Exceptions::ResourceNotLoaded(std::format("Resource with ID {} not loaded", resourceID));
+		if (m_ResourceMap.find(resourceId) == m_ResourceMap.end()) {
+			throw Exceptions::ResourceNotLoaded(std::format("Resource with ID {} not loaded", resourceId));
 		}
-		return std::static_pointer_cast<T>(m_ResourceMap.at(resourceID));
+		return std::static_pointer_cast<T>(m_ResourceMap.at(resourceId));
 	}
 
 	template <class T, typename... Args>
-	std::shared_ptr<T> ResourceManager::LoadResource(ResourceId resourceID, const ResourcePath* paths, const std::size_t numPaths, Args&&... resourceArgs) {
-		auto itr = m_ResourceMap.find(resourceID);
+	std::shared_ptr<T> ResourceManager::LoadResource(ResourceId resourceId, const ResourcePath *paths, const std::size_t numPaths, Args&&... resourceArgs) {
+		auto itr = m_ResourceMap.find(resourceId);
 		if (itr != m_ResourceMap.end()) {
 			return std::static_pointer_cast<T>(itr->second);
 		}
-		std::shared_ptr<T> pResource = std::make_shared<T>(resourceID, paths, numPaths, m_ResourceDirectory, std::forward<Args>(resourceArgs)...);
+		std::shared_ptr<T> pResource = std::make_shared<T>(resourceId, paths, numPaths, m_ResourceDirectory, std::forward<Args>(resourceArgs)...);
 		std::shared_ptr<Resource> pCastResource = std::static_pointer_cast<Resource>(pResource);
-		m_ResourceMap.emplace(resourceID, pCastResource);
+		m_ResourceMap.emplace(resourceId, pCastResource);
 		return pResource;
 	}
 }

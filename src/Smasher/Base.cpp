@@ -15,8 +15,8 @@ namespace Smasher {
 
 	// Column major order Copy
 	template<>
-	void Matrix<3, 3>::CopyMatrix(const sf::Transform& transform) {
-		const float* tmp = transform.getMatrix();
+	void Matrix<3, 3>::CopyMatrix(const sf::Transform &transform) {
+		const float *tmp = transform.getMatrix();
 		for (int i = 0; i < 3; i++) {              // Row
 			for (int j = 0; j < 2; j++) {          // Column
 				array[i * 3 + j] = tmp[i * 4 + j];
@@ -35,8 +35,7 @@ namespace Smasher {
 	}
 
 	template<>
-	void Matrix<4, 4>::CopyMatrix(const sf::Transform& transform) {
+	void Matrix<4, 4>::CopyMatrix(const sf::Transform &transform) {
 		CopyMatrix(transform.getMatrix(), 4 * 4, array);
 	}
-
 }

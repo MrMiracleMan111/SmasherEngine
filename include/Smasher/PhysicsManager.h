@@ -10,11 +10,11 @@ namespace Smasher {
 		~PhysicsManager();
 		PhysicsManager() = default;
 		PhysicsManager(PhysicsManager&) = delete;
-		PhysicsManager(PhysicsManager&& other) noexcept;
+		PhysicsManager(PhysicsManager &&other) noexcept;
 		PhysicsManager& operator=(PhysicsManager&) = delete;
-		PhysicsManager& operator=(PhysicsManager&& other) noexcept;
+		PhysicsManager& operator=(PhysicsManager &&other) noexcept;
 
-		void Initialize(const b2WorldDef& worldDef);
+		void Initialize(const b2WorldDef &worldDef);
 		void Initialize(); // Initialize with Box2D defaults 
 
 		void Step(Smasher::Millisecond delta); // Physics World Step

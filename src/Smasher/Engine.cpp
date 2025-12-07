@@ -28,27 +28,27 @@ namespace Smasher {
 	Engine::Engine() :
 		m_Headless(false),
 		m_EventManager(*this),
-		m_Window(
+		m_WindowPtr(
 			std::make_unique<sf::RenderWindow>(
 				sf::VideoMode(EngineConfig::WINDOW_WIDTH, EngineConfig::WINDOW_HEIGHT),
 				EngineConfig::TITLE, sf::Style::Default,
 				EngineConfig::DEFAULT_SETTINGS
 			)
 		),
-		m_WindowView(sf::FloatRect(0.f, 0.f, (float)m_Window->getSize().x, (float)m_Window->getSize().y))
+		m_WindowView(sf::FloatRect{ 0.f, 0.f, (float)m_WindowPtr->getSize().x, (float)m_WindowPtr->getSize().y })
 	{
 		Init();
 	}
 
-	Engine::Engine(bool headless) : m_Headless(true), m_Window(nullptr), m_EventManager(*this) {
+	Engine::Engine(bool headless) : m_Headless(true), m_WindowPtr(nullptr), m_EventManager(*this) {
 		assert(headless == true);
 		Init();
 	}
 
-	Engine::Engine(int width, int height, const sf::ContextSettings& settings) :
+	Engine::Engine(int width, int height, const sf::ContextSettings &settings) :
 		m_Headless(false),
 		m_EventManager(*this),
-		m_Window(
+		m_WindowPtr(
 			std::make_unique<sf::RenderWindow>(
 				sf::VideoMode(EngineConfig::WINDOW_WIDTH, EngineConfig::WINDOW_HEIGHT),
 				EngineConfig::TITLE,
@@ -56,7 +56,7 @@ namespace Smasher {
 				settings
 			)
 		),
-		m_WindowView(sf::FloatRect(0.f, 0.f, (float)m_Window->getSize().x, (float)m_Window->getSize().y))
+		m_WindowView(sf::FloatRect{ 0.f, 0.f, (float)m_WindowPtr->getSize().x, (float)m_WindowPtr->getSize().y })
 	{
 		Init();
 	}
@@ -64,14 +64,14 @@ namespace Smasher {
 	Engine::Engine(int width, int height) :
 		m_Headless(false),
 		m_EventManager(*this),
-		m_Window(
+		m_WindowPtr(
 			std::make_unique<sf::RenderWindow>(
 				sf::VideoMode(width, height),
 				EngineConfig::TITLE,
 				sf::Style::Default, EngineConfig::DEFAULT_SETTINGS
 			)
 		),
-		m_WindowView(sf::FloatRect(0.f, 0.f, (float)m_Window->getSize().x, (float)m_Window->getSize().y))
+		m_WindowView(sf::FloatRect{ 0.f, 0.f, (float)m_WindowPtr->getSize().x, (float)m_WindowPtr->getSize().y })
 	{
 		Init();
 	}
@@ -88,10 +88,10 @@ namespace Smasher {
 		}
 	}
 
-	Engine::Engine(Engine&& other) noexcept : 
+	Engine::Engine(Engine &&other) noexcept : 
 		m_Headless(other.m_Headless),
 		m_LayerStack(std::move(other.m_LayerStack)),
-		m_Window(std::move(other.m_Window)),
+		m_WindowPtr(std::move(other.m_WindowPtr)),
 		m_IsWindowOpen(other.m_IsWindowOpen),
 		m_EventManager(std::move(other.m_EventManager)),
 		m_ResourceManager(std::move(other.m_ResourceManager)),
@@ -107,12 +107,12 @@ namespace Smasher {
 		other.m_Valid = false;
 	}
 
-	Engine& Engine::operator =(Engine&& other) noexcept
+	Engine& Engine::operator =(Engine &&other) noexcept
 	{
 		if (&other != this) {
 			m_Headless = other.m_Headless;
 			m_LayerStack = std::move(other.m_LayerStack);
-			m_Window = std::move(other.m_Window);
+			m_WindowPtr = std::move(other.m_WindowPtr);
 			m_IsWindowOpen = other.m_IsWindowOpen;
 			m_EventManager = std::move(other.m_EventManager);
 			m_ResourceManager = std::move(other.m_ResourceManager);
@@ -134,7 +134,7 @@ namespace Smasher {
 	}
 
 	void Engine::Init() {
-		BaseLayer& base = PushLayer<BaseLayer>(); // Base layer
+		BaseLayer &base = PushLayer<BaseLayer>(); // Base layer
 
 		if (!m_Headless) {
 			glewExperimental = GL_TRUE;
@@ -161,13 +161,13 @@ namespace Smasher {
 			Millisecond updateTimer{ 0 };
 			Millisecond renderTimer{ 0 };
 
-			while ((!m_Headless && m_Window->isOpen()) and m_RunningAtomic) {
+			while ((!m_Headless && m_WindowPtr->isOpen()) and m_RunningAtomic) {
 				std::chrono::time_point<std::chrono::system_clock> tmp = std::chrono::system_clock::now();
 				Millisecond diff = std::chrono::duration_cast<std::chrono::milliseconds>(tmp - now);
 				now = tmp;
 				sf::Event event;
 				if (!m_Headless) {
-					while (m_Window->pollEvent(event)) {
+					while (m_WindowPtr->pollEvent(event)) {
 						m_EventFeeder.ForwardSFMLEvent(event);
 					}
 				}
@@ -182,7 +182,7 @@ namespace Smasher {
 					updateTimer = Millisecond{ 0 };
 				}
 				if (!m_Headless && renderTimer >= m_RenderInterval) {
-					Render(*m_Window);
+					Render();
 					renderTimer = Millisecond{ 0 };
 				}
 
@@ -198,7 +198,7 @@ namespace Smasher {
 			Shutdown();
 		}
 #ifdef CATCH_EXCEPTIONS
-		catch (const std::exception& e) {
+		catch (const std::exception &e) {
 			std::cerr << "Exception Thrown: " << e.what() << std::endl;
 			throw e;
 		}
@@ -207,17 +207,17 @@ namespace Smasher {
 
 
 	void Engine::HandleLayerTransitions() {
-		for (auto& itr : m_LayerTransitions) {
+		for (auto &itr : m_LayerTransitions) {
 			switch (itr.type) {
-			case LayerTransitionType::ADD:
-				AddLayer(itr);
-				break;
-			case LayerTransitionType::REMOVE:
-				RemoveLayer(itr);
-				break;
-			default:
-				//Error
-				assert(false);
+				case LayerTransitionType::ADD:
+					AddLayer(itr);
+					break;
+				case LayerTransitionType::REMOVE:
+					RemoveLayer(itr);
+					break;
+				default:
+					//Error
+					assert(false);
 			}
 		}
 		m_LayerTransitions.clear();
@@ -241,8 +241,8 @@ namespace Smasher {
 
 		HandleLayerTransitions();
 
-		for (auto& itr : m_LayerStack) {
-			std::unique_ptr<Layer>& pLayer = itr.second;
+		for (auto &itr : m_LayerStack) {
+			std::unique_ptr<Layer> &pLayer = itr.second;
 			m_UpdateTimestamp = std::chrono::system_clock::now();
 			if (pLayer->GetStatus() == LayerStatus::ACTIVE) {
 				pLayer->PreUpdate(delta);
@@ -258,27 +258,25 @@ namespace Smasher {
 	}
 
 	// Renders layers bottom to top order (so that top layer appears above other layers)
-	void Engine::Render(sf::RenderWindow& rWindow) {
-		//rWindow.pushGLStates();
-		m_Window->clear();
+	void Engine::Render() {
+		m_WindowPtr->clear();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear Screen And Depth Buffer
 
 		// Render in reverse order
-		for (auto& itr : m_LayerStack) {
-			std::unique_ptr<Layer>& pLayer = itr.second;
+		for (auto &itr : m_LayerStack) {
+			std::unique_ptr<Layer> &pLayer = itr.second;
 			m_RenderTimestamp = std::chrono::system_clock::now();
 
 			if (pLayer->GetStatus() == LayerStatus::ACTIVE) {
-				pLayer->Render(rWindow);
-				pLayer->RenderComponentManagers(rWindow);
+				pLayer->Render(*m_WindowPtr);
+				pLayer->RenderComponentManagers(*m_WindowPtr);
 			}
 
 			Millisecond diff = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - m_RenderTimestamp);
 			pLayer->SetRenderTime(diff);
 		}
 
-		m_Window->display();
-		//rWindow.popGLStates();
+		m_WindowPtr->display();
 
 		GLenum err;
 		while ((err = glGetError()) != GL_NO_ERROR)
@@ -302,26 +300,26 @@ namespace Smasher {
 	}
 #endif
 
-	void Engine::OnWindowClose(Events::WindowCloseEvent& event) {
+	void Engine::OnWindowClose(Events::WindowCloseEvent &event) {
 		m_RunningAtomic = false;
 	}
 
-	void Engine::OnWindowResize(Events::WindowResizeEvent& event) {
+	void Engine::OnWindowResize(Events::WindowResizeEvent &event) {
 		m_WindowView.setSize(sf::Vector2f((float)event.WindowSize.x, (float)event.WindowSize.y));
-		m_Window->setView(m_WindowView);
+		m_WindowPtr->setView(m_WindowView);
 	}
 
 
-	void Engine::AddLayer(LayerTransition& transition)
+	void Engine::AddLayer(LayerTransition &transition)
 	{
 		std::scoped_lock lock(m_LayerTransitionMutex);
-		Layer& rLayer = *transition.pLayer;
+		Layer &layer = *transition.pLayer;
 		std::type_index index = transition.addTransition.index;
 		m_LayerStack.emplace_back(index, std::move(transition.pLayer));
-		rLayer.Init();
+		layer.Init();
 	}
 
-	void Engine::RemoveLayer(LayerTransition& transition)
+	void Engine::RemoveLayer(LayerTransition &transition)
 	{
 		std::scoped_lock lock(m_LayerTransitionMutex);
 		if (transition.removeTransition.index == std::type_index(typeid(BaseLayer))) {
@@ -343,7 +341,7 @@ namespace Smasher {
 
 		std::scoped_lock lock(m_WindowMutex);
 		if (m_IsWindowOpen) {
-			m_Window->close();
+			m_WindowPtr->close();
 			m_IsWindowOpen = false;
 		}
 	}
@@ -353,7 +351,7 @@ namespace Smasher {
 		return m_LayerStack.begin();
 	}
 
-	sf::RenderWindow& Engine::GetWindow() { return *m_Window; }
+	sf::RenderWindow& Engine::GetWindow() { return *m_WindowPtr; }
 	EventManager& Engine::GetEventManager() { return m_EventManager; };
 	ResourceManager& Engine::GetResourceManager() { return m_ResourceManager; };
 	PhysicsManager& Engine::GetPhysicsManager() { return m_PhysicsManager; };

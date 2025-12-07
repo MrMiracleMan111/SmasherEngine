@@ -9,18 +9,18 @@ class SMASHER_API Smasher::UUID {
 public:
 	static UUID GetUUID();
 	~UUID() {};
-	UUID(const UUID& other) : m_UUID(other.m_UUID) {};
-	UUID(UUID&& other) noexcept;
-	UUID& operator = (const UUID& other);
-	UUID& operator = (UUID&& other) noexcept;
-	explicit UUID(uint64_t uuid) : m_UUID(uuid) {};
+	UUID(const UUID &other) : m_Uuid(other.m_Uuid) {};
+	UUID(UUID &&other) noexcept;
+	UUID& operator = (const UUID &other);
+	UUID& operator = (UUID &&other) noexcept;
+	explicit UUID(uint64_t uuid) : m_Uuid(uuid) {};
 	UUID() = delete;
 
-	operator uint64_t() const { return m_UUID; }
-	bool operator == (const UUID& other) const { return other.m_UUID == m_UUID; }
+	operator uint64_t() const { return m_Uuid; }
+	bool operator == (const UUID& other) const { return other.m_Uuid == m_Uuid; }
 private:
 	inline static uint64_t s_count = 0;
-	uint64_t m_UUID;
+	uint64_t m_Uuid;
 };
 
 namespace std {

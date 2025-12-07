@@ -16,14 +16,14 @@ namespace Smasher {
 		friend class ResourceManager;
 	public:
 		Resource() = delete;
-		const ResourceId GetId() const { return m_ID; }
+		const ResourceId GetId() const { return m_Id; }
 		virtual ~Resource() {};
 		virtual ResourceType GetType() const = 0;
 	protected:
 		Resource(ResourceId id, 
-			const ResourcePath* const relativePaths, const std::size_t numPaths,
-			const ResourcePath& resourcesDirectory) :
-			m_ID(id), m_Paths(numPaths, "") {
+			const ResourcePath *const relativePaths, const std::size_t numPaths,
+			const ResourcePath &resourcesDirectory) :
+			m_Id(id), m_Paths(numPaths, "") {
 
 			assert(m_Paths.size() > 0);
 
@@ -35,11 +35,11 @@ namespace Smasher {
 		}
 
 		// Constructor for resources with no paths (ex. shaders generated from std::string)
-		Resource(ResourceId id) : m_ID(id), m_Paths(), m_Loaded(true) {}
+		Resource(ResourceId id) : m_Id(id), m_Paths(), m_Loaded(true) {}
 
 	protected:
 		bool m_Loaded = false;
-		ResourceId m_ID;
+		ResourceId m_Id;
 		std::vector<ResourcePath> m_Paths;
 	};
 
@@ -49,8 +49,8 @@ namespace Smasher {
 		SMASHER_RESOURCE_TYPE(ResourceType::TEXTURE)
 		TextureResource() = delete;
 		TextureResource(ResourceId id,
-			const ResourcePath* const relativePaths, const std::size_t numPaths,
-			const ResourcePath& resourcesDirectory) :
+			const ResourcePath *const relativePaths, const std::size_t numPaths,
+			const ResourcePath &resourcesDirectory) :
 			Resource(id, relativePaths, numPaths, resourcesDirectory) {
 			assert(numPaths > 0);
 
@@ -67,8 +67,8 @@ namespace Smasher {
 		SMASHER_RESOURCE_TYPE(ResourceType::FONT)
 		FontResource() = delete;
 		FontResource(ResourceId id,
-			const ResourcePath* const relativePaths, const std::size_t numPaths,
-			const ResourcePath& resourcesDirectory) :
+			const ResourcePath *const relativePaths, const std::size_t numPaths,
+			const ResourcePath &resourcesDirectory) :
 			Resource(id, relativePaths, numPaths, resourcesDirectory) {
 			if (!m_Font.loadFromFile(m_Paths[0].string())) {
 				throw Exceptions::ResourceFailedToLoad(std::format("Failed to load file {}", m_Paths[0].string()));
@@ -84,8 +84,8 @@ namespace Smasher {
 		SMASHER_RESOURCE_TYPE(ResourceType::AUDIO)
 			AudioResource() = delete;
 		AudioResource(ResourceId id,
-			const ResourcePath* const relativePaths, const std::size_t numPaths,
-			const ResourcePath& resourcesDirectory) :
+			const ResourcePath *const relativePaths, const std::size_t numPaths,
+			const ResourcePath &resourcesDirectory) :
 			Resource(id, relativePaths, numPaths, resourcesDirectory) {
 			if (!m_Music.openFromFile(m_Paths[0].string())) {
 				throw Exceptions::ResourceFailedToLoad(std::format("Failed to load file {}", m_Paths[0].string()));
@@ -101,8 +101,8 @@ namespace Smasher {
 			ShaderResource() = delete;
 
 		ShaderResource(ResourceId id,
-			const ResourcePath* const relativePaths, const std::size_t numPaths,
-			const ResourcePath& resourcesDirectory) :
+			const ResourcePath *const relativePaths, const std::size_t numPaths,
+			const ResourcePath &resourcesDirectory) :
 			Resource(id, relativePaths, numPaths, resourcesDirectory),
 			m_ShaderType{sf::Shader::Type::Fragment}  {
 			
@@ -125,7 +125,7 @@ namespace Smasher {
 			}
 		}
 
-		ShaderResource(ResourceId id, const std::string& vert, const std::string& frag) :
+		ShaderResource(ResourceId id, const std::string &vert, const std::string &frag) :
 			Resource(id), m_ShaderType(sf::Shader::Type::Geometry) {
 			m_Shader.loadFromMemory(vert, frag);
 		}
@@ -142,8 +142,8 @@ namespace Smasher {
 		SMASHER_RESOURCE_TYPE(ResourceType::FILE)
 		FileResource() = delete;
 		FileResource(ResourceId id,
-			const ResourcePath* const relativePaths, const std::size_t numPaths,
-			const ResourcePath& resourcesDirectory, std::ios_base::openmode mode) :
+			const ResourcePath *const relativePaths, const std::size_t numPaths,
+			const ResourcePath &resourcesDirectory, std::ios_base::openmode mode) :
 			Resource(id, relativePaths, numPaths, resourcesDirectory), m_File(m_Paths[0], mode) {
 
 		}

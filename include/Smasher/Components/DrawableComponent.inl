@@ -10,9 +10,9 @@ namespace Smasher {
 		// Update Render Batch
 		rCompManager.OnComponentSetTexture(*this, T::Id, opts.transluscent);
 		// Assign texture to component
-		m_TextureResource = pTextureResource;
+		m_TextureResourcePtr = pTextureResource;
 
-		sf::Texture& texture = m_TextureResource->GetTexture();
+		sf::Texture& texture = m_TextureResourcePtr->GetTexture();
 		m_TextureLoaded = true;
 		SetClipRect(sf::IntRect{ 0, 0, (int)(texture.getSize().x), (int)(texture.getSize().y) });
 		GetClipTransform(); // Cache the clip transform

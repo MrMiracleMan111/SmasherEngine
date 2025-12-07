@@ -15,33 +15,33 @@ namespace Smasher {
 			using ManagerType = typename decltype(T::StaticInstantiateManager(m_LayerRef.get()))::element_type;
 
 			
-			ManagerType& rManager = static_cast<ManagerType&>(m_LayerRef.get().GetComponentManager<T>());
-			T& rComponent = rManager.ManagerType::AddComponent(*this, std::forward<Args>(componentArgs)...);
-			IComponent& rComponentInterface = static_cast<IComponent&>(rComponent);
-			m_ComponentsByType.emplace(std::type_index(typeid(T)), rComponentInterface);
-			return rComponent;
+			ManagerType& manager = static_cast<ManagerType&>(m_LayerRef.get().GetComponentManager<T>());
+			T& component = manager.ManagerType::AddComponent(*this, std::forward<Args>(componentArgs)...);
+			IComponent& componentInterface = static_cast<IComponent&>(component);
+			m_ComponentsByType.emplace(std::type_index(typeid(T)), componentInterface);
+			return component;
 		}
 		else {
 			// Use Generic
     		using ManagerType = GenericComponentManager<T>;
-            ManagerType& rManager = static_cast<ManagerType&>(m_LayerRef.get().GetComponentManager<T>());
-			T& rComponent = rManager.AddComponent(*this, std::forward<Args>(componentArgs)...);
-			IComponent& rComponentInterface = static_cast<IComponent&>(rComponent);
-			m_ComponentsByType.emplace(std::type_index(typeid(T)), rComponentInterface);
-			return rComponent;
+            ManagerType &manager = static_cast<ManagerType&>(m_LayerRef.get().GetComponentManager<T>());
+			T &component = manager.AddComponent(*this, std::forward<Args>(componentArgs)...);
+			IComponent &componentInterface = static_cast<IComponent&>(component);
+			m_ComponentsByType.emplace(std::type_index(typeid(T)), componentInterface);
+			return component;
 		}
 	}
 
 	template<class T>
 	void Entity::RemoveComponent() {
 		if (!HasComponent<T>()) {
-			throw Exceptions::EntityComponentNotFound(std::format("Could not find component for entity {}", (uint64_t)(m_UUID)));
+			throw Exceptions::EntityComponentNotFound(std::format("Could not find component for entity {}", (uint64_t)(m_Uuid)));
 		}
 		const std::type_index index = std::type_index(typeid(T));
-		std::reference_wrapper<IComponent>& rComponentPtr = m_ComponentsByType.at(index);
+		std::reference_wrapper<IComponent>& componentPtr = m_ComponentsByType.at(index);
 
 		IComponentManager& manager = m_LayerRef.get().template GetComponentManager<T>();
-		manager.RemoveComponent(rComponentPtr.get());
+		manager.RemoveComponent(componentPtr.get());
 		m_ComponentsByType.erase(index);
 	}
 

@@ -10,7 +10,7 @@ namespace Smasher {
 		}
 	};
 
-	PhysicsManager::PhysicsManager(PhysicsManager&& other) noexcept :
+	PhysicsManager::PhysicsManager(PhysicsManager &&other) noexcept :
 		m_WorldId(other.m_WorldId), 
 		m_Initialized(other.m_Initialized),
 		m_Accumulator(other.m_Accumulator)
@@ -19,7 +19,7 @@ namespace Smasher {
 		other.m_Initialized = false;
 	}
 
-	PhysicsManager& PhysicsManager::operator=(PhysicsManager&& other) noexcept {
+	PhysicsManager& PhysicsManager::operator=(PhysicsManager &&other) noexcept {
 		if (this != &other) {
 			if (m_Initialized) {
 				b2DestroyWorld(m_WorldId);
@@ -34,7 +34,7 @@ namespace Smasher {
 		return *this;
 	}
 
-	void PhysicsManager::Initialize(const b2WorldDef& worldDef) {
+	void PhysicsManager::Initialize(const b2WorldDef &worldDef) {
 		if (m_Initialized) {
 			throw Exceptions::Box2DWorldAlreadyCreated("Box 2D World was already created");
 		}

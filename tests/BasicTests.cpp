@@ -1117,7 +1117,7 @@ TEST(LayerTest, InitLayer) {
 	layer.Activate();
 	engine.Update(Smasher::Millisecond{ 10 });
 	engine.Update(Smasher::Millisecond{ 10 });
-	engine.Render(engine.GetWindow());
+	engine.Render();
 	EXPECT_EQ(1, layer.GetValue());
 }
 

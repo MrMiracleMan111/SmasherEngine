@@ -8,7 +8,7 @@ namespace Smasher {
 		StopAsync();
 	}
 
-	EventManager::EventManager(EventManager&& other) noexcept :
+	EventManager::EventManager(EventManager &&other) noexcept :
 		m_EventQueue(std::move(other.m_EventQueue)),
 		m_AsyncRunning(false),
 		m_EngineRef(other.m_EngineRef)
@@ -20,7 +20,7 @@ namespace Smasher {
 		m_AsyncEventConsumerThread = std::thread(&EventManager::AsyncEventConsumer, this);
 	}
 
-	EventManager& EventManager::operator=(EventManager&& other) noexcept
+	EventManager& EventManager::operator=(EventManager &&other) noexcept
 	{
 		if (this != &other) {
 			// Stop Async events on this
@@ -40,7 +40,7 @@ namespace Smasher {
 	}
 
 	void EventManager::Dispatch() {
-		for (auto& pEvent : m_EventQueue) {
+		for (auto &pEvent : m_EventQueue) {
 			auto itr = m_EngineRef.get().m_LayerStack.rbegin();
 			while (pEvent->CanPropagate() && itr != m_EngineRef.get().m_LayerStack.rend()) {
 				itr->second->ProcessEvent(*pEvent);
@@ -50,8 +50,8 @@ namespace Smasher {
 		m_EventQueue.clear();
 	}
 
-	void EventManager::DispatchAsync(Engine& engine) {
-		for (auto& pEvent : m_AsyncEventQueue) {
+	void EventManager::DispatchAsync(Engine &engine) {
+		for (auto &pEvent : m_AsyncEventQueue) {
 			// Layers and Asyc Subscriptions may change in between processing Async Events
 			std::scoped_lock lock(m_AsyncSubscriptionsMutex, engine.m_LayerTransitionMutex);
 			auto itr = engine.m_LayerStack.rbegin();
@@ -73,7 +73,7 @@ namespace Smasher {
 			try {
 				DispatchAsync(m_EngineRef.get());
 			}
-			catch (std::exception& e) {
+			catch (std::exception &e) {
 				std::cerr << "Exception thrown: " << e.what() << std::endl;
 			}
 			catch (...) {
@@ -111,7 +111,7 @@ namespace Smasher {
 		}
 	}
 
-	EventSubscriptionHandle::EventSubscriptionHandle(EventSubscriptionHandle&& other) noexcept :
+	EventSubscriptionHandle::EventSubscriptionHandle(EventSubscriptionHandle &&other) noexcept :
 		m_SubscriptionListPtr(other.m_SubscriptionListPtr),
 		m_SubscriptionPtr(other.m_SubscriptionPtr),
 		m_EventManagerPtr(other.m_EventManagerPtr),
@@ -120,7 +120,7 @@ namespace Smasher {
 		other.Invalidate();
 	}
 
-	EventSubscriptionHandle& EventSubscriptionHandle::operator=(EventSubscriptionHandle&& other) noexcept
+	EventSubscriptionHandle& EventSubscriptionHandle::operator=(EventSubscriptionHandle &&other) noexcept
 	{
 		if (&other != this) {
 			if (IsValid()) {

@@ -6,7 +6,7 @@
 
 namespace Smasher {
 
-	BaseLayer::BaseLayer(Smasher::Engine& engine) : Smasher::Layer(engine) {};
+	BaseLayer::BaseLayer(Smasher::Engine &engine) : Smasher::Layer(engine) {};
 
 	Layer::~Layer() {
 		m_EntityMap.clear();
@@ -17,20 +17,20 @@ namespace Smasher {
 		m_AsyncEventSubscriptionsByType.clear();
 	}
 
-	void Layer::RenderComponentManagers(sf::RenderWindow& window) {
-		for (IComponentManager* pManager : m_ComponentManagersWithRender) {
+	void Layer::RenderComponentManagers(sf::RenderWindow &window) {
+		for (IComponentManager *pManager : m_ComponentManagersWithRender) {
 			pManager->Render(window);
 		}
 	}
 
 	void Layer::PreUpdateComponentManagers(Millisecond delta) {
-		for (auto& [key, pManager] : m_ComponentManagers) {
+		for (auto &[key, pManager] : m_ComponentManagers) {
 			pManager->PreUpdate(delta);
 		}
 	}
 
 	void Layer::PostUpdateComponentManagers(Millisecond delta) {
-		for (auto& [key, pManager] : m_ComponentManagers) {
+		for (auto &[key, pManager] : m_ComponentManagers) {
 			pManager->PostUpdate(delta);
 		}
 	}
@@ -46,27 +46,27 @@ namespace Smasher {
 		m_Engine.Shutdown();
 	}
 
-	void Layer::ProcessEvent(Event& event)
+	void Layer::ProcessEvent(Event &event)
 	{
 		const std::type_index index = event.GetEventType();
 		std::string typeName = index.name();
-		auto& subscriptionList = m_EventSubscriptionsByType[index];
-		for (auto& subsription : subscriptionList) {
+		auto &subscriptionList = m_EventSubscriptionsByType[index];
+		for (auto &subsription : subscriptionList) {
 			subsription->Callback(event);
 		}
 	}
 
-	void Layer::ProcessAsyncEvent(Event& event)
+	void Layer::ProcessAsyncEvent(Event &event)
 	{
 		const std::type_index index = event.GetEventType();
 		std::string typeName = index.name();
-		auto& subscriptionList = m_AsyncEventSubscriptionsByType[index];
-		for (auto& subsription : subscriptionList) {
-			subsription->Callback(event);
+		auto &subscriptionList = m_AsyncEventSubscriptionsByType[index];
+		for (auto &pSubsription : subscriptionList) {
+			pSubsription->Callback(event);
 		}
 	}
 
-	Entity& Layer::MoveEntity(Entity& entity)
+	Entity& Layer::MoveEntity(Entity &entity)
 	{
 		if (&entity.GetLayer() == this) {
 			return entity; // Can't move entity to this layer

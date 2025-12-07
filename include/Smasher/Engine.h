@@ -29,14 +29,14 @@ namespace Smasher {
 	public:
 		Engine();
 		Engine(int width, int height);
-		Engine(int width, int height, const sf::ContextSettings& settings);
+		Engine(int width, int height, const sf::ContextSettings &settings);
 		~Engine();
 
 		// non-copyable, moveable
 		Engine(const Engine&) = delete;
-		Engine(Engine&& other) noexcept;
+		Engine(Engine &&other) noexcept;
 		Engine& operator =(const Engine&) = delete;
-		Engine& operator =(Engine&& other) noexcept;
+		Engine& operator =(Engine &&other) noexcept;
 
 		static Engine CreateHeadless();
 
@@ -44,7 +44,7 @@ namespace Smasher {
 		void Run();
 		void Shutdown();
 		void Update(Millisecond delta);
-		void Render(sf::RenderWindow& rWindow);
+		void Render();
 
 		// Creates layer and adds it to transition list
 		template<class T, typename... Args>
@@ -81,11 +81,11 @@ namespace Smasher {
 		void BENCHMARK_LogAccumulatedTime();
 #endif
 		Engine(bool headless); // Headless constructor
-		void OnWindowClose(Events::WindowCloseEvent& event);
-		void OnWindowResize(Events::WindowResizeEvent& event);
+		void OnWindowClose(Events::WindowCloseEvent &event);
+		void OnWindowResize(Events::WindowResizeEvent &event);
 
-		void AddLayer(LayerTransition& transition);
-		void RemoveLayer(LayerTransition& transition);
+		void AddLayer(LayerTransition &transition);
+		void RemoveLayer(LayerTransition &transition);
 
 		void HandleLayerTransitions(); // Handles all layer transitions
 
@@ -94,7 +94,7 @@ namespace Smasher {
 
 		bool m_Valid = true; // Becomes false if this object is moved
 		std::vector<LayerTransition> m_LayerTransitions;
-		std::unique_ptr<sf::RenderWindow> m_Window = nullptr;
+		std::unique_ptr<sf::RenderWindow> m_WindowPtr = nullptr;
 		std::atomic_bool m_RunningAtomic = false;
 		bool m_Headless = false;
 		bool m_IsWindowOpen = false; // Needed to prevent double delete on Window Context

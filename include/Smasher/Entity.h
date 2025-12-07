@@ -19,16 +19,16 @@ namespace Smasher {
 		friend class Layer;
 	public:
 		Entity() = delete;
-		Entity(Layer& state, UUID uuid) : m_LayerRef(state), m_UUID(uuid), m_Engine(state.GetEngine()) {};
-		Entity(const Entity& other) = delete;
-		Entity(Entity&& other) noexcept : m_LayerRef(other.m_LayerRef), m_UUID(other.m_UUID), m_Engine(other.m_Engine) {};
-		Entity& operator =(const Entity& other) = delete;
+		Entity(Layer &state, UUID uuid) : m_LayerRef(state), m_Uuid(uuid), m_Engine(state.GetEngine()) {};
+		Entity(const Entity &other) = delete;
+		Entity(Entity &&other) noexcept : m_LayerRef(other.m_LayerRef), m_Uuid(other.m_Uuid), m_Engine(other.m_Engine) {};
+		Entity& operator =(const Entity &other) = delete;
 		Entity& operator =(Entity&&) = delete; // No need for this so far and seems dangerous
 		virtual ~Entity();
 
 		Layer& GetLayer() { return m_LayerRef.get(); };
 		Engine& GetEngine() { return m_Engine; };
-		UUID GetUUID() const { return m_UUID; };
+		UUID GetUUID() const { return m_Uuid; };
 
 		virtual void Init() {}
 
@@ -55,12 +55,12 @@ namespace Smasher {
 		T& GetComponent() const;
 
 	protected:
-		void SetLayer(Layer& layer) { m_LayerRef = layer; }
+		void SetLayer(Layer &layer) { m_LayerRef = layer; }
 
 	private:
-		const UUID m_UUID;
+		const UUID m_Uuid;
 		std::reference_wrapper<Layer> m_LayerRef;
-		Engine& m_Engine;
+		Engine &m_Engine;
 		std::unordered_map<std::type_index, std::reference_wrapper<IComponent>> m_ComponentsByType;
 	};
 }

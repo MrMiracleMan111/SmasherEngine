@@ -3,12 +3,12 @@
 #include "Smasher/Layer.h"
 #include "Smasher/Engine.h"
 
-Smasher::EventFeeder::EventFeeder(EventManager& eventManager, Engine& engine) : m_EventManager(eventManager), m_Engine(engine)
+Smasher::EventFeeder::EventFeeder(EventManager &eventManager, Engine &engine) : m_EventManager(eventManager), m_Engine(engine)
 {
 	m_KeyboardState.fill(false);
 }
 
-void Smasher::EventFeeder::ForwardSFMLEvent(const sf::Event& event)
+void Smasher::EventFeeder::ForwardSFMLEvent(const sf::Event &event)
 {
 	switch (event.type)
 	{

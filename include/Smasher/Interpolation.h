@@ -25,15 +25,14 @@ namespace Smasher {
 		float SMASHER_API easeOutElastic(float x);
 		float SMASHER_API easeInOutElastic(float x);
 		float SMASHER_API step(float x);
-		float SMASHER_API cubicBezier(float t, float p0, float p1, float p2, float p3);
 	};
 
 	template <typename T>
 	class Interpolated {
 	public:
 		Interpolated();
-		Interpolated(const T& value);
-		Interpolated(const T& startValue, const T& endValue);
+		Interpolated(const T &value);
+		Interpolated(const T &startValue, const T &endValue);
 
 		const Smasher::Millisecond& GetDuration() const { return m_Duration; };
 		void SetDuration(Smasher::Millisecond duration) { m_Duration = duration; };
@@ -42,7 +41,7 @@ namespace Smasher {
 		T Get();
 
 		// Set the value without interpolation
-		void Set(const T& value);
+		void Set(const T &value);
 		void SetCurve(InterpolationType type) { m_Curve = type; }
 		Interpolated& operator=(const T&);
 	private:
