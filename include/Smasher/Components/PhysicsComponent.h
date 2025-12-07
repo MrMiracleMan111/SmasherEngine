@@ -58,6 +58,7 @@ namespace Smasher {
 		template<class T>
 		PhysicsComponent& SetOnCollisionCallback(void (T:: *method)(PhysicsCollision), T *instance);
 
+		const b2BodyId& GetBodyId() const { return m_BodyId; }
 		PhysicsType GetPhysicsType() { return m_PhysicsType; }
 		sf::Vector2f GetPosition() const;
 		sf::Vector2f GetVelocity() const;
