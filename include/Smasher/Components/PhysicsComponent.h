@@ -55,6 +55,7 @@ namespace Smasher {
 		PhysicsComponent& SetOnCollisionCallback(void (T:: *method)(PhysicsCollision), T *instance);
 
 		PhysicsType GetPhysicsType() { return m_PhysicsType; }
+		const b2BodyId& GetBodyId() const { return m_BodyId; }
 		sf::Vector2f GetPosition() const;
 		sf::Vector2f GetVelocity() const;
 		Smasher::Degrees GetRotation() const;
