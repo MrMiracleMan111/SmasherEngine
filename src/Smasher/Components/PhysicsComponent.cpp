@@ -109,8 +109,8 @@ namespace Smasher {
 			return sf::Vector2f{ 0.f, 0.f };
 		}
 
-		b2Vec2 pos = b2Body_GetPosition(m_BodyId);
-		return sf::Vector2f{ pos.x, pos.y };
+		b2Vec2 velocity = b2Body_GetLinearVelocity(m_BodyId);
+		return sf::Vector2f{ velocity.x, velocity.y };
 	}
 
 	// Expensive
