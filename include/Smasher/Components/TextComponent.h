@@ -16,9 +16,9 @@ namespace Smasher {
 		TextComponent& operator=(const TextComponent&) = default;
 
 
-		static void StaticRenderComponent(TextComponent& self, sf::RenderWindow& rWindow);
+		static void StaticRenderComponent(TextComponent &self, sf::RenderWindow &window);
 
-		void SetEntity(Entity& rEntity) override;
+		void SetEntity(Entity &entity) override;
 
 		TextComponent& UseDefaults() {
 			m_Text.setCharacterSize(30);
@@ -34,7 +34,7 @@ namespace Smasher {
 			return *this;
 		}
 
-		TextComponent& SetString(const std::string& str);
+		TextComponent& SetString(const std::string &str);
 
 		TextComponent& SetFontSize(unsigned int size);
 

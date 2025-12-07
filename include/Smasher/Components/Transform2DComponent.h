@@ -7,7 +7,7 @@ namespace Smasher {
 	class SMASHER_API Transform2DComponent : public IComponent, private sf::Transformable {
 	public:
 		Transform2DComponent() : IComponent(), sf::Transformable() {
-			SetScale(sf::Vector2f(100.0f, 100.0f));
+			SetScale(sf::Vector2f{ 100.f, 100.f });
 		}
 
 		Transform2DComponent& SetPosition(sf::Vector2f position);

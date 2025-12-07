@@ -181,7 +181,7 @@ namespace Smasher {
 		}
 		Vec2(const sf::Vector2f& vec) : data{ .x = vec.x, .y = vec.y } {}
 		Vec2(float x, float y) : data{ .x = x, .y = y } {}
-		Vec2() : data{ .x = 0.0f, .y = 0.0f } {}
+		Vec2() : data{ .x = 0.f, .y = 0.f } {}
 
 		union {
 			struct {
@@ -205,8 +205,8 @@ namespace Smasher {
 			return *this;
 		}
 		Vec3(const sf::Vector2f& vec, float z) : data{ .x = vec.x, .y = vec.y, .z = z } {}
-		Vec3(float x, float y, float z) : data{ .x = 0.0f, .y = 0.0f, .z = z } {}
-		Vec3() : data{ .x = 0.0f, .y = 0.0f, .z = 0.0f} {}
+		Vec3(float x, float y, float z) : data{ .x = 0.f, .y = 0.f, .z = z } {}
+		Vec3() : data{ .x = 0.f, .y = 0.f, .z = 0.f} {}
 
 		union {
 			struct {

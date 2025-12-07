@@ -60,7 +60,7 @@ namespace Smasher {
 		float clamped = (float)std::clamp<long long>(elapsed.count(), 0, m_Duration.count());
 		float duration = (float)m_Duration.count();
 
-		if (duration == 0.0f) {
+		if (duration == 0.f) {
 			return m_EndValue;
 		}
 

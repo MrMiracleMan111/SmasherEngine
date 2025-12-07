@@ -17,7 +17,9 @@
 #include "Smasher/Events.h"
 
 namespace Smasher {
-	// The MIT License
+
+// The following "sdRoundBox" method was designed by Inigo Quilez
+// The MIT License
 // Copyright © 2015 Inigo Quilez
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // https://www.youtube.com/c/InigoQuilez
@@ -44,30 +46,25 @@ namespace Smasher {
 			borderRadius[2], // Bottom right corner
 			borderRadius[1], // Top right corner
 		};
-		if (p.x <= 0.0f) { r[0] = r[2]; r[1] = r[3]; }
-		if (p.y <= 0.0f) { r[0] = r[1]; }
+		if (p.x <= 0.f) { r[0] = r[2]; r[1] = r[3]; }
+		if (p.y <= 0.f) { r[0] = r[1]; }
 		sf::Vector2f q = sf::Vector2f{ std::abs(p.x), std::abs(p.y) } - b + sf::Vector2f{ r[0], r[0] };
-		sf::Vector2f t = sf::Vector2f(std::max(q.x, 0.0f), std::max(q.y, 0.0f));
-		return std::min(std::max(q.x, q.y), 0.0f) + std::sqrt(t.x*t.x + t.y*t.y) - r[0];
-
-		//r.xy = (p.x > 0.0) ? r.xy : r.zw;
-		//r.x = (p.y > 0.0) ? r.x : r.y;
-		//vec2 q = abs(p) - b + r.x;
-		//return min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - r.x;
+		sf::Vector2f t = sf::Vector2f{ std::max(q.x, 0.f), std::max(q.y, 0.f) };
+		return std::min(std::max(q.x, q.y), 0.f) + std::sqrt(t.x*t.x + t.y*t.y) - r[0];
 	}
 
-	UIPanelComponent::UIPanelComponent() : m_DebugSprite(sf::Vector2f(1.0f, 1.0f)), IComponent(), Transform2DWrapper(*this, m_Transformable)
+	UIPanelComponent::UIPanelComponent() : m_DebugSprite(sf::Vector2f{ 1.f, 1.f }), IComponent(), Transform2DWrapper(*this, m_Transformable)
 	{
 		m_DebugSprite.setFillColor(sf::Color::White);
 		m_DebugSprite.setOrigin(0.5f, 0.5f);
 	}
 
-	void UIPanelComponent::StaticRenderComponent(UIPanelComponent& self, sf::RenderWindow& rWindow)
+	void UIPanelComponent::StaticRenderComponent(UIPanelComponent &self, sf::RenderWindow &window)
 	{
 		self.m_DebugSprite.setPosition(self.m_Transformable.getPosition());
 		self.m_DebugSprite.setRotation(self.m_Transformable.getRotation());
 		self.m_DebugSprite.setScale(self.m_Transformable.getScale());
-		rWindow.draw(self.m_DebugSprite);
+		window.draw(self.m_DebugSprite);
 	}
 
 	bool UIPanelComponent::IntersectsPanel(int x, int y)
@@ -78,13 +75,11 @@ namespace Smasher {
 		pos = m_Transformable.getPosition() - pos;
 		Smasher::Radians radians = std::atan2(pos.y, pos.x);
 		float dist = std::sqrt(pos.x * pos.x + pos.y * pos.y);
-		Smasher::Radians inversePanelRadians = -m_Transformable.getRotation() * ((float)std::numbers::pi / 180.f);
+		Smasher::Radians inversePanelRadians = Smasher::ToRadians(-m_Transformable.getRotation());
 		Smasher::Radians finalRadians = radians + inversePanelRadians;
 		pos.x = std::cos(finalRadians) * dist;
 		pos.y = std::sin(finalRadians) * dist;
-		//return (std::abs(pos.x) <= (width / 2)) && (std::abs(pos.y) <= (height / 2));
-		return (sdRoundBox(pos, sf::Vector2f{ width / 2.0f, height / 2.0f }, std::to_array(m_BorderRadius)) < 0.0f);
-
+		return (sdRoundBox(pos, sf::Vector2f{ width / 2.f, height / 2.f }, std::to_array(m_BorderRadius)) < 0.f);
 	}
 
 	UIPanelComponent& UIPanelComponent::SetTexture(std::shared_ptr<Smasher::TextureResource> pTexture) {
@@ -122,7 +117,7 @@ namespace Smasher {
 
 		m_ClipTransform = sf::Transform::Identity;
 		sf::Texture& pTexture = m_TexturePtr->GetTexture();
-		sf::Vector2f dimensions = sf::Vector2f((float)pTexture.getSize().x, (float)pTexture.getSize().y);
+		sf::Vector2f dimensions = sf::Vector2f{ (float)pTexture.getSize().x, (float)pTexture.getSize().y };
 
 		float left = (float)m_ClipRect.left;
 		float top = (float)m_ClipRect.top;
@@ -159,7 +154,7 @@ namespace Smasher {
 			return m_BorderRadius[3];
 		default:
 			assert(false); // Invalid UIPanelCorner type in GetBorderRadius, must use specific corner (ie. TOP_LEFT)
-			return -1.0f;
+			return -1.f;
 		}
 	}
 
@@ -174,10 +169,10 @@ namespace Smasher {
 			m_BorderRadius[0] = radius;
 		}
 		if (tmp & (char)UIPanelCorner::TOP_LEFT) {
-			m_BorderRadius[3] = radius; //
+			m_BorderRadius[3] = radius;
 		}
 		if (tmp & (char)UIPanelCorner::TOP_RIGHT) {
-			m_BorderRadius[2] = radius; //
+			m_BorderRadius[2] = radius;
 		}
 		return *this;
 	}
@@ -188,12 +183,12 @@ namespace Smasher {
 		return *this;
 	}
 
-	UIPanelComponent& UIPanelComponent::SetBorderColor(const sf::Color& color) {
+	UIPanelComponent& UIPanelComponent::SetBorderColor(const sf::Color &color) {
 		m_Changed = true;
 		return SetBorderColor(UIPanelCorner::ALL, color);
 	}
 
-	UIPanelComponent& UIPanelComponent::SetBorderColor(UIPanelCorner corner, const sf::Color& color) {
+	UIPanelComponent& UIPanelComponent::SetBorderColor(UIPanelCorner corner, const sf::Color &color) {
 		m_Changed = true;
 		char tmp = (char)corner;
 		if (tmp & (char)UIPanelCorner::BOTTOM_RIGHT) {
@@ -227,12 +222,12 @@ namespace Smasher {
 		}
 	}
 
-	UIPanelComponent& UIPanelComponent::SetBackgroundColor(const sf::Color& color) {
+	UIPanelComponent& UIPanelComponent::SetBackgroundColor(const sf::Color &color) {
 		m_Changed = true;
 		return SetBackgroundColor(UIPanelCorner::ALL, color);
 	}
 
-	UIPanelComponent& UIPanelComponent::SetBackgroundColor(UIPanelCorner corner, const sf::Color& color) {
+	UIPanelComponent& UIPanelComponent::SetBackgroundColor(UIPanelCorner corner, const sf::Color &color) {
 		m_Changed = true;
 		char tmp = (char)corner;
 		if (tmp & (char)UIPanelCorner::BOTTOM_RIGHT) {
@@ -273,14 +268,14 @@ namespace Smasher {
 		return *this;
 	}
 
-	void UIPanelComponent::OnHoverEvent(Events::MouseMoveEvent& event)
+	void UIPanelComponent::OnHoverEvent(Events::MouseMoveEvent &event)
 	{
 		if (m_MouseMoveCallback) {
 			m_MouseMoveCallback(event);
 		}
 	}
 
-	void UIPanelComponent::OnPressEvent(Events::MouseButtonEvent& event)
+	void UIPanelComponent::OnPressEvent(Events::MouseButtonEvent &event)
 	{
 		if (m_MousePressCallback) {
 			m_MousePressCallback(event);
@@ -299,7 +294,7 @@ namespace Smasher {
 		// r.w = roundness bottom-left
 
 		UIPanelData data{
-			{ GetPosition().x, GetPosition().y, GetDepth(), (float)(GetRotation() * ((float)std::numbers::pi / 180.f))}, // position xyz, rotation w (vec4)
+			{ GetPosition().x, GetPosition().y, GetDepth(), Smasher::ToRadians(GetRotation()) }, // position xyz, rotation w (vec4)
 			{ GetScale().x, GetScale().y,  GetBorderThickness()}, // scale (vec2), border thickness (float)
 			Mat3{ GetClipTransform() }, // texTransform (Mat3)
 			// 0 bottom left
@@ -358,7 +353,8 @@ namespace Smasher {
 
 		// Cache the current GL_VERTEX_ARRAY_BINDING, GL_ARRAY_BUFFER_BINDING values
 		// so that they can be restored after, InitGLObjects
-		GLint currentVAO, currentVBO;
+		GLint currentVAO;
+		GLint currentVBO;
 		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &currentVAO);
 		glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &currentVBO);
 

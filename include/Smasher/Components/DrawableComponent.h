@@ -13,7 +13,7 @@ namespace Smasher {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief Component meant for drawing textures to screen. Textures can be passed to the @ref SetTextureAsset
-/// as either Manifest objects or by using the @ref ResourceID of the texture.
+/// as either Manifest objects or by using the @ref ResourceId of the texture.
 /// 
 /// @details
 /// The @ref DrawableComponent stores the transforms of the image and texture transforms. These
@@ -28,19 +28,19 @@ namespace Smasher {
 /// GetEngine().GetResourceManager().GetOrLoadResource<Manifest::Textures::Potrait, TextureResource>();
 /// Entity& image = state.AddEntity<Entity>();
 /// image.AddComponent<DrawableComponent>()
-///			.SetPosition(sf::Vector2f(100.0f, 50.0f))
-/// 		.SetScale(sf::Vector2f(20.0f, 20.0f))
+///			.SetPosition(sf::Vector2f{ 100.f, 50.f })
+/// 		.SetScale(sf::Vector2f{ 20.f, 20.f })
 ///			.SetTextureAsset<Manifest::Textures::Portrait>({.transluscent = true});
 /// @endcode
 /// 
 /// In this example, the texture is loaded using the filepath instead of the Manifest Object.
 /// @code
-/// state.GetEngine().GetResourceManager().GetOrLoadResource(ResourceID { 10 }, ResourcePath{ "Resources/Textures/Portrait.png" });
+/// state.GetEngine().GetResourceManager().GetOrLoadResource(ResourceId { 10 }, ResourcePath{ "Resources/Textures/Portrait.png" });
 /// Entity& image = state.AddEntity<Entity>();
 /// image.AddComponent<DrawableComponent>()
-///			.SetPosition(sf::Vector2f(100.0f, 50.0f))
-/// 		.SetScale(sf::Vector2f(20.0f, 20.0f))
-///			.SetTextureAsset(ResourceID { 10 }, {.transluscent = true});
+///			.SetPosition(sf::Vector2f{ 100.f, 50.f })
+/// 		.SetScale(sf::Vector2f{20.f, 20.f })
+///			.SetTextureAsset(ResourceId { 10 }, {.transluscent = true});
 /// @endcode
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -61,7 +61,7 @@ namespace Smasher {
 		template <class T>
 		DrawableComponent& SetTextureAsset(const TextureOptions& opts);
 
-		virtual void SetEntity(Entity& pEntity);
+		void SetEntity(Entity &Entity);
 
 		// Depth bassed to depth buffer shader [0 - 1] with [0] being top and [1] being bottom
 		DrawableComponent& SetDepth(float depth);
@@ -87,8 +87,8 @@ namespace Smasher {
 	protected:
 		BatchContext m_OpaqueBatchContext;
 		BatchContext m_TranslucentBatchContext;
-		std::shared_ptr<TextureResource> m_TextureResource; // Solely for preventing destruction of resource object
-		std::shared_ptr<ShaderResource> m_ShaderResource; // Solely for preventing destruction of resource object
+		std::shared_ptr<TextureResource> m_TextureResourcePtr; // Solely for preventing destruction of resource object
+		std::shared_ptr<ShaderResource> m_ShaderResourcePtr; // Solely for preventing destruction of resource object
 	private:
 		sf::IntRect m_ClipRect{ 0, 0, 0, 0 };
 		sf::Color m_Color = sf::Color::White;
@@ -96,8 +96,8 @@ namespace Smasher {
 		sf::Transformable m_Transformable;
 		bool m_TextureLoaded = false;
 		bool m_ClipChanged = false;
-		float m_Depth = 0.0f;
-		Degrees m_ClipRotation = 0.0f;
+		float m_Depth = 0.f;
+		Degrees m_ClipRotation = 0.f;
 	};
 }
 

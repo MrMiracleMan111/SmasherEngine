@@ -7,5 +7,5 @@ public:
 
 	static void StaticUpdateComponent(BoxControllerComponent& self, const Smasher::Millisecond& delta);
 
-	static inline const float VELOCITY = 600.0f;
+	static inline const float VELOCITY = 600.f;
 };

@@ -2,18 +2,18 @@
 #include "Smasher/Entity.h"
 
 namespace Smasher {
-	void TextComponent::StaticRenderComponent(TextComponent& self, sf::RenderWindow& rWindow) {
+	void TextComponent::StaticRenderComponent(TextComponent &self, sf::RenderWindow &window) {
 		if (self.m_FontLoaded) {
-			rWindow.draw(self.m_Text);
+			window.draw(self.m_Text);
 		}
 	}
 
-	void TextComponent::SetEntity(Entity& rEntity)
+	void TextComponent::SetEntity(Entity &entity)
 	{
-		IComponent::SetEntity(rEntity);
+		IComponent::SetEntity(entity);
 	}
 
-	TextComponent& TextComponent::SetString(const std::string& str) {
+	TextComponent& TextComponent::SetString(const std::string &str) {
 		m_Text.setString(str);
 		return *this;
 	}

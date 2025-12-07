@@ -9,17 +9,17 @@ namespace Smasher {
     DrawableComponent::DrawableComponent() : IComponent(), Transform2DWrapper(*this, m_Transformable),
         m_OpaqueBatchContext() /* Invalid State */,
         m_TranslucentBatchContext() /* Invalid State */ {
-        SetScale(sf::Vector2f(100.0f, 100.0f));
+        SetScale(sf::Vector2f{ 100.f, 100.f });
     }
 
     DrawableComponent::DrawableComponent(
         std::shared_ptr<TextureResource> texturePtr,
         std::shared_ptr<ShaderResource> shaderPtr) : IComponent(), Transform2DWrapper(*this, m_Transformable),
-        m_ShaderResource(shaderPtr),
-        m_TextureResource(texturePtr),
+        m_ShaderResourcePtr(shaderPtr),
+        m_TextureResourcePtr(texturePtr),
         m_OpaqueBatchContext() /* Invalid State */,
         m_TranslucentBatchContext() /* Invalid State */ {
-        SetScale(sf::Vector2f(100.0f, 100.0f));
+        SetScale(sf::Vector2f{ 100.f, 100.f });
 
         auto& rCompManager = static_cast<DrawableComponentManager&>(GetManager());
         SetShader(rCompManager.GetDefaultShader());
@@ -54,7 +54,7 @@ namespace Smasher {
 
     DrawableComponent& DrawableComponent::SetShader(std::shared_ptr<ShaderResource> pShader) {
         m_TransformChanged = true;
-        m_ShaderResource = pShader;
+        m_ShaderResourcePtr = pShader;
         return *this;
     }
 
@@ -80,8 +80,8 @@ namespace Smasher {
         }
 
         m_ClipTransform = sf::Transform::Identity;
-        sf::Texture& pTexture = m_TextureResource->GetTexture();
-        sf::Vector2f dimensions = sf::Vector2f((float)pTexture.getSize().x, (float)pTexture.getSize().y);
+        sf::Texture& pTexture = m_TextureResourcePtr->GetTexture();
+        sf::Vector2f dimensions = sf::Vector2f{ (float)pTexture.getSize().x, (float)pTexture.getSize().y };
         
         float left = (float)m_ClipRect.left;
         float top = (float)m_ClipRect.top;

@@ -13,7 +13,7 @@ namespace Smasher {
 		m_ResizeHandle = GetEntity().GetLayer().Subscribe<Events::WindowResizeEvent>(&CameraComponent::OnWindowResize, this);
 	}
 
-	void CameraComponent::OnWindowResize(Events::WindowResizeEvent& event) {
+	void CameraComponent::OnWindowResize(Events::WindowResizeEvent &event) {
 		m_View.setSize((float)event.WindowSize.x, (float)event.WindowSize.y);
 	}
 
@@ -48,7 +48,7 @@ namespace Smasher {
 		return *this;
 	}
 
-	CameraComponent& CameraComponent::SetTarget(sf::RenderTarget& target)
+	CameraComponent& CameraComponent::SetTarget(sf::RenderTarget &target)
 	{
 		m_Target = &target;
 		return *this;
@@ -63,7 +63,7 @@ namespace Smasher {
 		return *this;
 	}
 
-	CameraComponent& CameraComponent::ApplyToTarget(sf::RenderTarget& target)
+	CameraComponent& CameraComponent::ApplyToTarget(sf::RenderTarget &target)
 	{
 		target.setView(m_View);
 		return *this;

@@ -23,12 +23,12 @@ namespace Smasher {
 	class UIPanelComponentManager;
 
 	struct UIPanelData {
-		float position_rotation[4] = { 0 }; //x, y, z
-		float scale_borderThickness[3] = { 0 }; // x, y, z
+		float position_rotation[4] = { 0.f }; //x, y, z
+		float scale_borderThickness[3] = { 0.f }; // x, y, z
 		Mat3 texTransform = Mat3{};
 		uint32_t backgroundColors[4] = { 0 };
 		uint32_t borderColors[4] = { 0 };
-		float borderRadius[4] = { 0.0f }; // top left, top right, bottom right, bottom left
+		float borderRadius[4] = { 0.f }; // top left, top right, bottom right, bottom left
 		uint32_t hasTexture = (uint32_t)false;
 	};
 
@@ -98,7 +98,7 @@ namespace Smasher {
 		UIPanelComponent(const UIPanelComponent&) = default;
 		UIPanelComponent& operator=(const UIPanelComponent&) = default;
 
-		static void StaticRenderComponent(UIPanelComponent& self, sf::RenderWindow& rWindow);
+		static void StaticRenderComponent(UIPanelComponent &self, sf::RenderWindow &window);
 
 		// Checks if window coordinate intersects the panel
 		bool IntersectsPanel(int x, int y);
@@ -113,46 +113,59 @@ namespace Smasher {
 
 		UIPanelComponent& SetBorderThickness(float thickness);
 
-		UIPanelComponent& SetBorderColor(const sf::Color& color);
+		UIPanelComponent& SetBorderColor(const sf::Color &color);
 
-		UIPanelComponent& SetBorderColor(UIPanelCorner corner, const sf::Color& color);
+		UIPanelComponent& SetBorderColor(UIPanelCorner corner, const sf::Color &color);
 
-		UIPanelComponent& SetBackgroundColor(const sf::Color& color);
+		UIPanelComponent& SetBackgroundColor(const sf::Color &color);
 
-		UIPanelComponent& SetBackgroundColor(UIPanelCorner corner, const sf::Color& color);
+		UIPanelComponent& SetBackgroundColor(UIPanelCorner corner, const sf::Color &color);
 
 		UIPanelComponent& SetDepth(float depth);
 
-		float GetDepth() const { return m_Depth; }
-		float GetBorderRadius(const UIPanelCorner corner) const;
-		float GetBorderThickness() const { return m_BorderThickness; }
-		sf::Color GetBorderColor(const UIPanelCorner corner);
-		sf::Color GetBackgroundColor(const UIPanelCorner corner);
-		std::shared_ptr<Smasher::TextureResource> GetTexture() const { return m_TexturePtr; };
-		const std::shared_ptr<Smasher::TextureResource>& GetTextureRef() const { return m_TexturePtr; };
-		const sf::IntRect& GetClipRect() const { return m_ClipRect; }
-		Degrees GetClipRotation() const { return m_ClipRotation; }
-		const sf::Transform& GetClipTransform();
-
 		UIPanelComponent& SetTexture(std::shared_ptr<Smasher::TextureResource> pTexture);
 
-		const UIPanelState& GetPanelState() const { return m_PanelState; };
-		void SetPanelState(UIPanelState state) { m_PanelState = state; }
-
-		const UIPanelSettings& GetPanelSettings() const { return m_PanelSettings; };
 		UIPanelComponent& SetPanelSettings(UIPanelSettings settings) { m_PanelSettings = settings; return *this; }
 
 		UIPanelComponent& SetOnHoverCallback(std::function<void(Events::MouseMoveEvent&)> callback);
+
 		template<class T>
-		UIPanelComponent& SetOnHoverCallback(void (T::* method)(Events::MouseMoveEvent&), T* instance);
+		UIPanelComponent& SetOnHoverCallback(void (T:: *method)(Events::MouseMoveEvent&), T *pInstance);
 
 		UIPanelComponent& SetOnPressCallback(std::function<void(Events::MouseButtonEvent&)> callback);
+		
 		template<class T>
-		UIPanelComponent& SetOnPressCallback(void (T::* method)(Events::MouseButtonEvent&), T* instance);
+		UIPanelComponent& SetOnPressCallback(void (T:: *method)(Events::MouseButtonEvent&), T *pInstance);
 
+		void SetPanelState(UIPanelState state) { m_PanelState = state; }
+
+		float GetDepth() const { return m_Depth; }
+
+		float GetBorderRadius(const UIPanelCorner corner) const;
+
+		float GetBorderThickness() const { return m_BorderThickness; }
+
+		sf::Color GetBorderColor(const UIPanelCorner corner);
+
+		sf::Color GetBackgroundColor(const UIPanelCorner corner);
+
+		std::shared_ptr<Smasher::TextureResource> GetTexture() const { return m_TexturePtr; };
+
+		const std::shared_ptr<Smasher::TextureResource>& GetTextureRef() const { return m_TexturePtr; };
+
+		const sf::IntRect& GetClipRect() const { return m_ClipRect; }
+
+		Degrees GetClipRotation() const { return m_ClipRotation; }
+
+		const sf::Transform& GetClipTransform();
+
+		const UIPanelState& GetPanelState() const { return m_PanelState; };
+
+		const UIPanelSettings& GetPanelSettings() const { return m_PanelSettings; };
+		
 	protected:
-		void OnHoverEvent(Events::MouseMoveEvent& event);
-		void OnPressEvent(Events::MouseButtonEvent& event);
+		void OnHoverEvent(Events::MouseMoveEvent &event);
+		void OnPressEvent(Events::MouseButtonEvent &event);
 		void DrawPanel();
 		sf::Shape& GetShape() { return m_DebugSprite; };
 
@@ -178,9 +191,9 @@ namespace Smasher {
 		void InitGLObjects();
 		void UpdateGLBufferData();
 
-		float m_BorderRadius[4] = { 0.0f };
-		float m_BorderThickness = 0.0f;
-		float m_Depth = 0.0f;
+		float m_BorderRadius[4] = { 0.f };
+		float m_BorderThickness = 0.f;
+		float m_Depth = 0.f;
 		UIPanelState m_PanelState = UIPanelState::NONE;
 		UIPanelData m_PanelRenderData;
 		UIPanelSettings m_PanelSettings = UIPanelSettings::NONE;
@@ -188,7 +201,7 @@ namespace Smasher {
 		sf::Transformable m_Transformable;
 		sf::IntRect m_ClipRect{ 0, 0, 0, 0 };
 		sf::Transform m_ClipTransform;
-		Degrees m_ClipRotation = 0.0f;
+		Degrees m_ClipRotation = 0.f;
 		std::function<void(Events::MouseMoveEvent&)> m_MouseMoveCallback;
 		std::function<void(Events::MouseButtonEvent&)> m_MousePressCallback;
 		std::shared_ptr<Smasher::TextureResource> m_TexturePtr;

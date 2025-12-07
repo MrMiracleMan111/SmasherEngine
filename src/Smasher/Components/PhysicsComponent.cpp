@@ -14,7 +14,7 @@ namespace Smasher {
 		}
 	}
 
-	PhysicsComponent::PhysicsComponent(PhysicsComponent&& other) noexcept :
+	PhysicsComponent::PhysicsComponent(PhysicsComponent &&other) noexcept :
 		m_BodyId(other.m_BodyId),
 		m_BodyValid(other.m_BodyValid),
 		m_ShapeId(other.m_ShapeId),
@@ -26,7 +26,7 @@ namespace Smasher {
 		other.m_ShapeValid = false;
 	}
 
-	PhysicsComponent& PhysicsComponent::operator = (PhysicsComponent&& other) noexcept {
+	PhysicsComponent& PhysicsComponent::operator = (PhysicsComponent &&other) noexcept {
 		if (this != &other) {
 			if (m_BodyValid) {
 				b2DestroyBody(m_BodyId);
@@ -100,7 +100,7 @@ namespace Smasher {
 		}
 
 		b2Vec2 pos = b2Body_GetPosition(m_BodyId);
-		return sf::Vector2f{pos.x, pos.y};
+		return sf::Vector2f{ pos.x, pos.y };
 	};
 
 	sf::Vector2f PhysicsComponent::GetVelocity() const {
@@ -117,7 +117,7 @@ namespace Smasher {
 	Smasher::Degrees PhysicsComponent::GetRotation() const {
 		assert(m_BodyValid && "Body must be valid before calling GetAcceleration");
 		if (!m_BodyValid) {
-			return Smasher::Radians { 0.f };
+			return Smasher::Radians{ 0.f };
 		}
 
 		Smasher::Radians radians{ b2Rot_GetAngle(b2Body_GetRotation(m_BodyId)) };
@@ -193,7 +193,6 @@ namespace Smasher {
 				break;
 
 		}
-
 		return *this;
 	};
 

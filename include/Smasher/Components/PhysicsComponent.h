@@ -11,7 +11,7 @@ namespace Smasher {
 	class PhysicsComponent;
 
 	struct SMASHER_API PhysicsCollision {
-		PhysicsComponent& other; // Object collided with
+		PhysicsComponent &other; // Object collided with
 		sf::Vector2f normal; // surface normal
 	};
 
@@ -28,10 +28,10 @@ namespace Smasher {
 	public:
 		PhysicsComponent();
 		~PhysicsComponent();
-		PhysicsComponent(const PhysicsComponent& other) = delete;
-		PhysicsComponent(PhysicsComponent&& other) noexcept;
-		PhysicsComponent& operator = (const PhysicsComponent& other) = delete;
-		PhysicsComponent& operator = (PhysicsComponent&& other) noexcept;
+		PhysicsComponent(const PhysicsComponent &other) = delete;
+		PhysicsComponent(PhysicsComponent &&other) noexcept;
+		PhysicsComponent& operator = (const PhysicsComponent &other) = delete;
+		PhysicsComponent& operator = (PhysicsComponent &&other) noexcept;
 
 		void OnAddComponent() override;
 
@@ -52,16 +52,15 @@ namespace Smasher {
 		PhysicsComponent& UseCircleCollider(float radius);
 
 		template<class T>
-		PhysicsComponent& SetOnCollisionCallback(void (T::* method)(PhysicsCollision), T* instance);
+		PhysicsComponent& SetOnCollisionCallback(void (T:: *method)(PhysicsCollision), T *instance);
 
 		PhysicsType GetPhysicsType() { return m_PhysicsType; }
 		sf::Vector2f GetPosition() const;
 		sf::Vector2f GetVelocity() const;
-		sf::Vector2f GetAcceleration() const;
 		Smasher::Degrees GetRotation() const;
 
 	protected:
-		void OnCollide(PhysicsCollision& collision);
+		void OnCollide(PhysicsCollision &collision);
 
 	private:
 		PhysicsType m_PhysicsType = PhysicsType::STATIC;

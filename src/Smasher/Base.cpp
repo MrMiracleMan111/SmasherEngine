@@ -28,9 +28,9 @@ namespace Smasher {
 		array[2 * 3 + 1] = tmp[3 * 4 + 1];
 
 		// Last Row is [0 0 1] to satify homogenous coordinates
-		array[0 * 3 + 2] = 0.0f;
-		array[1 * 3 + 2] = 0.0f;
-		array[2 * 3 + 2] = 1.0f;
+		array[0 * 3 + 2] = 0.f;
+		array[1 * 3 + 2] = 0.f;
+		array[2 * 3 + 2] = 1.f;
 
 	}
 
