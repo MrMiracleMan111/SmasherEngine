@@ -45,6 +45,10 @@ namespace Smasher {
 
 		PhysicsComponent& Move(sf::Vector2f delta);
 
+		PhysicsComponent& ApplyImpulse(sf::Vector2f impulse);
+
+		PhysicsComponent& ApplyForce(sf::Vector2f force);
+
 		PhysicsComponent& SetOnCollisionCallback(std::function<void(PhysicsCollision)> callback);
 
 		PhysicsComponent& UseRectCollider(float width, float height);
@@ -55,10 +59,10 @@ namespace Smasher {
 		PhysicsComponent& SetOnCollisionCallback(void (T:: *method)(PhysicsCollision), T *instance);
 
 		PhysicsType GetPhysicsType() { return m_PhysicsType; }
-		const b2BodyId& GetBodyId() const { return m_BodyId; }
 		sf::Vector2f GetPosition() const;
 		sf::Vector2f GetVelocity() const;
 		Smasher::Degrees GetRotation() const;
+		float GetMass() const;
 
 	protected:
 		void OnCollide(PhysicsCollision &collision);

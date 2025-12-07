@@ -124,6 +124,16 @@ namespace Smasher {
 		return Smasher::ToDegrees(radians);
 	}
 
+	float PhysicsComponent::GetMass() const {
+		assert(m_BodyValid && "Body must be valid before calling GetAcceleration");
+		if (!m_BodyValid) {
+			return 0.f;
+		}
+
+		return b2Body_GetMass(m_BodyId);
+	}
+
+
 	void PhysicsComponent::OnCollide(PhysicsCollision& collision) {
 		if (!m_OnCollisionCallback) {
 			return;
@@ -174,6 +184,26 @@ namespace Smasher {
 
 		return *this;
 	};
+
+	PhysicsComponent& PhysicsComponent::ApplyImpulse(sf::Vector2f impulse) {
+		assert(m_BodyValid && "Body must be valid before calling Move");
+		if (!m_BodyValid) {
+			return *this;
+		}
+
+		b2Body_ApplyForceToCenter(m_BodyId, b2Vec2{ impulse.x ,impulse.y }, true);
+		return *this;
+	}
+
+	PhysicsComponent& PhysicsComponent::ApplyForce(sf::Vector2f force) {
+		assert(m_BodyValid && "Body must be valid before calling Move");
+		if (!m_BodyValid) {
+			return *this;
+		}
+
+		b2Body_ApplyForceToCenter(m_BodyId, b2Vec2{ force.x ,force.y }, true);
+		return *this;
+	}
 
 	PhysicsComponent& PhysicsComponent::SetPhysicsType(PhysicsType type) {
 		assert(m_BodyValid && "Body must be valid before calling Move");
