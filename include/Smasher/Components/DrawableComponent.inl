@@ -8,7 +8,7 @@ namespace Smasher {
 		// Load Resource
 		auto pTextureResource = rResourceManager.template GetOrLoadResource<T, TextureResource>();
 		// Update Render Batch
-		rCompManager.OnComponentSetTexture(*this, T::ID, opts.transluscent);
+		rCompManager.OnComponentSetTexture(*this, T::Id, opts.transluscent);
 		// Assign texture to component
 		m_TextureResource = pTextureResource;
 

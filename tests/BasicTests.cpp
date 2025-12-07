@@ -507,7 +507,7 @@ TEST(ResourcesTest, OpenFileResource) {
 	Smasher::Engine engine(640, 420);
 	Smasher::ResourceManager& rResourceManager = engine.GetResourceManager();
 	std::ios_base::openmode flags = std::ios_base::out;
-	Smasher::ResourceID fileResourceID{ 1 };
+	Smasher::ResourceId fileResourceID{ 1 };
 	auto pFileResource = rResourceManager.GetOrLoadResource<Smasher::FileResource>(fileResourceID, Smasher::ResourcePath{ "test_file" }, flags);
 
 	EXPECT_NO_THROW({ rResourceManager.GetResource<Smasher::FileResource>(fileResourceID); });
@@ -531,7 +531,7 @@ TEST(ResourcesTest, OpenReleaseFileResource) {
 	Smasher::ResourceManager& rResourceManager = engine.GetResourceManager();
 	std::ios_base::openmode flags = std::ios_base::out;
 	Smasher::ResourcePath paths[] = { Smasher::ResourcePath{"test_file"} };
-	auto pFileResource = rResourceManager.GetOrLoadResource<Smasher::FileResource>(Smasher::ResourceID{ 1 }, paths, size_t{ 1 }, flags);
+	auto pFileResource = rResourceManager.GetOrLoadResource<Smasher::FileResource>(Smasher::ResourceId{ 1 }, paths, size_t{ 1 }, flags);
 	pFileResource->GetFileStream() << "message";
 }
 
@@ -542,7 +542,7 @@ TEST(ResourcesTest, MoveResourceManager) {
 		Smasher::ResourceManager& manager = engine.GetResourceManager();
 		std::ios_base::openmode flags = std::ios_base::out;
 		Smasher::ResourcePath paths[] = { Smasher::ResourcePath{"test_file"} };
-		auto pFileResource = manager.GetOrLoadResource<Smasher::FileResource>(Smasher::ResourceID{ 1 }, paths, size_t{ 1 }, flags);
+		auto pFileResource = manager.GetOrLoadResource<Smasher::FileResource>(Smasher::ResourceId{ 1 }, paths, size_t{ 1 }, flags);
 		pFileResource->GetFileStream() << "message";
 
 		Smasher::ResourceManager tmp = std::move(manager);

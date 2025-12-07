@@ -31,7 +31,7 @@ namespace Smasher {
 
 		friend class Entity;
 	public:
-		BaseComponentManager(Layer& state);
+		BaseComponentManager(Layer &state);
 		BaseComponentManager() = delete;
 		BaseComponentManager(const BaseComponentManager&) = delete;
 		BaseComponentManager(BaseComponentManager&&) = delete;
@@ -41,12 +41,12 @@ namespace Smasher {
 
 		virtual void PreUpdateComponents() {};
 		virtual void UpdateComponents(Millisecond delta) {};
-		virtual void RenderComponents(sf::RenderWindow& rWindow) {};
+		virtual void RenderComponents(sf::RenderWindow &window) {};
 
 		template<typename... Args>
 		T& AddComponent(Entity& rEntity, Args&&... args);
 
-		virtual void RemoveComponent(IComponent& rComponentInterface);
+		virtual void RemoveComponent(IComponent &componentInterface);
 
 		void PreUpdate(Millisecond delta);
 		void Update(Millisecond delta);

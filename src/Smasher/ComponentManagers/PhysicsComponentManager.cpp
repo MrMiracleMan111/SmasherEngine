@@ -1,6 +1,6 @@
 #include "Smasher/Physics.h"
 namespace Smasher {
-	PhysicsComponentManager::PhysicsComponentManager(Layer& state) :
+	PhysicsComponentManager::PhysicsComponentManager(Layer &state) :
 		BaseComponentManager<PhysicsComponent>(state)
 	{
 	}

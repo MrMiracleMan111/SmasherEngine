@@ -8,7 +8,7 @@ namespace Smasher {
         uint64_t hash2 = hash_str(vert.c_str());
         uint64_t combinedHash = hash1 ^ hash2;
 
-        ResourceID resourceID{ combinedHash };
+        ResourceId resourceID{ combinedHash };
         return std::make_shared<Smasher::ShaderResource>(resourceID, vert, frag);
     }
 }

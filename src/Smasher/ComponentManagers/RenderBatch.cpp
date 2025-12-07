@@ -14,7 +14,7 @@
 #endif
 
 namespace Smasher {
-	RenderBatch::RenderBatch(std::list<RenderBatch>& list, GLuint quadVBO, GLuint quadEBO) :
+	RenderBatch::RenderBatch(std::list<RenderBatch> &list, GLuint quadVBO, GLuint quadEBO) :
 		ownerBatchList(list),
 		quadVBO(quadVBO),
 		quadEBO(quadEBO)
@@ -29,7 +29,7 @@ namespace Smasher {
 		glDeleteBuffers(1, &quadVBO);
 	}
 
-	RenderBatch::RenderBatch(RenderBatch&& other) :
+	RenderBatch::RenderBatch(RenderBatch &&other) :
 		ownerBatchList(other.ownerBatchList),
 		quadVBO(other.quadVBO),
 		quadEBO(other.quadEBO) {
@@ -40,7 +40,7 @@ namespace Smasher {
 		models = std::move(other.models);
 		InitGLObjects();
 	};
-	RenderBatch& RenderBatch::operator = (RenderBatch&& other) {
+	RenderBatch& RenderBatch::operator = (RenderBatch &&other) {
 		quadVBO = other.quadVBO;
 		quadEBO = other.quadEBO;
 		models = other.models;
@@ -61,20 +61,16 @@ namespace Smasher {
 
 		glGenVertexArrays(1, &instanceVAO);
 		glGenBuffers(1, &instanceVBO);
-		//glGenBuffers(1, &quadVBO);
-		//glGenBuffers(1, &quadEBO);
 
 		glBindVertexArray(instanceVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-		//glBufferData(GL_ARRAY_BUFFER, sizeof(RenderBatch::StaticVertices), RenderBatch::StaticVertices, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, quadVBO); // Use preloaded VBO data from RenderBatch::STATIC_VERTICES
 
 		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)0);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
 		glEnableVertexAttribArray(1);
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadEBO);
-		//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(RenderBatch::StaticIndices), RenderBatch::StaticIndices, GL_STATIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadEBO); // Use preloaded EBO data from RenderBatch::STATIC_INDICES
 		glBindVertexArray(0);
 
 		glBindVertexArray(instanceVAO);
@@ -84,12 +80,6 @@ namespace Smasher {
 
 		glBindVertexArray(instanceVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-
-		// Instance Position Vec3
-		// glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Smasher::ModelData), (GLvoid*)(offsetof(Smasher::ModelData, position)));
-
-		// Instance Scale Vec 2
-		// glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Smasher::ModelData), (GLvoid*)(offsetof(Smasher::ModelData, scale)));
 
 		// Instance Vertex Transform Matrix
 		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Smasher::ModelData), (GLvoid*)(offsetof(Smasher::ModelData, vertTransform) + (0 * sizeof(float))));
@@ -107,7 +97,6 @@ namespace Smasher {
 
 		// Instance Depth
 		glVertexAttribPointer(9, 1, GL_FLOAT, GL_FALSE, sizeof(Smasher::ModelData), (GLvoid*)(offsetof(Smasher::ModelData, depth)));
-
 
 		glEnableVertexAttribArray(2);
 		glEnableVertexAttribArray(3);
@@ -144,7 +133,7 @@ namespace Smasher {
 			const std::size_t index = context.index;
 			models.at(index).ownerContext = nullptr;
 
-			const BatchContext* newOwnerContex = models.at(modelCount - 1).ownerContext;
+			const BatchContext *newOwnerContex = models.at(modelCount - 1).ownerContext;
 			std::swap(models.at(index), models.at(modelCount - 1));
 			if (models.at(index).ownerContext != nullptr) {
 				models.at(index).ownerContext->index = index;
@@ -156,7 +145,7 @@ namespace Smasher {
 			// Nothing
 		}
 		else {
-			assert(false); // unreachable
+			assert(false); // should be unreachable
 		}
 
 		--modelCount;
@@ -172,7 +161,7 @@ namespace Smasher {
 		ownerBatchList.splice(iterator, ownerBatchList, ownerBatchList.begin());
 	}
 
-	void RenderBatch::AddModel(BatchContext& context) {
+	void RenderBatch::AddModel(BatchContext &context) {
 		dirty = true; // Data will be copied in later
 		context.index = modelCount;
 		context.batch = this;

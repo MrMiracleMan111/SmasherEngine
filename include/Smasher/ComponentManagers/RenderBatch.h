@@ -28,17 +28,17 @@ namespace Smasher {
 	// Models will use 2D plane
 	struct SMASHER_API RenderBatch {
 		RenderBatch() = delete;
-		RenderBatch(std::list<RenderBatch>& list, GLuint quadVBO, GLuint quadEBO);
+		RenderBatch(std::list<RenderBatch> &list, GLuint quadVBO, GLuint quadEBO);
 		~RenderBatch();
-		RenderBatch(const RenderBatch& other) = delete;
+		RenderBatch(const RenderBatch &other) = delete;
 		RenderBatch(RenderBatch&&);
-		RenderBatch& operator = (const RenderBatch& other) = delete;
+		RenderBatch& operator = (const RenderBatch &other) = delete;
 		RenderBatch& operator = (RenderBatch&&);
 
 		static const std::size_t MAX_MODEL_COUNT = 512; // Arbitrary
 		std::array<ModelData, RenderBatch::MAX_MODEL_COUNT> models; // doesn't keep accurate track of model count
-		sf::Texture* pTexture = nullptr;
-		std::list<RenderBatch>& ownerBatchList;
+		sf::Texture *pTexture = nullptr;
+		std::list<RenderBatch> &ownerBatchList;
 		std::list<RenderBatch>::iterator iterator;
 		bool dirty = false; // Has the render batch or any elemnts inside changed?
 		bool full = false; // Can more models be added to this batch
@@ -47,17 +47,17 @@ namespace Smasher {
 		GLuint instanceVBO;
 		GLuint quadVBO; // Quad mesh data (buffers are created DrawableComponentManager)
 		GLuint quadEBO; // Quad mesh data (buffers are created DrawableComponentManager)
-		static inline const GLubyte StaticIndices[6]{
+		static inline const GLubyte STATIC_INDICES[6]{
 			0, 1, 2,   // first triangle
 			2, 3, 0    // second triangle
 		};
 
-		static inline const float StaticVertices[24]{
+		static inline const float STATIC_VERTICES[24]{
 			//   Position       Tex Coord
-			   -0.5f, -0.5f,     0.0, 0.0,   // bottom left
-				0.5f, -0.5f,     1.0, 0.0,   // bottom right
-				0.5f,  0.5f,     1.0, 1.0,   // top right
-			   -0.5f,  0.5f,     0.0, 1.0,   // top left
+			   -0.5f, -0.5f,     0.f, 0.f,   // bottom left
+				0.5f, -0.5f,     1.f, 0.f,   // bottom right
+				0.5f,  0.5f,     1.f, 1.f,   // top right
+			   -0.5f,  0.5f,     0.f, 1.f,   // top left
 		};
 
 		void InitGLObjects();
@@ -74,11 +74,11 @@ namespace Smasher {
 	};
 
 	struct SMASHER_API BatchContext {
-		RenderBatch* batch = nullptr; // Pointer to a render batch the drawable component is a part of
+		RenderBatch *batch = nullptr; // Pointer to a render batch the drawable component is a part of
 		std::size_t index = SIZE_MAX; // Index of the drawable component within the Render Batch
 
 		BatchContext() = default; // Invalid state
-		BatchContext(RenderBatch* batch, std::size_t index) :
+		BatchContext(RenderBatch *batch, std::size_t index) :
 			batch(batch), index(index) {}
 
 		// Non-Copyable

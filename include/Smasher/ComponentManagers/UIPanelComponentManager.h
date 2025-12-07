@@ -11,23 +11,23 @@ namespace Smasher {
 	class UIPanelComponentManager : public BaseComponentManager<UIPanelComponent> {
 	public:
 		UIPanelComponentManager() = delete;
-		UIPanelComponentManager(Layer& state);
+		UIPanelComponentManager(Layer &state);
 		UIPanelComponentManager(const UIPanelComponentManager&) = default;
 		~UIPanelComponentManager() = default;
 
 		template<typename... Args>
-		UIPanelComponent& AddComponent(Entity& entity, Args&&... args);
+		UIPanelComponent& AddComponent(Entity &entity, Args&&... args);
 
-		void RenderComponents(sf::RenderWindow& rWindow) override;
+		void RenderComponents(sf::RenderWindow &window) override;
 
-		void OnMouseMove(Events::MouseMoveEvent& event);
-		void OnMouseButton(Events::MouseButtonEvent& event);
-		void SetShaderResource(std::shared_ptr<ShaderResource> pShaderResource) { m_ShaderResource = pShaderResource; }
+		void OnMouseMove(Events::MouseMoveEvent &event);
+		void OnMouseButton(Events::MouseButtonEvent &event);
+		void SetShaderResource(std::shared_ptr<ShaderResource> pShaderResource) { m_ShaderResourcePtr = pShaderResource; }
 
 	private:
 		EventSubscriptionHandle m_MouseMoveSubscription;
 		EventSubscriptionHandle m_MouseButtonSubscription;
-		std::shared_ptr<ShaderResource> m_ShaderResource;
+		std::shared_ptr<ShaderResource> m_ShaderResourcePtr;
 	};
 }
 

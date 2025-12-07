@@ -161,12 +161,12 @@ namespace Smasher {
 		GLuint quadVBO = std::numeric_limits<GLuint>::max();
 		GLuint quadEBO = std::numeric_limits<GLuint>::max();
 
-		static inline const GLubyte StaticIndices[6]{
+		static inline const GLubyte STATIC_INDICES[6]{
 			0, 1, 2,   // first triangle
 			2, 3, 0    // second triangle
 		};
 
-		static inline const float StaticVertices[24]{
+		static inline const float STATIC_VERTICES[24]{
 			//   Position       Tex Coord
 			   -0.5f, -0.5f,     0.0, 0.0,   // bottom left
 				0.5f, -0.5f,     1.0, 0.0,   // bottom right

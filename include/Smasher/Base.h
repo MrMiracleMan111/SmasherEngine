@@ -38,7 +38,7 @@ namespace Smasher {
 	class IComponent;
 	class Entity;
 	using Millisecond = std::chrono::milliseconds;
-	using ResourceID = uint64_t;
+	using ResourceId = uint64_t;
 	using ResourcePath = std::filesystem::path;
 	using Degrees = float;
 	using Radians = float;
@@ -73,7 +73,7 @@ namespace Smasher {
 
 	template <typename T>
 	concept ManifestItemHasResourceID = requires(T) {
-		T::ID; // Checks if 'member_name' is a valid member access
+		T::Id; // Checks if 'member_name' is a valid member access
 	};
 
 	template <typename T>

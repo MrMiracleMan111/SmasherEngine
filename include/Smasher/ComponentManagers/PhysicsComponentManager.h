@@ -8,13 +8,10 @@ namespace Smasher {
 	class SMASHER_API PhysicsComponentManager : public BaseComponentManager<PhysicsComponent> {
 	public:
 		PhysicsComponentManager() = delete;
-		PhysicsComponentManager(Layer& state);
+		PhysicsComponentManager(Layer &state);
 		PhysicsComponentManager(const PhysicsComponentManager&) = default;
 		~PhysicsComponentManager();
 
 		void PostUpdate(Smasher::Millisecond delta) override;
-
-		//template<typename... Args>
-		//PhysicsComponent& AddComponent(Entity& rEntity, Args&&... args) {};
 	};
 }

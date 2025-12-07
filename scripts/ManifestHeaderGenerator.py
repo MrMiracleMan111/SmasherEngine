@@ -87,7 +87,7 @@ def RecursiveParse(data, name, out_file, depth, resource_dir=None):
 
     elif isinstance(data, list):
         out_file.write((depth * "\t") + f"struct {FormatName(name)}" + " {\n")
-        out_file.write(((depth + 1) * "\t") + f'static constexpr ResourceID ID = hash_str("{name}");\n')
+        out_file.write(((depth + 1) * "\t") + f'static constexpr ResourceId Id = hash_str("{name}");\n')
         out_file.write(((depth + 1) * "\t") + f'static inline const ResourcePath PATHS[] = ' + '{')
         first = True
         for item in data:
@@ -101,7 +101,7 @@ def RecursiveParse(data, name, out_file, depth, resource_dir=None):
         out_file.write((depth * "\t") + "};\n")
     else:
         out_file.write((depth * "\t") + f"struct {FormatName(name)}" + " {\n")
-        out_file.write(((depth + 1) * "\t") + f'static constexpr ResourceID ID = hash_str("{data}");\n')
+        out_file.write(((depth + 1) * "\t") + f'static constexpr ResourceId Id = hash_str("{data}");\n')
         out_file.write(((depth + 1) * "\t") + f'static inline const ResourcePath PATH {{ "{data}" }};\n')
         out_file.write((depth * "\t") + "};\n")
 

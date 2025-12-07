@@ -28,7 +28,7 @@ namespace Smasher {
 
 		friend class Entity;
 	public:
-		GenericComponentManager(Layer& state);
+		GenericComponentManager(Layer &state);
 		GenericComponentManager() = delete;
 		GenericComponentManager(const GenericComponentManager&) = delete;
 		GenericComponentManager(GenericComponentManager&&) = delete;
@@ -46,28 +46,28 @@ namespace Smasher {
 		void Update(Millisecond delta) override;
 
 		/// @brief Renders all components.
-		/// @param rWindow Reference to the `sf::RenderWindow` to draw on.
+		/// @param window Reference to the `sf::RenderWindow` to draw on.
 		/// 
 		/// @ref GenericComponentManager::Render is called only if Component type `T` defines `StaticUpdateComponent(T& self)`.
 		/// Render order matching component insertion order is not guaranteed.
-		void Render(sf::RenderWindow& rWindow);
+		void Render(sf::RenderWindow &window);
 
 		/// @brief Renders all components
-		/// @param rEntity Entity to attach the component to.
+		/// @param entity Entity to attach the component to.
 		/// @param args Arguments to pass to the component constructor.
 		/// 
 		/// @ref GenericComponentManager::Render is called only if Component type `T` defines `StaticUpdateComponent(T& self)`.
 		template<typename... Args>
-		T& AddComponent(Entity& rEntity, Args&&... args);
+		T& AddComponent(Entity &entity, Args&&... args);
 
 		/// @brief Marks components for removal
-		/// @param rComponentInterface Reference to @ref IComponent instance to remove.
+		/// @param componentInterface Reference to @ref IComponent instance to remove.
 		/// 
 		/// If the component status is @ref ComponentStatus::VALID it will be ignored
 		/// and nothing will happen. This method only marks components for removal.
 		/// Component removal is handled after @ref GenericComponentManager::Update by the 
 		/// `GenericComponentManager::RemoveMarkedComponents` private method.
-		void RemoveComponent(IComponent& rComponentInterface);
+		void RemoveComponent(IComponent &componentInterface);
 
 	private:
 		void RemoveMarkedComponents();

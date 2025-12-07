@@ -30,35 +30,35 @@ namespace Smasher {
 	class SMASHER_API DrawableComponentManager : public BaseComponentManager<DrawableComponent> {
 	public:
 		DrawableComponentManager() = delete;
-		DrawableComponentManager(Layer& state);
+		DrawableComponentManager(Layer &state);
 		DrawableComponentManager(const DrawableComponentManager&) = default;
 		~DrawableComponentManager();
 
-		void Render(sf::RenderWindow& rWindow) override;
+		void Render(sf::RenderWindow &window) override;
 
 		template<typename... Args>
-		DrawableComponent& AddComponent(Entity& entity, Args&&... args);
+		DrawableComponent& AddComponent(Entity &entity, Args&&... args);
 
 		// Sets component batch index and render batch pointer
-		void OnComponentChangeData(DrawableComponent& rComponent);
-		void OnComponentSetTexture(DrawableComponent& rComponent, ResourceID id, bool transulcent);
-		void OnComponentDelete(DrawableComponent& rComponent);
+		void OnComponentChangeData(DrawableComponent &component);
+		void OnComponentSetTexture(DrawableComponent &component, ResourceId textureId, bool transulcent);
+		void OnComponentDelete(DrawableComponent &component);
 		void SetShaderResource(std::shared_ptr<ShaderResource> pShaderResource) { m_ShaderResource = pShaderResource; }
 
-		void OnWindowClose(Events::WindowCloseEvent& event);
+		void OnWindowClose(Events::WindowCloseEvent &event);
 
 		std::shared_ptr<ShaderResource> GetDefaultShader() const { return m_DefaultShader; }
 
 		GLuint GetQuadVBO() const { return m_QuadVBO; }
 		GLuint GetQuadEBO() const { return m_QuadEBO; }
 
-		static const ResourceID EMPTY_TEXTURE_ID = 1;
+		static const ResourceId EMPTY_TEXTURE_ID = 1;
 
 	private:
-		void DrawBatch(RenderBatch& rRenderBatch);
+		void DrawBatch(RenderBatch &renderBatch);
 		void InitQuadGLBuffers();
-		std::map<ResourceID, std::list<RenderBatch>> m_OpaqueBatches; // Linked List of Batches
-		std::map<ResourceID, std::list<RenderBatch>> m_TranslucentBatches;// Linked List of Batches
+		std::map<ResourceId, std::list<RenderBatch>> m_OpaqueBatches; // Linked List of Batches
+		std::map<ResourceId, std::list<RenderBatch>> m_TranslucentBatches;// Linked List of Batches
 
 		std::shared_ptr<ShaderResource> m_ShaderResource; // Solely for preventing destruction of resource object
 		std::shared_ptr<ShaderResource> m_DefaultShader; // Shader loaded from EngineConfig.h
