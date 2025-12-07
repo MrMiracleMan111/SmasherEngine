@@ -4,13 +4,13 @@
 
 class ExampleWindowLayer : public Smasher::Layer {
 public:
-	ExampleWindowLayer(Smasher::Engine& engine) : Smasher::Layer(engine) {};
+	ExampleWindowLayer(Smasher::Engine &engine) : Smasher::Layer(engine) {};
 	~ExampleWindowLayer();
 	void Init() override;
 	void Reset() override;
-	void Render(sf::RenderWindow& window) override;
+	void Render(sf::RenderWindow &window) override;
 
 private:
-	void OnKeyPress(Smasher::Events::KeyboardEvent& e);
+	void OnKeyPress(Smasher::Events::KeyboardEvent &event);
 	Smasher::EventSubscriptionHandle m_KeyPressSubscription;
 };

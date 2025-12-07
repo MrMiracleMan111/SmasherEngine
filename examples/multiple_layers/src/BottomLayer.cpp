@@ -7,7 +7,7 @@ BottomLayer::~BottomLayer()
 
 void BottomLayer::Init()
 {
-	Smasher::Entity& entity = AddEntity();
+	Smasher::Entity &entity = AddEntity();
 
 	entity.AddComponent<Smasher::TextComponent>()
 		.UseDefaults()

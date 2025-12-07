@@ -23,7 +23,7 @@ void SerializeLayer::Init()
 	const size_t SPACING = 5;
 	for (size_t i = 0; i < DIMENSION; i++) {
 		for (size_t j = 0; j < DIMENSION; j++) {
-			Smasher::Entity& ball = SpawnBouncingBall(sf::Vector2i(10, 10));
+			Smasher::Entity& ball = SpawnBouncingBall(sf::Vector2i{ 10, 10 });
 			ball.GetComponent<Smasher::DrawableComponent>()
 				.SetPosition((float)(i * SPACING), (float)(j * SPACING))
 				.SetTextureAsset<Smasher::Manifest::Textures::small_art>({});
@@ -60,12 +60,12 @@ Smasher::Entity& SerializeLayer::SpawnBouncingBall(sf::Vector2i position)
 	float depth = (float)(rand() % 100) / 100.0f;
 	Smasher::Entity& image = AddEntity<Smasher::Entity>();
 	image.AddComponent<Smasher::DrawableComponent>()
-		.SetPosition(sf::Vector2f((float)position.x, (float)position.y))
-		.SetScale(sf::Vector2f(20.0f, 20.0f))
+		.SetPosition(sf::Vector2f{ (float)position.x, (float)position.y })
+		.SetScale(sf::Vector2f{ 20.0f, 20.0f })
 		.SetDepth(depth)
 		.GetEntity()
 		.AddComponent<BallComponent>()
-		.SetVelocity(sf::Vector2f(tmpX, tmpY));
+		.SetVelocity(sf::Vector2f{ tmpX, tmpY });
 	return image;
 }
 

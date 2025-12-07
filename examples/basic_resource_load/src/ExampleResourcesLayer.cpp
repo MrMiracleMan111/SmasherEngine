@@ -4,6 +4,6 @@ void ExampleResourcesLayer::Init() {
 
 }
 
-void ExampleResourcesLayer::Render(sf::RenderWindow& rWindow) {
+void ExampleResourcesLayer::Render(sf::RenderWindow &window) {
 
 }

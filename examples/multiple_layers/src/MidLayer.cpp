@@ -28,19 +28,19 @@ void MidLayer::Update(Smasher::Millisecond delta) {
 void MidLayer::Init()
 {
 	//GetEngine().GetResourceManager().SetResourceDirectory(Smasher::Manifest::Metadata::RESOURCES_DIRECTORY);
-	//std::shared_ptr<Smasher::ShaderResource> shader = GetEngine().GetResourceManager().GetOrLoadResource<Smasher::Manifest::Shaders::basic_ui_shader, Smasher::ShaderResource>();
+	//std::shared_ptr<Smasher::ShaderResource> pShader = GetEngine().GetResourceManager().GetOrLoadResource<Smasher::Manifest::Shaders::basic_ui_pShader, Smasher::ShaderResource>();
 	//sf::Glsl::Mat4 viewProjectionMatrix = sf::Glsl::Mat4(GetEngine().GetWindow().getView().getTransform().getMatrix());
-	//shader->GetShader().setUniform("ViewProjectionMatrix", viewProjectionMatrix);
+	//pShader->GetShader().setUniform("ViewProjectionMatrix", viewProjectionMatrix);
 
-	//Smasher::UIPanelComponentManager& rCompManager = static_cast<Smasher::UIPanelComponentManager&>(GetComponentManager<Smasher::UIPanelComponent>());
-	//rCompManager.SetShaderResource(shader);
+	//Smasher::UIPanelComponentManager &rCompManager = static_cast<Smasher::UIPanelComponentManager&>(GetComponentManager<Smasher::UIPanelComponent>());
+	//rCompManager.SetShaderResource(pShader);
 
 	m_PanelPosition.Set(sf::Vector2f(0.f, 0.f));
 	m_PanelPosition.SetCurve(Smasher::InterpolationType::EASE_OUT);
 	m_PanelPosition.SetDuration(Smasher::Millisecond{ 1000 });
 
-	Smasher::Entity& entity = AddEntity();
-	Smasher::Entity& fpsTracker = AddEntity();
+	Smasher::Entity &entity = AddEntity();
+	Smasher::Entity &fpsTracker = AddEntity();
 
 	fpsTracker.AddComponent<Smasher::TextComponent>()
 		.UseDefaults()
@@ -58,11 +58,11 @@ void MidLayer::Init()
 		.SetPosition(130.0f, 200.0f)
 		.SetFontAsset<Smasher::Manifest::Fonts::arial>();
 
-	Smasher::Entity& uiPanel = AddEntity();
+	Smasher::Entity &uiPanel = AddEntity();
 
 	std::shared_ptr<Smasher::TextureResource> pTexture = GetEngine().GetResourceManager().GetOrLoadResource<Smasher::Manifest::Textures::small_art, Smasher::TextureResource>();
 
-	Smasher::UIPanelComponent& panel = uiPanel.AddComponent<Smasher::UIPanelComponent>()
+	Smasher::UIPanelComponent &panel = uiPanel.AddComponent<Smasher::UIPanelComponent>()
 		.SetBackgroundColor(sf::Color::Yellow)
 		.SetBackgroundColor(Smasher::UIPanelCorner::LEFT, sf::Color::Blue)
 		.SetBorderRadius(Smasher::UIPanelCorner::TOP_LEFT, 60.f)
@@ -78,7 +78,7 @@ void MidLayer::Init()
 		//.SetClipRotation(Smasher::Degrees{ 10.0f })
 		.SetDepth(0.4f);
 	m_UIPanelPtr = &panel;
-	panel.SetOnHoverCallback([&panel](Smasher::Events::MouseMoveEvent& event) {
+	panel.SetOnHoverCallback([&panel](Smasher::Events::MouseMoveEvent &event) {
 		if ((bool)(panel.GetPanelState() & Smasher::UIPanelState::HOVERED)) {
 			sf::Color tmp = sf::Color::Cyan;
 			tmp.a = 40;
@@ -91,13 +91,13 @@ void MidLayer::Init()
 		}
 	});
 
-	m_OnMouseMove = Subscribe<Smasher::Events::MouseMoveEvent>([&panel](Smasher::Events::MouseMoveEvent& event) {
+	m_OnMouseMove = Subscribe<Smasher::Events::MouseMoveEvent>([&panel](Smasher::Events::MouseMoveEvent &event) {
 		//panel.SetPosition(sf::Vector2f(event.Position));
 		panel.SetClipRotation(panel.GetClipRotation() + 1.0f);
 		panel.SetRotation(panel.GetRotation() + 1.0f);
 	});
 
-	m_OnMouseClick = Subscribe<Smasher::Events::MouseButtonEvent>([this](Smasher::Events::MouseButtonEvent& event) {
+	m_OnMouseClick = Subscribe<Smasher::Events::MouseButtonEvent>([this](Smasher::Events::MouseButtonEvent &event) {
 		m_PanelPosition = sf::Vector2f(event.Position);
 	});
 }

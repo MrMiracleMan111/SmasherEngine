@@ -39,7 +39,7 @@ void Smasher::EventFeeder::ForwardSFMLEvent(const sf::Event &event)
 		if (!m_Engine.IsHeadless()) {
 			sf::Vector2i windowPos = sf::Mouse::getPosition(m_Engine.GetWindow());
 			sf::Vector2f localPos = m_Engine.GetWindow().mapPixelToCoords(windowPos);
-			m_EventManager.Publish<Events::MouseButtonEvent>(Mouse::MouseEventType::BUTTON_PRESS, event.mouseButton.button, sf::Vector2i(localPos));
+			m_EventManager.Publish<Events::MouseButtonEvent>(Mouse::MouseEventType::BUTTON_PRESS, event.mouseButton.button, sf::Vector2i{ localPos });
 		}
 		else {
 			m_EventManager.Publish<Events::MouseButtonEvent>(Mouse::MouseEventType::BUTTON_PRESS, event.mouseButton.button, sf::Mouse::getPosition());
@@ -49,7 +49,7 @@ void Smasher::EventFeeder::ForwardSFMLEvent(const sf::Event &event)
 		if (!m_Engine.IsHeadless()) {
 			sf::Vector2i windowPos = sf::Mouse::getPosition(m_Engine.GetWindow());
 			sf::Vector2f localPos = m_Engine.GetWindow().mapPixelToCoords(windowPos);
-			m_EventManager.Publish<Events::MouseButtonEvent>(Mouse::MouseEventType::BUTTON_RELEASE, event.mouseButton.button, sf::Vector2i(localPos));
+			m_EventManager.Publish<Events::MouseButtonEvent>(Mouse::MouseEventType::BUTTON_RELEASE, event.mouseButton.button, sf::Vector2i{ localPos });
 		}
 		else {
 			m_EventManager.Publish<Events::MouseButtonEvent>(Mouse::MouseEventType::BUTTON_RELEASE, event.mouseButton.button, sf::Mouse::getPosition());
@@ -59,17 +59,17 @@ void Smasher::EventFeeder::ForwardSFMLEvent(const sf::Event &event)
 		if (!m_Engine.IsHeadless()) {
 			sf::Vector2i windowPos = sf::Mouse::getPosition(m_Engine.GetWindow());
 			sf::Vector2f localPos = m_Engine.GetWindow().mapPixelToCoords(windowPos);
-			m_EventManager.Publish<Events::MouseMoveEvent>(Mouse::MouseEventType::MOUSE_MOVE, sf::Vector2i(event.mouseMove.x, event.mouseMove.y), sf::Vector2i(localPos));
+			m_EventManager.Publish<Events::MouseMoveEvent>(Mouse::MouseEventType::MOUSE_MOVE, sf::Vector2i{ event.mouseMove.x, event.mouseMove.y }, sf::Vector2i{ localPos });
 		}
 		else {
-			m_EventManager.Publish<Events::MouseMoveEvent>(Mouse::MouseEventType::MOUSE_MOVE, sf::Vector2i(event.mouseMove.x, event.mouseMove.y), sf::Mouse::getPosition());
+			m_EventManager.Publish<Events::MouseMoveEvent>(Mouse::MouseEventType::MOUSE_MOVE, sf::Vector2i{ event.mouseMove.x, event.mouseMove.y }, sf::Mouse::getPosition());
 		}
 		break;
 	case sf::Event::MouseWheelScrolled:
 		if (!m_Engine.IsHeadless()) {
 			sf::Vector2i windowPos = sf::Mouse::getPosition(m_Engine.GetWindow());
 			sf::Vector2f localPos = m_Engine.GetWindow().mapPixelToCoords(windowPos);
-			m_EventManager.Publish<Events::MouseScrollWheelEvent>(Mouse::MouseEventType::SCROLL, event.mouseWheelScroll.delta, sf::Vector2i(localPos));
+			m_EventManager.Publish<Events::MouseScrollWheelEvent>(Mouse::MouseEventType::SCROLL, event.mouseWheelScroll.delta, sf::Vector2i{ localPos });
 		}
 		else {
 			m_EventManager.Publish<Events::MouseScrollWheelEvent>(Mouse::MouseEventType::SCROLL, event.mouseWheelScroll.delta, sf::Mouse::getPosition());

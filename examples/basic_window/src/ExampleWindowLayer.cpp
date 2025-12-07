@@ -13,13 +13,13 @@ void ExampleWindowLayer::Reset() {
 
 }
 
-void ExampleWindowLayer::Render(sf::RenderWindow& window) {
+void ExampleWindowLayer::Render(sf::RenderWindow &window) {
 
 }
 
-void ExampleWindowLayer::OnKeyPress(Smasher::Events::KeyboardEvent& e) {
+void ExampleWindowLayer::OnKeyPress(Smasher::Events::KeyboardEvent &event) {
 	std::string type = "NA";
-	switch (e.Type) {
+	switch (event.Type) {
 		case Smasher::Keyboard::KeyboardEventType::KEY_PRESS:
 			type = "KEY PRESS";
 		break;
@@ -30,5 +30,5 @@ void ExampleWindowLayer::OnKeyPress(Smasher::Events::KeyboardEvent& e) {
 			type = "KEY HOLD";
 		break;
 	}
-	std::cout << "Key Event: " << type << " Key Code: " << e.KeyCode << std::endl;
+	std::cout << "Key Event: " << type << " Key Code: " << event.KeyCode << std::endl;
 }

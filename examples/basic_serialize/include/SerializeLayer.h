@@ -4,11 +4,11 @@
 
 class SerializeLayer : public Smasher::Layer {
 public:
-	SerializeLayer(Smasher::Engine& engine) : Smasher::Layer(engine) {}
+	SerializeLayer(Smasher::Engine &engine) : Smasher::Layer(engine) {}
 
 	void Init() override;
-	void OnClose(Smasher::Events::WindowCloseEvent& e);
-	Smasher::Entity& SpawnBouncingBall(sf::Vector2i position);
+	void OnClose(Smasher::Events::WindowCloseEvent &event);
+	Smasher::Entity &SpawnBouncingBall(sf::Vector2i position);
 
 private:
 	Smasher::EventSubscriptionHandle m_OnCloseSubscription;

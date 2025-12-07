@@ -4,7 +4,7 @@
 #include "Smasher/Entity.h"
 #include "Smasher/Components/DrawableComponent.h"
 
-void SavedComponent::Serialize(Smasher::OutputArchive& out) {
+void SavedComponent::Serialize(Smasher::OutputArchive &out) {
 	SaveState();
 
 	out.WriteBytes(m_SavedPos.data.x);
@@ -14,7 +14,7 @@ void SavedComponent::Serialize(Smasher::OutputArchive& out) {
 	out.WriteBytes((float)m_SavedRot);
 }
 
-void SavedComponent::Deserialize(Smasher::InputArchive& in) {
+void SavedComponent::Deserialize(Smasher::InputArchive &in) {
 	float rotation;
 
 	in.ReadBytes(m_SavedPos.data.x);
@@ -30,8 +30,8 @@ void SavedComponent::Deserialize(Smasher::InputArchive& in) {
 
 void SavedComponent::SaveState()
 {
-	BallComponent& ballComp = GetEntity().GetComponent<BallComponent>();
-	Smasher::DrawableComponent& drawableComp = GetEntity().GetComponent<Smasher::DrawableComponent>();
+	BallComponent &ballComp = GetEntity().GetComponent<BallComponent>();
+	Smasher::DrawableComponent &drawableComp = GetEntity().GetComponent<Smasher::DrawableComponent>();
 
 	sf::Vector2f pos = drawableComp.GetPosition();
 	m_SavedPos = {drawableComp.GetPosition().x, drawableComp.GetPosition().y};

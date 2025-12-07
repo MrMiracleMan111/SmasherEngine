@@ -14,7 +14,7 @@ void ExamplePhysicsLayer::Init() {
 	GetEngine().GetPhysicsManager().Initialize();
 	m_KeyPressSubscription = Subscribe<Smasher::Events::KeyboardEvent>(&ExamplePhysicsLayer::OnKeyPress, this);
 	
-	Smasher::Entity& box = AddEntity();
+	Smasher::Entity &box = AddEntity();
 
 	box.AddComponent<Smasher::PhysicsComponent>()
 		.SetPhysicsType(Smasher::PhysicsType::STATIC)
@@ -30,7 +30,7 @@ void ExamplePhysicsLayer::Init() {
 		.SetScale(sf::Vector2f{ 100.f, 100.f })
 		.SetColor(sf::Color::Red);
 
-	Smasher::Entity& moveBox = AddEntity();
+	Smasher::Entity &moveBox = AddEntity();
 	moveBox.AddComponent<Smasher::PhysicsComponent>()
 		.SetPhysicsType(Smasher::PhysicsType::DYNAMIC)
 		.UseRectCollider(100.f, 100.f)
@@ -46,17 +46,17 @@ void ExamplePhysicsLayer::Init() {
 	moveBox.AddComponent<BoxControllerComponent>();
 
 	m_MousePressSubscription = Subscribe<Smasher::Events::MouseButtonEvent>(
-		[&moveBox](Smasher::Events::MouseButtonEvent& event) {
+		[&moveBox](Smasher::Events::MouseButtonEvent &event) {
 			sf::Vector2f pos = moveBox.GetComponent<Smasher::PhysicsComponent>().GetPosition();
 
 			moveBox.GetComponent<Smasher::PhysicsComponent>()
-				.SetPosition(sf::Vector2f(event.Position));
+				.SetPosition(sf::Vector2f{ event.Position });
 			
 			std::cout << "Mouse Click X: " << event.Position.x << " Y: " << event.Position.y << std::endl;
 		});
 
 	m_MouseMoveSubscription = Subscribe<Smasher::Events::MouseMoveEvent>(
-		[&moveBox](Smasher::Events::MouseMoveEvent& event) {
+		[&moveBox](Smasher::Events::MouseMoveEvent &event) {
 			sf::Vector2f pos = moveBox.GetComponent<Smasher::PhysicsComponent>().GetPosition();
 			sf::Vector2f mousePos{ event.Position };
 
@@ -71,13 +71,13 @@ void ExamplePhysicsLayer::Reset() {
 
 }
 
-void ExamplePhysicsLayer::Render(sf::RenderWindow& window) {
+void ExamplePhysicsLayer::Render(sf::RenderWindow &window) {
 
 }
 
-void ExamplePhysicsLayer::OnKeyPress(Smasher::Events::KeyboardEvent& e) {
+void ExamplePhysicsLayer::OnKeyPress(Smasher::Events::KeyboardEvent &event) {
 	std::string type = "NA";
-	switch (e.Type) {
+	switch (event.Type) {
 		case Smasher::Keyboard::KeyboardEventType::KEY_PRESS:
 			type = "KEY PRESS";
 		break;
@@ -88,5 +88,5 @@ void ExamplePhysicsLayer::OnKeyPress(Smasher::Events::KeyboardEvent& e) {
 			type = "KEY HOLD";
 		break;
 	}
-	std::cout << "Key Event: " << type << " Key Code: " << e.KeyCode << std::endl;
+	std::cout << "Key Event: " << type << " Key Code: " << event.KeyCode << std::endl;
 }

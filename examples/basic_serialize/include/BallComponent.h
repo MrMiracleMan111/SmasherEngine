@@ -15,9 +15,9 @@ public:
 	BallComponent() = default;
 	BallComponent(sf::Vector2f velocity) : m_Velocity(velocity) {}
 
-	void SetEntity(Smasher::Entity& rEntity) override;
+	void SetEntity(Smasher::Entity &entity) override;
 
-	static void StaticUpdateComponent(BallComponent& self, const Smasher::Millisecond& delta);
+	static void StaticUpdateComponent(BallComponent& self, const Smasher::Millisecond &delta);
 
 	BallComponent& SetVelocity(sf::Vector2f velocity);
 
@@ -26,5 +26,5 @@ public:
 private:
 	sf::Vector2f m_Velocity;
 	sf::IntRect m_Collider;
-	Smasher::DrawableComponent* m_DrawableComponentPtr = nullptr;
+	Smasher::DrawableComponent *m_DrawableComponentPtr = nullptr;
 };

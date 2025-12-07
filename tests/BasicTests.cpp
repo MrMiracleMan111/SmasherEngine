@@ -84,7 +84,7 @@ public:
 	~CustomComponentManager() = default;
 
 	void Update(Smasher::Millisecond delta) override {};
-	void Render(sf::RenderWindow& rWindow) override {};
+	void Render(sf::RenderWindow& window) override {};
 };
 
 // Component that deletes itself during update
@@ -226,11 +226,11 @@ TEST(LayerTest, GetLayer) {
 }
 
 TEST(LayerTest, AddLayer) {
-	Smasher::Engine engine(640, 420);
+	Smasher::Engine engine{ 640, 420 };
 
-	Smasher::Layer& pushLayer = engine.PushLayer<DummyLayer>();
-	Smasher::Layer& getLayer = engine.GetLayer<DummyLayer>();
-	Smasher::Layer& baseLayer = engine.GetLayer<Smasher::BaseLayer>();
+	Smasher::Layer &pushLayer = engine.PushLayer<DummyLayer>();
+	Smasher::Layer &getLayer = engine.GetLayer<DummyLayer>();
+	Smasher::Layer &baseLayer = engine.GetLayer<Smasher::BaseLayer>();
 
 	EXPECT_TRUE(engine.HasLayer<DummyLayer>());
 	EXPECT_TRUE(engine.HasLayer<Smasher::BaseLayer>());
@@ -239,7 +239,7 @@ TEST(LayerTest, AddLayer) {
 }
 
 TEST(LayerTest, DuplicateLayer) {
-	Smasher::Engine engine(640, 420);
+	Smasher::Engine engine{ 640, 420 };
 
 	EXPECT_NO_THROW({ engine.PushLayer<DummyLayer>(); });
 	EXPECT_THROW({ engine.PushLayer<DummyLayer>(); }, Smasher::Exceptions::LayerDuplicate);
@@ -247,7 +247,7 @@ TEST(LayerTest, DuplicateLayer) {
 }
 
 TEST(LayerTest, RemoveLayer) {
-	Smasher::Engine engine(640, 420);
+	Smasher::Engine engine{ 640, 420 };
 
 	// Add Layer
 	engine.PushLayer<DummyLayer>();
@@ -281,7 +281,7 @@ TEST(LayerTest, RemoveLayer) {
 }
 
 TEST(LayerTest, RemoveBaseLayer) {
-	Smasher::Engine engine(640, 420);
+	Smasher::Engine engine{ 640, 420 };
 
 	engine.PushLayer<DummyLayer>();
 
@@ -295,12 +295,12 @@ TEST(LayerTest, RemoveBaseLayer) {
 }
 
 TEST(LayerTest, RemoveLayerWithEvents) {
-	Smasher::Engine engine(640, 420);
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::EventManager& manager = layer.GetEventManager();
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
+	Smasher::EventManager &manager = layer.GetEventManager();
 
 	int triggered_count = 0;
-	std::function<void(Smasher::Events::DummyEvent&)> callback = [&triggered_count](Smasher::Events::DummyEvent& event) {
+	std::function<void(Smasher::Events::DummyEvent&)> callback = [&triggered_count](Smasher::Events::DummyEvent &event) {
 		++triggered_count;
 	};
 	Smasher::EventSubscriptionHandle handle = layer.Subscribe<Smasher::Events::DummyEvent>(callback);
@@ -326,12 +326,12 @@ TEST(LayerTest, RemoveLayerWithEvents) {
 }
 
 TEST(LayerTest, RemoveLayerWithAsyncEvents) {
-	Smasher::Engine engine(640, 420);
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::EventManager& manager = layer.GetEventManager();
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
+	Smasher::EventManager &manager = layer.GetEventManager();
 
 	int triggered_count = 0;
-	std::function<void(Smasher::Events::DummyEvent&)> callback = [&triggered_count](Smasher::Events::DummyEvent& event) {
+	std::function<void(Smasher::Events::DummyEvent&)> callback = [&triggered_count](Smasher::Events::DummyEvent &event) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(250));
 		++triggered_count;
 	};
@@ -356,14 +356,14 @@ TEST(LayerTest, RemoveLayerWithAsyncEvents) {
 }
 
 TEST(EntityTest, AddEntity) {
-	Smasher::Engine engine(640, 420);
+	Smasher::Engine engine{ 640, 420 };
 	Smasher::UUID entityUUID{ 0 };
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
 
 	EXPECT_FALSE(layer.HasEntity(entityUUID));
 
 	EXPECT_NO_THROW({
-		Smasher::Entity & entity = layer.AddEntity<Smasher::Entity>();
+		Smasher::Entity  &entity = layer.AddEntity<Smasher::Entity>();
 		entityUUID = entity.GetUUID();
 	});
 
@@ -371,39 +371,39 @@ TEST(EntityTest, AddEntity) {
 }
 
 TEST(EntityTest, GetEntity) {
-	Smasher::Engine engine(640, 420);
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::Entity& entity = layer.AddEntity<Smasher::Entity>();
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
+	Smasher::Entity &entity = layer.AddEntity<Smasher::Entity>();
 	EXPECT_NO_THROW({ layer.GetEntity(entity.GetUUID()); });
 }
 
 TEST(EntityTest, InitEntity) {
-	Smasher::Engine engine(640, 420);
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	InitEntityTest& entity = layer.AddEntity<InitEntityTest>();
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
+	InitEntityTest &entity = layer.AddEntity<InitEntityTest>();
 	EXPECT_EQ(1, entity.GetValue());
 }
 
 TEST(EntityTest, InitRemoveEntity) {
-	Smasher::Engine engine(640, 420);
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	InitRemoveEntityTest& entity = layer.AddEntity<InitRemoveEntityTest>();
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
+	InitRemoveEntityTest &entity = layer.AddEntity<InitRemoveEntityTest>();
 	EXPECT_FALSE(layer.HasEntity(entity.GetUUID()));
 }
 
 TEST(EntityTest, MissingEntity) {
-	Smasher::Engine engine(640, 420);
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
 	EXPECT_THROW({ layer.GetEntity(Smasher::UUID{10}); }, Smasher::Exceptions::LayerEntityNotFound);
-	Smasher::Entity& entity = layer.AddEntity<Smasher::Entity>();
+	Smasher::Entity &entity = layer.AddEntity<Smasher::Entity>();
 	EXPECT_THROW({ layer.GetEntity(Smasher::UUID{entity.GetUUID() + 1});}, Smasher::Exceptions::LayerEntityNotFound);
 }
 
 TEST(EntityTest, MoveEntity) {
-	Smasher::Engine engine(640, 420);
-	Smasher::BaseLayer& baseLayer = engine.GetLayer<Smasher::BaseLayer>();
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	InitEntityTest& entity = layer.AddEntity<InitEntityTest>();
+	Smasher::Engine engine{ 640, 420 };
+	Smasher::BaseLayer &baseLayer = engine.GetLayer<Smasher::BaseLayer>();
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
+	InitEntityTest &entity = layer.AddEntity<InitEntityTest>();
 	EXPECT_EQ(1, entity.GetValue());
 
 	EXPECT_FALSE(baseLayer.HasEntity(entity.GetUUID()));
@@ -427,16 +427,16 @@ TEST(EntityTest, MoveEntity) {
 
 
 TEST(ComponentsTest, CreateComponent) {
-	Smasher::Engine engine(640, 420);
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	TestComponent& test = layer.AddEntity<Smasher::Entity>().AddComponent<TestComponent>(10);
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
+	TestComponent &test = layer.AddEntity<Smasher::Entity>().AddComponent<TestComponent>(10);
 	EXPECT_EQ(10, test.GetValue());
 }
 
 TEST(ComponentsTest, DuplicateComponent) {
-	Smasher::Engine engine(640, 420);
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::Entity& entity = layer.AddEntity<Smasher::Entity>();
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
+	Smasher::Entity &entity = layer.AddEntity<Smasher::Entity>();
 	entity.AddComponent<TestComponent>(10);
 	EXPECT_THROW({
 			entity.AddComponent<TestComponent>(20);
@@ -445,9 +445,9 @@ TEST(ComponentsTest, DuplicateComponent) {
 }
 
 TEST(ComponentsTest, MissingComponent) {
-	Smasher::Engine engine(640, 420);
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::Entity& entity = layer.AddEntity<Smasher::Entity>();
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
+	Smasher::Entity &entity = layer.AddEntity<Smasher::Entity>();
 	entity.AddComponent<TestComponent>(10);
 	EXPECT_THROW({
 			entity.GetComponent<CustomComponent>();
@@ -455,19 +455,19 @@ TEST(ComponentsTest, MissingComponent) {
 }
 
 TEST(ComponentsTest, GetSiblingComponent) {
-	Smasher::Engine engine(640, 420);
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::Entity& entity = layer.AddEntity<Smasher::Entity>();
-	TestComponent& testComponent = entity.AddComponent<TestComponent>(10);
-	CustomComponent& customComponent = entity.AddComponent<CustomComponent>(11);
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
+	Smasher::Entity &entity = layer.AddEntity<Smasher::Entity>();
+	TestComponent &testComponent = entity.AddComponent<TestComponent>(10);
+	CustomComponent &customComponent = entity.AddComponent<CustomComponent>(11);
 	EXPECT_EQ(&testComponent.GetSiblingComponent<CustomComponent>(), &customComponent);
 	EXPECT_EQ(&customComponent.GetSiblingComponent<TestComponent>(), &testComponent);
 }
 
 TEST(ComponentsTest, RemoveComponent) {
-	Smasher::Engine engine(640, 420);
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::Entity& entity = layer.AddEntity<Smasher::Entity>();
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
+	Smasher::Entity &entity = layer.AddEntity<Smasher::Entity>();
 	entity.AddComponent<TestComponent>(10);
 	EXPECT_TRUE(entity.HasComponent<TestComponent>());
 	EXPECT_NO_THROW({
@@ -480,10 +480,10 @@ TEST(ComponentsTest, RemoveComponent) {
 }
 
 TEST(ComponentsTest, RemoveComponentDataChange) {
-	Smasher::Engine engine(640, 420);
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
 	layer.Activate();
-	Smasher::Entity& entity = layer.AddEntity<Smasher::Entity>();
+	Smasher::Entity &entity = layer.AddEntity<Smasher::Entity>();
 	entity.AddComponent<DeleteTestComponent>();
 	EXPECT_TRUE(entity.HasComponent<DeleteTestComponent>());
 	EXPECT_NO_THROW({ engine.Update(Smasher::Millisecond{10}); });
@@ -494,9 +494,9 @@ TEST(ComponentsTest, RemoveComponentDataChange) {
 }
 
 TEST(ComponentsTest, ExceptionRemoveComponentDataChange) {
-	Smasher::Engine engine(640, 420);
+	Smasher::Engine engine{ 640, 420 };
 	engine.PushLayer<DummyLayer>().Activate();
-	Smasher::Entity& entity = engine.GetLayer<DummyLayer>().AddEntity<Smasher::Entity>();
+	Smasher::Entity &entity = engine.GetLayer<DummyLayer>().AddEntity<Smasher::Entity>();
 	entity.AddComponent<SpicyDeleteTestComponent>();
 	EXPECT_TRUE(entity.HasComponent<SpicyDeleteTestComponent>());
 	EXPECT_NO_THROW({ engine.Update(Smasher::Millisecond{10}); });
@@ -504,19 +504,19 @@ TEST(ComponentsTest, ExceptionRemoveComponentDataChange) {
 }
 
 TEST(ResourcesTest, OpenFileResource) {
-	Smasher::Engine engine(640, 420);
-	Smasher::ResourceManager& rResourceManager = engine.GetResourceManager();
+	Smasher::Engine engine{ 640, 420 };
+	Smasher::ResourceManager &resourceManager = engine.GetResourceManager();
 	std::ios_base::openmode flags = std::ios_base::out;
-	Smasher::ResourceId fileResourceID{ 1 };
-	auto pFileResource = rResourceManager.GetOrLoadResource<Smasher::FileResource>(fileResourceID, Smasher::ResourcePath{ "test_file" }, flags);
+	Smasher::ResourceId fileResourceId{ 1 };
+	auto pFileResource = resourceManager.GetOrLoadResource<Smasher::FileResource>(fileResourceId, Smasher::ResourcePath{ "test_file" }, flags);
 
-	EXPECT_NO_THROW({ rResourceManager.GetResource<Smasher::FileResource>(fileResourceID); });
+	EXPECT_NO_THROW({ resourceManager.GetResource<Smasher::FileResource>(fileResourceId); });
 	EXPECT_TRUE(pFileResource->GetFileStream().is_open());
 	pFileResource->GetFileStream() << "message";
 	EXPECT_TRUE(pFileResource->GetFileStream().is_open());
-	rResourceManager.ReleaseResource(fileResourceID);
+	resourceManager.ReleaseResource(fileResourceId);
 	pFileResource.reset();
-	EXPECT_THROW({ rResourceManager.GetResource<Smasher::FileResource>(fileResourceID); }, Smasher::Exceptions::ResourceNotLoaded);
+	EXPECT_THROW({ resourceManager.GetResource<Smasher::FileResource>(fileResourceId); }, Smasher::Exceptions::ResourceNotLoaded);
 	EXPECT_EQ(nullptr, pFileResource.get());
 
 	std::string line;
@@ -527,19 +527,19 @@ TEST(ResourcesTest, OpenFileResource) {
 }
 
 TEST(ResourcesTest, OpenReleaseFileResource) {
-	Smasher::Engine engine(640, 420);
-	Smasher::ResourceManager& rResourceManager = engine.GetResourceManager();
+	Smasher::Engine engine{ 640, 420 };
+	Smasher::ResourceManager &resourceManager = engine.GetResourceManager();
 	std::ios_base::openmode flags = std::ios_base::out;
 	Smasher::ResourcePath paths[] = { Smasher::ResourcePath{"test_file"} };
-	auto pFileResource = rResourceManager.GetOrLoadResource<Smasher::FileResource>(Smasher::ResourceId{ 1 }, paths, size_t{ 1 }, flags);
+	auto pFileResource = resourceManager.GetOrLoadResource<Smasher::FileResource>(Smasher::ResourceId{ 1 }, paths, size_t{ 1 }, flags);
 	pFileResource->GetFileStream() << "message";
 }
 
 // Move Resource Manager
 TEST(ResourcesTest, MoveResourceManager) {
 	try {
-		Smasher::Engine engine(640, 420);
-		Smasher::ResourceManager& manager = engine.GetResourceManager();
+		Smasher::Engine engine{ 640, 420 };
+		Smasher::ResourceManager &manager = engine.GetResourceManager();
 		std::ios_base::openmode flags = std::ios_base::out;
 		Smasher::ResourcePath paths[] = { Smasher::ResourcePath{"test_file"} };
 		auto pFileResource = manager.GetOrLoadResource<Smasher::FileResource>(Smasher::ResourceId{ 1 }, paths, size_t{ 1 }, flags);
@@ -553,51 +553,51 @@ TEST(ResourcesTest, MoveResourceManager) {
 }
 
 TEST(PhysicsTest, DefaultInitializeManager) {
-	Smasher::Engine engine(640, 420);
-	Smasher::PhysicsManager& rPhysicsManager = engine.GetPhysicsManager();
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
+	Smasher::Engine engine{ 640, 420 };
+	Smasher::PhysicsManager &physicsManager = engine.GetPhysicsManager();
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
 	layer.Activate();
 	b2WorldDef worldDef = b2DefaultWorldDef();
 	worldDef.gravity = b2Vec2{ 1.f, -10.f };
-	EXPECT_NO_THROW({ rPhysicsManager.Initialize(); });
-	EXPECT_THROW({ rPhysicsManager.Initialize(worldDef); }, Smasher::Exceptions::Box2DWorldAlreadyCreated);
-	EXPECT_THROW({ rPhysicsManager.Initialize(); }, Smasher::Exceptions::Box2DWorldAlreadyCreated);
+	EXPECT_NO_THROW({ physicsManager.Initialize(); });
+	EXPECT_THROW({ physicsManager.Initialize(worldDef); }, Smasher::Exceptions::Box2DWorldAlreadyCreated);
+	EXPECT_THROW({ physicsManager.Initialize(); }, Smasher::Exceptions::Box2DWorldAlreadyCreated);
 
-	Smasher::Entity& entity = layer.AddEntity();
+	Smasher::Entity &entity = layer.AddEntity();
 	entity.AddComponent<Smasher::PhysicsComponent>()
 		.UseCircleCollider(10.f)
 		.SetVelocity(sf::Vector2f{10.f, 0.f});
 }
 
 TEST(PhysicsTest, MovePhysicsManager) {
-	Smasher::Engine engine(640, 420);
-	Smasher::PhysicsManager& rManager = engine.GetPhysicsManager();
+	Smasher::Engine engine{ 640, 420 };
+	Smasher::PhysicsManager &manager = engine.GetPhysicsManager();
 	b2WorldDef worldDef = b2DefaultWorldDef();
 	worldDef.gravity = b2Vec2{ 1.f, -10.f };
-	rManager.Initialize(worldDef);
+	manager.Initialize(worldDef);
 
 	{
 		// engine physics manager now invalid
-		Smasher::PhysicsManager tmp = std::move(rManager);
+		Smasher::PhysicsManager tmp = std::move(manager);
 	}
 	// tmp is now invalid
 }
 
 TEST(PhysicsTest, CustomInitializeManager) {
-	Smasher::Engine engine(640, 420);
-	Smasher::PhysicsManager& rPhysicsManager = engine.GetPhysicsManager();
+	Smasher::Engine engine{ 640, 420 };
+	Smasher::PhysicsManager &physicsManager = engine.GetPhysicsManager();
 	b2WorldDef worldDef = b2DefaultWorldDef();
 	worldDef.gravity = b2Vec2{ 1.f, -10.f };
-	EXPECT_NO_THROW({ rPhysicsManager.Initialize(worldDef); });
-	EXPECT_THROW({ rPhysicsManager.Initialize(worldDef); }, Smasher::Exceptions::Box2DWorldAlreadyCreated);
-	EXPECT_THROW({ rPhysicsManager.Initialize(); }, Smasher::Exceptions::Box2DWorldAlreadyCreated);
+	EXPECT_NO_THROW({ physicsManager.Initialize(worldDef); });
+	EXPECT_THROW({ physicsManager.Initialize(worldDef); }, Smasher::Exceptions::Box2DWorldAlreadyCreated);
+	EXPECT_THROW({ physicsManager.Initialize(); }, Smasher::Exceptions::Box2DWorldAlreadyCreated);
 }
 
 TEST(PhysicsTest, ChangeColliders) {
-	Smasher::Engine engine(640, 420);
+	Smasher::Engine engine{ 640, 420 };
 	engine.GetPhysicsManager().Initialize();
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::Entity& entity = layer.AddEntity();
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
+	Smasher::Entity &entity = layer.AddEntity();
 	entity.AddComponent<Smasher::PhysicsComponent>()
 		.UseCircleCollider(10.f)
 		.SetVelocity(sf::Vector2f{ 10.f, 0.f });
@@ -614,16 +614,16 @@ TEST(PhysicsTest, ChangeColliders) {
 }
 
 TEST(PhysicsTest, PhysicsDemo) {
-	Smasher::Engine engine(640, 420);
+	Smasher::Engine engine{ 640, 420 };
 	engine.GetResourceManager().SetResourceDirectory(Smasher::Manifest::Metadata::RESOURCES_DIRECTORY);
-	Smasher::PhysicsManager& rPhysicsManager = engine.GetPhysicsManager();
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
+	Smasher::PhysicsManager &physicsManager = engine.GetPhysicsManager();
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
 	layer.Activate();
 	b2WorldDef worldDef = b2DefaultWorldDef();
 	worldDef.gravity = b2Vec2{ 0.f, 50.f };
-	rPhysicsManager.Initialize(worldDef);
+	physicsManager.Initialize(worldDef);
 	
-	Smasher::Entity& ball = layer.AddEntity();
+	Smasher::Entity &ball = layer.AddEntity();
 	ball.AddComponent<Smasher::PhysicsComponent>()
 		.UseCircleCollider(20.f)
 		.SetPosition(sf::Vector2f{ 300.f, 200.f })
@@ -636,7 +636,7 @@ TEST(PhysicsTest, PhysicsDemo) {
 		.SetTextureAsset<Smasher::Manifest::Textures::alpha_test>({});
 	ball.AddComponent<TestPhysicsImageCtrl>();
 
-	Smasher::Entity& floor = layer.AddEntity();
+	Smasher::Entity &floor = layer.AddEntity();
 	floor.AddComponent<Smasher::PhysicsComponent>()
 		.UseRectCollider(100.f, 20.f)
 		.SetPosition(sf::Vector2f{ 200.f, 300.f })
@@ -658,15 +658,15 @@ TEST(PhysicsTest, PhysicsDemo) {
 	worker.join();
 }
 
-void TestCallback(Smasher::Events::DummyEvent& e) {};
+void TestCallback(Smasher::Events::DummyEvent &e) {};
 
 
 TEST(EventsTest, InvalidEventHandle) {
-	Smasher::Engine engine(640, 420);
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
 
 
-	Smasher::EventManager& manager = layer.GetEventManager();
+	Smasher::EventManager &manager = layer.GetEventManager();
 	Smasher::EventSubscriptionHandle handle = layer.Subscribe<Smasher::Events::DummyEvent>(TestCallback);
 	Smasher::EventSubscriptionHandle other_handle = std::move(handle);
 	EXPECT_THROW({
@@ -681,18 +681,18 @@ TEST(EventsTest, InvalidEventHandle) {
 }
 
 TEST(EventsTest, SubscribeEvent) {
-	Smasher::Engine engine(640, 420);
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
 	Smasher::EventSubscriptionHandle handle = layer.Subscribe<Smasher::Events::DummyEvent>(TestCallback);
 }
 
 TEST(EventsTest, SinglePublishEvent) {
-	Smasher::Engine engine(640, 420);
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::EventManager& manager = layer.GetEventManager();
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
+	Smasher::EventManager &manager = layer.GetEventManager();
 
 	int triggered_count = 0;
-	std::function<void(Smasher::Events::DummyEvent&)> callback = [&triggered_count](Smasher::Events::DummyEvent& event) {
+	std::function<void(Smasher::Events::DummyEvent&)> callback = [&triggered_count](Smasher::Events::DummyEvent &event) {
 		++triggered_count;
 	};
 	Smasher::EventSubscriptionHandle handle = layer.Subscribe<Smasher::Events::DummyEvent>(callback);
@@ -704,13 +704,13 @@ TEST(EventsTest, SinglePublishEvent) {
 }
 
 TEST(EventsTest, MultiplePublishEvent) {
-	Smasher::Engine engine(640, 420);
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::EventManager& manager = layer.GetEventManager();
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
+	Smasher::EventManager &manager = layer.GetEventManager();
 
 	int triggered_count = 0;
 	std::function<void(Smasher::Events::DummyEvent&)> callback =
-	[&triggered_count](Smasher::Events::DummyEvent& event) {
+	[&triggered_count](Smasher::Events::DummyEvent &event) {
 		triggered_count++;
 	};
 	Smasher::EventSubscriptionHandle handle = layer.Subscribe<Smasher::Events::DummyEvent>(callback);
@@ -725,13 +725,13 @@ TEST(EventsTest, MultiplePublishEvent) {
 
 
 TEST(EventsTest, StopPropagateEvent) {
-	Smasher::Engine engine(640, 420);
-	Smasher::BaseLayer& baseLayer = engine.GetLayer<Smasher::BaseLayer>();
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::EventManager& manager = layer.GetEventManager();
+	Smasher::Engine engine{ 640, 420 };
+	Smasher::BaseLayer &baseLayer = engine.GetLayer<Smasher::BaseLayer>();
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
+	Smasher::EventManager &manager = layer.GetEventManager();
 
 	int triggered_count = 0;
-	std::function<void(Smasher::Events::DummyEvent&)> callback1 = [&triggered_count](Smasher::Events::DummyEvent& event) {
+	std::function<void(Smasher::Events::DummyEvent&)> callback1 = [&triggered_count](Smasher::Events::DummyEvent &event) {
 		++triggered_count;
 	};
 	Smasher::EventSubscriptionHandle handle1 = layer.Subscribe<Smasher::Events::DummyEvent>(callback1);
@@ -746,7 +746,7 @@ TEST(EventsTest, StopPropagateEvent) {
 
 	triggered_count = 0;
 
-	std::function<void(Smasher::Events::DummyEvent&)> callback2 = [&triggered_count](Smasher::Events::DummyEvent& event) {
+	std::function<void(Smasher::Events::DummyEvent&)> callback2 = [&triggered_count](Smasher::Events::DummyEvent &event) {
 		++triggered_count;
 		event.StopPropagate();
 	};
@@ -759,13 +759,13 @@ TEST(EventsTest, StopPropagateEvent) {
 }
 
 TEST(EventsTest, SubscriptionLifetimeTest) {
-	Smasher::Engine engine(640, 420);
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::EventManager& manager = layer.GetEventManager();
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
+	Smasher::EventManager &manager = layer.GetEventManager();
 
 	int triggered_count = 0;
 	std::function<void(Smasher::Events::DummyEvent&)> callback =
-		[&triggered_count](Smasher::Events::DummyEvent& event) {
+		[&triggered_count](Smasher::Events::DummyEvent &event) {
 		triggered_count++;
 		};
 
@@ -785,13 +785,13 @@ TEST(EventsTest, SubscriptionLifetimeTest) {
 }
 
 TEST(EventsTest, SubscriptionLifetimeHandoffTest) {
-	Smasher::Engine engine(640, 420);
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::EventManager& manager = layer.GetEventManager();
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
+	Smasher::EventManager &manager = layer.GetEventManager();
 
 	int triggered_count = 0;
 	std::function<void(Smasher::Events::DummyEvent&)> callback =
-		[&triggered_count](Smasher::Events::DummyEvent& event) {
+		[&triggered_count](Smasher::Events::DummyEvent &event) {
 			triggered_count++;
 		};
 
@@ -826,12 +826,12 @@ TEST(EventsTest, SubscriptionLifetimeHandoffTest) {
 
 
 TEST(EventsTest, SinglePublishUnsubscribeEvent) {
-	Smasher::Engine engine(640, 420);
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::EventManager& manager = layer.GetEventManager();
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
+	Smasher::EventManager &manager = layer.GetEventManager();
 
 	int triggered_count = 0;
-	std::function<void(Smasher::Events::DummyEvent&)> callback = [&triggered_count](Smasher::Events::DummyEvent& event) {
+	std::function<void(Smasher::Events::DummyEvent&)> callback = [&triggered_count](Smasher::Events::DummyEvent &event) {
 		++triggered_count;
 		};
 	Smasher::EventSubscriptionHandle handle = layer.Subscribe<Smasher::Events::DummyEvent>(callback);
@@ -848,19 +848,19 @@ TEST(EventsTest, SinglePublishUnsubscribeEvent) {
 
 
 TEST(EventsTest, MultiplePublishMultipleSubscribeEvent) {
-	Smasher::Engine engine(640, 420);
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::EventManager& manager = layer.GetEventManager();
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
+	Smasher::EventManager &manager = layer.GetEventManager();
 
 	int triggered_count_1 = 0;
 	std::function<void(Smasher::Events::DummyEvent&)> callback1 =
-		[&triggered_count_1](Smasher::Events::DummyEvent& event) {
+		[&triggered_count_1](Smasher::Events::DummyEvent &event) {
 		triggered_count_1++;
 		};
 
 	int triggered_count_2 = 0;
 	std::function<void(Smasher::Events::DummyEventExtra&)> callback2 =
-		[&triggered_count_2](Smasher::Events::DummyEventExtra& event) {
+		[&triggered_count_2](Smasher::Events::DummyEventExtra &event) {
 		triggered_count_2++;
 		};
 
@@ -881,9 +881,9 @@ TEST(EventsTest, MultiplePublishMultipleSubscribeEvent) {
 // Move with synchronous events in queue
 TEST(EventsTest, MoveEventManagerSync) {
 	try {
-		Smasher::Engine engine(640, 420);
-		DummyLayer& layer = engine.PushLayer<DummyLayer>();
-		Smasher::EventManager& manager = layer.GetEventManager();
+		Smasher::Engine engine{ 640, 420 };
+		DummyLayer &layer = engine.PushLayer<DummyLayer>();
+		Smasher::EventManager &manager = layer.GetEventManager();
 
 		int count = 10;
 		auto incrementFunc = [&count](Smasher::Events::DummyEvent&) {
@@ -908,9 +908,9 @@ TEST(EventsTest, MoveEventManagerSync) {
 // Move with async events in queue
 TEST(EventsTest, MoveEventManagerAsync) {
 	try {
-		Smasher::Engine engine(640, 420);
-		DummyLayer& layer = engine.PushLayer<DummyLayer>();
-		Smasher::EventManager& manager = layer.GetEventManager();
+		Smasher::Engine engine{ 640, 420 };
+		DummyLayer &layer = engine.PushLayer<DummyLayer>();
+		Smasher::EventManager &manager = layer.GetEventManager();
 
 		int count = 10;
 		auto incrementFunc = [&count](Smasher::Events::DummyEvent&) {
@@ -934,16 +934,16 @@ TEST(EventsTest, MoveEventManagerAsync) {
 }
 
 TEST(AsyncEventTest, SubscribeEvent) {
-	Smasher::Engine engine(640, 420);
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::EventManager& manager = layer.GetEventManager();
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
+	Smasher::EventManager &manager = layer.GetEventManager();
 	Smasher::EventSubscriptionHandle handle = layer.SubscribeAsync<Smasher::Events::DummyEvent>(TestCallback);
 }
 
 TEST(AsyncEventTest, PublishEvent) {
-	Smasher::Engine engine(640, 420);
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::EventManager& manager = layer.GetEventManager();
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
+	Smasher::EventManager &manager = layer.GetEventManager();
 	int count = 10;
 	auto incrementFunc = [&count] (Smasher::Events::DummyEvent&) {
 		std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -958,9 +958,9 @@ TEST(AsyncEventTest, PublishEvent) {
 }
 
 TEST(AsyncEventTest, MultiplePublishEvent) {
-	Smasher::Engine engine(640, 420);
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::EventManager& manager = layer.GetEventManager();
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
+	Smasher::EventManager &manager = layer.GetEventManager();
 	int count = 10;
 	auto incrementFunc = [&count](Smasher::Events::DummyEvent&) {
 		std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -979,9 +979,9 @@ TEST(AsyncEventTest, MultiplePublishEvent) {
 
 TEST(AsyncEventTest, PublishWhileProcessingEvent) {
 	// Publish Async Event while another async event is processing
-	Smasher::Engine engine(640, 420);
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::EventManager& manager = layer.GetEventManager();
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
+	Smasher::EventManager &manager = layer.GetEventManager();
 	int count = 10;
 	auto incrementFunc = [&count](Smasher::Events::DummyEvent&) {
 		std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -1000,7 +1000,7 @@ TEST(AsyncEventTest, PublishWhileProcessingEvent) {
 
 TEST(EngineTest, MoveEngine) {
 	try {
-		Smasher::Engine engine(640, 420);
+		Smasher::Engine engine{ 640, 420 };
 		Smasher::Engine tmp = std::move(engine);
 	}
 	catch (...) {
@@ -1013,7 +1013,7 @@ TEST(EngineTest, HeadlessEngine) {
 		bool failed = false;
 		Smasher::Engine engine = Smasher::Engine::CreateHeadless();
 
-		ShutdownEngineLayer& layer = engine.PushLayer<ShutdownEngineLayer>();
+		ShutdownEngineLayer &layer = engine.PushLayer<ShutdownEngineLayer>();
 		layer.Activate();
 
 		std::thread worker([&engine]() {
@@ -1040,7 +1040,7 @@ TEST(EngineTest, MoveHeadlessEngine) {
 		Smasher::Engine engine = Smasher::Engine::CreateHeadless();
 		Smasher::Engine tmp = std::move(engine);
 
-		ShutdownEngineLayer& layer = tmp.PushLayer<ShutdownEngineLayer>();
+		ShutdownEngineLayer &layer = tmp.PushLayer<ShutdownEngineLayer>();
 		layer.Activate();
 
 		std::thread worker([&tmp]() {
@@ -1063,9 +1063,9 @@ TEST(EngineTest, MoveHeadlessEngine) {
 
 TEST(EngineTest, NoShutdownEngine) {
 	bool passed = false;
-	Smasher::Engine engine(640, 420);
+	Smasher::Engine engine{ 640, 420 };
 
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
+	DummyLayer &layer = engine.PushLayer<DummyLayer>();
 	layer.Activate();
 
 	engine.GetWindow().setActive(false);
@@ -1088,9 +1088,9 @@ TEST(EngineTest, NoShutdownEngine) {
 
 TEST(EngineTest, ShutdownEngine) {
 	bool failed = false;
-	Smasher::Engine engine(640, 420);
+	Smasher::Engine engine{ 640, 420 };
 
-	ShutdownEngineLayer& layer = engine.PushLayer<ShutdownEngineLayer>();
+	ShutdownEngineLayer &layer = engine.PushLayer<ShutdownEngineLayer>();
 	layer.Activate();
 
 	std::thread worker([&engine, &failed]() {
@@ -1111,8 +1111,8 @@ TEST(EngineTest, ShutdownEngine) {
 }
 
 TEST(LayerTest, InitLayer) {
-	Smasher::Engine engine(640, 420);
-	InitTestLayer& layer = engine.PushLayer<InitTestLayer>();
+	Smasher::Engine engine{ 640, 420 };
+	InitTestLayer &layer = engine.PushLayer<InitTestLayer>();
 	EXPECT_EQ(1, layer.GetValue());
 	layer.Activate();
 	engine.Update(Smasher::Millisecond{ 10 });
@@ -1123,9 +1123,9 @@ TEST(LayerTest, InitLayer) {
 
 TEST(EngineTest, ExplicitDoubleShutdownEngine) {
 	bool failed = false;
-	Smasher::Engine engine(640, 420);
+	Smasher::Engine engine{ 640, 420 };
 
-	ShutdownEngineLayer& layer = engine.PushLayer<ShutdownEngineLayer>();
+	ShutdownEngineLayer &layer = engine.PushLayer<ShutdownEngineLayer>();
 	layer.Activate();
 	std::thread worker([&engine, &failed]() {
 		std::this_thread::sleep_for(std::chrono::seconds(3));

@@ -5,18 +5,18 @@
 #include "Smasher/Components/CameraComponent.h"
 #include "Smasher/Entity.h"
 
-void BallComponent::SetEntity(Smasher::Entity& rEntity)
+void BallComponent::SetEntity(Smasher::Entity &entity)
 {
-	IComponent::SetEntity(rEntity);
-	rEntity.DependsOnComponent<Smasher::DrawableComponent>();
-	m_DrawableComponentPtr = &rEntity.GetComponent<Smasher::DrawableComponent>();
+	IComponent::SetEntity(entity);
+	entity.DependsOnComponent<Smasher::DrawableComponent>();
+	m_DrawableComponentPtr = &entity.GetComponent<Smasher::DrawableComponent>();
 	m_Collider.left = (int)m_DrawableComponentPtr->GetPosition().x;
 	m_Collider.top = (int)m_DrawableComponentPtr->GetPosition().y;
 	m_Collider.width = (int)m_DrawableComponentPtr->GetScale().x;
 	m_Collider.height = (int)m_DrawableComponentPtr->GetScale().y;
 }
 
-void BallComponent::StaticUpdateComponent(BallComponent& self, const Smasher::Millisecond& delta) {
+void BallComponent::StaticUpdateComponent(BallComponent &self, const Smasher::Millisecond &delta) {
 	sf::Vector2f position = self.m_DrawableComponentPtr->GetPosition();
 	sf::Vector2u windowSizeUint = self.GetEntity().GetEngine().GetWindow().getSize();
 	sf::Vector2f windowSize((float)windowSizeUint.x, (float)(windowSizeUint.y));
@@ -27,14 +27,14 @@ void BallComponent::StaticUpdateComponent(BallComponent& self, const Smasher::Mi
 		self.m_Velocity.x = -self.m_Velocity.x;
 		position.x = 0;
 
-		Smasher::Entity& entity = self.GetEntity();
+		Smasher::Entity &entity = self.GetEntity();
 		return;
 	}
 	if (position.y <= 0) {
 		self.m_Velocity.y = -self.m_Velocity.y;
 		position.y = 0;
 
-		Smasher::Entity& entity = self.GetEntity();
+		Smasher::Entity &entity = self.GetEntity();
 		return;
 	}
 

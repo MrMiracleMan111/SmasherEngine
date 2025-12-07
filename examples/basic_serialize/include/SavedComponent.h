@@ -9,11 +9,11 @@ class SavedComponent : public Smasher::IComponent, public Smasher::ISerializeabl
 public:
 	SavedComponent() : Smasher::ISerializeable() {}
 
-	const Smasher::Vec2& GetPosition() const;
-	const Smasher::Vec2& GetVelocity() const;
-	const Smasher::Degrees& GetRotation() const;
-	void Serialize(Smasher::OutputArchive& out) override;
-	void Deserialize(Smasher::InputArchive& in) override;
+	const Smasher::Vec2 &GetPosition() const;
+	const Smasher::Vec2 &GetVelocity() const;
+	const Smasher::Degrees GetRotation() const;
+	void Serialize(Smasher::OutputArchive &out) override;
+	void Deserialize(Smasher::InputArchive &in) override;
 
 
 private:

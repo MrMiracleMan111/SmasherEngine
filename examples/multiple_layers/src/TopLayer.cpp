@@ -10,14 +10,14 @@ TopLayer::~TopLayer()
 
 void TopLayer::Init()
 {
-	Smasher::DrawableComponentManager& drawableMgr = static_cast<Smasher::DrawableComponentManager&>(GetComponentManager<Smasher::DrawableComponent>());
-	std::shared_ptr<Smasher::ShaderResource> shader = GetEngine().GetResourceManager().GetOrLoadResource<Smasher::Manifest::Shaders::basic_texture_shader, Smasher::ShaderResource>();
+	Smasher::DrawableComponentManager &drawableMgr = static_cast<Smasher::DrawableComponentManager&>(GetComponentManager<Smasher::DrawableComponent>());
+	std::shared_ptr<Smasher::ShaderResource> pShader = GetEngine().GetResourceManager().GetOrLoadResource<Smasher::Manifest::Shaders::basic_texture_shader, Smasher::ShaderResource>();
 	sf::Glsl::Mat4 viewProjectionMatrix = sf::Glsl::Mat4(GetEngine().GetWindow().getView().getTransform().getMatrix());
-	shader->GetShader().setUniform("ViewProjectionMatrix", viewProjectionMatrix);
-	drawableMgr.SetShaderResource(shader);
+	pShader->GetShader().setUniform("ViewProjectionMatrix", viewProjectionMatrix);
+	drawableMgr.SetShaderResource(pShader);
 
-	Smasher::Entity& entity = AddEntity();
-	Smasher::Entity& uiPanel = AddEntity();
+	Smasher::Entity &entity = AddEntity();
+	Smasher::Entity &uiPanel = AddEntity();
 
 	entity.AddComponent<Smasher::TextComponent>()
 		.UseDefaults()
@@ -37,13 +37,13 @@ void TopLayer::Init()
 		.SetDepth(0.25f);
 
 
-	Smasher::UIPanelComponent& panel = uiPanel.AddComponent<Smasher::UIPanelComponent>()
+	Smasher::UIPanelComponent &panel = uiPanel.AddComponent<Smasher::UIPanelComponent>()
 		.SetBackgroundColor(sf::Color::Yellow)
 		.SetPosition(160.0f, 100.0f)
 		.SetScale(100.0f, 100.0f)
 		.SetDepth(0.5f)
 		.SetPanelSettings(Smasher::UIPanelSettings::BLOCK_MOUSE_MOVE);
-	panel.SetOnHoverCallback([&panel](Smasher::Events::MouseMoveEvent& event) {
+	panel.SetOnHoverCallback([&panel](Smasher::Events::MouseMoveEvent &event) {
 		if ((bool)(panel.GetPanelState() & Smasher::UIPanelState::HOVERED)) {
 			panel.SetBackgroundColor(sf::Color::Cyan);
 		}

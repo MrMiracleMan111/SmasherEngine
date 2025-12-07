@@ -92,7 +92,7 @@ void StressTestLayer::Init()
 	for (std::size_t i = 0; i < m_NumEntities; ++i) {
 		int positionX = int((rand() % 100) * 5);
 		int positionY = int((rand() % 100) * 5);
-		Smasher::Entity& image = SpawnBouncingBall(sf::Vector2i(positionX, positionY));
+		Smasher::Entity& image = SpawnBouncingBall(sf::Vector2i{ positionX, positionY });
 
 		if (i % 2 == 0) {
 			image.GetComponent<Smasher::DrawableComponent>()
@@ -125,7 +125,7 @@ void StressTestLayer::Update(Smasher::Millisecond delta) {
 
 }
 
-void StressTestLayer::Render(sf::RenderWindow& rWindow) {
+void StressTestLayer::Render(sf::RenderWindow &window) {
 	++m_RenderTimeSampleCount;
 	Smasher::Millisecond tmp = GetRenderTime();
 	m_RenderTimeSum += GetRenderTime();
@@ -143,11 +143,11 @@ void StressTestLayer::Render(sf::RenderWindow& rWindow) {
 }
 
 // Spawn an entity at mouse position
-void StressTestLayer::OnMouseMove(Smasher::Events::MouseMoveEvent& event) {
-	sf::Window& rWindow = GetEngine().GetWindow();
-	sf::Rect<int> windowRect(0, 0, (int)rWindow.getSize().x, (int)rWindow.getSize().y);
+void StressTestLayer::OnMouseMove(Smasher::Events::MouseMoveEvent &event) {
+	sf::Window &window = GetEngine().GetWindow();
+	sf::Rect<int> windowRect(0, 0, (int)window.getSize().x, (int)window.getSize().y);
 	if (windowRect.contains(event.Position.x, event.Position.y)) {
-		Smasher::Entity& ball = SpawnBouncingBall(event.Position);
+		Smasher::Entity &ball = SpawnBouncingBall(event.Position);
 		ball.GetComponent<Smasher::DrawableComponent>()
 			.SetTextureAsset<Smasher::Manifest::Textures::alpha_test>({});
 	}

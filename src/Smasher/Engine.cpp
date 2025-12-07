@@ -305,7 +305,7 @@ namespace Smasher {
 	}
 
 	void Engine::OnWindowResize(Events::WindowResizeEvent &event) {
-		m_WindowView.setSize(sf::Vector2f((float)event.WindowSize.x, (float)event.WindowSize.y));
+		m_WindowView.setSize(sf::Vector2f{ (float)event.WindowSize.x, (float)event.WindowSize.y });
 		m_WindowPtr->setView(m_WindowView);
 	}
 
