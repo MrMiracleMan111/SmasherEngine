@@ -13,7 +13,9 @@ namespace Smasher {
 	PhysicsManager::PhysicsManager(PhysicsManager &&other) noexcept :
 		m_WorldId(other.m_WorldId), 
 		m_Initialized(other.m_Initialized),
-		m_Accumulator(other.m_Accumulator)
+		m_Accumulator(other.m_Accumulator),
+		m_SubStepCount(other.m_SubStepCount),
+		m_TimeStep(other.m_TimeStep)
 	{
 		other.m_WorldId = b2WorldId{ 0 }; // Nullify world id
 		other.m_Initialized = false;
@@ -27,6 +29,8 @@ namespace Smasher {
 
 			m_WorldId = other.m_WorldId;
 			m_Accumulator = other.m_Accumulator;
+			m_SubStepCount = other.m_SubStepCount;
+			m_TimeStep = other.m_TimeStep;
 			other.m_Initialized = other.m_Initialized;
 			other.m_WorldId = b2WorldId{ 0 }; // Nullify world id
 			other.m_Initialized = false;
@@ -56,9 +60,11 @@ namespace Smasher {
 		}
 		m_Accumulator += (float)delta.count() / 1000.f;
 
-		while (m_Accumulator >= EngineConfig::BOX2D_TIMESTEP) {
-			b2World_Step(m_WorldId, EngineConfig::BOX2D_TIMESTEP, EngineConfig::BOX2D_SUBSTEP_COUNT);
-			m_Accumulator -= EngineConfig::BOX2D_TIMESTEP;
+		float timeStep = GetTimeStep(); // Create tmp copy of time step for multithreading shenanigan protection
+		int subStepCount = GetSubStepCount();
+		while (m_Accumulator >= timeStep) {
+			b2World_Step(m_WorldId, timeStep, subStepCount);
+			m_Accumulator -= timeStep;
 		}
 	}
 
