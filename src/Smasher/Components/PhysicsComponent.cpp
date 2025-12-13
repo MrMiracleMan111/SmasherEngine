@@ -4,7 +4,7 @@
 
 namespace Smasher {
 	PhysicsComponent::PhysicsComponent() {
-
+		m_ShapeDef = b2DefaultShapeDef();
 	}
 
 	PhysicsComponent::~PhysicsComponent() {
@@ -18,7 +18,8 @@ namespace Smasher {
 		m_BodyId(other.m_BodyId),
 		m_BodyValid(other.m_BodyValid),
 		m_ShapeId(other.m_ShapeId),
-		m_ShapeValid(other.m_ShapeValid)
+		m_ShapeValid(other.m_ShapeValid),
+		m_ShapeDef(other.m_ShapeDef)
 	{
 		other.m_BodyId = b2BodyId{ 0 }; // Nullify other body id
 		other.m_BodyValid = false;
@@ -35,6 +36,7 @@ namespace Smasher {
 			m_BodyId = other.m_BodyId;
 			m_BodyValid = other.m_BodyValid;
 			m_ShapeId = other.m_ShapeId;
+			m_ShapeDef = other.m_ShapeDef;
 			other.m_BodyId = b2BodyId{ 0 }; // Nullify other body id
 			other.m_BodyValid = false;
 			other.m_ShapeId = b2ShapeId{ 0 }; // Nullify other shape id
@@ -61,9 +63,8 @@ namespace Smasher {
 			// Replace old shape with new one
 			b2DestroyShape(m_ShapeId, false);
 		}
-		b2ShapeDef shapeDef = b2DefaultShapeDef();
 		b2Polygon shape = b2MakeBox(width / 2.f, height / 2.f);
-		m_ShapeId = b2CreatePolygonShape(m_BodyId, &shapeDef, &shape);
+		m_ShapeId = b2CreatePolygonShape(m_BodyId, &m_ShapeDef, &shape);
 		m_ShapeValid = true;
 		return *this;
 	}
@@ -77,12 +78,11 @@ namespace Smasher {
 			// Replace old shape with new one
 			b2DestroyShape(m_ShapeId, false);
 		}
-		b2ShapeDef shapeDef = b2DefaultShapeDef();
 		const b2Circle circle = {
 			b2Vec2_zero,
 			radius
 		};
-		m_ShapeId = b2CreateCircleShape(m_BodyId, &shapeDef, &circle);
+		m_ShapeId = b2CreateCircleShape(m_BodyId, &m_ShapeDef, &circle);
 		m_ShapeValid = true;
 		return *this;
 	}
@@ -92,6 +92,10 @@ namespace Smasher {
 		return *this;
 	}
 
+	PhysicsComponent& PhysicsComponent::UseShapeDef(b2ShapeDef& def) {
+		m_ShapeDef = def;
+		return *this;
+	}
 
 	sf::Vector2f PhysicsComponent::GetPosition() const {
 		assert(m_BodyValid && "Body must be valid before calling GetPosition");

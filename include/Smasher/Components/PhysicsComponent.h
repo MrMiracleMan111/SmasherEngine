@@ -51,6 +51,8 @@ namespace Smasher {
 
 		PhysicsComponent& SetOnCollisionCallback(std::function<void(PhysicsCollision)> callback);
 
+		PhysicsComponent& UseShapeDef(b2ShapeDef &def);
+
 		PhysicsComponent& UseRectCollider(float width, float height);
 
 		PhysicsComponent& UseCircleCollider(float radius);
@@ -72,6 +74,7 @@ namespace Smasher {
 		PhysicsType m_PhysicsType = PhysicsType::STATIC;
 		b2BodyId m_BodyId{ 0 };
 		b2ShapeId m_ShapeId{ 0 }; // Collider
+		b2ShapeDef m_ShapeDef;
 		bool m_BodyValid = false;
 		bool m_ShapeValid = false;
 		std::function<void(PhysicsCollision)> m_OnCollisionCallback;
