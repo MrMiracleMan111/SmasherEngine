@@ -17,7 +17,7 @@ add_custom_command(
 )
 
 # Basic Resource Load Example
-add_custom_target(generate_manifest_SmasherStressTest DEPENDS Manifest.h)
+add_custom_target(generate_manifest_SmasherStressTest DEPENDS ${STRESS_TEST_MANIFEST_HEADER})
 add_executable (SmasherStressTest "main.cpp" "include/BallComponent.h" "src/BallComponent.cpp" "include/StressTestLayer.h" "src/StressTestLayer.cpp")
 
 set_target_properties(SmasherStressTest PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${SMASHER_ENGINE_OUTPUT_DIR}")

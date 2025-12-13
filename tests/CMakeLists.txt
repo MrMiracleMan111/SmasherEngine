@@ -25,7 +25,7 @@ add_custom_command(
 )
 
 # Basic Resource Load Example
-add_custom_target(generate_manifest_BasicTests DEPENDS Manifest.h)
+add_custom_target(generate_manifest_BasicTests DEPENDS ${STRESS_TEST_MANIFEST_HEADER})
 
 
 add_executable(

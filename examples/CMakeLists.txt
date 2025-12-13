@@ -47,7 +47,7 @@ target_link_libraries( BasicSerializeExample PRIVATE SmasherEngine )
 
 
 # Basic Resource Load Example
-add_custom_target(generate_manifest_BasicResourceLoadExample DEPENDS Manifest.h)
+add_custom_target(generate_manifest_BasicResourceLoadExample DEPENDS ${RESOURCE_EXAMPLE_MANIFEST_HEADER})
 add_executable (BasicResourceLoadExample "basic_resource_load/main.cpp" "basic_resource_load/src/ExampleResourcesLayer.cpp"   )
 
 set_target_properties(BasicResourceLoadExample PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${SMASHER_ENGINE_OUTPUT_DIR}")
@@ -58,7 +58,7 @@ target_include_directories (BasicResourceLoadExample PUBLIC "${CMAKE_CURRENT_SOU
 target_link_libraries( BasicResourceLoadExample PRIVATE SmasherEngine )
 
 # Multiple Layers Example
-add_custom_target(generate_manifest_MultipleLayersExample DEPENDS Manifest.h)
+add_custom_target(generate_manifest_MultipleLayersExample DEPENDS ${RESOURCE_EXAMPLE_MANIFEST_HEADER})
 add_executable (MultipleLayersExample "multiple_layers/main.cpp" "multiple_layers/src/TopLayer.cpp" "multiple_layers/src/MidLayer.cpp" "multiple_layers/src/BottomLayer.cpp" )
 
 set_target_properties(MultipleLayersExample PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${SMASHER_ENGINE_OUTPUT_DIR}")
@@ -69,7 +69,7 @@ target_include_directories (MultipleLayersExample PUBLIC "${CMAKE_CURRENT_SOURCE
 target_link_libraries( MultipleLayersExample PRIVATE SmasherEngine )
 
 # Basic AABB Physics Engine Example
-add_custom_target(generate_manifest_PhysicsExample DEPENDS Manifest.h)
+add_custom_target(generate_manifest_PhysicsExample DEPENDS ${RESOURCE_EXAMPLE_MANIFEST_HEADER})
 add_executable (PhysicsExample "basic_physics/main.cpp" "basic_physics/src/ExamplePhysicsLayer.cpp" "basic_physics/include/BoxControllerComponent.h" "basic_physics/src/BoxControllerComponent.cpp" )
 
 set_target_properties(PhysicsExample PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${SMASHER_ENGINE_OUTPUT_DIR}")
