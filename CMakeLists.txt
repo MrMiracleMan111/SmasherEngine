@@ -63,6 +63,37 @@ if(NOT TARGET box2d)
     message(FATAL_ERROR "Failed to fetch/build Box2D")
 endif()
 
+# SFML 2.6.2 69ea0cd863aed1d4092b970b676924a716ff718b
+set(SFML_VERSION "2.6.1")
+set(TMP_BUILD_SHARED_LIBS BUILD_SHARED_LIBS)
+FetchContent_Declare(
+    sfml
+    GIT_REPOSITORY https://github.com/SFML/SFML.git
+    GIT_TAG "${SFML_VERSION}"
+)
+set(BUILD_SHARED_LIBS ON)
+set(SFML_BUILD_EXAMPLES OFF)
+set(SFML_BUILD_DOC OFF)
+
+FetchContent_MakeAvailable(sfml)
+list(APPEND SFML_MODULE_NAMES main window system graphics audio network)
+foreach(module_name IN LISTS SFML_MODULE_NAMES)
+    if(NOT TARGET sfml-${module_name})
+        message(FATAL_ERROR "Missing SFML ${SFML_VERSION} System ${module_name}")
+    endif()
+    set_target_properties(sfml-${module_name} PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY ${SMASHER_ENGINE_OUTPUT_DIR}
+    LIBRARY_OUTPUT_DIRECTORY ${SMASHER_ENGINE_OUTPUT_DIR}
+    RUNTIME_OUTPUT_DIRECTORY ${SMASHER_ENGINE_OUTPUT_DIR})
+    message(STATUS "Configured SFML Module ${module_name}")
+endforeach()
+
+set(BUILD_SHARED_LIBS TMP_BUILD_SHARED_LIBS)
+
+message(STATUS "Fetched SFML Successfully")
+
+
+
 # GoogleTest requires at least C++17
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -145,7 +176,7 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/local.cmake")
 endif()
 
 find_package(OpenGL REQUIRED)
-find_package(SFML 2.6.2 COMPONENTS system network window graphics audio REQUIRED)
+# find_package(SFML 2.6.2 COMPONENTS system network window graphics audio REQUIRED)
 find_package(GLEW NAMES glew GLEW QUIET)
 
 if(GLEW_FOUND)
@@ -231,12 +262,13 @@ set_target_properties(SmasherEngine PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE 
 generate_export_header(SmasherEngine EXPORT_FILE_NAME "${CMAKE_BINARY_DIR}/exports/Smasher_export.h")
 target_include_directories(SmasherEngine PUBLIC ${OPENGL_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/ComponentManagers" "${CMAKE_BINARY_DIR}/exports")
 
+target_link_libraries(SmasherEngine PRIVATE GTest::gtest_main)
 target_link_libraries(SmasherEngine PUBLIC
-"sfml-audio"
-"sfml-window"
-"sfml-graphics"
-"sfml-network"
-"sfml-system"
+sfml-audio
+sfml-window
+sfml-graphics
+sfml-network
+sfml-system
 ${GLEW_TARGET}
 OpenGL::GL
 OpenGL::GLU
