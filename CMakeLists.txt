@@ -34,6 +34,10 @@ if(SMASHER_TESTS)
     # For Windows: Prevent overriding the parent project's compiler/linker settings
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(googletest)
+    set_target_properties(gtest gtest_main PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY ${SMASHER_ENGINE_OUTPUT_DIR}
+    LIBRARY_OUTPUT_DIRECTORY ${SMASHER_ENGINE_OUTPUT_DIR}
+    RUNTIME_OUTPUT_DIRECTORY ${SMASHER_ENGINE_OUTPUT_DIR})
     include(GoogleTest)
 
     enable_testing()
