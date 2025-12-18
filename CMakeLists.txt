@@ -21,7 +21,11 @@ set (SMASHER_TESTS TRUE CACHE BOOL "Should unit tests be compiled")
 set (SMASHER_BENCHMARK FALSE CACHE BOOL "Should benchmarking info be logged")
 set (SMASHER_CATCH_EXCEPTIONS TRUE CACHE BOOL "Should Smasher Engine catch all Exceptions. This can make debugging difficult if your debugger struggles to track propagated exceptions.'")
 set(MANIFEST_GENERATOR "${CMAKE_SOURCE_DIR}/scripts/ManifestHeaderGenerator.py")
-set(SMASHER_ENGINE_OUTPUT_DIR ${CMAKE_BINARY_DIR})
+if(NOT DEFINED RUNTIME_OUTPUT_DIRECTORY)
+    set(SMASHER_ENGINE_OUTPUT_DIR ${CMAKE_BINARY_DIR})
+else()
+    set(SMASHER_ENGINE_OUTPUT_DIR ${RUNTIME_OUTPUT_DIRECTORY})
+endif()
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(SMASHER_TESTS)
@@ -33,14 +37,19 @@ if(SMASHER_TESTS)
     )
     # For Windows: Prevent overriding the parent project's compiler/linker settings
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    
     FetchContent_MakeAvailable(googletest)
+    
+    if(NOT TARGET gtest OR NOT TARGET gtest_main)
+        message(FATAL_ERROR "Could not Find GTest Targets")
+    endif()
+
     set_target_properties(gtest gtest_main PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY ${SMASHER_ENGINE_OUTPUT_DIR}
     LIBRARY_OUTPUT_DIRECTORY ${SMASHER_ENGINE_OUTPUT_DIR}
     RUNTIME_OUTPUT_DIRECTORY ${SMASHER_ENGINE_OUTPUT_DIR})
-    include(GoogleTest)
-
     enable_testing()
+    include(GoogleTest)
 endif()
 
 # Box2D v3.1.1
