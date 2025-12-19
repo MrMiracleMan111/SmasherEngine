@@ -45,10 +45,14 @@ if(SMASHER_TESTS)
         message(FATAL_ERROR "Could not Find GTest Targets")
     endif()
 
-    set_target_properties(gtest gtest_main PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY ${SMASHER_ENGINE_OUTPUT_DIR}
-    LIBRARY_OUTPUT_DIRECTORY ${SMASHER_ENGINE_OUTPUT_DIR}
-    RUNTIME_OUTPUT_DIRECTORY ${SMASHER_ENGINE_OUTPUT_DIR})
+    foreach(config DEBUG RELEASE RELWITHDEBINFO MINSIZEREL)
+        set_target_properties(gtest gtest_main PROPERTIES
+            ARCHIVE_OUTPUT_DIRECTORY_${config} "${SMASHER_ENGINE_OUTPUT_DIR}"
+            LIBRARY_OUTPUT_DIRECTORY_${config} "${SMASHER_ENGINE_OUTPUT_DIR}"
+            RUNTIME_OUTPUT_DIRECTORY_${config} "${SMASHER_ENGINE_OUTPUT_DIR}"
+        )
+    endforeach()
+
     enable_testing()
     include(GoogleTest)
 endif()
@@ -65,11 +69,14 @@ set(BUILD_SHARED_LIBS ON)
 set(DBOX2D_BUILD_DOCS OFF)
 set(DGLFW_BUILD_WAYLAND OFF)
 FetchContent_MakeAvailable(box2d)
-set_target_properties(box2d PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY ${SMASHER_ENGINE_OUTPUT_DIR}
-    LIBRARY_OUTPUT_DIRECTORY ${SMASHER_ENGINE_OUTPUT_DIR}
-    RUNTIME_OUTPUT_DIRECTORY ${SMASHER_ENGINE_OUTPUT_DIR}
-)
+foreach(config DEBUG RELEASE RELWITHDEBINFO MINSIZEREL)
+    set_target_properties(box2d PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY_${config} "${SMASHER_ENGINE_OUTPUT_DIR}"
+        LIBRARY_OUTPUT_DIRECTORY_${config} "${SMASHER_ENGINE_OUTPUT_DIR}"
+        RUNTIME_OUTPUT_DIRECTORY_${config} "${SMASHER_ENGINE_OUTPUT_DIR}"
+    )
+endforeach()
+
 set(BUILD_SHARED_LIBS TMP_BUILD_SHARED_LIBS)
 
 # Verify box2D target exists
@@ -95,10 +102,15 @@ foreach(module_name IN LISTS SFML_MODULE_NAMES)
     if(NOT TARGET sfml-${module_name})
         message(FATAL_ERROR "Missing SFML ${SFML_VERSION} System ${module_name}")
     endif()
-    set_target_properties(sfml-${module_name} PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${SMASHER_ENGINE_OUTPUT_DIR}"
-    LIBRARY_OUTPUT_DIRECTORY "${SMASHER_ENGINE_OUTPUT_DIR}"
-    RUNTIME_OUTPUT_DIRECTORY "${SMASHER_ENGINE_OUTPUT_DIR}")
+
+    foreach(config DEBUG RELEASE RELWITHDEBINFO MINSIZEREL)
+        set_target_properties(sfml-${module_name} PROPERTIES
+            ARCHIVE_OUTPUT_DIRECTORY_${config} "${SMASHER_ENGINE_OUTPUT_DIR}"
+            LIBRARY_OUTPUT_DIRECTORY_${config} "${SMASHER_ENGINE_OUTPUT_DIR}"
+            RUNTIME_OUTPUT_DIRECTORY_${config} "${SMASHER_ENGINE_OUTPUT_DIR}"
+        )
+    endforeach()
+
     message(STATUS "Configured SFML Module ${module_name} using output directory: ${SMASHER_ENGINE_OUTPUT_DIR}")
 endforeach()
 
