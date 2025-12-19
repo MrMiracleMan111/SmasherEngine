@@ -96,10 +96,10 @@ foreach(module_name IN LISTS SFML_MODULE_NAMES)
         message(FATAL_ERROR "Missing SFML ${SFML_VERSION} System ${module_name}")
     endif()
     set_target_properties(sfml-${module_name} PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY ${SMASHER_ENGINE_OUTPUT_DIR}
-    LIBRARY_OUTPUT_DIRECTORY ${SMASHER_ENGINE_OUTPUT_DIR}
-    RUNTIME_OUTPUT_DIRECTORY ${SMASHER_ENGINE_OUTPUT_DIR})
-    message(STATUS "Configured SFML Module ${module_name}")
+    ARCHIVE_OUTPUT_DIRECTORY "${SMASHER_ENGINE_OUTPUT_DIR}"
+    LIBRARY_OUTPUT_DIRECTORY "${SMASHER_ENGINE_OUTPUT_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY "${SMASHER_ENGINE_OUTPUT_DIR}")
+    message(STATUS "Configured SFML Module ${module_name} using output directory: ${SMASHER_ENGINE_OUTPUT_DIR}")
 endforeach()
 
 set(BUILD_SHARED_LIBS TMP_BUILD_SHARED_LIBS)
