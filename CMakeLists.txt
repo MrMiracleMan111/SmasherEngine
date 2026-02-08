@@ -193,7 +193,7 @@ add_library(SmasherEngine SHARED
 "src/Smasher/Components/PhysicsComponent.cpp"
 "include/Smasher/PhysicsManager.h"
 "src/Smasher/PhysicsManager.cpp"
-"include/Smasher/Physics.h")
+"include/Smasher/Physics.h" "include/ErrorCodes.h")
 
 # Try to include machine-specific config if it exists
 if(EXISTS "${CMAKE_SOURCE_DIR}/local.cmake")

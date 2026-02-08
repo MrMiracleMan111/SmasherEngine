@@ -12,6 +12,26 @@
 #include "Smasher/Drawable.h"
 #include "Manifest.h"
 
+class MoveObjectTest {
+public:
+	MoveObjectTest() {};
+	~MoveObjectTest() {};
+	MoveObjectTest(const MoveObjectTest&) : m_Copy(true) {};
+	MoveObjectTest(MoveObjectTest&& other) noexcept : m_FromMove(true) { other.m_Valid = false; };
+	MoveObjectTest& operator = (const MoveObjectTest&) { m_Copy = true; return *this; };
+	MoveObjectTest& operator = (MoveObjectTest&& other) noexcept { m_FromMove = true; other.m_Valid = false; return *this; };
+
+
+	const bool IsValid() const { return m_Valid; }
+	const bool IsCopy() const { return m_Copy; }
+	const bool IsFromMove() const { return m_FromMove; }
+
+private:
+	bool m_Valid = true;
+	bool m_Copy = false;
+	bool m_FromMove = false;
+};
+
 class DummyLayer : public Smasher::Layer {
 public:
 	DummyLayer(Smasher::Engine& engine) : Smasher::Layer(engine) {}
@@ -37,8 +57,6 @@ public:
 		ShutdownEngine();
 	};
 };
-
-
 
 struct TestComponent : public Smasher::IComponent {
 public:
@@ -216,6 +234,83 @@ TEST(TraitChecks, EventSubscription) {
 	static_assert(std::is_move_constructible_v<Smasher::EventSubscriptionHandle>);
 	static_assert(std::is_move_assignable_v<Smasher::EventSubscriptionHandle>);
 	EXPECT_TRUE(true);
+}
+
+TEST(TraitChecks, Expected) {
+	// Smasher::Expected<> should not be copyable, moveable
+	static_assert(!std::is_copy_constructible_v<Smasher::Expected<int>>);
+	static_assert(!std::is_copy_assignable_v<Smasher::Expected<int>>);
+	static_assert(!std::is_move_constructible_v<Smasher::Expected<int>>);
+	static_assert(!std::is_move_assignable_v<Smasher::Expected<int>>);
+	EXPECT_TRUE(true);
+}
+
+
+TEST(ErrorHandling, Expected_Get) {
+	Smasher::Engine engine(640, 420);
+	Smasher::Layer & layer = engine.GetLayer<Smasher::BaseLayer>();
+	auto foo = []() -> Smasher::Expected<float> {
+		return 15.f;
+	};
+	Smasher::Expected<float> tmp = foo();
+	float test = tmp.Get();
+	EXPECT_FALSE(tmp.HasError());
+	EXPECT_EQ(15.f, test);
+	EXPECT_NE(16.f, test);
+	EXPECT_EQ(15.f, tmp.Get());
+	EXPECT_NE(16.f, tmp.Get());
+}
+
+TEST(ErrorHandling, Expected_GetWhenError) {
+	Smasher::Engine engine(640, 420);
+	Smasher::Layer& layer = engine.GetLayer<Smasher::BaseLayer>();
+	auto foo = []() -> Smasher::Expected<float> {
+		return Smasher::Expected<float>::Error(100);
+	};
+	Smasher::Expected<float> tmp = foo();
+
+	EXPECT_TRUE(tmp.HasError());
+	EXPECT_FALSE(tmp); // Implicit bool cast
+	EXPECT_FALSE((bool)tmp); // Implicit bool cast
+	EXPECT_EQ(100, tmp.GetError());
+
+	EXPECT_THROW({
+		float a = 11;
+		float b = a + tmp.Get();
+	}, Smasher::Exceptions::ExpectedHasError);
+}
+
+TEST(ErrorHandling, ExpectedMoveTests) {
+	MoveObjectTest bill{};
+	MoveObjectTest george = std::move(bill);
+
+	MoveObjectTest bar {};
+	Smasher::Expected<MoveObjectTest> tmp_1 = std::move(bar);
+
+	EXPECT_TRUE(tmp_1.Get().IsValid());
+	EXPECT_FALSE(tmp_1.Get().IsCopy());
+	EXPECT_TRUE(tmp_1.Get().IsFromMove());
+	EXPECT_FALSE(bar.IsValid());
+	EXPECT_FALSE(bar.IsCopy());
+	EXPECT_FALSE(bar.IsFromMove());
+
+	auto foo = []() -> Smasher::Expected<MoveObjectTest> {
+		MoveObjectTest obj;
+		return obj;
+	};
+	Smasher::Expected<MoveObjectTest> tmp_2 = foo();
+
+	EXPECT_TRUE(tmp_2.Get().IsValid());
+	EXPECT_FALSE(tmp_2.Get().IsCopy());
+	EXPECT_TRUE(tmp_2.Get().IsFromMove());
+
+	MoveObjectTest tmp_3 = std::move(tmp_2.Get());
+
+	EXPECT_TRUE(tmp_3.IsValid());
+	EXPECT_FALSE(tmp_3.IsCopy());
+	EXPECT_TRUE(tmp_3.IsFromMove());
+	EXPECT_FALSE(tmp_2.Get().IsValid());
+	EXPECT_FALSE(tmp_2.Get().IsCopy());
 }
 
 TEST(LayerTest, GetLayer) {
