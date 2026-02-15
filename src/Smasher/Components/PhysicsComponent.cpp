@@ -15,11 +15,11 @@ namespace Smasher {
 	}
 
 	PhysicsComponent::PhysicsComponent(PhysicsComponent &&other) noexcept :
-		m_BodyId(other.m_BodyId),
-		m_BodyValid(other.m_BodyValid),
-		m_ShapeId(other.m_ShapeId),
-		m_ShapeValid(other.m_ShapeValid),
-		m_ShapeDef(other.m_ShapeDef)
+		m_BodyId(std::move(other.m_BodyId)),
+		m_BodyValid(std::move(other.m_BodyValid)),
+		m_ShapeId(std::move(other.m_ShapeId)),
+		m_ShapeValid(std::move(other.m_ShapeValid)),
+		m_ShapeDef(std::move(other.m_ShapeDef))
 	{
 		other.m_BodyId = b2BodyId{ 0 }; // Nullify other body id
 		other.m_BodyValid = false;
@@ -33,10 +33,10 @@ namespace Smasher {
 				b2DestroyBody(m_BodyId);
 				m_ShapeValid = false;
 			}
-			m_BodyId = other.m_BodyId;
-			m_BodyValid = other.m_BodyValid;
-			m_ShapeId = other.m_ShapeId;
-			m_ShapeDef = other.m_ShapeDef;
+			m_BodyId = std::move(other.m_BodyId);
+			m_BodyValid = std::move(other.m_BodyValid);
+			m_ShapeId = std::move(other.m_ShapeId);
+			m_ShapeDef = std::move(other.m_ShapeDef);
 			other.m_BodyId = b2BodyId{ 0 }; // Nullify other body id
 			other.m_BodyValid = false;
 			other.m_ShapeId = b2ShapeId{ 0 }; // Nullify other shape id
