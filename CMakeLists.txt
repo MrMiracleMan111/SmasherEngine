@@ -84,6 +84,19 @@ if(NOT TARGET box2d)
     message(FATAL_ERROR "Failed to fetch/build Box2D")
 endif()
 
+set(ENTT_VERSION "v3.16.0")
+FetchContent_Declare(
+    EnTT
+    GIT_REPOSITORY https://github.com/skypjack/entt.git
+    GIT_TAG "${ENTT_VERSION}"
+)
+FetchContent_MakeAvailable(EnTT)
+
+# Verify EnTT target exists
+if(NOT TARGET EnTT)
+    message(FATAL_ERROR "Failed to fetch/build EnTT")
+endif()
+
 # SFML 2.6.2 69ea0cd863aed1d4092b970b676924a716ff718b
 set(SFML_VERSION "2.6.1")
 set(TMP_BUILD_SHARED_LIBS BUILD_SHARED_LIBS)
@@ -298,7 +311,8 @@ sfml-system
 ${GLEW_TARGET}
 OpenGL::GL
 OpenGL::GLU
-box2d::box2d)
+box2d::box2d
+EnTT::EnTT)
 
 
 target_compile_features(SmasherEngine PUBLIC cxx_std_20)
