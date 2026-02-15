@@ -10,7 +10,6 @@
 #include "Smasher/Exceptions.h"
 #include "Smasher_export.h"
 #include "Smasher/ISerializeable.h"
-#include "Smasher/Exceptions.h"
 
 #define SMASHER_API SMASHERENGINE_EXPORT
 
