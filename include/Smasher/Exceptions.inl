@@ -1,28 +1,51 @@
+#include <format>
+#include <cassert>
 #include "Exceptions.h"
+
 namespace Smasher {
 	template <class T>
 	Expected<T>::Expected(const T& other) :
-		m_ReturnVal{ other },
 		m_Error(false)
 	{
+		if constexpr (std::is_copy_assignable_v<T>) {
+			m_ReturnVal.ret = other;
+		}
+		else {
+			assert(false && "T is not copy assignable");
+		}
 	}
 
 	template <class T>
 	Expected<T>::Expected(T&& other) :
-		m_ReturnVal{ std::move(other) },
 		m_Error(false)
-	{}
+	{
+		if constexpr (std::is_move_assignable_v<T>) {
+			m_ReturnVal.ret = std::move(other);
+		}
+		else {
+			assert(false && "T is not move assignable");
+		}
+	}
 
 	template <class T>
 	Expected<T>& Expected<T>::operator= (const T& other) {
-		m_ReturnVal.ret = other;
+		if constexpr (std::is_copy_assignable_v<T>) {
+			m_ReturnVal.ret = other;
+		}
+		else {
+			assert(false && "T is not copy assignable");
+		}
 		m_Error = false;
 	}
 
 	template <class T>
 	Expected<T>& Expected<T>::operator= (T&& other) {
-		m_ReturnVal.ret = other;
-		m_Error = false;
+		if constexpr (std::is_copy_assignable_v<T>) {
+			m_ReturnVal.ret = std::move(other);
+		}
+		else {
+			assert(false && "T is not move assignable");
+		}		m_Error = false;
 	}
 
 	// Factory Method for throwing error
