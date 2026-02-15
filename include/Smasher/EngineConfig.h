@@ -5,6 +5,7 @@ namespace Smasher {
 	struct EngineConfig {
 		const inline static int WINDOW_WIDTH = 640;
 		const inline static int WINDOW_HEIGHT = 420;
+		const inline static unsigned int MIN_THREAD_COUNT = 2;
 		const inline static std::string TITLE = "Smasher Engine Game";
 		const inline static unsigned int TARGET_UPDATE_RATE = 120u;
 		const inline static unsigned int TARGET_FRAMERATE = 60u;

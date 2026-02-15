@@ -355,4 +355,6 @@ namespace Smasher {
 	EventManager& Engine::GetEventManager() { return m_EventManager; };
 	ResourceManager& Engine::GetResourceManager() { return m_ResourceManager; };
 	PhysicsManager& Engine::GetPhysicsManager() { return m_PhysicsManager; };
+	JobManager& Engine::GetJobManager() { return m_JobManager; };
+
 }

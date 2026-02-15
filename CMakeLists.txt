@@ -131,8 +131,6 @@ set(BUILD_SHARED_LIBS TMP_BUILD_SHARED_LIBS)
 
 message(STATUS "Fetched SFML Successfully")
 
-
-
 # GoogleTest requires at least C++17
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -209,6 +207,15 @@ add_library(SmasherEngine SHARED
 "include/Smasher/Physics.h"
 "include/Smasher/ErrorCodes.h"
 "src/Smasher/ErrorCodes.cpp"
+"include/Smasher/ISystem.h"
+"include/Smasher/JobManager/Job.h"
+"src/Smasher/JobManager/Job.cpp"
+"include/Smasher/JobManager/JobManager.h"
+"src/Smasher/JobManager/JobManager.cpp"
+"include/Smasher/JobManager/JobRunner.h"
+"src/Smasher/JobManager/JobRunner.cpp"
+"include/Smasher/JobManager/JobPool.h"
+"src/Smasher/JobManager/JobPool.cpp")
 
 # Try to include machine-specific config if it exists
 if(EXISTS "${CMAKE_SOURCE_DIR}/local.cmake")

@@ -11,6 +11,7 @@
 #include "Smasher/PhysicsManager.h"
 #include "Smasher/ResourceManager.h"
 #include "Smasher/EventManager.h"
+#include "Smasher/JobManager/JobManager.h"
 #include "Smasher/Events.h"
 #include "Smasher/LayerTransition.h"
 
@@ -22,6 +23,7 @@ namespace Smasher {
 
 	// Non-Copyable
 	class SMASHER_API Engine final {
+
 		using LayerStackItr = std::list<std::pair<std::type_index, std::unique_ptr<Layer>>>::iterator;
 		using LayerStackConstItr = std::list<std::pair<std::type_index, std::unique_ptr<Layer>>>::const_iterator;
 
@@ -66,6 +68,7 @@ namespace Smasher {
 		EventManager& GetEventManager();
 		ResourceManager& GetResourceManager();
 		PhysicsManager& GetPhysicsManager();
+		JobManager& GetJobManager();
 
 		void SetUpdateInterval(Millisecond interval) { m_UpdateInterval = interval; }
 		void SetRenderInterval(Millisecond interval) { m_RenderInterval = interval; }
@@ -102,6 +105,7 @@ namespace Smasher {
 		PhysicsManager m_PhysicsManager;
 		EventManager m_EventManager;
 		ResourceManager m_ResourceManager;
+		JobManager m_JobManager{ 4u };
 		sf::View m_WindowView; // Default window view (used for resizing events)
 		Millisecond m_UpdateInterval = EngineConfig::UPDATE_INTERVAL;
 		Millisecond m_RenderInterval = EngineConfig::RENDER_INTERVAL;
@@ -114,6 +118,12 @@ namespace Smasher {
 		EventSubscriptionHandle m_WindowCloseHandle;
 		EventSubscriptionHandle m_WindowResizeHandle;
 	};
+
+	// Engine is non-copyable, moveable
+	static_assert(!std::is_copy_constructible_v<Smasher::Engine>);
+	static_assert(!std::is_copy_assignable_v<Smasher::Engine>);
+	static_assert(std::is_move_constructible_v<Smasher::Engine>);
+	static_assert(std::is_move_assignable_v<Smasher::Engine>);
 }
 
 #include "Engine.inl"
