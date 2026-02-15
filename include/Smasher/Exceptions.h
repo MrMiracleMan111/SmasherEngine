@@ -58,6 +58,8 @@ namespace Smasher {
 	*/
 	template<class T>
 	class Expected {
+		static_assert(!std::is_reference_v<T>,
+			"Smasher::Expected cannot hold reference types");
 	private:
 		// Used to indicate that we the "Expected" object
 		// will be housing an error not a value
@@ -96,6 +98,7 @@ namespace Smasher {
 			T ret;
 			ErrorCode code;
 			~ReturnErrorUnion() {};
+			ReturnErrorUnion() { std::memset(this, 0, std::max(sizeof(T), sizeof(ErrorCode))); };
 		} m_ReturnVal;
 
 		bool m_Error = false;
