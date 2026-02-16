@@ -240,15 +240,6 @@ TEST(TraitChecks, Expected) {
 	EXPECT_TRUE(true);
 }
 
-TEST(TraitChecks, Job) {
-	// Smasher::Expected<> should not be copyable, moveable
-	static_assert(!std::is_copy_constructible_v<Smasher::Job>);
-	static_assert(!std::is_copy_assignable_v<Smasher::Job>);
-	static_assert(std::is_move_constructible_v<Smasher::Job>);
-	static_assert(std::is_move_assignable_v<Smasher::Job>);
-	EXPECT_TRUE(true);
-}
-
 
 TEST(ErrorHandling, Expected_Get) {
 	Smasher::Engine engine(640, 420);

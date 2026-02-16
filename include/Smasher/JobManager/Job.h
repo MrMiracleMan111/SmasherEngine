@@ -61,4 +61,9 @@ namespace Smasher {
 
 		std::list<Job>::iterator m_AllJobsListItr; // Iterator for this job in "AllJobs list"
 	};
+
+	static_assert(!std::is_copy_constructible_v<Smasher::Job>);
+	static_assert(!std::is_copy_assignable_v<Smasher::Job>);
+	static_assert(std::is_move_constructible_v<Smasher::Job>);
+	static_assert(std::is_move_assignable_v<Smasher::Job>);
 }
