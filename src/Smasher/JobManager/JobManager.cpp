@@ -7,7 +7,8 @@
 
 namespace Smasher {
 	JobManager::JobManager() :
-		m_JobPool(),
+		m_AsyncJobPool(),
+		m_SyncJobPool(),
 		m_Valid(true),
 		m_Runners()
 	{
@@ -16,7 +17,8 @@ namespace Smasher {
 	}
 
 	JobManager::JobManager(unsigned int numJobRunners) :
-		m_JobPool(),
+		m_AsyncJobPool(),
+		m_SyncJobPool(),
 		m_Valid(true),
 		m_Runners()
 	{
@@ -32,7 +34,7 @@ namespace Smasher {
 
 	JobManager::JobManager(JobManager &&other) :
 		m_Runners(std::move(other.m_Runners)),
-		m_JobPool(std::move(other.m_JobPool))
+		m_AsyncJobPool(std::move(other.m_AsyncJobPool))
 	{
 		// Runners would have invalid references to m_JobPool
 		// after m_JobPool is moved
@@ -50,20 +52,26 @@ namespace Smasher {
 		if (this != &other) {
 			other.m_Valid = false;
 			m_Runners = std::move(other.m_Runners);
-			m_JobPool = std::move(other.m_JobPool);
+			m_AsyncJobPool = std::move(other.m_AsyncJobPool);
 		}
 		return *this;
 	}
 
 	void JobManager::InitializeRunners(unsigned int numRunners) {
 		for (std::size_t i = 0; i < numRunners; ++i) {
-			m_Runners.emplace_front(m_JobPool, m_RunnersStateCV);
+			m_Runners.emplace_front(m_AsyncJobPool, m_RunnersStateCV);
 		}
+		m_Runners.emplace_front(m_SyncJobPool, m_RunnersStateCV, true);
 	}
 
-	Expected<std::reference_wrapper<Job>> JobManager::CreateJob(std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies) {
-		std::scoped_lock lock(m_JobPool.GetMutex());
-		return m_JobPool.AddJob(callback, dependencies);
+	Expected<std::reference_wrapper<Job>> JobManager::AddAsyncJob(std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies) {
+		std::scoped_lock lock(m_AsyncJobPool.GetMutex());
+		return m_AsyncJobPool.AddJob(callback, dependencies);
+	}
+
+	Expected<std::reference_wrapper<Job>> JobManager::AddSyncJob(std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies) {
+		std::scoped_lock lock(m_SyncJobPool.GetMutex());
+		return m_SyncJobPool.AddJob(callback, dependencies);
 	}
 
 	ErrorCode JobManager::RunJobs() {
@@ -72,14 +80,20 @@ namespace Smasher {
 		}
 
 		// Wakeup all job runners
-		m_JobPool.GetCV().notify_all();
+		m_AsyncJobPool.GetCV().notify_all();
+
+		for (auto& job : m_Runners) {
+			if (job.IsSynchronous()) {
+				job.Run();
+			}
+		}
 		return ERROR_NoError;
 	}
 
-	ErrorCode JobManager::WaitForJobs() {
+	ErrorCode JobManager::WaitForAsyncJobs() {
 		std::unique_lock<std::mutex> lock(m_RunnersStateMutex);
 		m_RunnersStateCV.wait(lock, [this] {
-			if (m_JobPool.IsJobAvailable()) {
+			if (!m_AsyncJobPool.IsPoolEmpty()) {
 				return false;
 			}
 
@@ -99,10 +113,13 @@ namespace Smasher {
 		}
 
 		// Wakeup all job runners
-		m_JobPool.GetCV().notify_all();
+		m_AsyncJobPool.GetCV().notify_all();
+		m_SyncJobPool.GetCV().notify_all();
 
 		for (auto &job : m_Runners) {
-			job.GetThread().join();
+			if (!job.IsSynchronous()) {
+				job.GetThread().join();
+			}
 		}
 
 		return ERROR_NoError;

@@ -7,6 +7,7 @@
 #include "Smasher/Exceptions.h"
 
 namespace Smasher {
+	class JobPool;
 	enum class JobStatus {
 		WAITING,
 		RUNNING,
@@ -20,7 +21,9 @@ namespace Smasher {
 
 	public:
 		Job() = delete;
-		Job(std::function<ErrorCode(void)>, std::initializer_list<std::reference_wrapper<Job>> dependencies); // Called by JobManager
+		Job(std::reference_wrapper<JobPool> pool,
+			std::function<ErrorCode(void)> callback,
+			std::initializer_list<std::reference_wrapper<Job>> dependencies); // Called by JobManager
 		~Job();
 		Job(const Job&) = delete;
 		Job(Job&& other);
@@ -29,6 +32,7 @@ namespace Smasher {
 
 		const JobStatus GetStatus() const { return m_Status; }
 		const int GetJobId() const { return m_JobId; }
+		JobPool& GetJobPool() { return m_JobPoolRef.get(); }
 
 		static void ResetJobCount() { Job::s_JobCount = 1; };
 	protected:
@@ -51,11 +55,13 @@ namespace Smasher {
 		// Adds this job to m_Dependants of "other"
 		void AddDependant(Job& other);
 
+		std::reference_wrapper<JobPool> m_JobPoolRef; // Job pool that owns this job
 		static int s_JobCount;
 		int m_JobId;
 		std::mutex m_StateMutex;
 		unsigned int m_NumParents = 0; // Number of jobs this one waits on
 		JobStatus m_Status;
+
 		std::function<ErrorCode(void)> m_Callback;
 		std::vector<std::reference_wrapper<Job>> m_Dependants; // Jobs waiting on this one
 

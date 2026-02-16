@@ -19,27 +19,45 @@ namespace Smasher {
 		JobManager& operator= (const JobManager&) = delete;
 		JobManager& operator= (JobManager &&other);
 
-		// Creates a job, specify which jobs the new job is 
+		// Creates an asynchronous job, specify which jobs the new job is 
 		// dependent on. 
 		// There's no guarantee the returned reference
 		// points to a valid Job. In the time between
 		// constructing the refernce and copy assigning it,
 		// the job could have been taken, completed, and removed
-		Expected<std::reference_wrapper<Job>> CreateJob(std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies = {});
-		
+		Expected<std::reference_wrapper<Job>> AddAsyncJob(std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies = {});
+
+		// Creates a synchronous job, specify which jobs the new job is 
+		// dependent on. This is Primarily for Render jobs.
+		// Synchronous jobs CAN be dependant on asynchronous jobs
+		// Synchronous jobs must NEVER be dependant on other synchronous jobs
+		Expected<std::reference_wrapper<Job>> AddSyncJob(std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies = {});
+
+
 		// Launches runners, puts thread to sleep
 		// until all jobs are completed then returns
 		ErrorCode RunJobs();
 
 		// Wait for all jobs to finish
-		ErrorCode WaitForJobs();
+		ErrorCode WaitForAsyncJobs();
 
 		ErrorCode KillJobRunners();
 
+		// Sets the "TickJobProducer" callback which will generate
+		// jobs for every game tick.
+		// 
+		// "callback" will be run once at the start of each game tick.
+		// "callback" should be used to add jobs to the Job Queue not
+		// for component or game logic.
+		ErrorCode SetTickJobProducer(std::function<void(void)> callback);
+
+		void RunTickJobProducer() { m_TickJobProducer(); };
 	private:
 		void InitializeRunners(unsigned int numRunners);
+		std::function<void(void)> m_TickJobProducer = [](){};
 		bool m_Valid = true;
-		JobPool m_JobPool;
+		JobPool m_AsyncJobPool;
+		JobPool m_SyncJobPool;
 		std::forward_list<JobRunner> m_Runners;
 		std::condition_variable m_RunnersStateCV;
 		std::mutex m_RunnersStateMutex;

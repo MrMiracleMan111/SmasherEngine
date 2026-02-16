@@ -8,9 +8,10 @@ namespace Smasher {
 	Job::~Job() {
 	}
 
-	Job::Job(std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies) :
+	Job::Job(std::reference_wrapper<JobPool> pool, std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies) :
 		m_Callback(callback),
-		m_JobId(Job::s_JobCount)
+		m_JobId(Job::s_JobCount),
+		m_JobPoolRef(pool)
 	{
 		Job::s_JobCount++;
 		std::scoped_lock lock1(m_StateMutex);
@@ -29,6 +30,7 @@ namespace Smasher {
 		m_AllJobsListItr(std::move(other.m_AllJobsListItr)),
 		m_Callback(std::move(other.m_Callback)),
 		m_Status(std::move(other.m_Status)),
+		m_JobPoolRef(std::move(other.m_JobPoolRef)),
 		m_JobId(other.m_JobId)
 	{
 		// Job should not be locked when trying to move
@@ -45,6 +47,7 @@ namespace Smasher {
 			m_AllJobsListItr = std::move(other.m_AllJobsListItr);
 			m_Callback = std::move(other.m_Callback);
 			m_Status = std::move(other.m_Status);
+			m_JobPoolRef = std::move(other.m_JobPoolRef);
 			m_JobId = other.m_JobId;
 		}
 		return *this;

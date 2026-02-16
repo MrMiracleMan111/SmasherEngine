@@ -15,7 +15,7 @@ namespace Smasher {
 	class JobRunner {
 	public:
 		JobRunner() = delete;
-		JobRunner(JobPool &jobPool, std::condition_variable &runnerStateCV);
+		JobRunner(JobPool &jobPool, std::condition_variable &runnerStateCV, bool synchronous = false);
 		~JobRunner();
 		JobRunner(const JobRunner&) = delete;
 		JobRunner(JobRunner&& other);
@@ -31,12 +31,15 @@ namespace Smasher {
 
 		std::thread& GetThread() { return m_Thread; }
 		const JobRunnerSTATE GetState() const { return m_StateAtomic; }
+
+		const bool IsSynchronous() const { return m_Synchronous; }
 	private:
 		void _Run();
 		// Notify main thread, that JobRunner thread is waiting
 		void SignalWaiting();
 		bool m_Activated = false;
 		bool m_Dead = false;
+		const bool m_Synchronous = false;
 		JobPool& m_JobPool;
 		std::thread m_Thread;
 		std::reference_wrapper<std::condition_variable> m_RunnerStateCVRef;

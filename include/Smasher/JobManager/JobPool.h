@@ -26,7 +26,9 @@ namespace Smasher {
 		// Add job to Available Jobs list
 		void AddAvailableJob(Job& job) { m_AvailableJobs.push_back(job); };
 
-		bool IsJobAvailable() { return !m_AvailableJobs.empty(); };
+		const bool IsJobAvailable() const { return !m_AvailableJobs.empty(); };
+
+		const bool IsPoolEmpty() const { return m_AllJobs.empty(); };
 
 		// Thready safely removes job from m_AvailableJobs
 		// @precondition m_PoolStateMutex must be locked by calling function

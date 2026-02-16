@@ -35,7 +35,7 @@ namespace Smasher {
 
 
 	Expected<std::reference_wrapper<Job>> JobPool::AddJob(std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies) {
-		Job& job = *m_AllJobs.emplace(m_AllJobs.end(), callback, dependencies);
+		Job& job = *m_AllJobs.emplace(m_AllJobs.end(), std::ref(*this), callback, dependencies);
 		job.SetItr(--(m_AllJobs.end()));
 		if (dependencies.size() == 0) {
 			m_AvailableJobs.push_back(job);
@@ -48,10 +48,10 @@ namespace Smasher {
 			return Expected<Job>::Error(ERROR_NoJobsAvailable);
 		}
 
-		Job& jobRef = m_AvailableJobs.back();
+		Job& jobRef = m_AvailableJobs.front();
 		Job job = std::move(*jobRef.GetItr()); // Remove from m_AllJobs
 		m_AllJobs.erase(job.GetItr());
-		m_AvailableJobs.pop_back();
+		m_AvailableJobs.pop_front();
 		return std::move(job);
 	}
 }

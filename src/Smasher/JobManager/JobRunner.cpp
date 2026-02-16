@@ -3,12 +3,15 @@
 #include "Smasher/ErrorCodes.h"
 
 namespace Smasher {
-	JobRunner::JobRunner(JobPool& jobPool, std::condition_variable &runnerStateCV) :
+	JobRunner::JobRunner(JobPool& jobPool, std::condition_variable &runnerStateCV, bool synchronous) :
 		m_JobPool(jobPool),
 		m_RunnerStateCVRef(runnerStateCV),
+		m_Synchronous(synchronous),
 		m_Thread()
 	{
-		m_Thread = std::move(std::thread{ &JobRunner::Run, this });
+		if (!synchronous) {
+			m_Thread = std::move(std::thread{ &JobRunner::Run, this });
+		}
 	}
 
 	JobRunner::~JobRunner() {
@@ -62,27 +65,30 @@ namespace Smasher {
 
 	void JobRunner::_Run() {
 		// Wait for initial signal to start running
-		m_StateAtomic = JobRunnerSTATE::WAITING;
-		std::unique_lock<std::mutex> cvLock1(m_JobPool.GetCVMutex());
-		m_JobPool.GetCV().wait(cvLock1, [&]() {
-			return m_Activated || m_Dead;
-		});
-		cvLock1.unlock();
+		if (!m_Synchronous) {
+			m_StateAtomic = JobRunnerSTATE::WAITING;
+			std::unique_lock<std::mutex> cvLock(m_JobPool.GetCVMutex());
+			m_JobPool.GetCV().wait(cvLock, [&]() {
+				return m_Activated || m_Dead;
+				});
+			cvLock.unlock();
+		}
 
 		// Could be spuriously woken up
-		while (!m_Dead) {
+		while (!m_Dead && !m_JobPool.IsPoolEmpty()) {
 			std::unique_lock<std::mutex> lock1(m_JobPool.GetMutex());
 			// Sleep until another job is available
 			if (!m_JobPool.IsJobAvailable()) {
 				lock1.unlock();
 				m_StateAtomic = JobRunnerSTATE::WAITING;
 				SignalWaiting();
-				cvLock1.lock();
-				m_JobPool.GetCV().wait(cvLock1);
-				cvLock1.unlock();
+				std::unique_lock<std::mutex> cvLock(m_JobPool.GetCVMutex());
+				m_JobPool.GetCV().wait(cvLock);
+				cvLock.unlock();
 				continue;
 			}
 
+			m_StateAtomic = JobRunnerSTATE::RUNNING;
 			Expected<Job> ret = m_JobPool.TakeAvailableJob();
 			lock1.unlock();
 
@@ -91,28 +97,47 @@ namespace Smasher {
 				break;
 			}
 
-			m_StateAtomic = JobRunnerSTATE::RUNNING;
 			ErrorCode code = ret.Get().Run();
 
 			// Add all job dependants to the available job queue
 			// if their parent count is now 0
+			// Job dependants may belong to different pools
 			std::scoped_lock lock2(m_JobPool.GetMutex());
 			for (Job &dependant : ret.Get().GetDependants()) {
-				std::scoped_lock dependantLock(dependant.GetMutex());
-				if (dependant.GetParentCount() == 0) {
-					// Job was added to available job list by another JobRunner
-					continue;
+				ErrorCode ret;
+
+				// Extra logic if dependant is in different job pool
+				if (&m_JobPool != &dependant.GetJobPool()) {
+					dependant.GetJobPool().GetMutex().lock();
 				}
 
-				ErrorCode ret = dependant.RemoveParent();
+				std::scoped_lock dependantLock(dependant.GetMutex());
+				// Job was added to available job list by another JobRunner
+				if (dependant.GetParentCount() == 0) {
+					if (&m_JobPool != &dependant.GetJobPool()) {
+						dependant.GetJobPool().GetMutex().unlock();
+					}
+					
+					// same as "continue"
+					goto unlock_dependant_job_pool;
+				}
+
+				ret = dependant.RemoveParent();
 				assert((ret == ERROR_NoError) && "Remove Parent failed");
 				if (dependant.GetParentCount() == 0) {
-					m_JobPool.AddAvailableJob(dependant);
+					dependant.GetJobPool().AddAvailableJob(dependant);
+					dependant.GetJobPool().GetCV().notify_one();
+				}
+
+			unlock_dependant_job_pool:
+				if (&m_JobPool != &dependant.GetJobPool()) {
+					dependant.GetJobPool().GetMutex().unlock();
 				}
 			}
 			m_StateAtomic = JobRunnerSTATE::WAITING;
 			SignalWaiting();
 		}
+		m_Dead = true;
 	}
 
 	void JobRunner::Kill() {
