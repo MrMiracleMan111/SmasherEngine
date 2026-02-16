@@ -56,12 +56,9 @@ namespace Smasher {
 	}
 
 	void JobManager::InitializeRunners(unsigned int numRunners) {
-		std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
 		for (std::size_t i = 0; i < numRunners; ++i) {
 			m_Runners.emplace_front(m_JobPool, m_RunnersStateCV);
 		}
-		std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - startTime);
-		std::cout << "JobManager initialization time: " << diff.count() << "ms\n";
 	}
 
 	Expected<std::reference_wrapper<Job>> JobManager::CreateJob(std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies) {
@@ -97,8 +94,6 @@ namespace Smasher {
 	}
 
 	ErrorCode JobManager::KillJobRunners() {
-		std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
-
 		for (auto &job : m_Runners) {
 			job.Kill();
 		}
@@ -110,8 +105,6 @@ namespace Smasher {
 			job.GetThread().join();
 		}
 
-		std::chrono::milliseconds diff = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - startTime);
-		std::cout << "JobManager KillJobRunners time: " << diff.count() << "ms\n";
 		return ERROR_NoError;
 	}
 }
