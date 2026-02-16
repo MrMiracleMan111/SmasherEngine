@@ -435,7 +435,7 @@ TEST(JobManagerTest, JobManagerTickProducer) {
 	});
 
 	layer.Activate();
-	engine.Run(); // Engine should shutdown after third update
+	engine.Run(); // Engine should shutdown after the third update
 
 	EXPECT_EQ(3, triggered_count);
 }
