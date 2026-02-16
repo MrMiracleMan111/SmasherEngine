@@ -231,6 +231,178 @@ TEST(TraitChecks, EventSubscription) {
 	EXPECT_TRUE(true);
 }
 
+TEST(JobManagerTest, AddAJob) {
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer& layer = engine.PushLayer<DummyLayer>();
+	Smasher::JobManager& manager = engine.GetJobManager();
+
+	int triggered_count = 0;
+	std::function<Smasher::ErrorCode(void)> callback = [&triggered_count](void) {
+		triggered_count += 1;
+		std::this_thread::sleep_for(std::chrono::milliseconds(50));
+		return ERROR_NoError;
+		};
+
+	manager.AddAsyncJob(callback);
+	manager.RunJobs();
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+	EXPECT_EQ(1, triggered_count);
+}
+
+TEST(JobManagerTest, AddADependantJob) {
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer& layer = engine.PushLayer<DummyLayer>();
+	Smasher::JobManager& manager = engine.GetJobManager();
+
+	int triggered_count = 0;
+	std::function<Smasher::ErrorCode(void)> callback1 = [&triggered_count](void) {
+		EXPECT_EQ(0, triggered_count);
+		triggered_count += 1;
+		std::this_thread::sleep_for(std::chrono::milliseconds(50));
+		return ERROR_NoError;
+		};
+
+	std::function<Smasher::ErrorCode(void)> callback2 = [&triggered_count](void) {
+		EXPECT_EQ(1, triggered_count);
+		triggered_count += 2;
+		return ERROR_NoError;
+		};
+
+	auto job1 = manager.AddAsyncJob(callback1);
+	auto job2 = manager.AddAsyncJob(callback2, { job1.Get() });
+	manager.RunJobs();
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+	EXPECT_EQ(3, triggered_count);
+}
+
+TEST(JobManagerTest, ComplexJobTree) {
+	/**
+
+		JOB_1		JOB_3			JOB_5
+		/   \          |             |
+	 JOB_2   JOB_4   JOB_6          / \
+		|      \      /  __________/   JOB_9
+	 JOB_7       JOB_8                  |
+	                 \                JOB_10 [SYNC]
+					  \_________________|
+					                    |
+										V
+									  JOB_11 [SYNC]
+
+	*/
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer& layer = engine.PushLayer<DummyLayer>();
+	Smasher::JobManager& manager = engine.GetJobManager();
+
+	int triggered_count = 0;
+	// I am ignoring jobs_done[0] for reading clarity
+	// Job 1 Done -> jobs_done[1]
+	// Job 2 Done -> jobs_done[2]
+	bool jobs_done[12] = { false };
+	std::function<Smasher::ErrorCode(void)> callback1 = [&triggered_count, &jobs_done](void) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(50));
+		jobs_done[1] = true;
+		std::cout << "Job 1 finished\n";
+		return ERROR_NoError;
+		};
+
+	std::function<Smasher::ErrorCode(void)> callback2 = [&triggered_count, &jobs_done](void) {
+		EXPECT_TRUE(jobs_done[1]);
+		jobs_done[2] = true;
+		std::cout << "Job 2 finished\n";
+		return ERROR_NoError;
+		};
+
+	std::function<Smasher::ErrorCode(void)> callback3 = [&triggered_count, &jobs_done](void) {
+		jobs_done[3] = true;
+		std::cout << "Job 3 finished\n";
+		return ERROR_NoError;
+		};
+
+	std::function<Smasher::ErrorCode(void)> callback4 = [&triggered_count, &jobs_done](void) {
+		EXPECT_TRUE(jobs_done[1]);
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		jobs_done[4] = true;
+		std::cout << "Job 4 finished\n";
+		return ERROR_NoError;
+		};
+
+	std::function<Smasher::ErrorCode(void)> callback5 = [&triggered_count, &jobs_done](void) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		jobs_done[5] = true;
+		std::cout << "Job 5 finished\n";
+		return ERROR_NoError;
+		};
+
+	std::function<Smasher::ErrorCode(void)> callback6 = [&triggered_count, &jobs_done](void) {
+		EXPECT_TRUE(jobs_done[3]);
+		jobs_done[6] = true;
+		std::cout << "Job 6 finished\n";
+		return ERROR_NoError;
+		};
+
+	std::function<Smasher::ErrorCode(void)> callback7 = [&triggered_count, &jobs_done](void) {
+		EXPECT_TRUE(jobs_done[2]);
+		jobs_done[7] = true;
+		std::cout << "Job 7 finished\n";
+		return ERROR_NoError;
+		};
+
+	std::function<Smasher::ErrorCode(void)> callback8 = [&triggered_count, &jobs_done](void) {
+		EXPECT_TRUE(jobs_done[4]);
+		EXPECT_TRUE(jobs_done[5]);
+		EXPECT_TRUE(jobs_done[6]);
+		jobs_done[8] = true;
+		std::cout << "Job 8 finished\n";
+		return ERROR_NoError;
+		};
+
+	std::function<Smasher::ErrorCode(void)> callback9 = [&triggered_count, &jobs_done](void) {
+		EXPECT_TRUE(jobs_done[5]);
+		jobs_done[9] = true;
+		std::cout << "Job 9 finished\n";
+		return ERROR_NoError;
+		};
+
+	std::function<Smasher::ErrorCode(void)> callback10 = [&triggered_count, &jobs_done](void) {
+		EXPECT_TRUE(jobs_done[9]);
+		jobs_done[10] = true;
+		std::cout << "Job 10 finished\n";
+		return ERROR_NoError;
+		};
+
+	std::function<Smasher::ErrorCode(void)> callback11 = [&triggered_count, &jobs_done](void) {
+		EXPECT_TRUE(jobs_done[8]);
+		EXPECT_TRUE(jobs_done[10]);
+		jobs_done[11] = true;
+		std::cout << "Job 11 finished\n";
+		return ERROR_NoError;
+		};
+
+	Smasher::Job::ResetJobCount();
+	Smasher::Job& job1 = manager.AddAsyncJob(callback1).Get();
+	Smasher::Job& job2 = manager.AddAsyncJob(callback2, { job1 }).Get();
+	Smasher::Job& job3 = manager.AddAsyncJob(callback3).Get();
+	Smasher::Job& job4 = manager.AddAsyncJob(callback4, { job1 }).Get();
+	Smasher::Job& job5 = manager.AddAsyncJob(callback5).Get();
+	Smasher::Job& job6 = manager.AddAsyncJob(callback6, { job3 }).Get();
+	Smasher::Job& job7 = manager.AddAsyncJob(callback7, { job2 }).Get();
+	Smasher::Job& job8 = manager.AddAsyncJob(callback8, { job4, job5, job6 }).Get();
+	Smasher::Job& job9 = manager.AddAsyncJob(callback9, { job5 }).Get();
+	// Sync jobs are processed chronologically from first in line to last in line
+	Smasher::Job& job10 = manager.AddSyncJob(callback10, { job9 }).Get();
+	Smasher::Job& job11 = manager.AddSyncJob(callback11, { job8 }).Get();
+
+	manager.RunJobs();
+	std::cout << "Waiting for Jobs...\n";
+	manager.WaitForAsyncJobs();
+	std::cout << "Finished waiting!\n";
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+}
+
 TEST(TraitChecks, Expected) {
 	// Smasher::Expected<> should not be copyable, moveable
 	static_assert(!std::is_copy_constructible_v<Smasher::Expected<int>>);
@@ -313,155 +485,6 @@ TEST(LayerTest, GetLayer) {
 		Smasher::Engine engine(640, 420);
 		Smasher::Layer& layer = engine.GetLayer<Smasher::BaseLayer>();
 	});
-}
-
-TEST(JobManagerTest, AddAJob) {
-	Smasher::Engine engine{ 640, 420 };
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::JobManager& manager = engine.GetJobManager();
-
-	int triggered_count = 0;
-	std::function<Smasher::ErrorCode(void)> callback = [&triggered_count](void) {
-		triggered_count += 1;
-		std::this_thread::sleep_for(std::chrono::milliseconds(50));
-		return ERROR_NoError;
-	};
-
-	manager.CreateJob(callback);
-	manager.RunJobs();
-
-	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-	EXPECT_EQ(1, triggered_count);
-}
-
-TEST(JobManagerTest, AddADependantJob) {
-	Smasher::Engine engine{ 640, 420 };
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::JobManager& manager = engine.GetJobManager();
-
-	int triggered_count = 0;
-	std::function<Smasher::ErrorCode(void)> callback1 = [&triggered_count](void) {
-		EXPECT_EQ(0, triggered_count);
-		triggered_count += 1;
-		std::this_thread::sleep_for(std::chrono::milliseconds(50));
-		return ERROR_NoError;
-	};
-
-	std::function<Smasher::ErrorCode(void)> callback2 = [&triggered_count](void) {
-		EXPECT_EQ(1, triggered_count);
-		triggered_count += 2;
-		return ERROR_NoError;
-	};
-
-	auto job1 = manager.CreateJob(callback1);
-	auto job2 = manager.CreateJob(callback2, { job1.Get() });
-	manager.RunJobs();
-
-	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-	EXPECT_EQ(3, triggered_count);
-}
-
-TEST(JobManagerTest, ComplexJobTree) {
-	/**
-	
-		JOB_1		JOB_3			JOB_5
-		/   \          |             |
-	 JOB_2   JOB_4   JOB_6          / \
-	    |      \      /  __________/   JOB_9
-	 JOB_7       JOB_8
-	
-	*/
-	Smasher::Engine engine{ 640, 420 };
-	DummyLayer& layer = engine.PushLayer<DummyLayer>();
-	Smasher::JobManager& manager = engine.GetJobManager();
-
-	int triggered_count = 0;
-	// I am ignoring jobs_done[0] for reading clarity
-	// Job 1 Done -> jobs_done[1]
-	// Job 2 Done -> jobs_done[2]
-	bool jobs_done[10] = { false };
-	std::function<Smasher::ErrorCode(void)> callback1 = [&triggered_count, &jobs_done](void) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(50));
-		jobs_done[1] = true;
-		std::cout << "Job 1 finished\n";
-		return ERROR_NoError;
-	};
-
-	std::function<Smasher::ErrorCode(void)> callback2 = [&triggered_count, &jobs_done](void) {
-		EXPECT_TRUE(jobs_done[1]);
-		jobs_done[2] = true;
-		std::cout << "Job 2 finished\n";
-		return ERROR_NoError;
-	};
-
-	std::function<Smasher::ErrorCode(void)> callback3 = [&triggered_count, &jobs_done](void) {
-		jobs_done[3] = true;
-		std::cout << "Job 3 finished\n";
-		return ERROR_NoError;
-	};
-
-	std::function<Smasher::ErrorCode(void)> callback4 = [&triggered_count, &jobs_done](void) {
-		EXPECT_TRUE(jobs_done[1]);
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		jobs_done[4] = true;
-		std::cout << "Job 4 finished\n";
-		return ERROR_NoError;
-	};
-
-	std::function<Smasher::ErrorCode(void)> callback5 = [&triggered_count, &jobs_done](void) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		jobs_done[5] = true;
-		std::cout << "Job 5 finished\n";
-		return ERROR_NoError;
-	};
-
-	std::function<Smasher::ErrorCode(void)> callback6 = [&triggered_count, &jobs_done](void) {
-		EXPECT_TRUE(jobs_done[3]);
-		jobs_done[6] = true;
-		std::cout << "Job 6 finished\n";
-		return ERROR_NoError;
-	};
-
-	std::function<Smasher::ErrorCode(void)> callback7 = [&triggered_count, &jobs_done](void) {
-		EXPECT_TRUE(jobs_done[2]);
-		jobs_done[7] = true;
-		std::cout << "Job 7 finished\n";
-		return ERROR_NoError;
-	};
-
-	std::function<Smasher::ErrorCode(void)> callback8 = [&triggered_count, &jobs_done](void) {
-		EXPECT_TRUE(jobs_done[4]);
-		EXPECT_TRUE(jobs_done[5]);
-		EXPECT_TRUE(jobs_done[6]);
-		jobs_done[8] = true;
-		std::cout << "Job 8 finished\n";
-		return ERROR_NoError;
-	};
-
-	std::function<Smasher::ErrorCode(void)> callback9 = [&triggered_count, &jobs_done](void) {
-		EXPECT_TRUE(jobs_done[5]);
-		jobs_done[9] = true;
-		std::cout << "Job 9 finished\n";
-		return ERROR_NoError;
-	};
-
-	Smasher::Job::ResetJobCount();
-	Smasher::Job &job1 = manager.CreateJob(callback1).Get();
-	Smasher::Job &job2 = manager.CreateJob(callback2, { job1 }).Get();
-	Smasher::Job &job3 = manager.CreateJob(callback3).Get();
-	Smasher::Job &job4 = manager.CreateJob(callback4, { job1 }).Get();
-	Smasher::Job &job5 = manager.CreateJob(callback5).Get();
-	Smasher::Job &job6 = manager.CreateJob(callback6, { job3 }).Get();
-	Smasher::Job &job7 = manager.CreateJob(callback7, { job2 }).Get();
-	Smasher::Job &job8 = manager.CreateJob(callback8, { job4, job5, job6 }).Get();
-	Smasher::Job &job9 = manager.CreateJob(callback9, { job5 }).Get();
-	manager.RunJobs();
-	std::cout << "Waiting for Jobs...\n";
-	manager.WaitForJobs();
-	std::cout << "Finished waiting!\n";
-
-	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-	//EXPECT_EQ(3, triggered_count);
 }
 
 TEST(ErrorHandling, ExpectedReferenceTests) {
