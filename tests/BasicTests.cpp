@@ -21,9 +21,9 @@ public:
 	MoveObjectTest() {};
 	~MoveObjectTest() {};
 	MoveObjectTest(const MoveObjectTest&) : m_Copy(true) {};
-	MoveObjectTest(MoveObjectTest&& other) noexcept : m_FromMove(true) { other.m_Valid = false; };
+	MoveObjectTest(MoveObjectTest&& other) noexcept : m_FromMove(true), m_Valid(other.m_Valid) { other.m_Valid = false; };
 	MoveObjectTest& operator = (const MoveObjectTest&) { m_Copy = true; return *this; };
-	MoveObjectTest& operator = (MoveObjectTest&& other) noexcept { m_FromMove = true; other.m_Valid = false; return *this; };
+	MoveObjectTest& operator = (MoveObjectTest&& other) noexcept { m_Valid = other.m_Valid; m_FromMove = true; other.m_Valid = false; return *this; };
 
 
 	const bool IsValid() const { return m_Valid; }
