@@ -75,7 +75,11 @@ namespace Smasher {
 		}
 
 		// Could be spuriously woken up
-		while (!m_Dead && !m_JobPool.IsPoolEmpty()) {
+		while (!m_Dead) {
+			// Exit loop for synchronous job runners
+			if (m_Synchronous && m_JobPool.IsPoolEmpty()) {
+				break;
+			}
 			std::unique_lock<std::mutex> lock1(m_JobPool.GetMutex());
 			// Sleep until another job is available
 			if (!m_JobPool.IsJobAvailable()) {
@@ -137,7 +141,6 @@ namespace Smasher {
 			m_StateAtomic = JobRunnerSTATE::WAITING;
 			SignalWaiting();
 		}
-		m_Dead = true;
 	}
 
 	void JobRunner::Kill() {
