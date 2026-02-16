@@ -16,7 +16,7 @@ namespace Smasher {
 		InitializeRunners(count);
 	}
 
-	JobManager::JobManager(unsigned int numJobRunners) :
+	JobManager::JobManager(std::size_t numJobRunners) :
 		m_AsyncJobPool(),
 		m_SyncJobPool(),
 		m_Valid(true),
@@ -57,7 +57,7 @@ namespace Smasher {
 		return *this;
 	}
 
-	void JobManager::InitializeRunners(unsigned int numRunners) {
+	void JobManager::InitializeRunners(std::size_t numRunners) {
 		for (std::size_t i = 0; i < numRunners; ++i) {
 			m_Runners.emplace_front(m_AsyncJobPool, m_RunnersStateCV);
 		}
@@ -122,6 +122,11 @@ namespace Smasher {
 			}
 		}
 
+		return ERROR_NoError;
+	}
+
+	ErrorCode JobManager::SetTickJobProducer(std::function<void(void)> callback) {
+		m_TickJobProducer = callback;
 		return ERROR_NoError;
 	}
 }

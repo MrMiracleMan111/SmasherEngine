@@ -12,7 +12,7 @@ namespace Smasher {
 	class SMASHER_API JobManager {
 	public:
 		JobManager();
-		JobManager(unsigned int numJobRunners);
+		JobManager(std::size_t numJobRunners);
 		~JobManager();
 		JobManager(const JobManager&) = delete;
 		JobManager(JobManager &&other);
@@ -53,7 +53,7 @@ namespace Smasher {
 
 		void RunTickJobProducer() { m_TickJobProducer(); };
 	private:
-		void InitializeRunners(unsigned int numRunners);
+		void InitializeRunners(std::size_t numRunners);
 		std::function<void(void)> m_TickJobProducer = [](){};
 		bool m_Valid = true;
 		JobPool m_AsyncJobPool;

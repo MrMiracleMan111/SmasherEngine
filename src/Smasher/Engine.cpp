@@ -260,7 +260,7 @@ namespace Smasher {
 			pLayer->SetUpdateTime(diff);
 		}
 
-		m_JobManager.WaitForJobs();
+		m_JobManager.WaitForAsyncJobs();
 	}
 
 	// Renders layers bottom to top order (so that top layer appears above other layers)
