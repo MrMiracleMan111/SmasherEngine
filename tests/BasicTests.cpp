@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <type_traits>
+#include <array>
 #include "Smasher/Base.h"
 #include "Smasher/JobManager/Job.h"
 #include "Smasher/JobManager/JobManager.h"
@@ -300,7 +301,7 @@ TEST(JobManagerTest, ComplexJobTree) {
 	// I am ignoring jobs_done[0] for reading clarity
 	// Job 1 Done -> jobs_done[1]
 	// Job 2 Done -> jobs_done[2]
-	bool jobs_done[12] = { false };
+	std::array<bool, 12> jobs_done{ false };
 	std::function<Smasher::ErrorCode(void)> callback1 = [&triggered_count, &jobs_done](void) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 		jobs_done[1] = true;
@@ -401,6 +402,42 @@ TEST(JobManagerTest, ComplexJobTree) {
 	std::cout << "Finished waiting!\n";
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+}
+
+TEST(JobManagerTest, JobManagerTickProducer) {
+	Smasher::Engine engine{ 640, 420 };
+	DummyLayer& layer = engine.PushLayer<DummyLayer>();
+	Smasher::JobManager& manager = engine.GetJobManager();
+
+	int triggered_count = 0;
+	std::array<bool, 3> jobs_done{ false };
+	std::function<Smasher::ErrorCode(void)> callback1 = [&triggered_count, &jobs_done](void) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(50));
+		triggered_count++;
+		jobs_done[1] = true;
+		return ERROR_NoError;
+	};
+
+	std::function<Smasher::ErrorCode(void)> callback2 = [&triggered_count, &jobs_done, &engine](void) {
+		EXPECT_TRUE(jobs_done[1]);
+		jobs_done[2] = true;
+
+		if (triggered_count == 3) {
+			engine.Shutdown();
+		}
+		return ERROR_NoError;
+	};
+
+	manager.SetTickJobProducer([&]() {
+		jobs_done.fill(false);
+		auto job1 = manager.AddAsyncJob(callback1);
+		auto job2 = manager.AddSyncJob(callback2, { job1.Get() });
+	});
+
+	layer.Activate();
+	engine.Run(); // Engine should shutdown after first update
+
+	EXPECT_EQ(3, triggered_count);
 }
 
 TEST(TraitChecks, Expected) {
