@@ -40,12 +40,13 @@ namespace Smasher {
 
 	template <class T>
 	Expected<T>& Expected<T>::operator= (T&& other) {
-		if constexpr (std::is_copy_assignable_v<T>) {
+		if constexpr (std::is_move_assignable_v<T>) {
 			m_ReturnVal.ret = std::move(other);
 		}
 		else {
 			assert(false && "T is not move assignable");
-		}		m_Error = false;
+		}
+		m_Error = false;
 	}
 
 	// Factory Method for throwing error
