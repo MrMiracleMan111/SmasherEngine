@@ -26,9 +26,9 @@ namespace Smasher {
 			std::initializer_list<std::reference_wrapper<Job>> dependencies); // Called by JobManager
 		~Job();
 		Job(const Job&) = delete;
-		Job(Job&& other);
+		Job(Job&& other) noexcept;
 		Job& operator= (const Job&) = delete;
-		Job& operator= (Job&& other);
+		Job& operator= (Job&& other) noexcept;
 
 		const JobStatus GetStatus() const { return m_Status; }
 		const int GetJobId() const { return m_JobId; }
@@ -61,6 +61,7 @@ namespace Smasher {
 		std::mutex m_StateMutex;
 		unsigned int m_NumParents = 0; // Number of jobs this one waits on
 		JobStatus m_Status;
+		bool m_Valid = true; // For tracking moves
 
 		std::function<ErrorCode(void)> m_Callback;
 		std::vector<std::reference_wrapper<Job>> m_Dependants; // Jobs waiting on this one
