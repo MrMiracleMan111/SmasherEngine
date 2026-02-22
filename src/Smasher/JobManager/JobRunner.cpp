@@ -106,6 +106,14 @@ namespace Smasher {
 			// Add all job dependants to the available job queue
 			// if their parent count is now 0
 			// Job dependants may belong to different pools
+			// TODO: This will cause deadlock
+			// Thread A locks JobPool A
+			// Thread B locks JobPool B
+			// Thread A tries to lock JobPool B
+			// Thread A waits on Thread B
+			// Thread B tries to lock JobPool A
+			// Thread B waits on Thread A
+			// DEADLOCK
 			std::scoped_lock lock2(m_JobPool.GetMutex());
 			for (Job &dependant : ret.Get().GetDependants()) {
 				ErrorCode ret;
@@ -121,9 +129,7 @@ namespace Smasher {
 					if (&m_JobPool != &dependant.GetJobPool()) {
 						dependant.GetJobPool().GetMutex().unlock();
 					}
-					
-					// same as "continue"
-					goto unlock_dependant_job_pool;
+					continue;
 				}
 
 				ret = dependant.RemoveParent();
@@ -133,7 +139,6 @@ namespace Smasher {
 					dependant.GetJobPool().GetCV().notify_one();
 				}
 
-			unlock_dependant_job_pool:
 				if (&m_JobPool != &dependant.GetJobPool()) {
 					dependant.GetJobPool().GetMutex().unlock();
 				}
