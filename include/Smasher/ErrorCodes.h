@@ -14,6 +14,8 @@
 #define ERROR_ComponentInvalid 200
 #define ERROR_ComponentDowncastFailed 202
 #define ERROR_MissingComponentDependency 203
+#define ERROR_SystemNotInitialized 204
+#define ERROR_SystemAlreadyInitialized 205
 
 // ==== CAMERA EXCEPTIONS ====
 #define ERROR_CameraTargetNotSet 300
