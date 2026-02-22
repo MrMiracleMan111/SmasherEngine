@@ -6,6 +6,7 @@
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
 #include "box2d/box2d.h"
+#include "entt/entity/registry.hpp"
 #include "Smasher/Base.h"
 #include "Smasher/EngineConfig.h"
 #include "Smasher/PhysicsManager.h"
@@ -69,6 +70,7 @@ namespace Smasher {
 		ResourceManager& GetResourceManager();
 		PhysicsManager& GetPhysicsManager();
 		JobManager& GetJobManager();
+		entt::registry& GetRegistry();
 
 		void SetUpdateInterval(Millisecond interval) { m_UpdateInterval = interval; }
 		void SetRenderInterval(Millisecond interval) { m_RenderInterval = interval; }
@@ -109,6 +111,8 @@ namespace Smasher {
 		sf::View m_WindowView; // Default window view (used for resizing events)
 		Millisecond m_UpdateInterval = EngineConfig::UPDATE_INTERVAL;
 		Millisecond m_RenderInterval = EngineConfig::RENDER_INTERVAL;
+
+		entt::registry m_Registry;
 
 		// Cached for internal update/render speed checks
 		std::chrono::time_point<std::chrono::system_clock> m_UpdateTimestamp;

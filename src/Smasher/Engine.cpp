@@ -362,5 +362,6 @@ namespace Smasher {
 	ResourceManager& Engine::GetResourceManager() { return m_ResourceManager; };
 	PhysicsManager& Engine::GetPhysicsManager() { return m_PhysicsManager; };
 	JobManager& Engine::GetJobManager() { return m_JobManager; };
+	entt::registry& Engine::GetRegistry() { return m_Registry; };
 
 }
