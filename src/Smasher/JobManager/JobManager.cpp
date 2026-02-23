@@ -3,6 +3,7 @@
 #include <chrono>
 #include <iostream>
 #include "Smasher/JobManager/JobManager.h"
+#include "Smasher/JobManager/Job.h"
 #include "Smasher/ErrorCodes.h"
 
 namespace Smasher {
@@ -59,19 +60,45 @@ namespace Smasher {
 
 	void JobManager::InitializeRunners(std::size_t numRunners) {
 		for (std::size_t i = 0; i < numRunners; ++i) {
-			m_Runners.emplace_front(m_AsyncJobPool, m_RunnersStateCV);
+			m_Runners.emplace_front(m_AsyncJobPool, m_RunnersStateCV, *this);
 		}
-		m_Runners.emplace_front(m_SyncJobPool, m_RunnersStateCV, true);
+		m_Runners.emplace_front(m_SyncJobPool, m_RunnersStateCV, *this, true);
 	}
 
 	Expected<std::reference_wrapper<Job>> JobManager::AddAsyncJob(std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies) {
-		std::scoped_lock lock(m_AsyncJobPool.GetMutex());
+		//std::scoped_lock lock(m_AsyncJobPool.GetMutex());
+		std::scoped_lock lock(m_AsyncJobPool.GetCVMutex());
 		return m_AsyncJobPool.AddJob(callback, dependencies);
 	}
 
 	Expected<std::reference_wrapper<Job>> JobManager::AddSyncJob(std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies) {
-		std::scoped_lock lock(m_SyncJobPool.GetMutex());
+		//std::scoped_lock lock(m_SyncJobPool.GetMutex());
+		std::scoped_lock lock(m_SyncJobPool.GetCVMutex());
 		return m_SyncJobPool.AddJob(callback, dependencies);
+	}
+
+	void JobManager::FinishJob(Job& job) {
+		std::lock(m_JobPoolsMutex, job.GetMutex(), m_SyncJobPool.GetCVMutex(), m_AsyncJobPool.GetCVMutex());
+		std::unique_lock<std::mutex> jobPoolsMutex(m_JobPoolsMutex, std::adopt_lock);
+		std::unique_lock<std::mutex> jobMutex(job.GetMutex(), std::adopt_lock);
+		std::unique_lock<std::mutex> syncJobPoolMutex(m_SyncJobPool.GetCVMutex(), std::adopt_lock);
+		std::unique_lock<std::mutex> asyncJobPoolMutex(m_AsyncJobPool.GetCVMutex(), std::adopt_lock);
+
+		for (Job& dependant : job.GetDependants()) {
+			ErrorCode ret = dependant.RemoveParent();
+			assert((ret == ERROR_NoError) && "Remove Parent failed");
+			if (dependant.GetParentCount() == 0) {
+				dependant.GetJobPool().AddAvailableJob(dependant);
+				dependant.GetJobPool().GetCV().notify_all();
+			}
+		}
+		// Job is about to be deleted and go out of scope
+		// so we need to unlock its mutex
+		jobMutex.unlock();
+
+		// TODO: Error could occur here
+		// if another thread tries to access the job
+		job.GetJobPool().RemoveFromAllJobs(job);
 	}
 
 	ErrorCode JobManager::RunJobs() {

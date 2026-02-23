@@ -1,12 +1,14 @@
 #include <iostream>
 #include "Smasher/JobManager/JobRunner.h"
+#include "Smasher/JobManager/JobManager.h"
 #include "Smasher/ErrorCodes.h"
 
 namespace Smasher {
-	JobRunner::JobRunner(JobPool& jobPool, std::condition_variable &runnerStateCV, bool synchronous) :
+	JobRunner::JobRunner(JobPool& jobPool, std::condition_variable &runnerStateCV, JobManager &manager, bool synchronous) :
 		m_JobPool(jobPool),
 		m_RunnerStateCVRef(runnerStateCV),
 		m_Synchronous(synchronous),
+		m_JobManagerRef(manager),
 		m_Thread()
 	{
 		if (!synchronous) {
@@ -23,7 +25,8 @@ namespace Smasher {
 		m_JobPool(other.m_JobPool),
 		m_Thread(std::move(other.m_Thread)),
 		m_Activated(other.m_Activated),
-		m_RunnerStateCVRef(other.m_RunnerStateCVRef)
+		m_RunnerStateCVRef(other.m_RunnerStateCVRef),
+		m_JobManagerRef(std::move(other.m_JobManagerRef))
 	{
 		Smasher::JobRunnerSTATE state = other.m_StateAtomic;
 		m_StateAtomic = state;
@@ -35,6 +38,7 @@ namespace Smasher {
 			m_Thread = std::move(other.m_Thread);
 			m_RunnerStateCVRef = std::move(other.m_RunnerStateCVRef);
 			m_Activated = other.m_Activated;
+			m_JobManagerRef = std::move(other.m_JobManagerRef);
 			Smasher::JobRunnerSTATE state = other.m_StateAtomic;
 			m_StateAtomic = state;
 		}
@@ -70,79 +74,50 @@ namespace Smasher {
 			std::unique_lock<std::mutex> cvLock(m_JobPool.GetCVMutex());
 			m_JobPool.GetCV().wait(cvLock, [&]() {
 				return m_Activated || m_Dead;
-				});
+			});
 			cvLock.unlock();
 		}
 
 		// Could be spuriously woken up
 		while (!m_Dead) {
+			std::unique_lock<std::mutex> lock1(m_JobPool.GetCVMutex());
+
 			// Exit loop for synchronous job runners
 			if (m_Synchronous && m_JobPool.IsPoolEmpty()) {
 				break;
 			}
-			std::unique_lock<std::mutex> lock1(m_JobPool.GetMutex());
 			// Sleep until another job is available
 			if (!m_JobPool.IsJobAvailable()) {
-				lock1.unlock();
 				m_StateAtomic = JobRunnerSTATE::WAITING;
 				SignalWaiting();
-				std::unique_lock<std::mutex> cvLock(m_JobPool.GetCVMutex());
-				m_JobPool.GetCV().wait(cvLock);
-				cvLock.unlock();
-				continue;
+				m_JobPool.GetCV().wait(lock1);
+				continue; // lock1 goes out of scope and unlocks
 			}
 
 			m_StateAtomic = JobRunnerSTATE::RUNNING;
-			Expected<Job> ret = m_JobPool.TakeAvailableJob();
+			Expected<std::reference_wrapper<Job>> ret = m_JobPool.TakeAvailableJob();
 			lock1.unlock();
 
 			if (!ret) {
 				// Handle error
 				break;
 			}
+			Job& job = ret.Get();
 
-			ErrorCode code = ret.Get().Run();
+			ErrorCode code = job.Run();
 
 			// Add all job dependants to the available job queue
 			// if their parent count is now 0
 			// Job dependants may belong to different pools
 			// TODO: This will cause deadlock
-			// Thread A locks JobPool A
-			// Thread B locks JobPool B
-			// Thread A tries to lock JobPool B
+			// Thread A locks (JobPool or Job) A
+			// Thread B locks (JobPool or Job) B
+			// Thread A tries to lock (JobPool or Job) B
 			// Thread A waits on Thread B
-			// Thread B tries to lock JobPool A
+			// Thread B tries to lock (JobPool or Job) A
 			// Thread B waits on Thread A
 			// DEADLOCK
-			std::scoped_lock lock2(m_JobPool.GetMutex());
-			for (Job &dependant : ret.Get().GetDependants()) {
-				ErrorCode ret;
-
-				// Extra logic if dependant is in different job pool
-				if (&m_JobPool != &dependant.GetJobPool()) {
-					dependant.GetJobPool().GetMutex().lock();
-				}
-
-				std::scoped_lock dependantLock(dependant.GetMutex());
-				// Job was added to available job list by another JobRunner
-				if (dependant.GetParentCount() == 0) {
-					if (&m_JobPool != &dependant.GetJobPool()) {
-						dependant.GetJobPool().GetMutex().unlock();
-					}
-					continue;
-				}
-
-				ret = dependant.RemoveParent();
-				assert((ret == ERROR_NoError) && "Remove Parent failed");
-				if (dependant.GetParentCount() == 0) {
-					dependant.GetJobPool().AddAvailableJob(dependant);
-					dependant.GetJobPool().GetCV().notify_one();
-				}
-
-				if (&m_JobPool != &dependant.GetJobPool()) {
-					dependant.GetJobPool().GetMutex().unlock();
-				}
-			}
+			m_JobManagerRef.get().FinishJob(job);
 			m_StateAtomic = JobRunnerSTATE::WAITING;
 			SignalWaiting();
 		}

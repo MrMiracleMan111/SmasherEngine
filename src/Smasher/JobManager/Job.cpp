@@ -42,6 +42,7 @@ namespace Smasher {
 		// assert(other.m_StateMutex.try_lock());
 		// other.m_StateMutx.unlock();
 		other.m_Valid = false;
+		assert(false && "Job Shouldn't be moved");
 	}
 
 	Job& Job::operator= (Job&& other) noexcept {
@@ -60,6 +61,7 @@ namespace Smasher {
 			m_JobId = other.m_JobId;
 			other.m_Valid = false;
 		}
+		assert(false && "Job Shouldn't be moved");
 		return *this;
 	}
 

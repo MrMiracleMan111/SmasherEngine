@@ -30,11 +30,11 @@ namespace Smasher {
 
 		const bool IsPoolEmpty() const { return m_AllJobs.empty(); };
 
+		void RemoveFromAllJobs(Job &job);
+
 		// Thready safely removes job from m_AvailableJobs
 		// @precondition m_PoolStateMutex must be locked by calling function
-		Expected<Job> TakeAvailableJob();
-
-		std::mutex& GetMutex() { return m_PoolStateMutex; }
+		Expected<std::reference_wrapper<Job>> TakeAvailableJob();
 
 		std::mutex& GetCVMutex() { return m_PoolCVMutex; }
 
@@ -42,7 +42,6 @@ namespace Smasher {
 
 	private:
 		bool m_Valid = true;
-		std::mutex m_PoolStateMutex;
 		std::mutex m_PoolCVMutex; 
 		std::condition_variable m_PoolCV;
 		std::list<Job> m_AllJobs;

@@ -2,7 +2,6 @@
 #include <mutex>
 #include "Smasher/Exceptions.h"
 #include "Smasher/JobManager/Job.h"
-#include "Smasher/JobManager/JobPool.h"
 
 namespace Smasher {
 	class JobManager;
@@ -15,7 +14,7 @@ namespace Smasher {
 	class JobRunner {
 	public:
 		JobRunner() = delete;
-		JobRunner(JobPool &jobPool, std::condition_variable &runnerStateCV, bool synchronous = false);
+		JobRunner(JobPool &jobPool, std::condition_variable &runnerStateCV, JobManager &manager, bool synchronous = false);
 		~JobRunner();
 		JobRunner(const JobRunner&) = delete;
 		JobRunner(JobRunner&& other);
@@ -41,6 +40,7 @@ namespace Smasher {
 		bool m_Dead = false;
 		const bool m_Synchronous = false;
 		JobPool& m_JobPool;
+		std::reference_wrapper<JobManager> m_JobManagerRef;
 		std::thread m_Thread;
 		std::reference_wrapper<std::condition_variable> m_RunnerStateCVRef;
 		std::atomic<JobRunnerSTATE> m_StateAtomic { JobRunnerSTATE::WAITING };

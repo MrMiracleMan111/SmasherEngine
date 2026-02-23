@@ -8,8 +8,11 @@
 #include "Smasher/JobManager/JobRunner.h"
 
 namespace Smasher {
+	class JobRunner;
+
 	// Primary API for Jobs, feeds Jobs to the Job pool
 	class SMASHER_API JobManager {
+	friend class JobRunner;
 	public:
 		JobManager();
 		JobManager(std::size_t numJobRunners);
@@ -52,6 +55,9 @@ namespace Smasher {
 		ErrorCode SetTickJobProducer(std::function<void(void)> callback);
 
 		void RunTickJobProducer() { m_TickJobProducer(); };
+	protected:
+		void FinishJob(Job& job); // Removes job from job pool and adds job descendants
+								  // to available job list
 	private:
 		void InitializeRunners(std::size_t numRunners);
 		std::function<void(void)> m_TickJobProducer = [](){};
@@ -61,6 +67,7 @@ namespace Smasher {
 		std::forward_list<JobRunner> m_Runners;
 		std::condition_variable m_RunnersStateCV;
 		std::mutex m_RunnersStateMutex;
+		std::mutex m_JobPoolsMutex;
 	};
 
 	static_assert(!std::is_copy_constructible_v<JobManager>);

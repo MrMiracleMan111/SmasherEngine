@@ -1,4 +1,5 @@
 #include <mutex>
+#include <iostream>
 #include "Smasher/JobManager/JobPool.h"
 #include "Smasher/ErrorCodes.h"
 #include "Smasher/Exceptions.h"
@@ -43,15 +44,17 @@ namespace Smasher {
 		return std::ref(job);
 	}
 
-	Expected<Job> JobPool::TakeAvailableJob() {
+	Expected<std::reference_wrapper<Job>> JobPool::TakeAvailableJob() {
 		if (!IsJobAvailable()) {
-			return Expected<Job>::Error(ERROR_NoJobsAvailable);
+			return Expected<std::reference_wrapper<Job>>::Error(ERROR_NoJobsAvailable);
 		}
 
-		Job& jobRef = m_AvailableJobs.front();
-		Job job = std::move(*jobRef.GetItr()); // Remove from m_AllJobs
-		m_AllJobs.erase(job.GetItr());
+		Job& jobRef = m_AvailableJobs.front().get();
 		m_AvailableJobs.pop_front();
-		return std::move(job);
+		return std::ref(jobRef);
+	}
+
+	void JobPool::RemoveFromAllJobs(Job &job) {
+		m_AllJobs.erase(job.GetItr());
 	}
 }

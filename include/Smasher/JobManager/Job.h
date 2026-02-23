@@ -51,12 +51,13 @@ namespace Smasher {
 		std::list<Job>::iterator GetItr() { return m_AllJobsListItr; };
 		std::mutex& GetMutex() { return m_StateMutex; };
 	private:
+		static int s_JobCount;
+
 		// Forces this job to wait on other job before running
 		// Adds this job to m_Dependants of "other"
 		void AddDependant(Job& other);
 
 		std::reference_wrapper<JobPool> m_JobPoolRef; // Job pool that owns this job
-		static int s_JobCount;
 		int m_JobId;
 		std::mutex m_StateMutex;
 		unsigned int m_NumParents = 0; // Number of jobs this one waits on
