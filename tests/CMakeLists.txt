@@ -73,6 +73,29 @@ target_link_libraries(
     GTest::gtest_main
 )
 
+add_executable(
+    DemoTests
+    "DemoTests.cpp"
+)
+
+# Set output directory to parent folder where SFML DLLs are located
+set_target_properties(DemoTests PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${SMASHER_ENGINE_OUTPUT_DIR}"
+    TIMEOUT 6
+)
+
+set_target_properties(DemoTests PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${SMASHER_ENGINE_OUTPUT_DIR}" TIMEOUT 6)
+set_target_properties(DemoTests PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${SMASHER_ENGINE_OUTPUT_DIR}" TIMEOUT 6)
+
+
+target_link_libraries(
+    DemoTests
+    SmasherEngine
+    GTest::gtest
+    GTest::gtest_main
+)
+
 
 gtest_discover_tests(BasicTests)
 gtest_discover_tests(InternalComponentTests)
+gtest_discover_tests(DemoTests)
