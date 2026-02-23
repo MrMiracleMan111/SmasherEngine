@@ -926,6 +926,42 @@ TEST(PhysicsTest, ChangeColliders) {
 	});
 }
 
+TEST(GraphicsTest, JobsSystemGraphicsDemo) {
+	Smasher::Engine engine{ 640, 420 };
+	engine.GetResourceManager().SetResourceDirectory(Smasher::Manifest::Metadata::RESOURCES_DIRECTORY);
+	DummyLayer& layer = engine.PushLayer<DummyLayer>();
+	Smasher::JobManager& jobManager = engine.GetJobManager();
+	layer.Activate();
+
+	entt::registry& registry = engine.GetRegistry();
+	entt::entity entity = registry.create();
+	Smasher::DrawableComponent &comp = registry.emplace<Smasher::DrawableComponent>(entity);
+
+	jobManager.SetTickJobProducer([&]() {
+		jobManager.AddAsyncJob(std::bind(Smasher::DrawableSystem, registry))
+	});
+
+	Smasher::Entity& ball = layer.AddEntity();
+	ball.AddComponent<Smasher::PhysicsComponent>()
+		.UseCircleCollider(20.f)
+		.SetPosition(sf::Vector2f{ 300.f, 200.f })
+		.SetPhysicsType(Smasher::PhysicsType::DYNAMIC)
+		.SetVelocity(sf::Vector2f{ -50.f, 0.f });
+	ball.AddComponent<Smasher::DrawableComponent>()
+		.SetPosition(sf::Vector2f(0.f, 0.f))
+		.SetScale(sf::Vector2f(40.0f, 40.0f))
+		.SetDepth(1.f)
+		.SetTextureAsset<Smasher::Manifest::Textures::alpha_test>({});
+	ball.AddComponent<TestPhysicsImageCtrl>();
+
+	std::thread worker([&engine]() {
+		std::this_thread::sleep_for(std::chrono::seconds(5));
+		engine.Shutdown();
+		});
+	engine.Run();
+	worker.join();
+}
+
 TEST(PhysicsTest, PhysicsDemo) {
 	Smasher::Engine engine{ 640, 420 };
 	engine.GetResourceManager().SetResourceDirectory(Smasher::Manifest::Metadata::RESOURCES_DIRECTORY);
