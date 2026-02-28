@@ -131,6 +131,20 @@ set(BUILD_SHARED_LIBS TMP_BUILD_SHARED_LIBS)
 
 message(STATUS "Fetched SFML Successfully")
 
+FetchContent_Declare(
+	glm
+	GIT_REPOSITORY	https://github.com/g-truc/glm.git
+	GIT_TAG 	0af55ccecd98d4e5a8d1fad7de25ba429d60e863 #refs/tags/1.0.1
+)
+
+FetchContent_MakeAvailable(glm)
+# Verify glm target exists
+if(NOT TARGET glm)
+    message(FATAL_ERROR "Failed to fetch/build GLM")
+endif()
+message(STATUS "Fetched GLM Successfully")
+
+
 # GoogleTest requires at least C++17
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -146,13 +160,13 @@ endif()
 
 # Compile Engine
 add_library(SmasherEngine SHARED
-"src/Smasher/Core.cpp"
 "include/Smasher/Core.h"
+"src/Smasher/Core.cpp"
 "include/Smasher/Layer.h"
+"src/Smasher/Layer.cpp"
 "include/Smasher/UUID.h"
 "src/Smasher/UUID.cpp"
 "include/Smasher/Base.h"
-"src/Smasher/Layer.cpp"
 "include/Smasher/Engine.h"
 "src/Smasher/Engine.cpp"
 "include/Smasher/Exceptions.h"
@@ -207,7 +221,6 @@ add_library(SmasherEngine SHARED
 "include/Smasher/Physics.h"
 "include/Smasher/ErrorCodes.h"
 "src/Smasher/ErrorCodes.cpp"
-"include/Smasher/ISystem.h"
 "include/Smasher/JobManager/Job.h"
 "src/Smasher/JobManager/Job.cpp"
 "include/Smasher/JobManager/JobManager.h"
@@ -216,11 +229,14 @@ add_library(SmasherEngine SHARED
 "src/Smasher/JobManager/JobRunner.cpp"
 "include/Smasher/JobManager/JobPool.h"
 "src/Smasher/JobManager/JobPool.cpp"
+"include/Smasher/ComponentSystems/TransformSystem.h"
 "include/Smasher/ComponentSystems/DrawableSystem.h"
 "src/Smasher/ComponentSystems/DrawableSystem.cpp"
-"include/Smasher/ComponentSystems/Transform.h"
 "include/Smasher/ComponentSystems/FrameTimeSystem.h"
-"src/Smasher/ComponentSystems/FrameTimeSystem.cpp")
+"src/Smasher/ComponentSystems/FrameTimeSystem.cpp"
+"include/Smasher/ComponentSystems/CameraSystem.h"
+"src/Smasher/ComponentSystems/CameraSystem.cpp"
+"include/Smasher/ComponentSystems/EngineSystem.h")
 
 # Try to include machine-specific config if it exists
 if(EXISTS "${CMAKE_SOURCE_DIR}/local.cmake")
@@ -326,7 +342,8 @@ ${GLEW_TARGET}
 OpenGL::GL
 OpenGL::GLU
 box2d::box2d
-EnTT::EnTT)
+EnTT::EnTT
+glm::glm)
 
 
 target_compile_features(SmasherEngine PUBLIC cxx_std_20)
