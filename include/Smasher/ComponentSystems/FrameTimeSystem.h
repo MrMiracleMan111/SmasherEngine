@@ -18,6 +18,7 @@ namespace Smasher {
 		};
 
 		SMASHER_API const ErrorCode Initialize(entt::registry& registry);
+		SMASHER_API const ErrorCode Teardown(entt::registry& registry);
 		SMASHER_API const ErrorCode StartFrame(entt::registry& registry);
 		SMASHER_API const ErrorCode EndFrame(entt::registry& registry);
 	}
