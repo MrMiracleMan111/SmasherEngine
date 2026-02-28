@@ -8,6 +8,7 @@
 #include "Smasher/Base.h"
 #include "Smasher/UUID.h"
 #include "Smasher/Layer.h"
+#include "Smasher/IComponent.h"
 
 namespace Smasher {
 
@@ -19,9 +20,9 @@ namespace Smasher {
 		friend class Layer;
 	public:
 		Entity() = delete;
-		Entity(Layer &state, UUID uuid) : m_LayerRef(state), m_Uuid(uuid), m_Engine(state.GetEngine()) {};
+		Entity(Layer &state, UUID uuid) noexcept;
 		Entity(const Entity &other) = delete;
-		Entity(Entity &&other) noexcept : m_LayerRef(other.m_LayerRef), m_Uuid(other.m_Uuid), m_Engine(other.m_Engine) {};
+		Entity(Entity &&other) noexcept;
 		Entity& operator =(const Entity &other) = delete;
 		Entity& operator =(Entity&&) = delete; // No need for this so far and seems dangerous
 		virtual ~Entity();
