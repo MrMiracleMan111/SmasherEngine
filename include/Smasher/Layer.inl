@@ -1,10 +1,3 @@
-#pragma once
-#include "Smasher/Layer.h"
-#include "Smasher/IComponentManager.h"
-#include "Smasher/ComponentManagers/GenericComponentManager.h"
-#include "Smasher/Entity.h"
-
-
 namespace Smasher {
 	/*
 		Instantiates a Component Manager to handle the provided component type. Components

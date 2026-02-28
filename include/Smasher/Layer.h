@@ -3,10 +3,12 @@
 #include <optional>
 #include <type_traits>
 #include <typeindex>
+#include <functional>
 #include <SFML/Window.hpp>
 #include "Smasher/Base.h"
 #include "Smasher/UUID.h"
-#include "Smasher/Engine.h"
+#include "Smasher/EventManager.h"
+#include "Smasher/IComponentManager.h"
 
 
 namespace Smasher {
@@ -29,13 +31,7 @@ namespace Smasher {
 		friend class Engine;
 		friend class EventManager;
 	public:
-		Layer(Engine& engine) :
-			m_Engine(engine),
-			m_EventManager(engine.GetEventManager()),
-			m_ResourceManager(engine.GetResourceManager()),
-			m_UpdateTime(Millisecond::zero()),
-			m_RenderTime(Millisecond::zero()) {
-		}
+		Layer(Engine& engine);
 		virtual ~Layer();
 		Layer() = delete;
 		Layer(const Layer&) = delete;
@@ -81,7 +77,7 @@ namespace Smasher {
 		template <class ComponentType>
 		IComponentManager& GetComponentManager();
 
-		std::size_t EntityCount() { return m_EntityMap.size(); }
+		std::size_t EntityCount() { return m_EntityMap.size(); };
 
 		// Subscribe to synchronous event handling (immediately after its called)
 		template<class T>

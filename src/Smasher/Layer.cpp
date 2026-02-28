@@ -3,10 +3,21 @@
 #include "Smasher/Layer.h"
 #include "Smasher/Entity.h"
 #include "Smasher/Engine.h"
+#include "Smasher/IComponent.h"
+#include "Smasher/IComponentManager.h"
 
 namespace Smasher {
 
-	BaseLayer::BaseLayer(Smasher::Engine &engine) : Smasher::Layer(engine) {};
+	BaseLayer::BaseLayer(Smasher::Engine &engine) : Layer::Layer(engine) {};
+
+	Layer::Layer(Engine& engine) :
+		m_Engine(std::ref(engine)),
+		m_EventManager(std::ref(engine.GetEventManager())),
+		m_ResourceManager(std::ref(engine.GetResourceManager())),
+		m_UpdateTime(Millisecond::zero()),
+		m_RenderTime(Millisecond::zero())
+	{
+	}
 
 	Layer::~Layer() {
 		m_EntityMap.clear();
