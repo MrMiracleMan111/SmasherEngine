@@ -11,15 +11,18 @@
 #include <OpenGL/gl.h>
 #endif
 #include "Smasher/Base.h"
+#include "Smasher/EngineConfig.h"
 #include "Smasher/Resources.h"
 
 #include "Smasher/ComponentManagers/DrawableComponentManager.h"
 #include "Smasher/Components/DrawableComponent.h"
 #include "Smasher/Layer.h"
 #include "Smasher/ResourceManager.h"
+#include "Smasher/ComponentSystems/TransformSystem.h"
 #include "Smasher/ComponentManagers/RenderBatch.h"
 #include "Smasher/EventManager.h"
 #include "Smasher/Events.h"
+#include "Smasher/Engine.h"
 
 namespace Smasher {
 	DrawableComponentManager::DrawableComponentManager(Layer &state) :
