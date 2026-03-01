@@ -13,13 +13,17 @@ namespace Smasher {
 			return ERROR_NoError;
 		}
 
+		const ErrorCode Teardown(entt::registry& registry) {
+			return ERROR_NoError;
+		}
+
 		const ErrorCode StartFrame(entt::registry& registry) {
 			if (!registry.ctx().contains<Context>()) {
 				return ERROR_SystemNotInitialized;
 			}
 
 			Context& ctx = registry.ctx().get<Context>();
-			ctx.m_FrameStart = std::chrono::system_clock::now();
+			ctx.frameStart = std::chrono::system_clock::now();
 			return ERROR_NoError;
 		}
 
@@ -31,17 +35,17 @@ namespace Smasher {
 			Context& ctx = registry.ctx().get<Context>();
 
 			std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
-			ctx.m_FrameTime = std::chrono::duration_cast<std::chrono::microseconds>(end - ctx.m_FrameStart);
-			ctx.m_FrameTimeSum += ctx.m_FrameTime;
-			ctx.m_SampleCount++;
+			ctx.frameTime = std::chrono::duration_cast<std::chrono::microseconds>(end - ctx.frameStart);
+			ctx.frameTimeSum += ctx.frameTime;
+			ctx.sampleCount++;
 
-			if (ctx.m_SampleCount >= ctx.m_MaxSampleCount) {
-				ctx.m_AvgFrameTime = ctx.m_FrameTimeSum / ctx.m_MaxSampleCount;
-				ctx.m_SampleCount = 0;
-				std::cout << "Frame Sum Time: " << (int)(ctx.m_FrameTimeSum.count()) << "us \n";
-				std::cout << "Avg Frame Time: " << (int)(ctx.m_AvgFrameTime.count()) << "us \n";
-				std::cout << "Avg Frame Time: " << (float)(ctx.m_AvgFrameTime.count()) / 1000.f << "ms \n";
-				ctx.m_FrameTimeSum = std::chrono::microseconds::zero();
+			if (ctx.sampleCount >= ctx.maxSampleCount) {
+				ctx.avgFrameTime = ctx.frameTimeSum / ctx.maxSampleCount;
+				ctx.sampleCount = 0;
+				std::cout << "Frame Sum Time: " << (int)(ctx.frameTimeSum.count()) << "us \n";
+				std::cout << "Avg Frame Time: " << (int)(ctx.avgFrameTime.count()) << "us \n";
+				std::cout << "Avg Frame Time: " << (float)(ctx.avgFrameTime.count()) / 1000.f << "ms \n";
+				ctx.frameTimeSum = std::chrono::microseconds::zero();
 			}
 
 			return ERROR_NoError;

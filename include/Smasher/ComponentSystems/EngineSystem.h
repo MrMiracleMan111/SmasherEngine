@@ -5,7 +5,7 @@ namespace Smasher {
 	class Engine;
 	namespace EngineSystem {
 		struct Context {
-			std::reference_wrapper<Engine> m_EngineRef;
+			std::reference_wrapper<Engine> engineRef;
 		};
 	}
 }

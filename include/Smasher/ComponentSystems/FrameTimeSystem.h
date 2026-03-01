@@ -7,14 +7,14 @@
 namespace Smasher {
 	namespace FrameTimeSystem {
 		struct SMASHER_API Context {
-			std::chrono::time_point<std::chrono::system_clock> m_FrameStart;
-			std::chrono::microseconds m_FrameTime; // Time spent on the most recent frame
-			std::chrono::microseconds m_AvgFrameTime; // Average frame time over "m_SampleCount" number 
+			std::chrono::time_point<std::chrono::system_clock> frameStart;
+			std::chrono::microseconds frameTime; // Time spent on the most recent frame
+			std::chrono::microseconds avgFrameTime; // Average frame time over "sampleCount" number 
 													  // of samples
-			std::chrono::microseconds m_FrameTimeSum; // Sum of prior frame times in milliseconds
-			const unsigned int m_MaxSampleCount = 5; // How many samples to take for frame time average
+			std::chrono::microseconds frameTimeSum; // Sum of prior frame times in milliseconds
+			const unsigned int maxSampleCount = 5; // How many samples to take for frame time average
 
-			unsigned int m_SampleCount = 0; // How many samples to take for frame time average
+			unsigned int sampleCount = 0; // How many samples to take for frame time average
 		};
 
 		SMASHER_API const ErrorCode Initialize(entt::registry& registry);
