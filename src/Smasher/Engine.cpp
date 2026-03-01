@@ -20,6 +20,7 @@
 #include "Smasher/EngineConfig.h"
 #include "Smasher/EventFeeder.h"
 #include "Smasher/Layer.h"
+#include "Smasher/ComponentSystems/EngineSystem.h"
 
 namespace Smasher {
 
@@ -148,6 +149,8 @@ namespace Smasher {
 			m_WindowCloseHandle = base.Subscribe<Events::WindowCloseEvent>(&Engine::OnWindowClose, this);
 			m_WindowResizeHandle = base.Subscribe<Events::WindowResizeEvent>(&Engine::OnWindowResize, this);
 		}
+
+		m_Registry.ctx().emplace<EngineSystem::Context>(*this);
 	}
 
 	void Engine::Run() {
