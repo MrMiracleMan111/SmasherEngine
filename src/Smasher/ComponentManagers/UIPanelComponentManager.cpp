@@ -1,5 +1,3 @@
-#include "Smasher/ComponentManagers/UIPanelComponentManager.h"
-#include "Smasher/Layer.h"
 #include <GL/glew.h>
 #if defined(_WIN32)
 #define NOMINMAX
@@ -10,6 +8,9 @@
 #elif defined(__APPLE__)
 #include <OpenGL/gl.h>
 #endif
+#include "Smasher/ComponentManagers/UIPanelComponentManager.h"
+#include "Smasher/Layer.h"
+#include "Smasher/Engine.h"
 
 namespace Smasher {
 	UIPanelComponentManager::UIPanelComponentManager(Layer &layer) :

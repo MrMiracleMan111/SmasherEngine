@@ -1,6 +1,8 @@
 #include <cassert> // Required for assert
 #include "box2d/box2d.h"
+#include "Smasher/Entity.h"
 #include "Smasher/Physics.h"
+#include "Smasher/Engine.h"
 
 namespace Smasher {
 	PhysicsComponent::PhysicsComponent() {

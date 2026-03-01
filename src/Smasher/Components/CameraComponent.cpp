@@ -1,9 +1,11 @@
 #include <iostream>
 #include "Smasher/Components/CameraComponent.h"
 #include "Smasher/IComponentManager.h"
+#include "Smasher/Engine.h"
 #include "Smasher/Layer.h"
 #include "Smasher/Events.h"
 #include "Smasher/EventManager.h"
+#include "Smasher/Entity.h"
 
 namespace Smasher {
 	void CameraComponent::OnAddComponent()

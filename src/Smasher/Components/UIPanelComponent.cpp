@@ -15,6 +15,7 @@
 #include "Smasher/Base.h"
 #include "Smasher/Entity.h"
 #include "Smasher/Events.h"
+#include "Smasher/Engine.h"
 
 namespace Smasher {
 
