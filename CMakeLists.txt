@@ -230,13 +230,15 @@ add_library(SmasherEngine SHARED
 "include/Smasher/JobManager/JobPool.h"
 "src/Smasher/JobManager/JobPool.cpp"
 "include/Smasher/ComponentSystems/TransformSystem.h"
+"src/Smasher/ComponentSystems/TransformSystem.cpp"
 "include/Smasher/ComponentSystems/DrawableSystem.h"
 "src/Smasher/ComponentSystems/DrawableSystem.cpp"
 "include/Smasher/ComponentSystems/FrameTimeSystem.h"
 "src/Smasher/ComponentSystems/FrameTimeSystem.cpp"
 "include/Smasher/ComponentSystems/CameraSystem.h"
 "src/Smasher/ComponentSystems/CameraSystem.cpp"
-"include/Smasher/ComponentSystems/EngineSystem.h")
+"include/Smasher/ComponentSystems/EngineSystem.h"
+)
 
 # Try to include machine-specific config if it exists
 if(EXISTS "${CMAKE_SOURCE_DIR}/local.cmake")
