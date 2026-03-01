@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <array>
 #include "Smasher/Base.h"
+#include "Smasher/Layer.h"
 #include "Smasher/JobManager/Job.h"
 #include "Smasher/JobManager/JobManager.h"
 #include "Smasher/Core.h"
@@ -37,6 +38,10 @@ namespace CursorInteractSystem {
 		return ERROR_NoError;
 	}
 
+	Smasher::ErrorCode Teardown(entt::registry& registry) {
+		return ERROR_NoError;
+	}
+
 	Smasher::ErrorCode OnClick(entt::registry& registry) {
 		if (!registry.ctx().contains<Context>()) {
 			return ERROR_SystemNotInitialized;
@@ -65,8 +70,11 @@ namespace CollisionAvoidSystem {
 		registry.ctx().emplace<Context>();
 		return ERROR_NoError;
 	}
-}
 
+	Smasher::ErrorCode Teardown(entt::registry& registry) {
+		return ERROR_NoError;
+	}
+}
 
 namespace GameLogicSystem {
 	struct Context {
@@ -85,6 +93,10 @@ namespace GameLogicSystem {
 		}
 		return ERROR_NoError;
 	};
+
+	Smasher::ErrorCode Teardown(entt::registry & registry) {
+		return ERROR_NoError;
+	}
 }
 
 // Make an interactible graphics demo
@@ -126,4 +138,9 @@ TEST(GraphicsDemo, NewComponentSystem) {
 
 	layer.Activate();
 	engine.Run(); // Engine should shutdown after the third update
+
+	CursorInteractSystem::Teardown(engine.GetRegistry());
+	GameLogicSystem::Teardown(engine.GetRegistry());
+	Smasher::DrawableSystem::Teardown(engine.GetRegistry());
+	Smasher::FrameTimeSystem::Teardown(engine.GetRegistry());
 }
