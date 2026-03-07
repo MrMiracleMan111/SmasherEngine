@@ -11,6 +11,8 @@
 #include "Smasher_export.h"
 #include "Smasher/ISerializeable.h"
 
+#define GLM_ENABLE_EXPERIMENTAL 
+
 #define SMASHER_API SMASHERENGINE_EXPORT
 
 #define SMASHER_USE_COMPONENT_MANAGER(managerType) \
