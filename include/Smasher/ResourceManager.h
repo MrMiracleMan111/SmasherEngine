@@ -6,6 +6,7 @@
 #include <SFML/Audio.hpp>
 #include "Smasher/Base.h"
 #include "Smasher/Resources.h"
+#include "Smasher/ErrorCodes.h"
 
 /**
 
@@ -46,6 +47,13 @@ namespace Smasher {
 		template <class ManifestData, class T>
 		std::shared_ptr<T> GetResource();
 
+		// Retrieves resources
+		template <class ManifestData>
+		Expected<ResourceId> GetResourceId();
+
+		// Retrieves resources Path Information
+		template <class ManifestData>
+		static Expected<ResourceManifestInfo> GetManifestInfo();
 
 		template <class T>
 		std::shared_ptr<T> GetResource(ResourceId resourceId);
