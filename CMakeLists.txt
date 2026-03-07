@@ -131,6 +131,10 @@ set(BUILD_SHARED_LIBS TMP_BUILD_SHARED_LIBS)
 
 message(STATUS "Fetched SFML Successfully")
 
+set(TMP_BUILD_STATIC_LIBS BUILD_STATIC_LIBS)
+set(TMP_BUILD_SHARED_LIBS BUILD_SHARED_LIBS)
+set(BUILD_SHARED_LIBS OFF)
+set(BUILD_STATIC_LIBS ON)
 FetchContent_Declare(
 	glm
 	GIT_REPOSITORY	https://github.com/g-truc/glm.git
@@ -143,6 +147,8 @@ if(NOT TARGET glm)
     message(FATAL_ERROR "Failed to fetch/build GLM")
 endif()
 message(STATUS "Fetched GLM Successfully")
+set(BUILD_STATIC_LIBS TMP_BUILD_STATIC_LIBS)
+set(BUILD_SHARED_LIBS TMP_BUILD_SHARED_LIBS)
 
 
 # GoogleTest requires at least C++17
@@ -238,7 +244,7 @@ add_library(SmasherEngine SHARED
 "include/Smasher/ComponentSystems/CameraSystem.h"
 "src/Smasher/ComponentSystems/CameraSystem.cpp"
 "include/Smasher/ComponentSystems/EngineSystem.h"
-)
+ "include/Smasher/ECS.h")
 
 # Try to include machine-specific config if it exists
 if(EXISTS "${CMAKE_SOURCE_DIR}/local.cmake")
