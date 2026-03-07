@@ -1,5 +1,4 @@
 #pragma once
-#include "Smasher/ResourceManager.h"
 
 namespace Smasher {
 	// Lazily Loads Resource
@@ -50,6 +49,46 @@ namespace Smasher {
 			throw Exceptions::ResourceNotLoaded(std::format("Resource with ID {} not loaded", resourceId));
 		}
 		return std::static_pointer_cast<T>(m_ResourceMap.at(resourceId));
+	}
+
+	// Retrieves resources
+	template <class ManifestData>
+	Expected<ResourceId> ResourceManager::GetResourceId() {
+		static_assert(ManifestItemHasResourceId<ManifestData>, "Manifest item must have an ID");
+		static_assert(ManifestItemHasResourcePath<ManifestData>, "Manifest item must have an PATH");
+		static_assert(std::is_class_v<ManifestData>, "Manifest item T must be a struct or class");
+		static_assert(std::is_same_v<typename std::decay<decltype(ManifestData::Id)>::type, ResourceId>, "Manifest item ID must be of type ResourceID");
+		static_assert(std::is_same_v<typename std::decay<decltype(ManifestData::PATH)>::type, ResourcePath> ||
+			std::is_same_v<typename std::decay<decltype(ManifestData::PATHS)>::type, ResourcePath*>, "Manifest item must either have PATH of type ResourcePath or PATHS of type ResourcePath*");
+
+		if (m_ResourceMap.find(ManifestData::Id) == m_ResourceMap.end()) {
+			return Expected<ResourceId>::Error(ERROR_ResourceNotLoaded);
+		}
+
+		return ManifestData::Id;
+	}
+
+	// Retrieves resources Path Information
+	template <class ManifestData>
+	Expected<ResourceManifestInfo> ResourceManager::GetManifestInfo() {
+		static_assert(ManifestItemHasResourceId<ManifestData>, "Manifest item must have an ID");
+		static_assert(ManifestItemHasResourcePath<ManifestData>, "Manifest item must have an PATH");
+		static_assert(std::is_class_v<ManifestData>, "Manifest item T must be a struct or class");
+		static_assert(std::is_same_v<typename std::decay<decltype(ManifestData::Id)>::type, ResourceId>, "Manifest item ID must be of type ResourceID");
+		static_assert(std::is_same_v<typename std::decay<decltype(ManifestData::PATH)>::type, ResourcePath> ||
+			std::is_same_v<typename std::decay<decltype(ManifestData::PATHS)>::type, ResourcePath*>, "Manifest item must either have PATH of type ResourcePath or PATHS of type ResourcePath*");
+
+		if constexpr (HasPathsVariable<ManifestData>) {
+			constexpr std::size_t numPaths = sizeof(ManifestData::PATHS) / sizeof(ResourcePath);
+			return { ManifestData::Id, ManifestData::PATHS, numPaths };
+		}
+		else if constexpr (HasPathVariable<ManifestData>) {
+			return { ManifestData::Id, &ManifestData::PATH, 1 };
+		}
+
+		// Should be unreachable
+		static_assert(false, "Missing PATH or PATHS");
+		return {};
 	}
 
 	template <class T, typename... Args>
