@@ -3,14 +3,9 @@
 #include <iostream>
 #include <type_traits>
 #include <array>
-#include "Smasher/Base.h"
-#include "Smasher/Layer.h"
-#include "Smasher/JobManager/Job.h"
-#include "Smasher/JobManager/JobManager.h"
 #include "Smasher/Core.h"
 #include "Smasher/ComponentSystems/DrawableSystem.h"
 #include "Smasher/ComponentSystems/FrameTimeSystem.h"
-#include "Smasher/ErrorCodes.h"
 
 class DummyLayer : public Smasher::Layer {
 public:
