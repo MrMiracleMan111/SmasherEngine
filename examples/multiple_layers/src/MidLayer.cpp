@@ -1,4 +1,5 @@
 #include "MidLayer.h"
+#include "Smasher/ECS.h"
 #include "Smasher/Components/TextComponent.h"
 #include "Manifest.h"
 #include "Smasher/UI.h"

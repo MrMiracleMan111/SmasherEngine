@@ -3,18 +3,14 @@
 #include <iostream>
 #include <type_traits>
 #include <array>
-#include "Smasher/Base.h"
-#include "Smasher/JobManager/Job.h"
-#include "Smasher/JobManager/JobManager.h"
 #include "Smasher/Core.h"
+#include "Smasher/ECS.h"
 #include "Smasher/ComponentManagers/BaseComponentManager.h"
 #include "Smasher/Entity.h"
 #include "Smasher/ResourceManager.h"
 #include "Smasher/Resources.h"
-#include "Smasher/Layer.h"
 #include "Smasher/Physics.h"
 #include "Smasher/Drawable.h"
-#include "Smasher/ErrorCodes.h"
 #include "Manifest.h"
 
 class MoveObjectTest {

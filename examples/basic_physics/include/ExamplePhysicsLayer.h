@@ -1,5 +1,6 @@
 #pragma once
 #include "Smasher/EventManager.h"
+#include "Smasher/Events.h"
 #include "Smasher/Layer.h"
 
 class ExamplePhysicsLayer : public Smasher::Layer {

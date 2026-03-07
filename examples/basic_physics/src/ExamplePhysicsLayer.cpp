@@ -1,8 +1,10 @@
 #include <cmath>
+#include "BoxControllerComponent.h"
 #include "ExamplePhysicsLayer.h"
+#include "Smasher/Entity.h"
 #include "Smasher/Physics.h"
 #include "Smasher/Drawable.h"
-#include "BoxControllerComponent.h"
+#include "Smasher/Engine.h"
 #include "Manifest.h"
 
 ExamplePhysicsLayer::~ExamplePhysicsLayer()

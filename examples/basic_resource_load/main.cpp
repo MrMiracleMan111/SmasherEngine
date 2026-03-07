@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <SFML/Window.hpp>
 #include "Smasher/Core.h"
+#include "Smasher/ECS.h"
 #include "Manifest.h"
 #include "ExampleResourcesLayer.h"
 #include "Smasher/Components/Transform2DComponent.h"

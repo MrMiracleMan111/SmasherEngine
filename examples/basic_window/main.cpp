@@ -1,4 +1,5 @@
 #include "Smasher/Core.h"
+#include "Smasher/ECS.h"
 #include "ExampleWindowLayer.h"
 #include "Smasher/Components/Transform2DComponent.h"
 int main() {

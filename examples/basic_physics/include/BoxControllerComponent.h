@@ -1,5 +1,5 @@
 #include "Smasher/Base.h"
-#include "Smasher/IComponent.h"
+#include "Smasher/ECS.h"
 
 class BoxControllerComponent : public Smasher::IComponent {
 public:

@@ -1,4 +1,5 @@
 #include "TopLayer.h"
+#include "Smasher/ECS.h"
 #include "Smasher/Components/TextComponent.h"
 #include "Smasher/UI.h"
 #include "Smasher/Drawable.h"
