@@ -13,7 +13,7 @@ namespace Smasher {
 		};
 
 		entt::entity ConstructCamera();
-		SMASHER_API const ErrorCode Initialize(entt::registry& registry);
-		SMASHER_API const ErrorCode Teardown(entt::registry& registry);
+		SMASHER_API ErrorCode Initialize(entt::registry& registry);
+		SMASHER_API ErrorCode Teardown(entt::registry& registry);
 	}
 }
