@@ -6,24 +6,6 @@ if (NOT TARGET GTest::gtest_main)
     message(SEND_ERROR "Gtest::gtest_main target is missing")
 endif()
 
-# Generate Manifest Header for Basic Resource Load
-find_package(Python3 REQUIRED COMPONENTS Interpreter)
-set(STRESS_TEST_MANIFEST_JSON "${CMAKE_CURRENT_SOURCE_DIR}/Manifest.json")
-set(STRESS_TEST_MANIFEST_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/Manifest.h")
-
-add_custom_command(
-    OUTPUT ${STRESS_TEST_MANIFEST_HEADER}
-    COMMAND ${Python3_EXECUTABLE} 
-        ${MANIFEST_GENERATOR}
-        --files ${STRESS_TEST_MANIFEST_JSON}
-        --out ${STRESS_TEST_MANIFEST_HEADER}
-        --resources "${CMAKE_CURRENT_SOURCE_DIR}"
-
-    DEPENDS "${MANIFEST_GENERATOR}" "${STRESS_TEST_MANIFEST_JSON}"
-    COMMENT "Generating Manifest header file..."
-    VERBATIM
-)
-
 # Basic Resource Load Example
 add_custom_target(generate_manifest_BasicTests DEPENDS ${STRESS_TEST_MANIFEST_HEADER})
 
@@ -73,10 +55,14 @@ target_link_libraries(
     GTest::gtest_main
 )
 
+add_custom_target(generate_manifest_DemoTests DEPENDS ${STRESS_TEST_MANIFEST_HEADER})
+
 add_executable(
     DemoTests
     "DemoTests.cpp"
 )
+
+add_dependencies(DemoTests generate_manifest_SMASHER)
 
 # Set output directory to parent folder where SFML DLLs are located
 set_target_properties(DemoTests PROPERTIES
@@ -91,11 +77,8 @@ set_target_properties(DemoTests PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${S
 target_link_libraries(
     DemoTests
     SmasherEngine
-    GTest::gtest
-    GTest::gtest_main
 )
 
 
 gtest_discover_tests(BasicTests)
 gtest_discover_tests(InternalComponentTests)
-gtest_discover_tests(DemoTests)

@@ -3,6 +3,7 @@ project ("SmasherEngine")
 include(GenerateExportHeader)
 include(FetchContent)
 
+message(STATUS "Build Type is ${CMAKE_BUILD_TYPE}")
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(SFML_DYNAMIC_LIB_SUFFIX "-d")
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -164,6 +165,28 @@ else()
     message(STATUS "You will need to modify the CMakeLists.txt to add compiler flags for exception handling.")
 endif()
 
+# Build Manifest
+# Generate Manifest Header for use by all examples and unit tests
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+set(SMASHER_MANIFEST_JSON "${CMAKE_CURRENT_SOURCE_DIR}/Manifest.json")
+set(SMASHER_MANIFEST_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/Manifest.h")
+
+add_custom_command(
+    OUTPUT ${SMASHER_MANIFEST_HEADER}
+    COMMAND ${Python3_EXECUTABLE} 
+        ${MANIFEST_GENERATOR}
+        --files ${SMASHER_MANIFEST_JSON}
+        --out ${SMASHER_MANIFEST_HEADER}
+        --resources "${CMAKE_CURRENT_SOURCE_DIR}"
+
+    DEPENDS "${MANIFEST_GENERATOR}" "${SMASHER_MANIFEST_JSON}"
+    COMMENT "Generating Manifest header file..."
+    VERBATIM
+)
+add_custom_target(generate_manifest_SMASHER DEPENDS ${SMASHER_MANIFEST_HEADER})
+
+
+
 # Compile Engine
 add_library(SmasherEngine SHARED
 "include/Smasher/Core.h"
@@ -239,12 +262,12 @@ add_library(SmasherEngine SHARED
 "src/Smasher/ComponentSystems/TransformSystem.cpp"
 "include/Smasher/ComponentSystems/DrawableSystem.h"
 "src/Smasher/ComponentSystems/DrawableSystem.cpp"
-"include/Smasher/ComponentSystems/FrameTimeSystem.h"
-"src/Smasher/ComponentSystems/FrameTimeSystem.cpp"
+
+
 "include/Smasher/ComponentSystems/CameraSystem.h"
 "src/Smasher/ComponentSystems/CameraSystem.cpp"
 "include/Smasher/ComponentSystems/EngineSystem.h"
- "include/Smasher/ECS.h")
+ "include/Smasher/ECS.h" "include/Smasher/ComponentSystems/TextSystem.h" "src/Smasher/ComponentSystems/TextSystem.cpp" "src/Smasher/ComponentSystems/EngineSystem.cpp")
 
 # Try to include machine-specific config if it exists
 if(EXISTS "${CMAKE_SOURCE_DIR}/local.cmake")
@@ -352,6 +375,10 @@ OpenGL::GLU
 box2d::box2d
 EnTT::EnTT
 glm::glm)
+
+if(WIN32)
+    target_link_libraries(SmasherEngine PRIVATE winmm)
+endif()
 
 
 target_compile_features(SmasherEngine PUBLIC cxx_std_20)

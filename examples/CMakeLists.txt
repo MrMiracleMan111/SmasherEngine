@@ -1,22 +1,3 @@
-
-# Generate Manifest Header for Basic Resource Load
-find_package(Python3 REQUIRED COMPONENTS Interpreter)
-set(RESOURCE_EXAMPLE_MANIFEST_JSON "${CMAKE_CURRENT_SOURCE_DIR}/Manifest.json")
-set(RESOURCE_EXAMPLE_MANIFEST_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/Manifest.h")
-
-add_custom_command(
-    OUTPUT ${RESOURCE_EXAMPLE_MANIFEST_HEADER}
-    COMMAND ${Python3_EXECUTABLE} 
-        ${MANIFEST_GENERATOR}
-        --files ${RESOURCE_EXAMPLE_MANIFEST_JSON}
-        --out ${RESOURCE_EXAMPLE_MANIFEST_HEADER}
-        --resources "${CMAKE_SOURCE_DIR}/examples"
-
-    DEPENDS "${MANIFEST_GENERATOR}" "${RESOURCE_EXAMPLE_MANIFEST_JSON}"
-    COMMENT "Generating Manifest header file..."
-    VERBATIM
-)
-
 # Basic Window Example
 add_executable (BasicWindowExample "basic_window/main.cpp" "basic_window/src/ExampleWindowLayer.cpp"  )
 foreach(CONFIG ${CMAKE_CONFIGURATION_TYPES})
@@ -47,34 +28,31 @@ target_link_libraries( BasicSerializeExample PRIVATE SmasherEngine )
 
 
 # Basic Resource Load Example
-add_custom_target(generate_manifest_BasicResourceLoadExample DEPENDS ${RESOURCE_EXAMPLE_MANIFEST_HEADER})
 add_executable (BasicResourceLoadExample "basic_resource_load/main.cpp" "basic_resource_load/src/ExampleResourcesLayer.cpp"   )
 
 set_target_properties(BasicResourceLoadExample PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${SMASHER_ENGINE_OUTPUT_DIR}")
 set_target_properties(BasicResourceLoadExample PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${SMASHER_ENGINE_OUTPUT_DIR}")
-add_dependencies(BasicResourceLoadExample generate_manifest_BasicResourceLoadExample)
+add_dependencies(BasicResourceLoadExample generate_manifest_SMASHER )
 target_compile_features(BasicResourceLoadExample PUBLIC cxx_std_20)
 target_include_directories (BasicResourceLoadExample PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "basic_resource_load/include" "basic_resource_load/src")
 target_link_libraries( BasicResourceLoadExample PRIVATE SmasherEngine )
 
 # Multiple Layers Example
-add_custom_target(generate_manifest_MultipleLayersExample DEPENDS ${RESOURCE_EXAMPLE_MANIFEST_HEADER})
 add_executable (MultipleLayersExample "multiple_layers/main.cpp" "multiple_layers/src/TopLayer.cpp" "multiple_layers/src/MidLayer.cpp" "multiple_layers/src/BottomLayer.cpp" )
 
 set_target_properties(MultipleLayersExample PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${SMASHER_ENGINE_OUTPUT_DIR}")
 set_target_properties(MultipleLayersExample PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${SMASHER_ENGINE_OUTPUT_DIR}")
-add_dependencies(MultipleLayersExample generate_manifest_MultipleLayersExample)
+add_dependencies(MultipleLayersExample generate_manifest_SMASHER)
 target_compile_features(MultipleLayersExample PUBLIC cxx_std_20)
 target_include_directories (MultipleLayersExample PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "multiple_layers/include" "multiple_layers/src")
 target_link_libraries( MultipleLayersExample PRIVATE SmasherEngine )
 
 # Basic AABB Physics Engine Example
-add_custom_target(generate_manifest_PhysicsExample DEPENDS ${RESOURCE_EXAMPLE_MANIFEST_HEADER})
 add_executable (PhysicsExample "basic_physics/main.cpp" "basic_physics/src/ExamplePhysicsLayer.cpp" "basic_physics/include/BoxControllerComponent.h" "basic_physics/src/BoxControllerComponent.cpp" )
 
 set_target_properties(PhysicsExample PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${SMASHER_ENGINE_OUTPUT_DIR}")
 set_target_properties(PhysicsExample PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${SMASHER_ENGINE_OUTPUT_DIR}")
-add_dependencies(PhysicsExample generate_manifest_PhysicsExample)
+add_dependencies(PhysicsExample generate_manifest_SMASHER )
 target_compile_features(PhysicsExample PUBLIC cxx_std_20)
 target_include_directories (PhysicsExample PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "basic_physics/include" "basic_physics/src")
 target_link_libraries( PhysicsExample PRIVATE SmasherEngine )

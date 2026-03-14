@@ -1,0 +1,22 @@
+{
+  "Textures": {
+    "small_art": "assets/textures/small_art.png",
+    "alpha_test": "assets/textures/alpha_test.png",
+    "window": "assets/textures/window.png",
+    "clip_test": "assets/textures/frame-crop-test.png",
+    "texture_1": "assets/textures/pexels-steve-texture-1.jpg",
+    "texture_2": "assets/textures/pexels-steve-texture-2.jpg",
+    "textures": [ "assets/textures/pexels-steve-texture-1.jpg", "assets/textures/pexels-steve-texture-2.jpg" ]
+  },
+  "Sounds": {
+    "bg_music_1": "assets/songs/bg1.wav",
+    "bg_music_2": "assets/songs/bg2.wav"
+  },
+  "Fonts": {
+    "arial": "assets/fonts/arial.ttf"
+  },
+  "Shaders": {
+    "basic_ui_shader": [ "assets/shaders/basic_ui_shader/basic_ui_vertex_shader.glsl", "assets/shaders/basic_ui_shader/basic_ui_fragment_shader.glsl" ],
+    "basic_texture_shader": [ "assets/shaders/basic_texture_shader/basic_texture_vertex_shader.glsl", "assets/shaders/basic_texture_shader/basic_texture_fragment_shader.glsl" ]
+  }
+}

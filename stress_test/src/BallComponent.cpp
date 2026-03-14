@@ -1,9 +1,10 @@
 #include <SFML/Window.hpp>
+#include "Smasher/Core.h"
+#include "Smasher/ECS.h"
 #include "BallComponent.h"
 #include "Smasher/Components/Transform2DComponent.h"
 #include "Smasher/Components/DrawableComponent.h"
 #include "Smasher/Components/CameraComponent.h"
-#include "Smasher/Entity.h"
 
 BallComponent& BallComponent::SetCamera(Smasher::CameraComponent &camera)
 {
