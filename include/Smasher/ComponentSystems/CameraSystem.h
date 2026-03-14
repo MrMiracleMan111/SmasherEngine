@@ -4,11 +4,11 @@
 
 namespace Smasher {
 	namespace CameraSystem {
-		struct Context {
+		struct SMASHER_API Context {
 			std::vector<entt::entity> cameras;
 		};
 
-		struct Component {
+		struct SMASHER_API Component {
 
 		};
 
