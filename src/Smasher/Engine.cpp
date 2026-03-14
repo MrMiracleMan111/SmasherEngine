@@ -278,6 +278,37 @@ namespace Smasher {
 		m_JobManager.WaitForAsyncJobs();
 	}
 
+	ErrorCode Engine::DisplayWindow() {
+		if (m_Headless) {
+			return ERROR_EngineIsInHeadlessMode;
+		}
+
+		m_WindowPtr->display();
+
+		return ERROR_NoError;
+	}
+
+	ErrorCode Engine::ClearWindow(sf::Color color) {
+		if (m_Headless) {
+			return ERROR_EngineIsInHeadlessMode;
+		}
+
+		m_WindowPtr->clear(color);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear Screen And Depth Buffer
+
+		return ERROR_NoError;
+	}
+
+	inline std::chrono::microseconds Engine::GetTickDelta() {
+		return m_TickDelta;
+	}
+
+	// Should rendering occur on this tick (determiend by render interval)
+	inline bool Engine::IsRenderTick() {
+		return m_IsRenderTick;
+	}
+
+
 	// Renders layers bottom to top order (so that top layer appears above other layers)
 	void Engine::Render() {
 		m_WindowPtr->clear();

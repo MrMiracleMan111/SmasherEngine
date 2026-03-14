@@ -15,6 +15,7 @@
 #include "Smasher/JobManager/JobManager.h"
 #include "Smasher/Events.h"
 #include "Smasher/LayerTransition.h"
+#include "Smasher/ErrorCodes.h"
 
 
 namespace Smasher {
@@ -48,6 +49,8 @@ namespace Smasher {
 		void Shutdown();
 		void Update(Millisecond delta);
 		void Render();
+		ErrorCode DisplayWindow();
+		ErrorCode ClearWindow(sf::Color color = sf::Color::Black);
 
 		// Get time between ticks
 		std::chrono::microseconds GetTickDelta();
@@ -109,6 +112,7 @@ namespace Smasher {
 		std::atomic_bool m_RunningAtomic = false;
 		bool m_Headless = false;
 		bool m_IsWindowOpen = false; // Needed to prevent double delete on Window Context
+		bool m_IsRenderTick = false; // Should rendering occur this game tick (determined by render interval)
 		std::mutex m_WindowMutex; // Prevent double delete on Window Context
 		PhysicsManager m_PhysicsManager;
 		EventManager m_EventManager;
