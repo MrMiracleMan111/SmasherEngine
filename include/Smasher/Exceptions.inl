@@ -7,11 +7,11 @@ namespace Smasher {
 	Expected<T>::Expected(const T& other) :
 		m_Error(false)
 	{
-		if constexpr (std::is_copy_assignable_v<T>) {
-			m_ReturnVal.ret = other;
+		if constexpr (std::is_copy_constructible_v<T>) {
+			new (&m_ReturnVal.ret) T(other);
 		}
 		else {
-			assert(false && "T is not copy assignable");
+			assert(false && "T is not copy constructible");
 		}
 	}
 
@@ -19,11 +19,11 @@ namespace Smasher {
 	Expected<T>::Expected(T&& other) :
 		m_Error(false)
 	{
-		if constexpr (std::is_move_assignable_v<T>) {
-			m_ReturnVal.ret = std::move(other);
+		if constexpr (std::is_move_constructible_v<T>) {
+			new (&m_ReturnVal.ret) T(std::move(other));
 		}
 		else {
-			assert(false && "T is not move assignable");
+			assert(false && "T is not move constructible");
 		}
 	}
 
