@@ -256,7 +256,7 @@ namespace Smasher {
 
 		HandleLayerTransitions();
 
-		m_JobManager.RunJobs();
+		m_JobManager.RunTickJobProducer();
 
 		for (auto &itr : m_LayerStack) {
 			std::unique_ptr<Layer> &pLayer = itr.second;
@@ -272,6 +272,8 @@ namespace Smasher {
 			Millisecond diff = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - m_UpdateTimestamp);
 			pLayer->SetUpdateTime(diff);
 		}
+
+		m_JobManager.RunJobs();
 
 		m_JobManager.WaitForAsyncJobs();
 	}
