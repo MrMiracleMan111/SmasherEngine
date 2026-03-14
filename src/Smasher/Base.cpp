@@ -1,5 +1,6 @@
 #include "Smasher/Base.h"
 #include <iostream>
+#include <thread>
 namespace Smasher {
 
 #ifdef BENCHMARK
@@ -38,4 +39,21 @@ namespace Smasher {
 	void Matrix<4, 4>::CopyMatrix(const sf::Transform &transform) {
 		CopyMatrix(transform.getMatrix(), 4 * 4, array);
 	}
+
+	void PrecisionSleep(std::chrono::duration<double> duration) {
+		static const auto BUFFER = std::chrono::milliseconds{ 3 };
+		auto start = std::chrono::high_resolution_clock::now();
+		auto end = start + duration;
+
+		auto remaining = end - std::chrono::high_resolution_clock::now();
+
+		if (remaining > BUFFER) {
+			std::this_thread::sleep_for(remaining - BUFFER);
+		}
+
+		while (std::chrono::high_resolution_clock::now() < end) {
+			std::this_thread::yield();
+		}
+	}
+
 }

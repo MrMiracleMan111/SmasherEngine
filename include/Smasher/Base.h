@@ -174,6 +174,8 @@ namespace Smasher {
 		END
 	};
 
+	void SMASHER_API PrecisionSleep(std::chrono::duration<double> duration);
+
 	struct SMASHER_API Vec2 {
 		Vec2(const Vec2 &other) : data{ .x = other.data.x, .y = other.data.y } {}
 		Vec2& operator= (const Vec2 &other) {
