@@ -19,6 +19,7 @@
 #include "Smasher/Exceptions.h"
 #include "Smasher/EngineConfig.h"
 #include "Smasher/EventFeeder.h"
+#include "Smasher/ErrorCodes.h"
 #include "Smasher/Layer.h"
 #include "Smasher/ComponentSystems/EngineSystem.h"
 
@@ -137,6 +138,12 @@ namespace Smasher {
 	void Engine::Init() {
 		BaseLayer &base = PushLayer<BaseLayer>(); // Base layer
 
+#if defined(_WIN32)
+		timeBeginPeriod(1);
+#elif defined(__linux__)
+#elif defined(__APPLE__)
+#endif
+
 		if (!m_Headless) {
 			glewExperimental = GL_TRUE;
 			GLenum status = glewInit();
@@ -160,14 +167,15 @@ namespace Smasher {
 #ifdef CATCH_EXCEPTIONS
 		try {
 #endif
-			std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
-			Millisecond updateTimer{ 0 };
-			Millisecond renderTimer{ 0 };
+			std::chrono::time_point<std::chrono::system_clock> lastTickTime = std::chrono::system_clock::now();
+			std::chrono::microseconds updateTimer{ 0 };
+			std::chrono::microseconds renderTimer{ 0 };
 
-			while ((!m_Headless && m_WindowPtr->isOpen()) and m_RunningAtomic) {
+			while ((!m_Headless && m_WindowPtr->isOpen()) && m_RunningAtomic) {
 				std::chrono::time_point<std::chrono::system_clock> tmp = std::chrono::system_clock::now();
-				Millisecond diff = std::chrono::duration_cast<std::chrono::milliseconds>(tmp - now);
-				now = tmp;
+				// Time passed since last tick
+				m_TickDelta = std::chrono::duration_cast<std::chrono::microseconds>(tmp - lastTickTime);
+				lastTickTime = tmp;
 				sf::Event event;
 				if (!m_Headless) {
 					while (m_WindowPtr->pollEvent(event)) {
@@ -175,18 +183,19 @@ namespace Smasher {
 					}
 				}
 
-				updateTimer += diff;
-				renderTimer += diff;
+				updateTimer += m_TickDelta;
+				renderTimer += m_TickDelta;
 
+				m_IsRenderTick = (!m_Headless && renderTimer >= m_RenderInterval);
 				m_EventManager.Dispatch();
 
 				if (updateTimer >= m_UpdateInterval) {
-					Update(Millisecond{ updateTimer });
-					updateTimer = Millisecond{ 0 };
+					Update(std::chrono::duration_cast<std::chrono::milliseconds>( updateTimer ));
+					updateTimer = std::chrono::microseconds{ 0 };
 				}
-				if (!m_Headless && renderTimer >= m_RenderInterval) {
-					Render();
-					renderTimer = Millisecond{ 0 };
+				if (m_IsRenderTick) {
+					//Render();
+					renderTimer = std::chrono::microseconds{ 0 };
 				}
 
 #ifdef BENCHMARK
@@ -194,9 +203,11 @@ namespace Smasher {
 #endif
 
 				Millisecond minInterval = std::min(m_UpdateInterval, m_RenderInterval);
-				std::chrono::milliseconds loopTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - now);
-				Millisecond sleepTime = std::max(minInterval - loopTime, std::chrono::milliseconds::zero());
-				std::this_thread::sleep_for(sleepTime);
+				std::chrono::milliseconds currentTickTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - lastTickTime);
+				Millisecond sleepTime = std::max(minInterval - currentTickTime, std::chrono::milliseconds::zero());
+
+				m_IsRenderTick = false;
+				PrecisionSleep(sleepTime);
 			}
 			Shutdown();
 		}
@@ -238,7 +249,6 @@ namespace Smasher {
 
 	// Updates layers from bottom to top
 	void Engine::Update(Millisecond delta) {
-		m_JobManager.RunTickJobProducer();
 
 		if (m_PhysicsManager.IsInitialized()) {
 			m_PhysicsManager.Step(delta);
@@ -353,6 +363,12 @@ namespace Smasher {
 			m_WindowPtr->close();
 			m_IsWindowOpen = false;
 		}
+
+#if defined(_WIN32)
+		timeEndPeriod(1);
+#elif defined(__linux__)
+#elif defined(__APPLE__)
+#endif
 	}
 
 	Engine::LayerStackItr Engine::TopLayerItr()

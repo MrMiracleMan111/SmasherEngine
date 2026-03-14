@@ -49,6 +49,11 @@ namespace Smasher {
 		void Update(Millisecond delta);
 		void Render();
 
+		// Get time between ticks
+		std::chrono::microseconds GetTickDelta();
+		// Should rendering occur on this tick (determiend by render interval)
+		bool IsRenderTick();
+
 		// Creates layer and adds it to transition list
 		template<class T, typename... Args>
 		T& PushLayer(Args&&... componentArgs);
@@ -98,6 +103,7 @@ namespace Smasher {
 		LayerStackConstItr GetLayerItr(std::type_index index) const;
 
 		bool m_Valid = true; // Becomes false if this object is moved
+		std::chrono::microseconds m_TickDelta{ 0 };
 		std::vector<LayerTransition> m_LayerTransitions;
 		std::unique_ptr<sf::RenderWindow> m_WindowPtr = nullptr;
 		std::atomic_bool m_RunningAtomic = false;
