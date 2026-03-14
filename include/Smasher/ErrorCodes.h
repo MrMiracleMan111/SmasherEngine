@@ -4,6 +4,11 @@
 // ==== NO ERROR ====
 #define ERROR_NoError 0
 
+// ==== ENGINE EXCEPTIONS ====
+#define ERROR_ExpectedHasError 1
+#define ERROR_EngineNotInitialized 2
+#define ERROR_EngineIsInHeadlessMode 3
+
 // ==== LAYER EXCEPTIONS ====
 #define ERROR_LayerNotFound 100
 #define ERROR_LayerDuplicate 101
@@ -44,3 +49,5 @@
 #define ERROR_NotEnoughThreads 900
 #define ERROR_NoJobsAvailable 901
 #define ERROR_JobHasNoParents 902
+#define ERROR_SyncJobCannotDependOnSyncJob 903
+

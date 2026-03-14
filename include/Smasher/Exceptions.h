@@ -107,6 +107,8 @@ namespace Smasher {
 	namespace Exceptions {
 		// ==== ENGINE EXCEPTIONS ====
 		SMASHER_EXCEPTION(ExpectedHasError)
+		SMASHER_EXCEPTION(EngineNotInitialized)
+		SMASHER_EXCEPTION(EngineIsInHeadlessMode)
 
 		// ==== LAYER EXCEPTIONS ====
 		SMASHER_EXCEPTION(LayerNotFound)
@@ -141,6 +143,12 @@ namespace Smasher {
 
 		// ==== OPENGL EXCEPTIONS ====
 		SMASHER_EXCEPTION(GLEWInitFailed)
+
+		// ==== JOBS EXCEPTIONS ====
+		SMASHER_EXCEPTION(ERROR_NotEnoughThreads)
+		SMASHER_EXCEPTION(ERROR_NoJobsAvailable)
+		SMASHER_EXCEPTION(ERROR_JobHasNoParents)
+		SMASHER_EXCEPTION(ERROR_SyncJobCannotDependOnSyncJob)
 	}
 }
 
