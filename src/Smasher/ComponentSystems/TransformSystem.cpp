@@ -1,5 +1,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <entt/entity/registry.hpp>
 #include "Smasher/Base.h"
 #include "Smasher/ComponentSystems/TransformSystem.h"
 
@@ -13,16 +15,30 @@ namespace Smasher {
 		
 		}
 
-		void SetRotation(Component& component, glm::vec3 rotation) {
-		
+		// Expects radians
+		void SetEuler(Component& component, glm::vec3 rotation) {
+			component._rotation = glm::quat(rotation);
+			component._dirty = true;
+			component._hasChanged = true;
 		}
 
-		void SetRotation(Component& component, Degrees pitch, Degrees roll, Degrees yaw) {
-		
+		void SetEuler(Component& component, Radians pitch, Radians roll, Radians yaw) {
+			component._rotation = glm::quat(glm::vec3(pitch, roll, yaw));
+			component._dirty = true;
+			component._hasChanged = true;
 		}
 
-		void SetRotationRad(Component& component, Radians pitch, Radians roll, Radians yaw) {
+		void SetEulerDeg(Component& component, Degrees pitch, Degrees roll, Degrees yaw) {
+			glm::vec3 euler = glm::radians(glm::vec3(pitch, roll, yaw));
+			component._rotation = glm::quat(euler);
+			component._dirty = true;
+			component._hasChanged = true;
+		}
 
+		void SetRotation(Component& component, glm::quat quaternion) {
+			component._rotation = quaternion;
+			component._dirty = true;
+			component._hasChanged = true;
 		}
 
 		void SetScale(Component& component, glm::vec3 factors) {
@@ -38,8 +54,17 @@ namespace Smasher {
 			return component._position;
 		}
 
-		glm::vec3 GetRotation(Component& component) {
+		glm::quat GetRotation(Component& component) {
 			return component._rotation;
+		}
+
+		glm::vec3 GetEuler(Component& component) {
+			return glm::eulerAngles(component._rotation);
+		}
+
+		glm::vec3 GetEulerDeg(Component& component) {
+			glm::vec3 euler = glm::eulerAngles(component._rotation);
+			return glm::degrees(euler);
 		}
 
 		glm::vec3 GetScale(Component& component) {
