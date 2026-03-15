@@ -308,9 +308,9 @@ int main() {
 			pClearWindowJob = &jobManager.AddSyncJob(std::bind(Smasher::EngineSystem::ClearWindow, std::ref(registry)),
 				{}).Get().get();
 		}
+
 		Smasher::Job& transformLogicJob = jobManager.AddSyncJob(std::bind(Smasher::TransformSystem::Update, std::ref(registry)),
 		 	{}).Get();
-
 		Smasher::Job& gameLogicJob = jobManager.AddAsyncJob(std::bind(GameLogicSystem::Update, std::ref(registry)), 
 			{ transformLogicJob }).Get();
 		Smasher::Job& ballPhysicsJob = jobManager.AddAsyncJob(std::bind(BallSystem::Update, std::ref(registry)),
