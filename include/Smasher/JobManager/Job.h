@@ -30,9 +30,9 @@ namespace Smasher {
 		Job& operator= (const Job&) = delete;
 		Job& operator= (Job&& other) noexcept;
 
-		const JobStatus GetStatus() const { return m_Status; }
-		const int GetJobId() const { return m_JobId; }
-		JobPool& GetJobPool() { return m_JobPoolRef.get(); }
+		JobStatus GetStatus() const { return m_Status; }
+		int GetJobId() const { return m_JobId; }
+		JobPool& GetJobPool() const { return m_JobPoolRef.get(); }
 
 		static void ResetJobCount() { Job::s_JobCount = 1; };
 	protected:
@@ -40,7 +40,7 @@ namespace Smasher {
 
 		std::vector<std::reference_wrapper<Job>>& GetDependants() { return m_Dependants;  };
 		
-		const unsigned int GetParentCount() { return m_NumParents; };
+		unsigned int GetParentCount() const { return m_NumParents; };
 
 		// Decrement parent counter
 		// throws error if the job has no parents
@@ -48,7 +48,7 @@ namespace Smasher {
 
 		void SetItr(const std::list<Job>::iterator& itr) { m_AllJobsListItr = itr; };
 
-		std::list<Job>::iterator GetItr() { return m_AllJobsListItr; };
+		std::list<Job>::iterator GetItr() const { return m_AllJobsListItr; };
 		std::mutex& GetMutex() { return m_StateMutex; };
 	private:
 		static int s_JobCount;
