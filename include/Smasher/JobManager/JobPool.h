@@ -32,8 +32,11 @@ namespace Smasher {
 
 		void RemoveFromAllJobs(Job &job);
 
-		// Thready safely removes job from m_AvailableJobs
-		// @precondition m_PoolStateMutex must be locked by calling function
+		/**
+		 * @brief Removes job from m_AvailableJobs
+		 * 
+		 * @pre m_PoolStateMutex must be locked by caller.
+		 */
 		Expected<std::reference_wrapper<Job>> TakeAvailableJob();
 
 		std::mutex& GetCVMutex() { return m_PoolCVMutex; }
