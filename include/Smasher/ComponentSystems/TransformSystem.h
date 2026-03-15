@@ -26,8 +26,11 @@ namespace Smasher {
 			bool _dirty;
 		};
 
-		SMASHER_API const ErrorCode Initialize(entt::registry& registry) { return ERROR_NoError; };
-		SMASHER_API const ErrorCode Teardown(entt::registry& registry) { return ERROR_NoError; };
+		SMASHER_API ErrorCode Initialize(entt::registry& registry);
+		SMASHER_API ErrorCode Teardown(entt::registry& registry);
+		SMASHER_API ErrorCode Update(entt::registry& registry);
+
+		SMASHER_API Expected<std::reference_wrapper<Component>> AddComponent(entt::registry& registry, entt::entity entity);
 
 		SMASHER_API void SetPosition(Component &component, glm::vec3 position);
 		SMASHER_API void SetPosition(Component &component, float x, float y, float z);
