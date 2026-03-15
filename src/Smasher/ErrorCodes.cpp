@@ -6,6 +6,10 @@ namespace Smasher {
 			// ==== NO ERROR ====
 		case ERROR_NoError: return "Success, no errors were thrown";
 
+		case ERROR_ExpectedHasError: return "Expected<T> Has Error";
+		case ERROR_EngineNotInitialized: return "Engine Not Initialized";
+		case ERROR_EngineIsInHeadlessMode: return "Engine Is In Headless Mode";
+
 			// ==== LAYER EXCEPTIONS ====
 		case ERROR_LayerNotFound: return "LayerNotFound";
 		case ERROR_LayerDuplicate: return "LayerDuplicate";
@@ -42,6 +46,10 @@ namespace Smasher {
 
 			// ==== JOBS EXCEPTIONS ====
 		case ERROR_NotEnoughThreads: return "Could not create enough threads, check MIN_THREAD_COUNT in EngineConfig.h";
+		case ERROR_NoJobsAvailable: return "No jobs were available";
+		case ERROR_JobHasNoParents: return "Job has no parents";
+		case ERROR_SyncJobCannotDependOnSyncJob: return "Synchronous jobs cannot depend on other synchronous jobs";
+		
 		default: return "Unkown error code";
 		}
 	}
