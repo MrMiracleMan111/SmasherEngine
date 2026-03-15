@@ -63,6 +63,7 @@ namespace Smasher {
 			if (!m_Texture.loadFromFile(m_Paths[0].string())) {
 				throw Exceptions::ResourceFailedToLoad(std::format("Failed to load file {}", m_Paths[0].string()));
 			}
+			m_Loaded = true;
 		}
 		sf::Texture& GetTexture() { return m_Texture; }
 	private:
@@ -79,6 +80,7 @@ namespace Smasher {
 			if (!m_Font.loadFromFile(m_Paths[0].string())) {
 				throw Exceptions::ResourceFailedToLoad(std::format("Failed to load file {}", m_Paths[0].string()));
 			}
+			m_Loaded = true;
 		}
 
 		sf::Font& GetFont() { return m_Font; }
@@ -96,6 +98,7 @@ namespace Smasher {
 			if (!m_Music.openFromFile(m_Paths[0].string())) {
 				throw Exceptions::ResourceFailedToLoad(std::format("Failed to load file {}", m_Paths[0].string()));
 			}
+			m_Loaded = true;
 		}
 	private:
 		sf::Music m_Music;
@@ -129,11 +132,13 @@ namespace Smasher {
 				throw Smasher::Exceptions::ResourceInvalidNumPaths("numPaths is invalid");
 				assert(false); // Never should be reached
 			}
+			m_Loaded = true;
 		}
 
 		ShaderResource(ResourceId id, const std::string &vert, const std::string &frag) :
 			Resource(id), m_ShaderType(sf::Shader::Type::Geometry) {
 			m_Shader.loadFromMemory(vert, frag);
+			m_Loaded = true;
 		}
 
 		sf::Shader& GetShader() { return m_Shader; }
@@ -151,7 +156,7 @@ namespace Smasher {
 			const ResourcePath *const relativePaths, const std::size_t numPaths,
 			const ResourcePath &resourcesDirectory, std::ios_base::openmode mode) :
 			Resource(id, relativePaths, numPaths, resourcesDirectory), m_File(m_Paths[0], mode) {
-
+			m_Loaded = true;
 		}
 		~FileResource() {
 			if (m_File.is_open()) {
