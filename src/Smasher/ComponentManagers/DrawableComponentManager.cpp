@@ -175,6 +175,7 @@ namespace Smasher {
 		  0.f, 0.f, 0.f
 		};
 
+		//transform.m_Changed = false;
 		component.m_TransformChanged = false;
 
 		Mat3 clipTransform{ IDENTITY_TRANSFORM_MATRIX_ARRAY };
