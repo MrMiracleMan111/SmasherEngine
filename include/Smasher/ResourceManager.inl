@@ -75,20 +75,22 @@ namespace Smasher {
 		static_assert(ManifestItemHasResourcePath<ManifestData>, "Manifest item must have an PATH");
 		static_assert(std::is_class_v<ManifestData>, "Manifest item T must be a struct or class");
 		static_assert(std::is_same_v<typename std::decay<decltype(ManifestData::Id)>::type, ResourceId>, "Manifest item ID must be of type ResourceID");
-		static_assert(std::is_same_v<typename std::decay<decltype(ManifestData::PATH)>::type, ResourcePath> ||
-			std::is_same_v<typename std::decay<decltype(ManifestData::PATHS)>::type, ResourcePath*>, "Manifest item must either have PATH of type ResourcePath or PATHS of type ResourcePath*");
+
 
 		if constexpr (HasPathsVariable<ManifestData>) {
+			static_assert(std::is_same_v < typename std::decay<decltype(ManifestData::PATHS)>::type, ResourcePath*>, "Manifest item must either have PATHS of type ResourcePath*");
 			constexpr std::size_t numPaths = sizeof(ManifestData::PATHS) / sizeof(ResourcePath);
-			return { ManifestData::Id, ManifestData::PATHS, numPaths };
+			return ResourceManifestInfo { ManifestData::Id, ManifestData::PATHS, numPaths };
 		}
 		else if constexpr (HasPathVariable<ManifestData>) {
-			return { ManifestData::Id, &ManifestData::PATH, 1 };
+			static_assert(std::is_same_v < typename std::decay<decltype(ManifestData::PATH)>::type, ResourcePath>, "Manifest item must either have PATH of type ResourcePath");
+			return ResourceManifestInfo { ManifestData::Id, &ManifestData::PATH, (std::size_t) 1 };
 		}
-
-		// Should be unreachable
-		static_assert(false, "Missing PATH or PATHS");
-		return {};
+		else {
+			// Should be unreachable unless Manifest is malformed
+			static_assert(false, "Manifest item must either have PATH of type ResourcePath or PATHS of type ResourcePath*");
+			return ResourceManifestInfo {};
+		}
 	}
 
 	template <class T, typename... Args>
