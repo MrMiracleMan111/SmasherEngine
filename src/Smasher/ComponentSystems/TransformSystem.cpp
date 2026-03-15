@@ -7,12 +7,21 @@
 
 namespace Smasher {
 	namespace TransformSystem {
+		Expected<std::reference_wrapper<Component>> AddComponent(entt::registry& registry, entt::entity entity) {
+			Component& component = registry.emplace<Component>(entity);
+			return std::ref(component);
+		}
+
 		void SetPosition(Component& component, glm::vec3 position) {
-		
+			component._position = position;
+			component._dirty = true;
+			component._hasChanged = true;
 		}
 
 		void SetPosition(Component& component, float x, float y, float z) {
-		
+			component._position = glm::vec3(x, y, z);
+			component._dirty = true;
+			component._hasChanged = true;
 		}
 
 		// Expects radians
@@ -41,12 +50,17 @@ namespace Smasher {
 			component._hasChanged = true;
 		}
 
-		void SetScale(Component& component, glm::vec3 factors) {
-		
+
+		void SetScale(Component& component, glm::vec3 scale) {
+			component._scale = scale;
+			component._dirty = true;
+			component._hasChanged = true;
 		}
 
 		void SetScale(Component& component, float x, float y, float z) {
-		
+			component._scale = glm::vec3(x, y, z);
+			component._dirty = true;
+			component._hasChanged = true;
 		}
 
 
@@ -71,14 +85,28 @@ namespace Smasher {
 			return component._scale;
 		}
 
+		glm::mat3 Compute2DTransform(Component& component) {
+			// Extract Z-Axis rotation from rotation
+			float angle = std::atan2(2.0f * (component._rotation.w * component._rotation.z + component._rotation.x * component._rotation.y),
+				1.0f - 2.0f * (component._rotation.y * component._rotation.y + component._rotation.z * component._rotation.z));
+			float cosine = std::cos(angle);
+			float sine = std::sin(angle);
+
+			return glm::mat3 {
+				component._scale.x * cosine,	component._scale.x * sine,		0.f,
+				component._scale.y * sine,		component._scale.y * cosine,	0.f,
+				component._position.x,			component._position.y,			1.f
+			};
+		}
+
 		// Updates global matrix of transform
 		// using component's position, rotation, scale
 		void ComputeGlobalMatrix(Component& component) {
-			float angle = 0.f;
-			component._globalMatrix = glm::mat4(); // Identity matrix
-			glm::scale(component._globalMatrix, component._scale);
-			glm::rotate(component._globalMatrix, angle, glm::vec3(0.f, 0.f, 1.f));
-			glm::translate(component._globalMatrix, component._position);
+			component._globalMatrix =
+				glm::translate(glm::mat4(1.f), component._position) *
+				glm::scale(glm::mat4(1.f), component._scale) * glm::mat4(1.f) *
+				glm::toMat4(component._rotation);
+			component._dirty = true;
 		}
 
 		const glm::mat4& GetTransform(Component& component) {
@@ -87,6 +115,37 @@ namespace Smasher {
 			}
 
 			// Compute Global matrix
+			ComputeGlobalMatrix(component);
+			return component._globalMatrix;
+		}
+
+		glm::mat3 Extract2DTransform(const glm::mat4& matrix) {
+			// [column][row]
+			// column major
+			return glm::mat3 {
+				matrix[0][0], matrix[0][1], 0,
+				matrix[1][0], matrix[1][1], 0,
+				matrix[3][0], matrix[3][1], 1
+			};
+		}
+
+		bool HasChanged(Component& component) {
+			return component._hasChanged;
+		}
+
+		ErrorCode Initialize(entt::registry& registry) {
+			return ERROR_NoError;
+		}
+		ErrorCode Teardown(entt::registry& registry) {
+			return ERROR_NoError;
+		}
+
+		ErrorCode Update(entt::registry& registry) {
+			auto view = registry.view<Component>();
+			for (auto [entity, transform] : view.each()) {
+				transform._hasChanged = false;
+			}
+			return ERROR_NoError;
 		}
 	}
 }

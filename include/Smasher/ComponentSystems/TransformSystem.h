@@ -58,5 +58,13 @@ namespace Smasher {
 		SMASHER_API glm::vec3 GetScale(Component& component);
 
 		SMASHER_API const glm::mat4 &GetTransform(Component& component);
+
+		// Creates XY Transform from XYZ Transform Matrix
+		SMASHER_API glm::mat3 Extract2DTransform(const glm::mat4& matrix);
+		SMASHER_API glm::mat3 Compute2DTransform(Component& component);
+
+
+
+		SMASHER_API bool HasChanged(Component& component);
 	}
 }
