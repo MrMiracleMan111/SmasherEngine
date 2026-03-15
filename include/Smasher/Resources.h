@@ -13,6 +13,7 @@ static constexpr ResourceType GetStaticType() { return type; } \
 
 namespace Smasher {
 	struct SMASHER_API ResourceManifestInfo {
+		const ResourceId resourceId;
 		const ResourcePath* paths;
 		const std::size_t path_count;
 	};
