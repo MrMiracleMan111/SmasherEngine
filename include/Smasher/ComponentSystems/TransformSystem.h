@@ -15,7 +15,10 @@ Z - FORWARD
 */
 namespace Smasher {
 	namespace TransformSystem {
-		struct Component {
+		// Contains transform information (position, rotation, etc.)
+		// members should not directly be accessed, use the Set/Get
+		// methods instead.
+		struct SMASHER_API Component {
 			glm::vec3 _position;
 			glm::vec3 _rotation; // Radians
 			glm::vec4 _quatRotation;
