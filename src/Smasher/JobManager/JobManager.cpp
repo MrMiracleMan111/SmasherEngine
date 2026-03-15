@@ -102,16 +102,16 @@ namespace Smasher {
 	}
 
 	ErrorCode JobManager::RunJobs() {
-		for (auto& job : m_Runners) {
-			job.Activate();
+		for (auto& runner : m_Runners) {
+			runner.Activate();
 		}
 
 		// Wakeup all job runners
 		m_AsyncJobPool.GetCV().notify_all();
 
-		for (auto& job : m_Runners) {
-			if (job.IsSynchronous()) {
-				job.Run();
+		for (auto& runner : m_Runners) {
+			if (runner.IsSynchronous()) {
+				runner.Run();
 			}
 		}
 		return ERROR_NoError;
