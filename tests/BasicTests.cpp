@@ -11,6 +11,8 @@
 #include "Smasher/Resources.h"
 #include "Smasher/Physics.h"
 #include "Smasher/Drawable.h"
+#include "Smasher/ComponentSystems/DrawableSystem.h"
+#include "Smasher/ComponentSystems/TransformSystem.h"
 #include "Manifest.h"
 
 class MoveObjectTest {
@@ -924,17 +926,22 @@ TEST(PhysicsTest, ChangeColliders) {
 
 TEST(GraphicsTest, JobsSystemGraphicsDemo) {
 	Smasher::Engine engine{ 640, 420 };
+	engine.GetPhysicsManager().Initialize();
 	engine.GetResourceManager().SetResourceDirectory(Smasher::Manifest::Metadata::RESOURCES_DIRECTORY);
 	DummyLayer& layer = engine.PushLayer<DummyLayer>();
 	Smasher::JobManager& jobManager = engine.GetJobManager();
 	layer.Activate();
-
 	entt::registry& registry = engine.GetRegistry();
+
+	Smasher::DrawableSystem::Initialize(registry);
+	Smasher::TransformSystem::Initialize(registry);
+
 	entt::entity entity = registry.create();
 	Smasher::DrawableComponent &comp = registry.emplace<Smasher::DrawableComponent>(entity);
 
 	jobManager.SetTickJobProducer([&]() {
-		jobManager.AddAsyncJob(std::bind(Smasher::DrawableSystem, registry))
+		Smasher::Job& transformLogicJob = jobManager.AddSyncJob(std::bind(Smasher::TransformSystem::Update, std::ref(registry)), {}).Get();
+		Smasher::Job& renderJob = jobManager.AddSyncJob(std::bind(Smasher::DrawableSystem::Render, std::ref(registry)), {}).Get();
 	});
 
 	Smasher::Entity& ball = layer.AddEntity();
@@ -953,9 +960,12 @@ TEST(GraphicsTest, JobsSystemGraphicsDemo) {
 	std::thread worker([&engine]() {
 		std::this_thread::sleep_for(std::chrono::seconds(5));
 		engine.Shutdown();
-		});
+	});
 	engine.Run();
 	worker.join();
+
+	Smasher::DrawableSystem::Teardown(registry);
+	Smasher::TransformSystem::Teardown(registry);
 }
 
 TEST(PhysicsTest, PhysicsDemo) {
