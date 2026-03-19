@@ -7,7 +7,7 @@
 #include "Smasher/Core.h"
 #include "Smasher/ComponentSystems/EngineSystem.h"
 #include "Smasher/ComponentSystems/TransformSystem.h"
-#include "Smasher/ComponentSystems/DrawableSystem.h"
+#include "Smasher/ComponentSystems/SpriteSystem.h"
 #include "Smasher/ComponentSystems/TextSystem.h"
 #include "Smasher/Resources.h"
 #include "Manifest.h"
@@ -115,12 +115,12 @@ namespace CursorInteractSystem {
 		Smasher::TransformSystem::SetPosition(ballTransform, position.x, position.y, 0.f);
 		Smasher::TransformSystem::SetScale(ballTransform, 70.f, 70.f, 1.f);
 
-		auto &ballImage = Smasher::DrawableSystem::AddComponent(registry, ball).Get().get();
+		auto &ballImage = Smasher::SpriteSystem::AddComponent(registry, ball).Get().get();
 
-		Smasher::DrawableSystem::SetDepth(ballImage, 0.5f);
-		Smasher::DrawableSystem::SetTexture<Smasher::Manifest::Textures::alpha_test>(ballImage, registry, {});
-		Smasher::DrawableSystem::SetTextureClipSize(ballImage, 40.f, 20.f);
-		Smasher::DrawableSystem::SetTextureClipOffset(ballImage, 0.f, 0.f);
+		Smasher::SpriteSystem::SetDepth(ballImage, 0.5f);
+		Smasher::SpriteSystem::SetTexture<Smasher::Manifest::Textures::alpha_test>(ballImage, registry, {});
+		Smasher::SpriteSystem::SetTextureClipSize(ballImage, 40.f, 20.f);
+		Smasher::SpriteSystem::SetTextureClipOffset(ballImage, 0.f, 0.f);
 		auto& ballLogic = BallSystem::AddComponent(registry, ball).Get().get();
 		BallSystem::SetVelocity(ballLogic, tmpX, tmpY);
 		return ball;
@@ -283,13 +283,13 @@ int main() {
 	// Setup system contexts
 	entt::registry& registry = engine.GetRegistry();
 	Smasher::TransformSystem::Initialize(registry);
-	Smasher::DrawableSystem::Initialize(registry);
+	Smasher::SpriteSystem::Initialize(registry);
 	Smasher::TextSystem::Initialiaze(registry);
 	GameLogicSystem::Initialize(registry);
 	CursorInteractSystem::Initialize(registry, layer);
 
-	auto& ctx = registry.ctx().get<Smasher::DrawableSystem::Context>();
-	Smasher::DrawableSystem::SetSystemShader(ctx, pShaderResource);
+	auto& ctx = registry.ctx().get<Smasher::SpriteSystem::Context>();
+	Smasher::SpriteSystem::SetSystemShader(ctx, pShaderResource);
 
 		// Add entities
 		glm::uvec2 bounds{ engine.GetWindow().getSize().x, engine.GetWindow().getSize().y };
@@ -318,7 +318,7 @@ int main() {
 
 		if (engine.IsRenderTick()) {
 			assert(pClearWindowJob != nullptr);
-			 Smasher::Job& drawableJob = jobManager.AddSyncJob(std::bind(Smasher::DrawableSystem::Render, std::ref(registry)),
+			 Smasher::Job& drawableJob = jobManager.AddSyncJob(std::bind(Smasher::SpriteSystem::Render, std::ref(registry)),
 				{ *pClearWindowJob, gameLogicJob, ballPhysicsJob }).Get();
 			 Smasher::Job& textDrawJob = jobManager.AddSyncJob(std::bind(Smasher::TextSystem::Render, std::ref(registry)),
 				{ drawableJob }).Get();
@@ -336,7 +336,7 @@ int main() {
 	layer.Activate();
 	engine.Run(); // Engine should shutdown after the third update
 
-	Smasher::DrawableSystem::Teardown(engine.GetRegistry());
+	Smasher::SpriteSystem::Teardown(engine.GetRegistry());
 	GameLogicSystem::Teardown(engine.GetRegistry());
 	CursorInteractSystem::Teardown(engine.GetRegistry());
 	Smasher::TransformSystem::Teardown(engine.GetRegistry());

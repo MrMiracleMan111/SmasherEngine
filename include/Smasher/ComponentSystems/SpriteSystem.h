@@ -20,7 +20,7 @@
 #include "Smasher/ComponentSystems/EngineSystem.h"
 
 namespace Smasher {
-	namespace DrawableSystem {
+	namespace SpriteSystem {
 		struct BatchContext;
 
 		struct ModelData {
@@ -125,7 +125,7 @@ namespace Smasher {
 			bool _changed = false;
 		};
 
-		// Contains state information for the "DrawableSystem"
+		// Contains state information for the "SpriteSystem"
 		struct SMASHER_API Context {
 			std::map<ResourceId, std::list<RenderBatch>> opaqueBatches; // Linked List of Batches
 			std::map<ResourceId, std::list<RenderBatch>> translucentBatches;// Linked List of Batches
@@ -182,4 +182,4 @@ namespace Smasher {
 	}
 }
 
-#include "Smasher/ComponentSystems/DrawableSystem.inl"
+#include "Smasher/ComponentSystems/SpriteSystem.inl"

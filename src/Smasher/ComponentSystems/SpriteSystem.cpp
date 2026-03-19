@@ -17,14 +17,14 @@
 #include "entt/signal/delegate.hpp"
 #include "Smasher/ErrorCodes.h"
 #include "Smasher/Resources.h"
-#include "Smasher/ComponentSystems/DrawableSystem.h"
+#include "Smasher/ComponentSystems/SpriteSystem.h"
 #include "Smasher/ComponentSystems/TransformSystem.h"
 #include "Smasher/ComponentSystems/EngineSystem.h"
 #include "Smasher/ComponentManagers/RenderBatch.h"
 #include "Smasher/Engine.h"
 
 namespace Smasher {
-	namespace DrawableSystem {
+	namespace SpriteSystem {
 		RenderBatch::RenderBatch(std::list<RenderBatch>& list, GLuint quadVBO, GLuint quadEBO) :
 			ownerBatchList(list),
 			quadVBO(quadVBO),
@@ -467,7 +467,7 @@ namespace Smasher {
 		}
 
 		Expected<std::reference_wrapper<Component>> AddComponent(entt::registry& registry, entt::entity entity) {
-			assert(registry.all_of<TransformSystem::Component>(entity) && "DrawableSystem::Component requires TransformSystem::Component");
+			assert(registry.all_of<TransformSystem::Component>(entity) && "SpriteSystem::Component requires TransformSystem::Component");
 
 			if (!registry.ctx().contains<Context>()) {
 				return Expected<std::reference_wrapper<Component>>::Error(ERROR_SystemNotInitialized);

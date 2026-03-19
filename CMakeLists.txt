@@ -260,8 +260,8 @@ add_library(SmasherEngine SHARED
 "src/Smasher/JobManager/JobPool.cpp"
 "include/Smasher/ComponentSystems/TransformSystem.h"
 "src/Smasher/ComponentSystems/TransformSystem.cpp"
-"include/Smasher/ComponentSystems/DrawableSystem.h"
-"src/Smasher/ComponentSystems/DrawableSystem.cpp"
+"include/Smasher/ComponentSystems/SpriteSystem.h"
+"src/Smasher/ComponentSystems/SpriteSystem.cpp"
 
 
 "include/Smasher/ComponentSystems/CameraSystem.h"

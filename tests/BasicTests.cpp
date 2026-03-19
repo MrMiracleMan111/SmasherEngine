@@ -11,7 +11,7 @@
 #include "Smasher/Resources.h"
 #include "Smasher/Physics.h"
 #include "Smasher/Drawable.h"
-#include "Smasher/ComponentSystems/DrawableSystem.h"
+#include "Smasher/ComponentSystems/SpriteSystem.h"
 #include "Smasher/ComponentSystems/TransformSystem.h"
 #include "Manifest.h"
 
@@ -933,7 +933,7 @@ TEST(GraphicsTest, JobsSystemGraphicsDemo) {
 	layer.Activate();
 	entt::registry& registry = engine.GetRegistry();
 
-	Smasher::DrawableSystem::Initialize(registry);
+	Smasher::SpriteSystem::Initialize(registry);
 	Smasher::TransformSystem::Initialize(registry);
 
 	entt::entity entity = registry.create();
@@ -941,7 +941,7 @@ TEST(GraphicsTest, JobsSystemGraphicsDemo) {
 
 	jobManager.SetTickJobProducer([&]() {
 		Smasher::Job& transformLogicJob = jobManager.AddSyncJob(std::bind(Smasher::TransformSystem::Update, std::ref(registry)), {}).Get();
-		Smasher::Job& renderJob = jobManager.AddSyncJob(std::bind(Smasher::DrawableSystem::Render, std::ref(registry)), {}).Get();
+		Smasher::Job& renderJob = jobManager.AddSyncJob(std::bind(Smasher::SpriteSystem::Render, std::ref(registry)), {}).Get();
 	});
 
 	Smasher::Entity& ball = layer.AddEntity();
@@ -964,7 +964,7 @@ TEST(GraphicsTest, JobsSystemGraphicsDemo) {
 	engine.Run();
 	worker.join();
 
-	Smasher::DrawableSystem::Teardown(registry);
+	Smasher::SpriteSystem::Teardown(registry);
 	Smasher::TransformSystem::Teardown(registry);
 }
 

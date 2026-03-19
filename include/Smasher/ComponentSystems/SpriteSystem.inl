@@ -1,5 +1,5 @@
 namespace Smasher {
-	namespace DrawableSystem {
+	namespace SpriteSystem {
 		template <class ManifestData>
 		ErrorCode SetTexture(Component &component, entt::registry &registry, const TextureOptions& opts) {
 			ResourceManifestInfo info = ResourceManager::template GetManifestInfo<ManifestData>().Get();
