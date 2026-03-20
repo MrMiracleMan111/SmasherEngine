@@ -267,7 +267,7 @@ add_library(SmasherEngine SHARED
 "include/Smasher/ComponentSystems/CameraSystem.h"
 "src/Smasher/ComponentSystems/CameraSystem.cpp"
 "include/Smasher/ComponentSystems/EngineSystem.h"
- "include/Smasher/ECS.h" "include/Smasher/ComponentSystems/TextSystem.h" "src/Smasher/ComponentSystems/TextSystem.cpp" "src/Smasher/ComponentSystems/EngineSystem.cpp")
+ "include/Smasher/ECS.h" "include/Smasher/ComponentSystems/TextSystem.h" "src/Smasher/ComponentSystems/TextSystem.cpp" "src/Smasher/ComponentSystems/EngineSystem.cpp" "include/Smasher/ComponentSystems/StaticMeshSystem.h")
 
 # Try to include machine-specific config if it exists
 if(EXISTS "${CMAKE_SOURCE_DIR}/local.cmake")
