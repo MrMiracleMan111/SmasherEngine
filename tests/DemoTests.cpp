@@ -137,8 +137,8 @@ namespace CursorInteractSystem {
 		Smasher::Engine &engine = registry.ctx().get<Smasher::EngineSystem::Context>().engineRef.get();
 
 		sf::Window& window = engine.GetWindow();
-		sf::Rect<int> windowRect(0, 0, (int)window.getSize().x, (int)window.getSize().y);
-		if (windowRect.contains(event.Position.x, event.Position.y)) {
+		sf::Rect<int> windowRect({ 0, 0 }, { (int)window.getSize().x, (int)window.getSize().y });
+		if (windowRect.contains({ event.Position.x, event.Position.y })) {
 			entt::entity ball = SpawnBouncingBall(registry, glm::vec2(event.Position.x, event.Position.y));
 		}
 		return ERROR_NoError;
@@ -218,11 +218,16 @@ namespace GameLogicSystem {
 		if (registry.ctx().contains<Context>()) {
 			return ERROR_SystemAlreadyInitialized;
 		}
+		if (!registry.ctx().contains<Smasher::EngineSystem::Context>()) {
+			return ERROR_SystemNotInitialized;
+		}
 		Context &ctx = registry.ctx().emplace<Context>();
-
+		auto& engine = registry.ctx().get<Smasher::EngineSystem::Context>().engineRef.get();
 		ctx.frameTimeText = registry.create();
+
+		auto pFont = engine.GetResourceManager().GetOrLoadResource<Smasher::Manifest::Fonts::arial, Smasher::FontResource>();
 		auto &transform = Smasher::TransformSystem::AddComponent(registry, ctx.frameTimeText).Get().get();
-		auto &text = Smasher::TextSystem::AddComponent(registry, ctx.frameTimeText).Get().get();
+		auto &text = Smasher::TextSystem::AddComponent(registry, ctx.frameTimeText, pFont).Get().get();
 
 
 		Smasher::TransformSystem::SetScale(transform, 1.f, 1.f, 1.f);
@@ -269,7 +274,7 @@ namespace GameLogicSystem {
 // showing off how to use the Smasher ECS implementation
 int main() {
 	std::cout << "Resource Directory: " << Smasher::Manifest::Metadata::RESOURCES_DIRECTORY  << std::endl;
-	Smasher::Engine engine{ 640, 420 };
+	Smasher::Engine engine{ 640u, 420u };
 	engine.GetResourceManager().SetResourceDirectory(Smasher::Manifest::Metadata::RESOURCES_DIRECTORY);
 	Smasher::ResourceManager& resourceManager = engine.GetResourceManager();
 	
@@ -293,7 +298,7 @@ int main() {
 
 		// Add entities
 		glm::uvec2 bounds{ engine.GetWindow().getSize().x, engine.GetWindow().getSize().y };
-		for (size_t i = 0; i < 10000; ++i) {
+		for (size_t i = 0; i < 10; ++i) {
 			glm::vec2 position{ rand() % bounds.x, rand() % bounds.y };
 			entt::entity entity = registry.create();
 		entt::entity ball = CursorInteractSystem::SpawnBouncingBall(engine.GetRegistry(), position);

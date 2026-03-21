@@ -17,7 +17,7 @@ namespace Smasher {
 
 		SMASHER_API ErrorCode Initialiaze(entt::registry& registry);
 
-		SMASHER_API Expected<std::reference_wrapper<Component>> AddComponent(entt::registry& registry, entt::entity entity);
+		SMASHER_API Expected<std::reference_wrapper<Component>> AddComponent(entt::registry& registry, entt::entity entity, std::shared_ptr<FontResource> font);
 
 		SMASHER_API ErrorCode UseDefaults(Component& component);
 

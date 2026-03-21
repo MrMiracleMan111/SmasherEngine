@@ -57,7 +57,7 @@ namespace Smasher {
 	UIPanelComponent::UIPanelComponent() : m_DebugSprite(sf::Vector2f{ 1.f, 1.f }), IComponent(), Transform2DWrapper(*this, m_Transformable)
 	{
 		m_DebugSprite.setFillColor(sf::Color::White);
-		m_DebugSprite.setOrigin(0.5f, 0.5f);
+		m_DebugSprite.setOrigin({ 0.5f, 0.5f });
 	}
 
 	void UIPanelComponent::StaticRenderComponent(UIPanelComponent &self, sf::RenderWindow &window)
@@ -76,7 +76,7 @@ namespace Smasher {
 		pos = m_Transformable.getPosition() - pos;
 		Smasher::Radians radians = std::atan2(pos.y, pos.x);
 		float dist = std::sqrt(pos.x * pos.x + pos.y * pos.y);
-		Smasher::Radians inversePanelRadians = Smasher::ToRadians(-m_Transformable.getRotation());
+		Smasher::Radians inversePanelRadians = (Smasher::Radians)-m_Transformable.getRotation().asRadians();
 		Smasher::Radians finalRadians = radians + inversePanelRadians;
 		pos.x = std::cos(finalRadians) * dist;
 		pos.y = std::sin(finalRadians) * dist;
@@ -91,7 +91,7 @@ namespace Smasher {
 		if (m_TexturePtr) {
 			sf::Vector2u size = m_TexturePtr->GetTexture().getSize();
 			SetClipRotation(Degrees{ 0 });
-;			SetClipRect(sf::IntRect{ 0, 0, (int)size.x, (int)size.y });
+;			SetClipRect(sf::IntRect{ { 0, 0 }, { (int)size.x, (int)size.y } });
 		}
 		return *this;
 	}
@@ -120,16 +120,13 @@ namespace Smasher {
 		sf::Texture& pTexture = m_TexturePtr->GetTexture();
 		sf::Vector2f dimensions = sf::Vector2f{ (float)pTexture.getSize().x, (float)pTexture.getSize().y };
 
-		float left = (float)m_ClipRect.left;
-		float top = (float)m_ClipRect.top;
-
-		float scaleX = (float)m_ClipRect.width / dimensions.x;
-		float scaleY = (float)m_ClipRect.height / dimensions.y;
+		sf::Vector2f offset = sf::Vector2f{ m_ClipRect.position };
+		sf::Vector2f scale = sf::Vector2f{ m_ClipRect.size }.componentWiseDiv(dimensions);
 
 		m_ClipTransform
-			.scale(scaleX, scaleY)
-			.rotate((float)-m_ClipRotation)
-			.translate(left / (dimensions.x * scaleX), top / (dimensions.y * scaleY)) // Center the clip at 0,0
+			.scale(scale)
+			.rotate(sf::degrees(-m_ClipRotation))
+			.translate(sf::Vector2f{ m_ClipRect.position }.componentWiseDiv(dimensions.componentWiseMul(scale))) // Center the clip at 0,0
 			;
 		
 		m_ClipChanged = false;

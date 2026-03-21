@@ -32,8 +32,8 @@ namespace Smasher {
 		friend class EventManager;
 	public:
 		Engine();
-		Engine(int width, int height);
-		Engine(int width, int height, const sf::ContextSettings &settings);
+		Engine(unsigned int width, unsigned int height);
+		Engine(unsigned int width, unsigned int height, const sf::ContextSettings &settings);
 		~Engine();
 
 		// non-copyable, moveable

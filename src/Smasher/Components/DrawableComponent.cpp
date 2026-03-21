@@ -83,16 +83,13 @@ namespace Smasher {
         sf::Texture& pTexture = m_TextureResourcePtr->GetTexture();
         sf::Vector2f dimensions = sf::Vector2f{ (float)pTexture.getSize().x, (float)pTexture.getSize().y };
         
-        float left = (float)m_ClipRect.left;
-        float top = (float)m_ClipRect.top;
-
-        float scaleX = (float)m_ClipRect.width / dimensions.x;
-        float scaleY = (float)m_ClipRect.height / dimensions.y;
+        sf::Vector2f offset = sf::Vector2f{ m_ClipRect.position };
+        sf::Vector2f scale = sf::Vector2f{ m_ClipRect.size }.componentWiseDiv(dimensions);
 
         m_ClipTransform
-            .scale(scaleX, scaleY)
-            .rotate((float)-m_ClipRotation)
-            .translate(left / (dimensions.x * scaleX), top / (dimensions.y * scaleY)) // Center the clip at 0,0
+            .scale(scale)
+            .rotate(sf::degrees(-m_ClipRotation))
+            .translate(sf::Vector2f{ m_ClipRect.position }.componentWiseDiv(dimensions.componentWiseMul(scale))) // Center the clip at 0,0
             ;
 
         m_ClipChanged = false;

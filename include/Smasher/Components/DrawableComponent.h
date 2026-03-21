@@ -90,7 +90,7 @@ namespace Smasher {
 		std::shared_ptr<TextureResource> m_TextureResourcePtr; // Solely for preventing destruction of resource object
 		std::shared_ptr<ShaderResource> m_ShaderResourcePtr; // Solely for preventing destruction of resource object
 	private:
-		sf::IntRect m_ClipRect{ 0, 0, 0, 0 };
+		sf::IntRect m_ClipRect{ { 0, 0 }, { 0, 0} };
 		sf::Color m_Color = sf::Color::White;
 		sf::Transform m_ClipTransform;
 		sf::Transformable m_Transformable;

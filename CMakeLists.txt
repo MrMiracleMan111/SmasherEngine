@@ -98,8 +98,8 @@ if(NOT TARGET EnTT)
     message(FATAL_ERROR "Failed to fetch/build EnTT")
 endif()
 
-# SFML 2.6.2 69ea0cd863aed1d4092b970b676924a716ff718b
-set(SFML_VERSION "2.6.1")
+# SFML 3.0.2 0fa201c969e48ecc253581c5841ce73f44d42f49
+set(SFML_VERSION "3.0.2")
 set(TMP_BUILD_SHARED_LIBS BUILD_SHARED_LIBS)
 FetchContent_Declare(
     sfml
@@ -364,11 +364,11 @@ target_include_directories(SmasherEngine PUBLIC ${OPENGL_INCLUDE_DIR} ${GLEW_INC
 
 target_link_libraries(SmasherEngine PRIVATE GTest::gtest_main)
 target_link_libraries(SmasherEngine PUBLIC
-sfml-audio
-sfml-window
-sfml-graphics
-sfml-network
-sfml-system
+SFML::Audio
+SFML::Window
+SFML::Graphics
+SFML::Network
+SFML::System
 ${GLEW_TARGET}
 OpenGL::GL
 OpenGL::GLU

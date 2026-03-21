@@ -199,7 +199,7 @@ namespace Smasher {
 		UIPanelSettings m_PanelSettings = UIPanelSettings::NONE;
 		sf::RectangleShape m_DebugSprite;
 		sf::Transformable m_Transformable;
-		sf::IntRect m_ClipRect{ 0, 0, 0, 0 };
+		sf::IntRect m_ClipRect{ { 0, 0 }, { 0, 0 } };
 		sf::Transform m_ClipTransform;
 		Degrees m_ClipRotation = 0.f;
 		std::function<void(Events::MouseMoveEvent&)> m_MouseMoveCallback;

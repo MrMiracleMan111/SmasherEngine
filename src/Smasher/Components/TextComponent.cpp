@@ -2,6 +2,22 @@
 #include "Smasher/Entity.h"
 
 namespace Smasher {
+	TextComponent::TextComponent() :
+		m_Text((const sf::Font&)(sf::Font{})),
+		IComponent(),
+		Transform2DWrapper(*this, m_Text) {
+		m_Text.setCharacterSize(EngineConfig::DEFAULT_FONT_SIZE);
+		m_Text.setFillColor(EngineConfig::DEFAULT_FONT_COLOR);
+	}
+	
+	TextComponent::TextComponent(std::shared_ptr<FontResource> font) :
+		m_Text(font->GetFont()),
+		IComponent(),
+		Transform2DWrapper(*this, m_Text) {
+		m_Text.setCharacterSize(EngineConfig::DEFAULT_FONT_SIZE);
+		m_Text.setFillColor(EngineConfig::DEFAULT_FONT_COLOR);
+	}
+
 	void TextComponent::StaticRenderComponent(TextComponent &self, sf::RenderWindow &window) {
 		if (self.m_FontLoaded) {
 			window.draw(self.m_Text);

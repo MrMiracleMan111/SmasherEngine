@@ -67,7 +67,7 @@ namespace Smasher {
 
 		for (auto &itr : m_Components) {
 			if (itr.GetTextureRef()) {
-				sf::Texture::bind(&itr.GetTexture()->GetTexture(), sf::Texture::Pixels);
+				sf::Texture::bind(&itr.GetTexture()->GetTexture());
 			}
 			itr.DrawPanel();
 		}

@@ -9,12 +9,12 @@ namespace Smasher {
 
 	Transform2DComponent& Transform2DComponent::SetPosition(float x, float y)
 	{
-		setPosition(x, y);
+		setPosition({ x, y });
 		return* this;
 	}
 
 	Transform2DComponent& Transform2DComponent::SetRotation(Degrees angle) {
-		setRotation((Degrees)angle);
+		setRotation(sf::degrees(angle));
 		return *this;
 	}
 
@@ -25,13 +25,13 @@ namespace Smasher {
 
 	Transform2DComponent& Transform2DComponent::SetScale(float x, float y)
 	{
-		setScale(x, y);
+		setScale({ x, y });
 		return *this;
 	}
 
 	Transform2DComponent& Transform2DComponent::SetOrigin(float x, float y)
 	{
-		setOrigin(x, y);
+		setOrigin({ x, y });
 		return *this;
 	}
 
@@ -46,12 +46,12 @@ namespace Smasher {
 	}
 
 	Transform2DComponent& Transform2DComponent::Move(float x, float y) {
-		move(x, y);
+		move({ x, y });
 		return *this;
 	}
 
 	Transform2DComponent& Transform2DComponent::Rotate(Degrees angle) {
-		rotate((float)angle);
+		rotate(sf::degrees(angle));
 		return *this;
 	}
 
@@ -61,7 +61,7 @@ namespace Smasher {
 	}
 
 	Transform2DComponent& Transform2DComponent::Scale(float x, float y) {
-		scale(x, y);
+		scale({ x, y });
 		return *this;
 	}
 }

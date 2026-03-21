@@ -2,6 +2,7 @@
 #include "Smasher/ComponentSystems/TextSystem.h"
 #include "Smasher/ComponentSystems/TransformSystem.h"
 #include "Smasher/ComponentSystems/EngineSystem.h"
+#include "Smasher/Resources.h"
 #include "Smasher/Engine.h"
 #include "Smasher/ErrorCodes.h"
 
@@ -18,7 +19,7 @@ namespace Smasher {
 			for (auto [entity, textTransform, textImage] : view.each()) {
 				if (textImage.fontLoaded) {
 					if (TransformSystem::HasChanged(textTransform)) {
-						textImage.text.setPosition(textTransform._position.x, textTransform._position.y);
+						textImage.text.setPosition({ textTransform._position.x, textTransform._position.y });
 					}
 					window.draw(textImage.text);
 				}
@@ -31,9 +32,9 @@ namespace Smasher {
 			return ERROR_NoError;
 		}
 
-		Expected<std::reference_wrapper<Component>> AddComponent(entt::registry& registry, entt::entity entity) {
+		Expected<std::reference_wrapper<Component>> AddComponent(entt::registry& registry, entt::entity entity, std::shared_ptr<FontResource> font) {
 			assert(registry.all_of<TransformSystem::Component>(entity) && "TextSystem::Component requires TransformSystem::Component");
-			Component& component = registry.emplace<Component>(entity);	
+			Component& component = registry.emplace<Component>(entity, font, font->GetFont(), false);
 			UseDefaults(component);
 			return std::ref(component);
 		}

@@ -32,12 +32,13 @@ namespace Smasher {
 		m_EventManager(*this),
 		m_WindowPtr(
 			std::make_unique<sf::RenderWindow>(
-				sf::VideoMode(EngineConfig::WINDOW_WIDTH, EngineConfig::WINDOW_HEIGHT),
-				EngineConfig::TITLE, sf::Style::Default,
+				sf::VideoMode({ EngineConfig::WINDOW_WIDTH,EngineConfig::WINDOW_HEIGHT }),
+				sf::String{ EngineConfig::TITLE },
+				sf::State::Windowed,
 				EngineConfig::DEFAULT_SETTINGS
 			)
 		),
-		m_WindowView(sf::FloatRect{ 0.f, 0.f, (float)m_WindowPtr->getSize().x, (float)m_WindowPtr->getSize().y })
+		m_WindowView(sf::FloatRect{ { 0.f, 0.f }, { (float)m_WindowPtr->getSize().x, (float)m_WindowPtr->getSize().y } })
 	{
 		Init();
 	}
@@ -47,33 +48,34 @@ namespace Smasher {
 		Init();
 	}
 
-	Engine::Engine(int width, int height, const sf::ContextSettings &settings) :
+	Engine::Engine(unsigned int width, unsigned int height, const sf::ContextSettings &settings) :
 		m_Headless(false),
 		m_EventManager(*this),
 		m_WindowPtr(
 			std::make_unique<sf::RenderWindow>(
-				sf::VideoMode(EngineConfig::WINDOW_WIDTH, EngineConfig::WINDOW_HEIGHT),
-				EngineConfig::TITLE,
-				sf::Style::Default,
+				sf::VideoMode({ EngineConfig::WINDOW_WIDTH, EngineConfig::WINDOW_HEIGHT }),
+				sf::String{ EngineConfig::TITLE },
+				sf::State::Windowed,
 				settings
 			)
 		),
-		m_WindowView(sf::FloatRect{ 0.f, 0.f, (float)m_WindowPtr->getSize().x, (float)m_WindowPtr->getSize().y })
+		m_WindowView(sf::FloatRect{ { 0.f, 0.f }, { (float)m_WindowPtr->getSize().x, (float)m_WindowPtr->getSize().y } })
 	{
 		Init();
 	}
 
-	Engine::Engine(int width, int height) :
+	Engine::Engine(unsigned int width, unsigned int height) :
 		m_Headless(false),
 		m_EventManager(*this),
 		m_WindowPtr(
 			std::make_unique<sf::RenderWindow>(
-				sf::VideoMode(width, height),
-				EngineConfig::TITLE,
-				sf::Style::Default, EngineConfig::DEFAULT_SETTINGS
+				sf::VideoMode({ width, height }),
+				sf::String{ EngineConfig::TITLE },
+				sf::State::Windowed,
+				EngineConfig::DEFAULT_SETTINGS
 			)
 		),
-		m_WindowView(sf::FloatRect{ 0.f, 0.f, (float)m_WindowPtr->getSize().x, (float)m_WindowPtr->getSize().y })
+		m_WindowView(sf::FloatRect{ { 0.f, 0.f }, { (float)m_WindowPtr->getSize().x, (float)m_WindowPtr->getSize().y } })
 	{
 		Init();
 	}
@@ -176,10 +178,9 @@ namespace Smasher {
 				// Time passed since last tick
 				m_TickDelta = std::chrono::duration_cast<std::chrono::microseconds>(tmp - lastTickTime);
 				lastTickTime = tmp;
-				sf::Event event;
 				if (!m_Headless) {
-					while (m_WindowPtr->pollEvent(event)) {
-						m_EventFeeder.ForwardSFMLEvent(event);
+					while (const std::optional event = m_WindowPtr->pollEvent()) {
+						m_EventFeeder.ForwardSFMLEvent(event.value());
 					}
 				}
 

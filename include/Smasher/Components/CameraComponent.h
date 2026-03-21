@@ -29,7 +29,7 @@ namespace Smasher {
 
 		const sf::View& GetView() const { return m_View; };
 		sf::Vector2f GetPosition() const { return m_View.getCenter(); };
-		Degrees GetRotation() const { return Degrees{ m_View.getRotation() }; };
+		Degrees GetRotation() const { return Degrees{ m_View.getRotation().asDegrees() }; };
 		sf::Vector2f GetSize() const { return m_View.getSize(); };
 		sf::RenderTarget& GetTarget() const { return *m_Target; }
 	private:

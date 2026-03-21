@@ -16,7 +16,7 @@ namespace Smasher {
 	}
 
 	void CameraComponent::OnWindowResize(Events::WindowResizeEvent &event) {
-		m_View.setSize((float)event.WindowSize.x, (float)event.WindowSize.y);
+		m_View.setSize({ (float)event.WindowSize.x, (float)event.WindowSize.y });
 	}
 
 	CameraComponent& CameraComponent::SetPosition(sf::Vector2f position) {
@@ -30,12 +30,12 @@ namespace Smasher {
 	}
 
 	CameraComponent& CameraComponent::SetRotation(Degrees rotation) {
-		m_View.setRotation(rotation);
+		m_View.setRotation(sf::degrees(rotation));
 		return *this;
 	}
 
 	CameraComponent& CameraComponent::Rotate(Degrees rotation) {
-		m_View.rotate(rotation);
+		m_View.rotate(sf::degrees(rotation));
 		return *this;
 	}
 

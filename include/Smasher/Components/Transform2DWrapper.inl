@@ -11,14 +11,14 @@ namespace Smasher {
 	template <class T>
 	T& Transform2DWrapper<T>::SetPosition(float x, float y) {
 		m_TransformChanged = true;
-		m_Transformable.setPosition(x, y);
+		m_Transformable.setPosition({ x, y });
 		return m_Caller;
 	}
 
 	template <class T>
 	T& Transform2DWrapper<T>::SetRotation(Degrees angle) {
 		m_TransformChanged = true;
-		m_Transformable.setRotation((Degrees)angle);
+		m_Transformable.setRotation(sf::degrees(angle));
 		return m_Caller;
 	}
 
@@ -32,14 +32,14 @@ namespace Smasher {
 	template <class T>
 	T& Transform2DWrapper<T>::SetScale(float x, float y) {
 		m_TransformChanged = true;
-		m_Transformable.setScale(x, y);
+		m_Transformable.setScale({ x, y });
 		return m_Caller;
 	}
 
 	template <class T>
 	T& Transform2DWrapper<T>::SetOrigin(float x, float y) {
 		m_TransformChanged = true;
-		m_Transformable.setOrigin(x, y);
+		m_Transformable.setOrigin({ x, y });
 		return m_Caller;
 	}
 
@@ -60,14 +60,14 @@ namespace Smasher {
 	template <class T>
 	T& Transform2DWrapper<T>::Move(float x, float y) {
 		m_TransformChanged = true;
-		m_Transformable.move(x, y);
+		m_Transformable.move({ x, y });
 		return m_Caller;
 	}
 
 	template <class T>
 	T& Transform2DWrapper<T>::Rotate(Degrees angle) {
 		m_TransformChanged = true;
-		m_Transformable.rotate((float)angle);
+		m_Transformable.rotate(sf::degrees(angle));
 		return m_Caller;
 	}
 
@@ -81,7 +81,7 @@ namespace Smasher {
 	template <class T>
 	T& Transform2DWrapper<T>::Scale(float x, float y) {
 		m_TransformChanged = true;
-		m_Transformable.scale(x, y);
+		m_Transformable.scale({ x, y });
 		return m_Caller;
 	}
 }

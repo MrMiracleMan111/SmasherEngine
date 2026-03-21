@@ -77,7 +77,7 @@ namespace Smasher {
 			const ResourcePath *const relativePaths, const std::size_t numPaths,
 			const ResourcePath &resourcesDirectory) :
 			Resource(id, relativePaths, numPaths, resourcesDirectory) {
-			if (!m_Font.loadFromFile(m_Paths[0].string())) {
+			if (!m_Font.openFromFile(m_Paths[0].string())) {
 				throw Exceptions::ResourceFailedToLoad(std::format("Failed to load file {}", m_Paths[0].string()));
 			}
 			m_Loaded = true;
@@ -114,16 +114,16 @@ namespace Smasher {
 			const ResourcePath &resourcesDirectory) :
 			Resource(id, relativePaths, numPaths, resourcesDirectory),
 			m_ShaderType{sf::Shader::Type::Fragment}  {
-			
+			bool ret = false;
 			switch (numPaths) {
 			case 1:
-				m_Shader.loadFromFile(m_Paths[0].string(), sf::Shader::Type::Fragment);
+				ret = m_Shader.loadFromFile(m_Paths[0].string(), sf::Shader::Type::Fragment);
 				break;
 			case 2:
-				m_Shader.loadFromFile(m_Paths[0].string(), m_Paths[1].string());
+				ret = m_Shader.loadFromFile(m_Paths[0].string(), m_Paths[1].string());
 				break;
 			case 3:
-				m_Shader.loadFromFile(
+				ret = m_Shader.loadFromFile(
 					m_Paths[0].string(),
 					m_Paths[1].string(),
 					m_Paths[2].string());
@@ -132,13 +132,12 @@ namespace Smasher {
 				throw Smasher::Exceptions::ResourceInvalidNumPaths("numPaths is invalid");
 				assert(false); // Never should be reached
 			}
-			m_Loaded = true;
+			m_Loaded = ret;
 		}
 
 		ShaderResource(ResourceId id, const std::string &vert, const std::string &frag) :
 			Resource(id), m_ShaderType(sf::Shader::Type::Geometry) {
-			m_Shader.loadFromMemory(vert, frag);
-			m_Loaded = true;
+			m_Loaded = m_Shader.loadFromMemory(vert, frag);
 		}
 
 		sf::Shader& GetShader() { return m_Shader; }

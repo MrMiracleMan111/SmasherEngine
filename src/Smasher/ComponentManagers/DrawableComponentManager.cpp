@@ -116,7 +116,7 @@ namespace Smasher {
 			m_ShaderResourcePtr->GetShader().setUniform("hasTexture", hasTexture);
 
 			if (hasTexture) {
-				sf::Texture::bind(pTexture, sf::Texture::Pixels);
+				sf::Texture::bind(pTexture);
 			}
 
 			for (auto &batch : batchList) {
@@ -139,7 +139,7 @@ namespace Smasher {
 			m_ShaderResourcePtr->GetShader().setUniform("hasTexture", hasTexture);
 
 			if (hasTexture) {
-				sf::Texture::bind(batchList.back().pTexture, sf::Texture::Pixels);
+				sf::Texture::bind(batchList.back().pTexture);
 			}
 
 			for (auto &batch : batchList) {

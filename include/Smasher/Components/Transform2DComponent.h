@@ -26,7 +26,7 @@ namespace Smasher {
 
 		sf::Vector2f GetPosition() const { return getPosition(); }
 
-		Degrees GetRotation() const { return (Degrees)(getRotation()); }
+		Degrees GetRotation() const { return (Degrees)(getRotation()).asDegrees(); }
 
 		sf::Vector2f GetScale() const { return getScale(); }
 
