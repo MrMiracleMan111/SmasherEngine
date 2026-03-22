@@ -5,6 +5,10 @@
 - [SFML 2.6.x](https://github.com/SFML/SFML/tree/2.6.x)
 - [GLEW](https://github.com/nigels-com/glew)
 - OpenGL
+- [Box2D](https://github.com/erincatto/box2d)
+- [SDL3](https://github.com/libsdl-org/SDL)
+- [SDL_shadercross](https://github.com/libsdl-org/SDL_shadercross)
+- [spirv-cross](https://github.com/khronosgroup/spirv-cross)
 
 For **Linux** users, you likely will **NOT** be able to just use:
 ```bash
