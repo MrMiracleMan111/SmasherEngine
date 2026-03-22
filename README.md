@@ -9,6 +9,7 @@
 - [SDL3](https://github.com/libsdl-org/SDL)
 - [SDL_shadercross](https://github.com/libsdl-org/SDL_shadercross)
 - [spirv-cross](https://github.com/khronosgroup/spirv-cross)
+- [DirectXShaderCompiler](https://github.com/microsoft/DirectXShaderCompiler)
 
 For **Linux** users, you likely will **NOT** be able to just use:
 ```bash
