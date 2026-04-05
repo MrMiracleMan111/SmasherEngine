@@ -15,13 +15,17 @@ else()
     set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
-set (GENERATE_DOCS TRUE CACHE BOOL "Generate Doxygen Documentation Files")
-set (SMASHER_EXAMPLES TRUE CACHE BOOL "Should examples be compiled")
-set (SMASHER_STRESS_TEST TRUE CACHE BOOL "Should stress test be compiled")
-set (SMASHER_TESTS TRUE CACHE BOOL "Should unit tests be compiled")
-set (SMASHER_BENCHMARK FALSE CACHE BOOL "Should benchmarking info be logged")
-set (SMASHER_CATCH_EXCEPTIONS TRUE CACHE BOOL "Should Smasher Engine catch all Exceptions. This can make debugging difficult if your debugger struggles to track propagated exceptions.'")
+set(GENERATE_DOCS TRUE CACHE BOOL "Generate Doxygen Documentation Files")
+set(SMASHER_EXAMPLES TRUE CACHE BOOL "Should examples be compiled")
+set(SMASHER_STRESS_TEST TRUE CACHE BOOL "Should stress test be compiled")
+set(SMASHER_TESTS TRUE CACHE BOOL "Should unit tests be compiled")
+set(SMASHER_BENCHMARK FALSE CACHE BOOL "Should benchmarking info be logged")
+set(SMASHER_CATCH_EXCEPTIONS TRUE CACHE BOOL "Should Smasher Engine catch all Exceptions. This can make debugging difficult if your debugger struggles to track propagated exceptions.'")
 set(MANIFEST_GENERATOR "${CMAKE_SOURCE_DIR}/scripts/ManifestHeaderGenerator.py")
+
+message(STATUS "SPIRV CMAKE PATH ${spirv_cross_c_shared_DIR}")
+list(APPEND CMAKE_MODULE_PATH "${spirv_cross_c_shared_DIR}")
+
 if(NOT DEFINED SMASHER_ENGINE_OUTPUT_DIR)
     message(STATUS "Using Default Output Directoy ${CMAKE_BINARY_DIR} for Smasher")
     set(SMASHER_ENGINE_OUTPUT_DIR ${CMAKE_BINARY_DIR})
@@ -58,6 +62,50 @@ if(SMASHER_TESTS)
     include(GoogleTest)
 endif()
 
+# SDL3 3.4.2
+find_package(SDL3 3.4 CONFIG OPTIONAL COMPONENTS SDL3-static)
+if(SDL3_FOUND)
+    message(STATUS "Found local SDL3 v3.4 installation")
+else()
+    message(STATUS "Could not find SDL3 locally, fetching from git...")
+    set(TMP_BUILD_SHARED_LIBS BUILD_SHARED_LIBS)
+    set(BUILD_SHARED_LIBS OFF)
+    set(SDL_SHARED OFF)
+    set(SDL_STATIC ON)
+    set(SDL_VERSION "release-3.4.2")
+    FetchContent_Declare(
+        SDL3
+        GIT_REPOSITORY https://github.com/libsdl-org/SDL
+        GIT_TAG "${SDL_VERSION}" 
+    )
+    FetchContent_MakeAvailable(SDL3)
+    set(BUILD_SHARED_LIBS TMP_BUILD_SHARED_LIBS)
+
+    message(STATUS "Fetched SDL3 Successfully")
+endif()
+
+# SDL3_shadercross (for runtime shader compilation)
+set(SDLSHADERCROSS_SHARED OFF)
+set(SDLSHADERCROSS_SPRIVCROSS_SHARED OFF)
+find_package(SDL3_shadercross OPTIONAL)
+if(SDL3_shadercross_FOUND)
+    message(STATUS "Found local SDL3_shadercross installation")
+else()
+    message(STATUS "Could not find SDL3_shadercross locally, fetching from git...")
+    set(TMP_BUILD_SHARED_LIBS BUILD_SHARED_LIBS)
+    set(BUILD_SHARED_LIBS OFF)
+    set(SDL3_shadercross_VERSION "3a314481ede01f5d966f0e834019942e34c02b82")
+    FetchContent_Declare(
+        SDL3_shadercross
+        GIT_REPOSITORY https://github.com/libsdl-org/SDL
+        GIT_TAG "${SDL3_shadercross_VERSION}" 
+    )
+    FetchContent_MakeAvailable(SDL3_shadercross)
+    set(BUILD_SHARED_LIBS TMP_BUILD_SHARED_LIBS)
+
+    message(STATUS "Fetched SDL_shadercross Successfully")
+endif()
+
 # Box2D v3.1.1
 FetchContent_Declare(
     box2d
@@ -85,6 +133,7 @@ if(NOT TARGET box2d)
     message(FATAL_ERROR "Failed to fetch/build Box2D")
 endif()
 
+# Box2D v3.16.0
 set(ENTT_VERSION "v3.16.0")
 FetchContent_Declare(
     EnTT
@@ -150,6 +199,31 @@ endif()
 message(STATUS "Fetched GLM Successfully")
 set(BUILD_STATIC_LIBS TMP_BUILD_STATIC_LIBS)
 set(BUILD_SHARED_LIBS TMP_BUILD_SHARED_LIBS)
+
+# TinyOBJLoader
+set(TMP_BUILD_STATIC_LIBS BUILD_STATIC_LIBS)
+set(TMP_BUILD_SHARED_LIBS BUILD_SHARED_LIBS)
+# set(TINYOBJLOADER_COMPILATION_SHARED OFF)
+set(TMP_CMAKE_POLICY_VERSION_MINIMUM ${CMAKE_POLICY_VERSION_MINIMUM})
+set(BUILD_SHARED_LIBS OFF)
+set(BUILD_STATIC_LIBS ON)
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+FetchContent_Declare(
+	tinyobjloader 
+	GIT_REPOSITORY	https://github.com/tinyobjloader/tinyobjloader.git
+	GIT_TAG 	966edceaf8cdca7996c4e9a1c5ced2938de63366 # v2.0.0
+)
+
+FetchContent_MakeAvailable(tinyobjloader)
+# Verify TinyOBJLoader target exists
+if(NOT TARGET tinyobjloader)
+    message(FATAL_ERROR "Failed to fetch/build tinyobjloader")
+endif()
+message(STATUS "Fetched tinyobjloader Successfully")
+set(BUILD_STATIC_LIBS TMP_BUILD_STATIC_LIBS)
+set(BUILD_SHARED_LIBS TMP_BUILD_SHARED_LIBS)
+set(CMAKE_POLICY_VERSION_MINIMUM ${TMP_CMAKE_POLICY_VERSION_MINIMUM})
+
 
 
 # GoogleTest requires at least C++17
@@ -232,12 +306,12 @@ add_library(SmasherEngine SHARED
 "src/Smasher/Components/CameraComponent.cpp"
 "include/Smasher/ComponentManagers/GenericComponentManager.inl"
 "include/Smasher/ISerializeable.h"
-"include/Smasher/Components/UIPanelComponent.h"
-"src/Smasher/Components/UIPanelComponent.cpp"
+#"include/Smasher/Components/UIPanelComponent.h"
+#"src/Smasher/Components/UIPanelComponent.cpp"
 "src/Smasher/IComponent.cpp"
 "include/Smasher/LayerTransition.h"
-"include/Smasher/ComponentManagers/UIPanelComponentManager.h"
-"src/Smasher/ComponentManagers/UIPanelComponentManager.cpp"
+#"include/Smasher/ComponentManagers/UIPanelComponentManager.h"
+#"src/Smasher/ComponentManagers/UIPanelComponentManager.cpp"
 "include/Smasher/Interpolation.h"
 "src/Smasher/Interpolation.cpp"
 "include/Smasher/Drawable.h"
@@ -258,16 +332,19 @@ add_library(SmasherEngine SHARED
 "src/Smasher/JobManager/JobRunner.cpp"
 "include/Smasher/JobManager/JobPool.h"
 "src/Smasher/JobManager/JobPool.cpp"
+
+ "include/Smasher/ECS.h"
 "include/Smasher/ComponentSystems/TransformSystem.h"
 "src/Smasher/ComponentSystems/TransformSystem.cpp"
 "include/Smasher/ComponentSystems/SpriteSystem.h"
 "src/Smasher/ComponentSystems/SpriteSystem.cpp"
-
-
 "include/Smasher/ComponentSystems/CameraSystem.h"
 "src/Smasher/ComponentSystems/CameraSystem.cpp"
 "include/Smasher/ComponentSystems/EngineSystem.h"
- "include/Smasher/ECS.h" "include/Smasher/ComponentSystems/TextSystem.h" "src/Smasher/ComponentSystems/TextSystem.cpp" "src/Smasher/ComponentSystems/EngineSystem.cpp" "include/Smasher/ComponentSystems/StaticMeshSystem.h")
+"include/Smasher/ComponentSystems/TextSystem.h"
+"src/Smasher/ComponentSystems/TextSystem.cpp"
+"src/Smasher/ComponentSystems/EngineSystem.cpp"
+"include/Smasher/ComponentSystems/StaticMeshSystem.h" "include/Smasher/ComponentSystems/SDLSystem.h" "src/Smasher/ComponentSystems/SDLSystem.cpp" "src/Smasher/Resources.cpp" "include/Smasher/ComponentSystems/SDLSpriteSystem.h" "src/Smasher/ComponentSystems/SDLSpriteSystem.cpp" "src/Smasher/ComponentSystems/StaticMeshSystem.cpp" "src/Smasher/ComponentSystems/PBRSystem.cpp")
 
 # Try to include machine-specific config if it exists
 if(EXISTS "${CMAKE_SOURCE_DIR}/local.cmake")
@@ -360,9 +437,15 @@ set_target_properties(SmasherEngine PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "$
 set_target_properties(SmasherEngine PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${SMASHER_ENGINE_OUTPUT_DIR}")
 
 generate_export_header(SmasherEngine EXPORT_FILE_NAME "${CMAKE_BINARY_DIR}/exports/Smasher_export.h")
-target_include_directories(SmasherEngine PUBLIC ${OPENGL_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/ComponentManagers" "${CMAKE_BINARY_DIR}/exports")
+target_include_directories(SmasherEngine PUBLIC ${OPENGL_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_SOURCE_DIR}/ComponentManagers" "${CMAKE_BINARY_DIR}/exports" ${tinyobjloader_SOURCE_DIR})
 
-target_link_libraries(SmasherEngine PRIVATE GTest::gtest_main)
+target_link_libraries(SmasherEngine PRIVATE
+GTest::gtest_main
+tinyobjloader
+)
+
+message(STATUS "Tinyobjloader source dir ${tinyobjloader_SOURCE_DIR}")
+
 target_link_libraries(SmasherEngine PUBLIC
 SFML::Audio
 SFML::Window
@@ -374,7 +457,9 @@ OpenGL::GL
 OpenGL::GLU
 box2d::box2d
 EnTT::EnTT
-glm::glm)
+glm::glm
+SDL3::SDL3-static
+SDL3_shadercross::SDL3_shadercross-static)
 
 if(WIN32)
     target_link_libraries(SmasherEngine PRIVATE winmm)
