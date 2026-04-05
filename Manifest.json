@@ -17,6 +17,21 @@
   },
   "Shaders": {
     "basic_ui_shader": [ "assets/shaders/basic_ui_shader/basic_ui_vertex_shader.glsl", "assets/shaders/basic_ui_shader/basic_ui_fragment_shader.glsl" ],
-    "basic_texture_shader": [ "assets/shaders/basic_texture_shader/basic_texture_vertex_shader.glsl", "assets/shaders/basic_texture_shader/basic_texture_fragment_shader.glsl" ]
+    "basic_texture_shader": [ "assets/shaders/basic_texture_shader/basic_texture_vertex_shader.glsl", "assets/shaders/basic_texture_shader/basic_texture_fragment_shader.glsl" ],
+    "test_frag_shader": "assets/shaders/test_shaders/testFrag.hlsl",
+    "test_vert_shader": "assets/shaders/test_shaders/testVert.hlsl",
+    "composition_frag_shader": "assets/shaders/test_shaders/composition.frag.hlsl",
+    "composition_vert_shader": "assets/shaders/test_shaders/composition.vert.hlsl",
+    "composition_copy_frag_shader": "assets/shaders/test_shaders/compositionCopy.frag.hlsl",
+    "composition_copy_vert_shader": "assets/shaders/test_shaders/compositionCopy.vert.hlsl",
+    "copy_depth_frag_shader": "assets/shaders/test_shaders/copyDepth.frag.hlsl",
+    "copy_depth_vert_shader": "assets/shaders/test_shaders/copyDepth.vert.hlsl",
+    "composition_comp_shader": "assets/shaders/test_shaders/composition.comp.hlsl",
+    "depth_pass_frag_shader": "assets/shaders/PBR_shaders/depth_pass.frag.hlsl",
+    "depth_pass_vert_shader": "assets/shaders/PBR_shaders/depth_pass.vert.hlsl"
+
+  },
+  "Models": {
+    "teapot": "assets/static_models/teapot/teapot.obj"
   }
 }
