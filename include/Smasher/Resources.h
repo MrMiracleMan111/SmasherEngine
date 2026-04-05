@@ -1,6 +1,9 @@
 #pragma once
-#include <ios>
+#include <iostream>
 #include <fstream>
+#include <SDL3/SDL.h>
+#include <SDL3_shadercross/SDL_shadercross.h>
+#include <tiny_obj_loader.h>
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Shader.hpp>
 #include <SFML/Audio.hpp>
@@ -147,6 +150,46 @@ namespace Smasher {
 		sf::Shader::Type m_ShaderType = sf::Shader::Type::Fragment;
 	};
 
+	SDL_GPUShader *LoadGPUShaderHLSL(SDL_GPUDevice *device, SDL_GPUShaderStage stage, const char* code);
+	SDL_GPUComputePipeline* LoadComputePipelineHLSL(SDL_GPUDevice* device, const char* code);
+
+	class SMASHER_API SDLGraphicShaderResource : public Resource {
+	public:
+		SMASHER_RESOURCE_TYPE(ResourceType::SHADER)
+			SDLGraphicShaderResource() = delete;
+
+		SDLGraphicShaderResource(ResourceId id,
+			const ResourcePath* const relativePaths, const std::size_t numPaths,
+			const ResourcePath& resourcesDirectory, std::shared_ptr<SDL_GPUDeviceWrapper> gpu, SDL_GPUShaderStage type);
+
+		SDL_GPUShader* GetShader();
+
+		~SDLGraphicShaderResource();
+
+	private:
+		SDL_GPUShader* m_ShaderPtr;
+		std::shared_ptr<SDL_GPUDeviceWrapper> m_GPUPtr;
+		const SDL_GPUShaderStage m_ShaderType;
+	};
+
+	class SMASHER_API SDLComputeShaderResource : public Resource {
+	public:
+		SMASHER_RESOURCE_TYPE(ResourceType::SHADER)
+			SDLComputeShaderResource() = delete;
+
+		SDLComputeShaderResource(ResourceId id,
+			const ResourcePath* const relativePaths, const std::size_t numPaths,
+			const ResourcePath& resourcesDirectory, std::shared_ptr<SDL_GPUDeviceWrapper> gpu);
+
+		SDL_GPUComputePipeline* GetShader();
+
+		~SDLComputeShaderResource();
+
+	private:
+		SDL_GPUComputePipeline* m_ShaderPtr;
+		std::shared_ptr<SDL_GPUDeviceWrapper> m_GPUPtr;
+	};
+
 	class SMASHER_API FileResource : public Resource {
 	public:
 		SMASHER_RESOURCE_TYPE(ResourceType::FILE)
@@ -167,5 +210,30 @@ namespace Smasher {
 
 	private:
 		std::fstream m_File;
+	};
+
+
+	class SMASHER_API StaticMeshResource : public Resource {
+	public:
+		SMASHER_RESOURCE_TYPE(ResourceType::STATIC_MESH)
+			StaticMeshResource() = delete;
+		StaticMeshResource(ResourceId id,
+			const ResourcePath* const relativePaths, const std::size_t numPaths,
+			const ResourcePath& resourcesDirectory, std::shared_ptr<SDL_GPUDeviceWrapper> gpu);
+		~StaticMeshResource();
+
+		SDL_GPUBuffer *GetVertexPositionBuffer() const;
+		SDL_GPUBuffer *GetVertexNormalBuffer() const;
+		SDL_GPUBuffer *GetIndexBuffer() const;
+		unsigned int GetNumIndices() const;
+		unsigned int GetNumVertices() const;
+
+	private:
+		SDL_GPUBuffer *m_VertexPositionBuffer;
+		SDL_GPUBuffer* m_VertexNormalBuffer;
+		SDL_GPUBuffer *m_IndexBuffer;
+		unsigned int m_NumIndices = 0;
+		unsigned int m_NumVertices = 0;
+		std::shared_ptr<SDL_GPUDeviceWrapper> m_GPUPtr;
 	};
 }

@@ -4,6 +4,7 @@
 #include <sstream>
 #include <numbers>
 #include <filesystem>
+#include <SDL3/SDL.h>
 #include <SFML/System.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include "Smasher/plf_colony.h"
@@ -132,6 +133,7 @@ namespace Smasher {
 		AUDIO,
 		SHADER,
 		FILE,
+		STATIC_MESH,
 		INVALID
 	};
 
@@ -287,4 +289,29 @@ namespace Smasher {
 
 	using Mat4 = Matrix<4, 4>;
 	using Mat3 = Matrix<3, 3>;
+
+	struct SMASHER_API WindowOptions {
+		const char* title = nullptr;
+		unsigned int width = 0u;
+		unsigned int height = 0u;
+	};
+
+	class SMASHER_API SDL_GPUDeviceWrapper {
+	public:
+		SDL_GPUDeviceWrapper() = delete;
+		~SDL_GPUDeviceWrapper();
+		SDL_GPUDeviceWrapper(SDL_GPUDevice* m_GPUPtr);
+		SDL_GPUDeviceWrapper(const SDL_GPUDeviceWrapper&) = delete;
+		SDL_GPUDeviceWrapper(SDL_GPUDeviceWrapper&& other);
+		SDL_GPUDeviceWrapper& operator= (const SDL_GPUDeviceWrapper&) = delete;
+		SDL_GPUDeviceWrapper& operator= (SDL_GPUDeviceWrapper&& other);
+		SDL_GPUDevice* Get() const;
+		operator SDL_GPUDevice* const ();
+
+		// Checks if Wrapper owns a GPU device
+		operator bool const ();
+
+	private:
+		SDL_GPUDevice* m_GPUPtr = nullptr;
+	};
 }
