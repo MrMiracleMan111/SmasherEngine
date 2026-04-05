@@ -7,15 +7,12 @@ if (NOT TARGET GTest::gtest_main)
 endif()
 
 # Basic Resource Load Example
-add_custom_target(generate_manifest_BasicTests DEPENDS ${STRESS_TEST_MANIFEST_HEADER})
-
-
 add_executable(
     BasicTests
     "BasicTests.cpp"
-)
+ )
 
-add_dependencies(BasicTests generate_manifest_BasicTests)
+add_dependencies(BasicTests generate_manifest_SMASHER)
 
 # Set output directory to parent folder where SFML DLLs are located
 set_target_properties(BasicTests PROPERTIES
@@ -55,8 +52,6 @@ target_link_libraries(
     GTest::gtest_main
 )
 
-add_custom_target(generate_manifest_DemoTests DEPENDS ${STRESS_TEST_MANIFEST_HEADER})
-
 add_executable(
     DemoTests
     "DemoTests.cpp"
@@ -73,12 +68,33 @@ set_target_properties(DemoTests PROPERTIES
 set_target_properties(DemoTests PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${SMASHER_ENGINE_OUTPUT_DIR}" TIMEOUT 6)
 set_target_properties(DemoTests PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${SMASHER_ENGINE_OUTPUT_DIR}" TIMEOUT 6)
 
-
 target_link_libraries(
     DemoTests
     SmasherEngine
 )
 
+# SDL Test
+add_executable(
+    SDLTest
+    "SDLTest.cpp"
+)
+
+add_dependencies(SDLTest generate_manifest_SMASHER)
+
+# Set output directory to parent folder where SFML DLLs are located
+set_target_properties(SDLTest PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${SMASHER_ENGINE_OUTPUT_DIR}"
+    TIMEOUT 6
+)
+
+set_target_properties(SDLTest PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${SMASHER_ENGINE_OUTPUT_DIR}" TIMEOUT 6)
+set_target_properties(SDLTest PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${SMASHER_ENGINE_OUTPUT_DIR}" TIMEOUT 6)
+
+
+target_link_libraries(
+    SDLTest
+    SmasherEngine
+)
 
 gtest_discover_tests(BasicTests)
 gtest_discover_tests(InternalComponentTests)

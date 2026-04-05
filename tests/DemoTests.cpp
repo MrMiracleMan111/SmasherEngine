@@ -343,6 +343,7 @@ int main() {
 
 	Smasher::SpriteSystem::Teardown(engine.GetRegistry());
 	GameLogicSystem::Teardown(engine.GetRegistry());
+	Smasher::TextSystem::Initialiaze(registry);
 	CursorInteractSystem::Teardown(engine.GetRegistry());
 	Smasher::TransformSystem::Teardown(engine.GetRegistry());
 }

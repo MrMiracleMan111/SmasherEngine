@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include <SDL3/SDL.h>
 #include "Smasher/Base.h"
 #include "Smasher/Events.h"
 #include "Smasher/EventManager.h"
@@ -7,13 +8,9 @@
 namespace Smasher {
 	class Engine;
 
-	class SMASHER_API EventFeeder {
-	public:
-		EventFeeder(EventManager &eventManager, Engine &engine);
-		void ForwardSFMLEvent(const sf::Event &event);
-	private:
-		EventManager &m_EventManager;
-		Engine &m_Engine;
-		std::array<bool, sf::Keyboard::KeyCount> m_KeyboardState; // State of keyboard (true means key is pressed)
+	namespace EventFeeder {
+		//EventFeeder(EventManager &eventManager, Engine &engine);
+		//void ForwardEvent(const sf::Event &event);
+		SMASHER_API void ForwardSDLEvent(Engine &engine, const SDL_Event &event);
 	};
 }

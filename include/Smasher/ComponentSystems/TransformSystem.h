@@ -22,9 +22,9 @@ namespace Smasher {
 		// members should not directly be accessed, use the Set/Get
 		// methods instead.
 		struct SMASHER_API Component {
-			glm::vec3 _position;
-			glm::quat _rotation;
-			glm::vec3 _scale;
+			glm::vec3 _position = glm::vec3{0.f, 0.f, 0.f};
+			glm::quat _rotation = glm::quat{ 0.f, 0.f, 0.f, 0.f };
+			glm::vec3 _scale = glm::vec3{ 1.f, 1.f, 1.f };
 			glm::mat4x4 _globalMatrix; // Cached, updated upon change
 			bool _dirty; // Indicates that _globalMatrix needs to be updated
 			bool _hasChanged; // Has the transform changed this frame

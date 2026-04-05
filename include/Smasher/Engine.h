@@ -5,6 +5,7 @@
 #include <atomic>
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
+#include <SDL3/SDL.h>
 #include "box2d/box2d.h"
 #include "entt/entity/registry.hpp"
 #include "Smasher/Base.h"

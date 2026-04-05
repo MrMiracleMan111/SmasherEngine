@@ -1,6 +1,9 @@
-#include "Smasher/Base.h"
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_stdinc.h>
 #include <iostream>
 #include <thread>
+#include "Smasher/Base.h"
+
 namespace Smasher {
 
 #ifdef BENCHMARK
@@ -54,6 +57,50 @@ namespace Smasher {
 		while (std::chrono::high_resolution_clock::now() < end) {
 			std::this_thread::yield();
 		}
+	}
+
+	SDL_GPUDeviceWrapper::~SDL_GPUDeviceWrapper() {
+		if (m_GPUPtr != nullptr) {
+			SDL_free(m_GPUPtr);
+		}
+	}
+
+	SDL_GPUDeviceWrapper::SDL_GPUDeviceWrapper(SDL_GPUDevice* m_GPUPtr) :
+		m_GPUPtr(m_GPUPtr)
+	{
+	}
+
+	SDL_GPUDeviceWrapper::SDL_GPUDeviceWrapper(SDL_GPUDeviceWrapper&& other) :
+		m_GPUPtr(other.m_GPUPtr)
+	{
+		other.m_GPUPtr = nullptr;
+	}
+
+	SDL_GPUDeviceWrapper& SDL_GPUDeviceWrapper::operator= (SDL_GPUDeviceWrapper&& other) {
+		if (&other != this) {
+			// Cleanup current GPU Device
+			if ((bool)(*this)) {
+				SDL_DestroyGPUDevice(m_GPUPtr);
+			}
+
+			// Obtain next GPU device
+			m_GPUPtr = other.m_GPUPtr;
+			other.m_GPUPtr = nullptr;
+		}
+		return *this;
+	}
+
+
+	SDL_GPUDevice* SDL_GPUDeviceWrapper::Get() const {
+		return m_GPUPtr;
+	}
+
+	SDL_GPUDeviceWrapper::operator SDL_GPUDevice* const () {
+		return m_GPUPtr;
+	}
+
+	SDL_GPUDeviceWrapper::operator bool const () {
+		return m_GPUPtr != nullptr;
 	}
 
 }

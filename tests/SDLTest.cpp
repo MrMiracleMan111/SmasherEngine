@@ -1,15 +1,21 @@
+#define GLM_ENABLE_EXPERIMENTAL
 #include <fstream>
 #include <iostream>
 #include <type_traits>
 #include <array>
 #include <format>
-#include "glm/glm.hpp"
+#include <Windows.h>
+#include <glm/glm.hpp>
+#include <glm/gtx/string_cast.hpp>
 #include "Smasher/Core.h"
 #include "Smasher/Base.h"
 #include "Smasher/ComponentSystems/EngineSystem.h"
 #include "Smasher/ComponentSystems/TransformSystem.h"
 #include "Smasher/ComponentSystems/SDLSystem.h"
 #include "Smasher/ComponentSystems/SDLSpriteSystem.h"
+#include "Smasher/ComponentSystems/StaticMeshSystem.h"
+#include "Smasher/ComponentSystems/CameraSystem.h"
+#include "Smasher/ComponentSystems/PBRSystem.h"
 #include "Smasher/Resources.h"
 #include "Manifest.h"
 
@@ -57,104 +63,18 @@ int main() {
 	// Setup system contexts
 	entt::registry& registry = engine.GetRegistry();
 	Smasher::TransformSystem::Initialize(registry);
+	Smasher::CameraSystem::Initialize(registry);
 	Smasher::SDLSystem::Initialize(registry, Smasher::WindowOptions { "Hello World", 640, 480 });
-
-
 	auto &sdlSystemCtx = registry.ctx().get<Smasher::SDLSystem::Context>();
+
 	// Same shader file, different entry points used (PSMain, VSMain)
 	auto fragShader = resourceManager.GetOrLoadResource<Smasher::Manifest::Shaders::test_frag_shader, Smasher::SDLGraphicShaderResource>(sdlSystemCtx.pGpu, SDL_GPUShaderStage::SDL_GPU_SHADERSTAGE_FRAGMENT);
 	auto vertShader = resourceManager.GetOrLoadResource<Smasher::Manifest::Shaders::test_vert_shader, Smasher::SDLGraphicShaderResource>(sdlSystemCtx.pGpu, SDL_GPUShaderStage::SDL_GPU_SHADERSTAGE_VERTEX);
+	auto teapotMeshResource = resourceManager.GetOrLoadResource<Smasher::Manifest::Models::teapot, Smasher::StaticMeshResource>(sdlSystemCtx.pGpu);
 
-	// a list of vertices
-	static Vertex vertices[]
-	{
-		{0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f},     // top vertex
-		{-0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f},   // bottom left vertex
-		{0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f}     // bottom right vertex
-	};
-
-	// Create Command Buffer
-	SDL_GPUCommandBuffer* commandBuffer = SDL_AcquireGPUCommandBuffer(sdlSystemCtx.pGpu->Get());
-
-	// Create Vertex Buffer
-	SDL_GPUBufferCreateInfo bufferInfo{};
-	bufferInfo.size = sizeof(vertices);
-	bufferInfo.usage = SDL_GPU_BUFFERUSAGE_VERTEX;
-	SDL_GPUBuffer* vertexBuffer = SDL_CreateGPUBuffer(sdlSystemCtx.pGpu->Get(), &bufferInfo);
-
-	// Create Transfer Buffer
-	SDL_GPUTransferBufferCreateInfo transferInfo{};
-	transferInfo.size = sizeof(vertices);
-	transferInfo.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
-	SDL_GPUTransferBuffer* transferBuffer = SDL_CreateGPUTransferBuffer(sdlSystemCtx.pGpu->Get(), &transferInfo);
-
-	// Copy from Transfer Buffer to Vertex Buffer
-	SDL_GPUCopyPass* copyPass = SDL_BeginGPUCopyPass(commandBuffer);
-
-	// Upload to Transfer Buffer
-	Vertex* data = (Vertex*)SDL_MapGPUTransferBuffer(sdlSystemCtx.pGpu->Get(), transferBuffer, false);
-	SDL_memcpy(data, vertices, sizeof(vertices));
-	SDL_UnmapGPUTransferBuffer(sdlSystemCtx.pGpu->Get(), transferBuffer);
-
-	SDL_GPUTransferBufferLocation location{};
-	location.transfer_buffer = transferBuffer;
-	location.offset = 0;
-
-	SDL_GPUBufferRegion region{};
-	region.buffer = vertexBuffer;
-	region.size = sizeof(vertices);
-	region.offset = 0;
-
-	SDL_UploadToGPUBuffer(copyPass, &location, &region, true);
-	SDL_EndGPUCopyPass(copyPass);
-	SDL_SubmitGPUCommandBuffer(commandBuffer);
-
-	SDL_GPUGraphicsPipelineCreateInfo pipelineInfo{};
-	pipelineInfo.vertex_shader = vertShader->GetShader();
-	pipelineInfo.fragment_shader = fragShader->GetShader();
-
-	pipelineInfo.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
-
-	SDL_GPUVertexBufferDescription vertexBufferDescriptions[1];
-	vertexBufferDescriptions[0].slot = 0;
-	vertexBufferDescriptions[0].input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
-	vertexBufferDescriptions[0].instance_step_rate = 0;
-	vertexBufferDescriptions[0].pitch = sizeof(Vertex);
-
-	SDL_GPUVertexAttribute vertexAttributeDescriptions[2];
-	// a_position
-	vertexAttributeDescriptions[0].buffer_slot = 0;								// fetch data from buffer at slot 0
-	vertexAttributeDescriptions[0].location = 0;								// layout (location = 0)
-	vertexAttributeDescriptions[0].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3; // vec3
-	vertexAttributeDescriptions[0].offset = 0;									// 
-
-	// a_color
-	vertexAttributeDescriptions[1].buffer_slot = 0;								// fetch data from buffer at slot 1
-	vertexAttributeDescriptions[1].location = 1;								// layout (location = 1)
-	vertexAttributeDescriptions[1].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4; // vec4
-	vertexAttributeDescriptions[1].offset = sizeof(float) * 3;					// 
-
-	SDL_GPUColorTargetDescription colorTargetDescriptions[1];
-	colorTargetDescriptions[0] = {};
-	colorTargetDescriptions[0].blend_state.enable_blend = true;
-	colorTargetDescriptions[0].blend_state.color_blend_op = SDL_GPU_BLENDOP_ADD;
-	colorTargetDescriptions[0].blend_state.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
-	colorTargetDescriptions[0].blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
-	colorTargetDescriptions[0].blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
-	colorTargetDescriptions[0].blend_state.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
-	colorTargetDescriptions[0].blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
-	colorTargetDescriptions[0].format = SDL_GetGPUSwapchainTextureFormat(sdlSystemCtx.pGpu->Get(), sdlSystemCtx.pWindow);
-
-	pipelineInfo.vertex_input_state.num_vertex_buffers = 1;
-	pipelineInfo.vertex_input_state.vertex_buffer_descriptions = vertexBufferDescriptions;
-	pipelineInfo.vertex_input_state.num_vertex_attributes = 2;
-	pipelineInfo.vertex_input_state.vertex_attributes = vertexAttributeDescriptions;
-	pipelineInfo.target_info.num_color_targets = 1;
-	pipelineInfo.target_info.color_target_descriptions = colorTargetDescriptions;
-
-	SDL_GPUGraphicsPipeline* pipeline = SDL_CreateGPUGraphicsPipeline(sdlSystemCtx.pGpu->Get(), &pipelineInfo);
-
-
+	Smasher::StaticMeshSystem::Initialize(registry);
+	Smasher::PBRSystem::Initialize(registry, sdlSystemCtx.pGpu);
+	Smasher::SDLSpriteSystem::Initialize(registry, sdlSystemCtx.pGpu, fragShader, vertShader, sdlSystemCtx.window);
 
 	// Add entities
 	glm::uvec2 bounds{ 640u, 420u };
@@ -163,6 +83,31 @@ int main() {
 		entt::entity entity = registry.create();
 		entt::entity ball = SpawnBouncingBall(engine.GetRegistry(), position);
 	}
+	// Add Camera
+	int width, height;
+	SDL_GetWindowSizeInPixels(sdlSystemCtx.window, &width, &height);
+	entt::entity camera = registry.create();
+	auto& cameraTransform = Smasher::TransformSystem::AddComponent(registry, camera).Get().get();
+	Smasher::TransformSystem::SetPosition(cameraTransform, 0.f, 0.f, 5.f);
+	auto& cameraComponent = Smasher::CameraSystem::AddComponent(registry, camera).Get().get();
+	Smasher::CameraSystem::SetFOV(cameraComponent, 90.f);
+	Smasher::CameraSystem::SetNearClipPlane(cameraComponent, 1.f);
+	Smasher::CameraSystem::SetFarClipPlane(cameraComponent, 1000.f);
+	Smasher::CameraSystem::SetAspectRatio(cameraComponent, width / height);
+	Smasher::CameraSystem::ComputeProjectionMatrix(cameraComponent);
+	Smasher::CameraSystem::ComputeViewMatrix(cameraComponent, Smasher::TransformSystem::GetTransform(cameraTransform));
+
+	std::cout << "Projection Matrix" << glm::to_string(cameraComponent._projectionMatrix) << std::endl;
+	std::cout << "Camera Transform" << glm::to_string(Smasher::TransformSystem::GetTransform(cameraTransform)) << std::endl;
+	std::cout << "View Matrix" << glm::to_string(cameraComponent._viewMatrix) << std::endl;
+
+
+	// Add Teapot Model
+	entt::entity teapot = registry.create();
+	auto& teapotTransform = Smasher::TransformSystem::AddComponent(registry, teapot).Get().get();
+	Smasher::TransformSystem::SetPosition(teapotTransform, 0.f, 0.f, 0.f);
+	Smasher::TransformSystem::SetScale(teapotTransform, 0.1f, 0.1f, 0.1f);
+	auto& teapotMesh = Smasher::StaticMeshSystem::AddComponent(registry, teapot, teapotMeshResource).Get().get();
 
 	jobManager.SetTickJobProducer([&]() {
 		entt::registry& registry = engine.GetRegistry();
@@ -172,19 +117,27 @@ int main() {
 			{}).Get();
 
 		if (engine.IsRenderTick()) {
-			Smasher::Job& sdlBeginFrameJob = jobManager.AddSyncJob(std::bind(Smasher::SDLSystem::BeginFrame, std::ref(registry)),
-				{}).Get();
-			Smasher::Job& sdlDrawTriangleJob = jobManager.AddSyncJob(std::bind(Smasher::SDLSystem::DrawTrianglePass, std::ref(registry), fragShader, vertShader, pipeline, vertexBuffer),
-				{ sdlBeginFrameJob }).Get();
-			Smasher::Job& sdlEndFrameJob = jobManager.AddSyncJob(std::bind(Smasher::SDLSystem::EndFrame, std::ref(registry)),
+			auto& sdlSpriteSystemCtx = registry.ctx().get<Smasher::SDLSpriteSystem::Context>();
+			auto& pbrSystemCtx = registry.ctx().get<Smasher::PBRSystem::Context>();
+			SDL_GPUDevice* device = sdlSystemCtx.pGpu->Get();
+			Smasher::Job& sdlModelDepthPrePass = jobManager.AddSyncJob(std::bind(Smasher::PBRSystem::DepthPrePass, pbrSystemCtx, device, cameraComponent),
+				{ }).Get();
+			Smasher::Job& sdlDrawTriangleJob = jobManager.AddSyncJob(std::bind(Smasher::SDLSpriteSystem::DrawTriangle, sdlSpriteSystemCtx),
+				{ sdlModelDepthPrePass }).Get();
+			Smasher::Job& sdlCompositionJob = jobManager.AddSyncJob(std::bind(Smasher::SDLSystem::CompositionPass, sdlSystemCtx, std::vector<Smasher::SDLSystem::RenderTexture>{ Smasher::SDLSystem::RenderTexture{ sdlSpriteSystemCtx.renderTexture, sdlSpriteSystemCtx.depthTexture } }),
 				{ sdlDrawTriangleJob }).Get();
+			Smasher::Job& sdlCopyToWindowJob = jobManager.AddSyncJob(std::bind(Smasher::SDLSystem::CopyToWindow, sdlSystemCtx, sdlSystemCtx.gColorTexture),
+				{ sdlCompositionJob }).Get();
 		}
 		});
 
 	layer.Activate();
 	engine.Run(); // Engine should shutdown after the third update
 
-	SDL_ReleaseGPUTransferBuffer(sdlSystemCtx.pGpu->Get(), transferBuffer);
-	SDL_ReleaseGPUBuffer(sdlSystemCtx.pGpu->Get(), vertexBuffer);
-	Smasher::TransformSystem::Teardown(engine.GetRegistry());
+	Smasher::SDLSpriteSystem::Teardown(registry);
+	Smasher::PBRSystem::Teardown(registry);
+	Smasher::StaticMeshSystem::Teardown(registry);
+	Smasher::SDLSystem::Teardown(registry);
+	Smasher::CameraSystem::Teardown(registry);
+	Smasher::TransformSystem::Teardown(registry);
 }

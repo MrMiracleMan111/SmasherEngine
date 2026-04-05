@@ -14,6 +14,7 @@
 #include <exception>
 #include <stdexcept>
 #include <iostream>
+#include <SDL3/SDL.h>
 #include <SFML/Window.hpp>
 #include "Smasher/Engine.h"
 #include "Smasher/Exceptions.h"
@@ -22,23 +23,24 @@
 #include "Smasher/ErrorCodes.h"
 #include "Smasher/Layer.h"
 #include "Smasher/ComponentSystems/EngineSystem.h"
-
-namespace Smasher {
-
+#include "Smasher/ComponentSystems/SDLSystem.h"
 #include "Smasher/Core.h"
 
+namespace Smasher {
 	Engine::Engine() :
 		m_Headless(false),
 		m_EventManager(*this),
 		m_WindowPtr(
-			std::make_unique<sf::RenderWindow>(
-				sf::VideoMode({ EngineConfig::WINDOW_WIDTH,EngineConfig::WINDOW_HEIGHT }),
-				sf::String{ EngineConfig::TITLE },
-				sf::State::Windowed,
-				EngineConfig::DEFAULT_SETTINGS
-			)
+			//std::make_unique<sf::RenderWindow>(
+			//	sf::VideoMode({ EngineConfig::WINDOW_WIDTH,EngineConfig::WINDOW_HEIGHT }),
+			//	sf::String{ EngineConfig::TITLE },
+			//	sf::State::Windowed,
+			//	EngineConfig::DEFAULT_SETTINGS
+			//)
 		),
-		m_WindowView(sf::FloatRect{ { 0.f, 0.f }, { (float)m_WindowPtr->getSize().x, (float)m_WindowPtr->getSize().y } })
+		m_WindowView(
+			//sf::FloatRect{ { 0.f, 0.f }, { (float)m_WindowPtr->getSize().x, (float)m_WindowPtr->getSize().y } }
+		)
 	{
 		Init();
 	}
@@ -52,14 +54,16 @@ namespace Smasher {
 		m_Headless(false),
 		m_EventManager(*this),
 		m_WindowPtr(
-			std::make_unique<sf::RenderWindow>(
-				sf::VideoMode({ EngineConfig::WINDOW_WIDTH, EngineConfig::WINDOW_HEIGHT }),
-				sf::String{ EngineConfig::TITLE },
-				sf::State::Windowed,
-				settings
-			)
+			//std::make_unique<sf::RenderWindow>(
+			//	sf::VideoMode({ EngineConfig::WINDOW_WIDTH, EngineConfig::WINDOW_HEIGHT }),
+			//	sf::String{ EngineConfig::TITLE },
+			//	sf::State::Windowed,
+			//	settings
+			//)
 		),
-		m_WindowView(sf::FloatRect{ { 0.f, 0.f }, { (float)m_WindowPtr->getSize().x, (float)m_WindowPtr->getSize().y } })
+		m_WindowView(
+			//sf::FloatRect{ { 0.f, 0.f }, { (float)m_WindowPtr->getSize().x, (float)m_WindowPtr->getSize().y } }
+		)
 	{
 		Init();
 	}
@@ -68,28 +72,35 @@ namespace Smasher {
 		m_Headless(false),
 		m_EventManager(*this),
 		m_WindowPtr(
-			std::make_unique<sf::RenderWindow>(
-				sf::VideoMode({ width, height }),
-				sf::String{ EngineConfig::TITLE },
-				sf::State::Windowed,
-				EngineConfig::DEFAULT_SETTINGS
-			)
+			//std::make_unique<sf::RenderWindow>(
+			//	sf::VideoMode({ width, height }),
+			//	sf::String{ EngineConfig::TITLE },
+			//	sf::State::Windowed,
+			//	EngineConfig::DEFAULT_SETTINGS
+			//)
 		),
-		m_WindowView(sf::FloatRect{ { 0.f, 0.f }, { (float)m_WindowPtr->getSize().x, (float)m_WindowPtr->getSize().y } })
+		m_WindowView(
+			//sf::FloatRect{ { 0.f, 0.f }, { (float)m_WindowPtr->getSize().x, (float)m_WindowPtr->getSize().y } }
+		)
 	{
 		Init();
 	}
 
 	Engine::~Engine()
 	{
+		// Clear up any last async jobs
+		m_JobManager.WaitForAsyncJobs();
 		m_EventManager.StopAsync();
 		if (m_Valid) {
 			if (!m_Headless) {
 				m_WindowCloseHandle.Unsubscribe(); // Explicilty unsubscribe before EventManager is deconstructed
 				m_WindowResizeHandle.Unsubscribe();
 			}
+			else {
+			}
 			m_LayerStack.clear();
 		}
+		SDL_Quit();
 	}
 
 	Engine::Engine(Engine &&other) noexcept : 
@@ -147,16 +158,21 @@ namespace Smasher {
 #endif
 
 		if (!m_Headless) {
-			glewExperimental = GL_TRUE;
-			GLenum status = glewInit();
-			if (status != GLEW_OK) {
-				std::string_view errCode = reinterpret_cast<const char*>(glewGetErrorString(status));
-				std::string message = std::format("GLEW Failed to initialize, status: {}", errCode);
-				throw Exceptions::GLEWInitFailed(message);
-			}
+			SDL_Init(SDL_INIT_VIDEO);
+
+			//glewExperimental = GL_TRUE;
+			//GLenum status = glewInit();
+			//if (status != GLEW_OK) {
+			//	std::string_view errCode = reinterpret_cast<const char*>(glewGetErrorString(status));
+			//	std::string message = std::format("GLEW Failed to initialize, status: {}", errCode);
+			//	throw Exceptions::GLEWInitFailed(message);
+			//}
 
 			m_WindowCloseHandle = base.Subscribe<Events::WindowCloseEvent>(&Engine::OnWindowClose, this);
 			m_WindowResizeHandle = base.Subscribe<Events::WindowResizeEvent>(&Engine::OnWindowResize, this);
+		}
+		else {
+			SDL_Init(0);
 		}
 
 		m_Registry.ctx().emplace<EngineSystem::Context>(*this);
@@ -165,7 +181,6 @@ namespace Smasher {
 	void Engine::Run() {
 		m_RunningAtomic = true;
 
-		EventFeeder m_EventFeeder(m_EventManager, *this);
 #ifdef CATCH_EXCEPTIONS
 		try {
 #endif
@@ -173,14 +188,18 @@ namespace Smasher {
 			std::chrono::microseconds updateTimer{ 0 };
 			std::chrono::microseconds renderTimer{ 0 };
 
-			while ((!m_Headless && m_WindowPtr->isOpen()) && m_RunningAtomic) {
+			while ((!m_Headless) && m_RunningAtomic) {
+				assert(m_Registry.ctx().contains<SDLSystem::Context>() && "SDLSystem was not initialized");
+
 				std::chrono::time_point<std::chrono::system_clock> tmp = std::chrono::system_clock::now();
 				// Time passed since last tick
 				m_TickDelta = std::chrono::duration_cast<std::chrono::microseconds>(tmp - lastTickTime);
 				lastTickTime = tmp;
 				if (!m_Headless) {
-					while (const std::optional event = m_WindowPtr->pollEvent()) {
-						m_EventFeeder.ForwardSFMLEvent(event.value());
+					auto& sdlCtx = m_Registry.ctx().get<SDLSystem::Context>();
+					SDL_Event event;
+					while (SDL_PollEvent(&event)) {
+						EventFeeder::ForwardSDLEvent(*this, event);
 					}
 				}
 
@@ -194,10 +213,10 @@ namespace Smasher {
 					Update(std::chrono::duration_cast<std::chrono::milliseconds>( updateTimer ));
 					updateTimer = std::chrono::microseconds{ 0 };
 				}
-				if (m_IsRenderTick) {
-					//Render();
-					renderTimer = std::chrono::microseconds{ 0 };
-				}
+
+				// Reset render timer on render tick
+				renderTimer = m_IsRenderTick ? std::chrono::microseconds{ 0 } : renderTimer;
+
 
 #ifdef BENCHMARK
 				BENCHMARK_LogAccumulatedTime();
@@ -358,8 +377,8 @@ namespace Smasher {
 	}
 
 	void Engine::OnWindowResize(Events::WindowResizeEvent &event) {
-		m_WindowView.setSize(sf::Vector2f{ (float)event.WindowSize.x, (float)event.WindowSize.y });
-		m_WindowPtr->setView(m_WindowView);
+		//m_WindowView.setSize(sf::Vector2f{ (float)event.WindowSize.x, (float)event.WindowSize.y });
+		//m_WindowPtr->setView(m_WindowView);
 	}
 
 

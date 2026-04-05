@@ -2,6 +2,8 @@
 #include <chrono>
 #include <iostream>
 #include <typeindex>
+#include <SDL3/SDL.h>
+#include <glm/glm.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
 #include "Smasher/Base.h"
@@ -56,9 +58,9 @@ namespace Smasher {
 
 		struct SMASHER_API KeyboardEvent : public Event {
 			Smasher::Keyboard::KeyboardEventType Type;
-			sf::Keyboard::Key KeyCode;
+			SDL_Keycode KeyCode;
 			KeyboardEvent() = delete;
-			KeyboardEvent(SMASHER_TIMESTAMP timestamp, Keyboard::KeyboardEventType type, sf::Keyboard::Key keycode) :
+			KeyboardEvent(SMASHER_TIMESTAMP timestamp, Keyboard::KeyboardEventType type, SDL_Keycode keycode) :
 				Event(timestamp), Type(type), KeyCode(keycode) {}
 		};
 
@@ -73,23 +75,23 @@ namespace Smasher {
 		};
 
 		struct SMASHER_API MouseButtonEvent : public MouseEvent {
-			sf::Mouse::Button ButtonCode;
-			sf::Vector2i Position;
-			MouseButtonEvent(SMASHER_TIMESTAMP timestamp, Mouse::MouseEventType type, sf::Mouse::Button buttoncode, sf::Vector2i position) :
+			Uint8 ButtonCode;
+			glm::vec2 Position;
+			MouseButtonEvent(SMASHER_TIMESTAMP timestamp, Mouse::MouseEventType type, Uint8 buttoncode, glm::vec2 position) :
 				MouseEvent(timestamp, type), ButtonCode(buttoncode), Position(position) {}
 		};
 
 		struct SMASHER_API MouseScrollWheelEvent : public MouseEvent {
 			float Delta;
-			sf::Vector2i Position;
-			MouseScrollWheelEvent(SMASHER_TIMESTAMP timestamp, Mouse::MouseEventType type, float delta, sf::Vector2i position) :
+			glm::vec2 Position;
+			MouseScrollWheelEvent(SMASHER_TIMESTAMP timestamp, Mouse::MouseEventType type, float delta, glm::vec2 position) :
 				MouseEvent(timestamp, type), Delta(delta), Position(position) {}
 		};
 
 		struct SMASHER_API MouseMoveEvent : public MouseEvent {
-			sf::Vector2i Delta;
-			sf::Vector2i Position;
-			MouseMoveEvent(SMASHER_TIMESTAMP timestamp, Mouse::MouseEventType type, sf::Vector2i delta, sf::Vector2i position) :
+			glm::vec2 Delta;
+			glm::vec2 Position;
+			MouseMoveEvent(SMASHER_TIMESTAMP timestamp, Mouse::MouseEventType type, glm::vec2 delta, glm::vec2 position) :
 				MouseEvent(timestamp, type), Delta(delta), Position(position) {}
 		};
 
@@ -98,8 +100,8 @@ namespace Smasher {
 		};
 
 		struct SMASHER_API WindowResizeEvent : public Event {
-			sf::Vector2u WindowSize;
-				WindowResizeEvent(SMASHER_TIMESTAMP timestamp, sf::Vector2u size) :
+			glm::uvec2 WindowSize;
+				WindowResizeEvent(SMASHER_TIMESTAMP timestamp, glm::uvec2 size) :
 				Event(timestamp), WindowSize(size) {}
 		};
 	}

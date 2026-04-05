@@ -9,6 +9,7 @@ namespace Smasher {
 		case ERROR_ExpectedHasError: return "Expected<T> Has Error";
 		case ERROR_EngineNotInitialized: return "Engine Not Initialized";
 		case ERROR_EngineIsInHeadlessMode: return "Engine Is In Headless Mode";
+		case ERROR_EngineFailedtoInitializeGPU: return "Engien could not initialize the SDL GPU Device";
 
 			// ==== LAYER EXCEPTIONS ====
 		case ERROR_LayerNotFound: return "LayerNotFound";

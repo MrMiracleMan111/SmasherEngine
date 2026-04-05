@@ -8,6 +8,7 @@
 #define ERROR_ExpectedHasError 1
 #define ERROR_EngineNotInitialized 2
 #define ERROR_EngineIsInHeadlessMode 3
+#define ERROR_EngineFailedtoInitializeGPU 4
 
 // ==== LAYER EXCEPTIONS ====
 #define ERROR_LayerNotFound 100

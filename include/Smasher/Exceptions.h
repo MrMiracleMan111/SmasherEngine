@@ -109,6 +109,7 @@ namespace Smasher {
 		SMASHER_EXCEPTION(ExpectedHasError)
 		SMASHER_EXCEPTION(EngineNotInitialized)
 		SMASHER_EXCEPTION(EngineIsInHeadlessMode)
+		SMASHER_EXCEPTION(EngineFailedtoInitializeGPU)
 
 		// ==== LAYER EXCEPTIONS ====
 		SMASHER_EXCEPTION(LayerNotFound)
