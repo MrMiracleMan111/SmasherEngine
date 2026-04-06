@@ -224,6 +224,7 @@ namespace Smasher {
 
 		SDL_GPUBuffer *GetVertexPositionBuffer() const;
 		SDL_GPUBuffer *GetVertexNormalBuffer() const;
+		SDL_GPUBuffer *GetVertexUVBuffer() const;
 		SDL_GPUBuffer *GetIndexBuffer() const;
 		unsigned int GetNumIndices() const;
 		unsigned int GetNumVertices() const;
@@ -231,6 +232,7 @@ namespace Smasher {
 	private:
 		SDL_GPUBuffer *m_VertexPositionBuffer;
 		SDL_GPUBuffer* m_VertexNormalBuffer;
+		SDL_GPUBuffer* m_VertexUVBuffer;
 		SDL_GPUBuffer *m_IndexBuffer;
 		unsigned int m_NumIndices = 0;
 		unsigned int m_NumVertices = 0;

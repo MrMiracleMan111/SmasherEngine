@@ -165,6 +165,7 @@ namespace Smasher {
 		std::string filepath;
 		SDL_GPUBuffer **pVertexPositionBuffer;
 		SDL_GPUBuffer **pVertexNormalBuffer;
+		SDL_GPUBuffer **pVertexUVBuffer;
 		SDL_GPUBuffer **pIndexBuffer;
 		unsigned int *pNumIndices;
 		unsigned int *pNumVertices;
@@ -198,6 +199,7 @@ namespace Smasher {
 
 		size_t VERT_POS_BUFFER_SIZE = attrib.vertices.size() * sizeof(tinyobj::real_t);
 		size_t VERT_NORM_BUFFER_SIZE = attrib.normals.size() * sizeof(tinyobj::real_t);
+		size_t VERT_UV_BUFFER_SIZE = attrib.texcoords.size() * sizeof(tinyobj::real_t);
 		size_t INDEX_BUFFER_SIZE = 0;
 		unsigned int indexCount = 0;
 		for (auto& shape : shapes) {
@@ -211,6 +213,7 @@ namespace Smasher {
 
 		SDL_GPUTransferBuffer* transferPositionBuffer = NULL;
 		SDL_GPUTransferBuffer* transferNormalBuffer = NULL;
+		SDL_GPUTransferBuffer* transferUVBuffer = NULL;
 		SDL_GPUTransferBuffer* transferIndexBuffer = NULL;
 
 		// Create Vertex Position + Vertex Normals + Index Buffer
@@ -225,10 +228,17 @@ namespace Smasher {
 			vertexNormalBufferInfo.usage = SDL_GPU_BUFFERUSAGE_VERTEX;
 			*info.pVertexNormalBuffer = SDL_CreateGPUBuffer(device, &vertexNormalBufferInfo);
 			
+			SDL_GPUBufferCreateInfo vertexUVBufferInfo{};
+			vertexUVBufferInfo.size = VERT_NORM_BUFFER_SIZE;
+			vertexUVBufferInfo.usage = SDL_GPU_BUFFERUSAGE_VERTEX;
+			*info.pVertexUVBuffer = SDL_CreateGPUBuffer(device, &vertexUVBufferInfo);
+			
 			SDL_GPUBufferCreateInfo indexBufferInfo{};
 			indexBufferInfo.size = INDEX_BUFFER_SIZE;
 			indexBufferInfo.usage = SDL_GPU_BUFFERUSAGE_INDEX;
 			*info.pIndexBuffer = SDL_CreateGPUBuffer(device, &indexBufferInfo);
+			
+
 		}
 
 		// Create Transfer Buffer, upload to vertex buffers and index buffer
@@ -241,6 +251,10 @@ namespace Smasher {
 			transferNormalBufferInfo.size = VERT_NORM_BUFFER_SIZE;
 			transferNormalBufferInfo.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
 			transferNormalBuffer = SDL_CreateGPUTransferBuffer(device, &transferNormalBufferInfo);
+			SDL_GPUTransferBufferCreateInfo transferUVBufferInfo{};
+			transferUVBufferInfo.size = VERT_UV_BUFFER_SIZE;
+			transferUVBufferInfo.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+			transferUVBuffer = SDL_CreateGPUTransferBuffer(device, &transferUVBufferInfo);
 			SDL_GPUTransferBufferCreateInfo transferIndexBufferInfo{};
 			transferIndexBufferInfo.size = INDEX_BUFFER_SIZE;
 			transferIndexBufferInfo.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
@@ -270,7 +284,7 @@ namespace Smasher {
 			// Upload Vertex Normals to Transfer Buffer
 			{
 				void* data = SDL_MapGPUTransferBuffer(device, transferNormalBuffer, false);
-				SDL_memcpy(data, attrib.normals.data(), VERT_POS_BUFFER_SIZE);
+				SDL_memcpy(data, attrib.normals.data(), VERT_NORM_BUFFER_SIZE);
 
 				SDL_GPUTransferBufferLocation location{};
 				location.transfer_buffer = transferNormalBuffer;
@@ -278,10 +292,29 @@ namespace Smasher {
 
 				SDL_GPUBufferRegion region{};
 				region.buffer = *info.pVertexNormalBuffer;
-				region.size = VERT_POS_BUFFER_SIZE;
+				region.size = VERT_NORM_BUFFER_SIZE;
 				region.offset = 0;
 
 				SDL_UnmapGPUTransferBuffer(device, transferNormalBuffer);
+				SDL_UploadToGPUBuffer(copyPass, &location, &region, true);
+			}
+
+
+			// Upload Vertex UV to Transfer Buffer
+			{
+				void* data = SDL_MapGPUTransferBuffer(device, transferUVBuffer, false);
+				SDL_memcpy(data, attrib.texcoords.data(), VERT_UV_BUFFER_SIZE);
+
+				SDL_GPUTransferBufferLocation location{};
+				location.transfer_buffer = transferUVBuffer;
+				location.offset = 0;
+
+				SDL_GPUBufferRegion region{};
+				region.buffer = *info.pVertexUVBuffer;
+				region.size = VERT_UV_BUFFER_SIZE;
+				region.offset = 0;
+
+				SDL_UnmapGPUTransferBuffer(device, transferUVBuffer);
 				SDL_UploadToGPUBuffer(copyPass, &location, &region, true);
 			}
 
@@ -328,6 +361,7 @@ namespace Smasher {
 		SDL_WaitForGPUFences(device, true, &fence, 1);
 		SDL_ReleaseGPUTransferBuffer(device, transferPositionBuffer);
 		SDL_ReleaseGPUTransferBuffer(device, transferNormalBuffer);
+		SDL_ReleaseGPUTransferBuffer(device, transferUVBuffer);
 		SDL_ReleaseGPUTransferBuffer(device, transferIndexBuffer);
 	}
 
@@ -345,6 +379,7 @@ namespace Smasher {
 			.filepath = m_Paths.front().generic_string(),
 			.pVertexPositionBuffer = &m_VertexPositionBuffer,
 			.pVertexNormalBuffer = &m_VertexNormalBuffer,
+			.pVertexUVBuffer = &m_VertexUVBuffer,
 			.pIndexBuffer = &m_IndexBuffer,
 			.pNumIndices = &m_NumIndices,
 			.pNumVertices = &m_NumVertices
@@ -356,6 +391,7 @@ namespace Smasher {
 	StaticMeshResource::~StaticMeshResource() {
 		SDL_ReleaseGPUBuffer(*m_GPUPtr, m_VertexPositionBuffer);
 		SDL_ReleaseGPUBuffer(*m_GPUPtr, m_VertexNormalBuffer);
+		SDL_ReleaseGPUBuffer(*m_GPUPtr, m_VertexUVBuffer);
 		SDL_ReleaseGPUBuffer(*m_GPUPtr, m_IndexBuffer);
 	};
 
@@ -366,6 +402,10 @@ namespace Smasher {
 	SDL_GPUBuffer* StaticMeshResource::GetVertexNormalBuffer() const {
 		return m_VertexNormalBuffer;
 	};
+
+	SDL_GPUBuffer* StaticMeshResource::GetVertexUVBuffer() const {
+		return m_VertexUVBuffer;
+	}
 
 	SDL_GPUBuffer* StaticMeshResource::GetIndexBuffer() const {
 		return m_IndexBuffer;

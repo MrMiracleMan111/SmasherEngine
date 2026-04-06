@@ -33,6 +33,9 @@
 //
 namespace Smasher {
 	namespace PBRSystem {
+		SDL_GPUTextureFormat NORMALS_TEX_FORMAT = SDL_GPU_TEXTUREFORMAT_R32G32B32A32_FLOAT;
+		SDL_GPUTextureFormat UV_TEX_FORMAT = SDL_GPU_TEXTUREFORMAT_R32G32_FLOAT;// SDL_GPU_TEXTUREFORMAT_R16G16_FLOAT;
+
 		struct Context {
 			// G-Buffer Objects
 			SDL_GPUTexture *gDepthPrePass;
@@ -41,6 +44,13 @@ namespace Smasher {
 			SDL_GPUTexture *gAlbedo;
 			SDL_GPUTexture *gSpecular;
 			SDL_GPUTexture *gLighting;
+
+			SDL_GPUSampler* gDepthPrePassSampler;
+			SDL_GPUSampler* gNormalsSampler;
+			SDL_GPUSampler* gUVSampler;
+			SDL_GPUSampler* gAlbedoSampler;
+			SDL_GPUSampler* gSpecularSampler;
+			SDL_GPUSampler* gLightingSampler;
 
 			SDL_GPUGraphicsPipeline *depthPassPipeline;
 

@@ -41,14 +41,14 @@ namespace Smasher {
 			};
 			//teapotInstances[0].transform = glm::translate(glm::mat4(0.3f), glm::vec3(0.f, 0.f, 0.4f));
 
+			int width, height;
+			SDL_GetWindowSizeInPixels(sdlSystemCtx.window, &width, &height);
 
 			SDL_GPUCommandBuffer* commandBuffer = SDL_AcquireGPUCommandBuffer(device);
 			SDL_GPUTransferBuffer* transferBuffer = NULL;
 			// Create Depth Texture
 			{
 				SDL_GPUTextureCreateInfo depthStencilTextureInfo{};
-				int width, height;
-				SDL_GetWindowSizeInPixels(sdlSystemCtx.window, &width, &height);
 				depthStencilTextureInfo.format = SDLSystem::GetGPUDepthStencilFormat(device);
 				depthStencilTextureInfo.height = height;
 				depthStencilTextureInfo.width = width;
@@ -59,6 +59,60 @@ namespace Smasher {
 				depthStencilTextureInfo.usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET;
 				ctx.gDepthPrePass = SDL_CreateGPUTexture(device, &depthStencilTextureInfo);
 				SDL_SetGPUTextureName(device, ctx.gDepthPrePass, "Depth Pre Pass Texture");
+			}
+
+			// Create Normals Buffer
+			{
+				SDL_GPUTextureCreateInfo normalsTextureInfo{};
+				normalsTextureInfo.format = NORMALS_TEX_FORMAT;
+				normalsTextureInfo.height = height;
+				normalsTextureInfo.width = width;
+				normalsTextureInfo.layer_count_or_depth = 1;
+				normalsTextureInfo.num_levels = 1;
+				normalsTextureInfo.sample_count = SDL_GPU_SAMPLECOUNT_1;
+				normalsTextureInfo.type = SDL_GPU_TEXTURETYPE_2D;
+				normalsTextureInfo.usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET;
+				ctx.gNormals = SDL_CreateGPUTexture(device, &normalsTextureInfo);
+				SDL_SetGPUTextureName(device, ctx.gNormals, "Normals Texture");
+			}
+
+			// Create UV Buffer
+			{
+				SDL_GPUTextureCreateInfo uvTextureInfo{};
+				uvTextureInfo.format = UV_TEX_FORMAT;
+				uvTextureInfo.height = height;
+				uvTextureInfo.width = width;
+				uvTextureInfo.layer_count_or_depth = 1;
+				uvTextureInfo.num_levels = 1;
+				uvTextureInfo.sample_count = SDL_GPU_SAMPLECOUNT_1;
+				uvTextureInfo.type = SDL_GPU_TEXTURETYPE_2D;
+				uvTextureInfo.usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET;
+				ctx.gUV = SDL_CreateGPUTexture(device, &uvTextureInfo);
+				SDL_SetGPUTextureName(device, ctx.gUV, "UV Texture");
+			}
+
+			// Create Samplers
+			{
+				SDL_GPUSamplerCreateInfo samplerInfo{};
+				samplerInfo.min_filter = SDL_GPU_FILTER_LINEAR;                 /**< The minification filter to apply to lookups. */
+				samplerInfo.mag_filter = SDL_GPU_FILTER_LINEAR;                 /**< The magnification filter to apply to lookups. */
+				samplerInfo.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_LINEAR;				/**< The mipmap filter to apply to lookups. */
+				samplerInfo.address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;				/**< The addressing mode for U coordinates outside [0, 1). */
+				samplerInfo.address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;				/**< The addressing mode for V coordinates outside [0, 1). */
+				samplerInfo.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;				/**< The addressing mode for W coordinates outside [0, 1). */
+				samplerInfo.mip_lod_bias = 0.f;               /**< The bias to be added to mipmap LOD calculation. */
+				samplerInfo.min_lod = 0.f;                    /**< Clamps the minimum of the computed LOD value. */
+				samplerInfo.max_lod = 0.f;                    /**< Clamps the maximum of the computed LOD value. */
+				samplerInfo.enable_anisotropy = false;          /**< true to enable anisotropic filtering. */
+				samplerInfo.enable_compare = false;             /**< true to enable comparison against a reference value during lookups. */
+				samplerInfo.props = 0;
+
+				ctx.gDepthPrePassSampler = SDL_CreateGPUSampler(device, &samplerInfo);
+				ctx.gNormalsSampler = SDL_CreateGPUSampler(device, &samplerInfo);
+				ctx.gUVSampler = SDL_CreateGPUSampler(device, &samplerInfo);
+				ctx.gAlbedoSampler = SDL_CreateGPUSampler(device, &samplerInfo);
+				ctx.gSpecularSampler = SDL_CreateGPUSampler(device, &samplerInfo);
+				ctx.gLightingSampler = SDL_CreateGPUSampler(device, &samplerInfo);
 			}
 
 			// Create Instance buffer
@@ -105,6 +159,28 @@ namespace Smasher {
 			{
 				SDL_GPUGraphicsPipelineCreateInfo depthPassPipelineInfo{};
 
+				SDL_GPUColorTargetDescription gTargetDescriptions[2];
+				// G-Buffer Depth target
+				gTargetDescriptions[0] = {};
+				gTargetDescriptions[0].blend_state.enable_blend = false;
+				gTargetDescriptions[0].blend_state.color_blend_op = SDL_GPU_BLENDOP_ADD;
+				gTargetDescriptions[0].blend_state.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
+				gTargetDescriptions[0].blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
+				gTargetDescriptions[0].blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+				gTargetDescriptions[0].blend_state.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
+				gTargetDescriptions[0].blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+				gTargetDescriptions[0].format = NORMALS_TEX_FORMAT;
+
+				gTargetDescriptions[1] = {};
+				gTargetDescriptions[1].blend_state.enable_blend = false;
+				gTargetDescriptions[1].blend_state.color_blend_op = SDL_GPU_BLENDOP_ADD;
+				gTargetDescriptions[1].blend_state.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
+				gTargetDescriptions[1].blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
+				gTargetDescriptions[1].blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+				gTargetDescriptions[1].blend_state.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
+				gTargetDescriptions[1].blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+				gTargetDescriptions[1].format = UV_TEX_FORMAT;
+
 				// Vertex Buffers
 				// Instance Data Buffer (slot 0)
 				//		model matrix location(0-3)
@@ -112,7 +188,7 @@ namespace Smasher {
 				// Normal	(slot 2, location 5)
 				// UV Coord (slot 3, location 6)
 
-				SDL_GPUVertexBufferDescription vertexBufferDesc[3];
+				SDL_GPUVertexBufferDescription vertexBufferDesc[4];
 				// Instance Buffer
 				vertexBufferDesc[0] = {};
 				vertexBufferDesc[0].input_rate = SDL_GPU_VERTEXINPUTRATE_INSTANCE;
@@ -134,8 +210,15 @@ namespace Smasher {
 				vertexBufferDesc[2].pitch = sizeof(float) * 3;
 				vertexBufferDesc[2].instance_step_rate = 0;
 
+				// Vertex UV Buffer
+				vertexBufferDesc[3] = {};
+				vertexBufferDesc[3].input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
+				vertexBufferDesc[3].slot = 3;
+				vertexBufferDesc[3].pitch = sizeof(float) * 2;
+				vertexBufferDesc[3].instance_step_rate = 0;
 
-				SDL_GPUVertexAttribute vertexAttributes[6];
+
+				SDL_GPUVertexAttribute vertexAttributes[7];
 				// Model Transform
 				vertexAttributes[0].buffer_slot = 0;
 				vertexAttributes[0].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4;
@@ -161,21 +244,27 @@ namespace Smasher {
 				vertexAttributes[4].offset = 0;
 
 				// Vertex Normal
-				vertexAttributes[5].buffer_slot = 1;
+				vertexAttributes[5].buffer_slot = 2;
 				vertexAttributes[5].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3;
 				vertexAttributes[5].location = 5;
 				vertexAttributes[5].offset = 0;
 
+				// Vertex UV
+				vertexAttributes[6].buffer_slot = 3;
+				vertexAttributes[6].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2;
+				vertexAttributes[6].location = 6;
+				vertexAttributes[6].offset = 0;
+
 				depthPassPipelineInfo.fragment_shader = ctx.depthPassFragShader->GetShader();
 				depthPassPipelineInfo.vertex_shader = ctx.depthPassVertShader->GetShader();
-				depthPassPipelineInfo.target_info.color_target_descriptions = NULL;
-				depthPassPipelineInfo.target_info.num_color_targets = 0;
+				depthPassPipelineInfo.target_info.color_target_descriptions = gTargetDescriptions;
+				depthPassPipelineInfo.target_info.num_color_targets = 2;
 				depthPassPipelineInfo.target_info.has_depth_stencil_target = true;
 				depthPassPipelineInfo.target_info.depth_stencil_format = SDLSystem::GetGPUDepthStencilFormat(device);
 				depthPassPipelineInfo.vertex_input_state.vertex_attributes = vertexAttributes;
-				depthPassPipelineInfo.vertex_input_state.num_vertex_attributes = 6;
+				depthPassPipelineInfo.vertex_input_state.num_vertex_attributes = 7;
 				depthPassPipelineInfo.vertex_input_state.vertex_buffer_descriptions = vertexBufferDesc;
-				depthPassPipelineInfo.vertex_input_state.num_vertex_buffers = 3;
+				depthPassPipelineInfo.vertex_input_state.num_vertex_buffers = 4;
 				depthPassPipelineInfo.depth_stencil_state.enable_depth_test = true;
 				depthPassPipelineInfo.depth_stencil_state.enable_depth_write = true;
 				depthPassPipelineInfo.depth_stencil_state.enable_stencil_test = true;
@@ -219,6 +308,31 @@ namespace Smasher {
 		ErrorCode DepthPrePass(Context& ctx, SDL_GPUDevice* device, const CameraSystem::Component& camera) {
 			SDL_GPUCommandBuffer* commandBuffer = SDL_AcquireGPUCommandBuffer(device);
 			
+			SDL_GPUColorTargetInfo gTargetInfos[2];
+			// Normals
+			gTargetInfos[0] = {};
+			gTargetInfos[0].clear_color = { 0 / 255.f, 0 / 255.f, 0 / 255.f, 0.f / 255.f };
+			gTargetInfos[0].load_op = SDL_GPU_LOADOP_CLEAR;
+			gTargetInfos[0].store_op = SDL_GPU_STOREOP_STORE;
+			gTargetInfos[0].texture = ctx.gNormals;
+			gTargetInfos[0].resolve_texture = NULL;
+			gTargetInfos[0].cycle = true;
+			gTargetInfos[0].mip_level = 0;
+			gTargetInfos[0].layer_or_depth_plane = 0;
+			gTargetInfos[0].cycle_resolve_texture = false;
+
+			// UVs
+			gTargetInfos[1] = {};
+			gTargetInfos[1].clear_color = { 0 / 255.f, 0 / 255.f, 0 / 255.f, 0.f / 255.f };
+			gTargetInfos[1].load_op = SDL_GPU_LOADOP_CLEAR;
+			gTargetInfos[1].store_op = SDL_GPU_STOREOP_STORE;
+			gTargetInfos[1].texture = ctx.gUV;
+			gTargetInfos[1].resolve_texture = NULL;
+			gTargetInfos[1].cycle = true;
+			gTargetInfos[1].mip_level = 0;
+			gTargetInfos[1].layer_or_depth_plane = 0;
+			gTargetInfos[1].cycle_resolve_texture = false;
+
 			SDL_GPUDepthStencilTargetInfo depthStencilTargetInfo = {};
 			depthStencilTargetInfo.clear_depth = 1.f;
 			depthStencilTargetInfo.clear_stencil = 0;
@@ -239,7 +353,7 @@ namespace Smasher {
 			SDL_PushGPUVertexUniformData(commandBuffer, 0, &ubo, sizeof(ubo));
 			Uint8 materialID = 1;
 			for (int i = 0; i < 1; ++i) {
-				SDL_GPURenderPass* renderPass = SDL_BeginGPURenderPass(commandBuffer, NULL, 0, &depthStencilTargetInfo);
+				SDL_GPURenderPass* renderPass = SDL_BeginGPURenderPass(commandBuffer, gTargetInfos, 2, &depthStencilTargetInfo);
 				SDL_BindGPUGraphicsPipeline(renderPass, ctx.depthPassPipeline);
 				SDL_SetGPUStencilReference(renderPass, 64);
 				
@@ -249,17 +363,21 @@ namespace Smasher {
 				indexBuffer.buffer = ctx.testTeapotMeshResource->GetIndexBuffer();
 				indexBuffer.offset = 0;
 
-				SDL_GPUBufferBinding vertexBuffers[2];
+				SDL_GPUBufferBinding vertexBuffers[4];
 				vertexBuffers[0].buffer = instanceBuffer;
 				vertexBuffers[0].offset = 0;
 				vertexBuffers[1].buffer = ctx.testTeapotMeshResource->GetVertexPositionBuffer();
 				vertexBuffers[1].offset = 0;
+				vertexBuffers[2].buffer = ctx.testTeapotMeshResource->GetVertexNormalBuffer();
+				vertexBuffers[2].offset = 0;
+				vertexBuffers[3].buffer = ctx.testTeapotMeshResource->GetVertexUVBuffer();
+				vertexBuffers[3].offset = 0;
 
 				Uint32 numIndices = ctx.testTeapotMeshResource->GetNumIndices();
 				Uint32 numInstances = 1;
 				SDL_BindGPUIndexBuffer(renderPass, &indexBuffer, SDL_GPUIndexElementSize::SDL_GPU_INDEXELEMENTSIZE_32BIT);
 
-				SDL_BindGPUVertexBuffers(renderPass, 0, vertexBuffers, 2);
+				SDL_BindGPUVertexBuffers(renderPass, 0, vertexBuffers, 4);
 				for (int j = 0; j < 1; j++) {
 					SDL_DrawGPUIndexedPrimitives(renderPass, numIndices, numInstances, 0, 0, 0);
 				}
