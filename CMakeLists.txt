@@ -1,4 +1,4 @@
-﻿cmake_minimum_required (VERSION 3.8)
+﻿cmake_minimum_required (VERSION 3.21)
 project ("SmasherEngine")
 include(GenerateExportHeader)
 include(FetchContent)
@@ -458,7 +458,7 @@ OpenGL::GLU
 box2d::box2d
 EnTT::EnTT
 glm::glm
-SDL3::SDL3-static
+SDL3::SDL3-shared
 SDL3_shadercross::SDL3_shadercross-static)
 
 if(WIN32)
@@ -471,6 +471,15 @@ target_compile_features(SmasherEngine PUBLIC cxx_std_20)
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET SmasherEngine PROPERTY CXX_STANDARD 20)
 endif()
+
+# Copy all necessary DLLs to build directory
+add_custom_command(TARGET SmasherEngine POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:SDL3::SDL3-shared>
+        $<TARGET_FILE_DIR:SmasherEngine>
+    COMMAND_EXPAND_LISTS
+)
+
 
 # TODO: Add tests and install targets if needed.
 
