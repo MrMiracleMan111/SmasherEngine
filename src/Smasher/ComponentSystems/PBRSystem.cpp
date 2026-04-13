@@ -31,7 +31,7 @@ namespace Smasher {
 				auto& resourceManager = registry.ctx().get<EngineSystem::Context>().engineRef.get().GetResourceManager();
 				ctx.depthPassFragShader = resourceManager.GetOrLoadResource<Manifest::Shaders::depth_pass_frag_shader, Smasher::SDLGraphicShaderResource>(gpu, SDL_GPUShaderStage::SDL_GPU_SHADERSTAGE_FRAGMENT);
 				ctx.depthPassVertShader = resourceManager.GetOrLoadResource<Manifest::Shaders::depth_pass_vert_shader, Smasher::SDLGraphicShaderResource>(gpu, SDL_GPUShaderStage::SDL_GPU_SHADERSTAGE_VERTEX);
-				ctx.testTeapotMeshResource = resourceManager.GetOrLoadResource<Manifest::Models::teapot, Smasher::StaticMeshResource>(gpu);
+				ctx.testTeapotMeshResource = resourceManager.GetOrLoadResource<Manifest::Models::suzanne, Smasher::StaticMeshResource>(gpu);
 			}
 
 			StaticMeshInstance teapotInstances[3] = {
@@ -56,7 +56,7 @@ namespace Smasher {
 				depthStencilTextureInfo.num_levels = 1;
 				depthStencilTextureInfo.sample_count = SDL_GPU_SAMPLECOUNT_1;
 				depthStencilTextureInfo.type = SDL_GPU_TEXTURETYPE_2D;
-				depthStencilTextureInfo.usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET;
+				depthStencilTextureInfo.usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER;
 				ctx.gDepthPrePass = SDL_CreateGPUTexture(device, &depthStencilTextureInfo);
 				SDL_SetGPUTextureName(device, ctx.gDepthPrePass, "Depth Pre Pass Texture");
 			}
@@ -71,7 +71,7 @@ namespace Smasher {
 				normalsTextureInfo.num_levels = 1;
 				normalsTextureInfo.sample_count = SDL_GPU_SAMPLECOUNT_1;
 				normalsTextureInfo.type = SDL_GPU_TEXTURETYPE_2D;
-				normalsTextureInfo.usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET;
+				normalsTextureInfo.usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER;
 				ctx.gNormals = SDL_CreateGPUTexture(device, &normalsTextureInfo);
 				SDL_SetGPUTextureName(device, ctx.gNormals, "Normals Texture");
 			}
@@ -86,7 +86,7 @@ namespace Smasher {
 				uvTextureInfo.num_levels = 1;
 				uvTextureInfo.sample_count = SDL_GPU_SAMPLECOUNT_1;
 				uvTextureInfo.type = SDL_GPU_TEXTURETYPE_2D;
-				uvTextureInfo.usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET;
+				uvTextureInfo.usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER;
 				ctx.gUV = SDL_CreateGPUTexture(device, &uvTextureInfo);
 				SDL_SetGPUTextureName(device, ctx.gUV, "UV Texture");
 			}
@@ -274,7 +274,7 @@ namespace Smasher {
 				depthPassPipelineInfo.depth_stencil_state.front_stencil_state.depth_fail_op = SDL_GPU_STENCILOP_KEEP;
 				depthPassPipelineInfo.depth_stencil_state.front_stencil_state.pass_op = SDL_GPU_STENCILOP_REPLACE;
 				depthPassPipelineInfo.depth_stencil_state.front_stencil_state.fail_op = SDL_GPU_STENCILOP_REPLACE;
-				depthPassPipelineInfo.depth_stencil_state.back_stencil_state.compare_op = SDL_GPU_COMPAREOP_ALWAYS;
+				depthPassPipelineInfo.depth_stencil_state.back_stencil_state.compare_op = SDL_GPU_COMPAREOP_NEVER;
 				depthPassPipelineInfo.depth_stencil_state.back_stencil_state.depth_fail_op = SDL_GPU_STENCILOP_KEEP;
 				depthPassPipelineInfo.depth_stencil_state.back_stencil_state.pass_op = SDL_GPU_STENCILOP_REPLACE;
 				depthPassPipelineInfo.depth_stencil_state.back_stencil_state.fail_op = SDL_GPU_STENCILOP_REPLACE;

@@ -19,6 +19,8 @@ namespace Smasher {
 
 		SMASHER_API ErrorCode Initialize(entt::registry& registry);
 		SMASHER_API ErrorCode Teardown(entt::registry& registry);
+		SMASHER_API	ErrorCode Update(entt::registry& registry);
+
 		SMASHER_API Expected<std::reference_wrapper<Component>> AddComponent(entt::registry& registry, entt::entity entity);
 
 		SMASHER_API	float GetFOV(const Component& component);

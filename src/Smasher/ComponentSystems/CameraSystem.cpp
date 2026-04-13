@@ -13,10 +13,28 @@ namespace Smasher {
 
 			return ERROR_NoError;
 		}
+
 		ErrorCode Teardown(entt::registry& registry) {
 			if (!registry.ctx().contains<Context>()) {
 				return ERROR_NoError;
 			}
+			return ERROR_NoError;
+		}
+
+		// Should be called before TransformSystem::Update
+		// Updates view matrices for all cameras
+		ErrorCode Update(entt::registry& registry) {
+			if (!registry.ctx().contains<Context>()) {
+				return ERROR_SystemNotInitialized;
+			}
+
+			auto view = registry.view<TransformSystem::Component, Component>();
+			for (auto [entity, cameraTransform, cameraComp] : view.each()) {
+				if (TransformSystem::HasChanged(cameraTransform)) {
+					ComputeViewMatrix(cameraComp, TransformSystem::GetTransform(cameraTransform));
+				}
+			}
+
 			return ERROR_NoError;
 		}
 

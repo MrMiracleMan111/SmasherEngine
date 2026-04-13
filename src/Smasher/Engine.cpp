@@ -158,7 +158,7 @@ namespace Smasher {
 #endif
 
 		if (!m_Headless) {
-			SDL_Init(SDL_INIT_VIDEO);
+			SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_GAMEPAD);
 
 			//glewExperimental = GL_TRUE;
 			//GLenum status = glewInit();

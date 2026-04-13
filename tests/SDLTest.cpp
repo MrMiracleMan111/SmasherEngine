@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <array>
 #include <format>
+#include <SDL3/SDL.h>
 #include <Windows.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
@@ -17,12 +18,58 @@
 #include "Smasher/ComponentSystems/CameraSystem.h"
 #include "Smasher/ComponentSystems/PBRSystem.h"
 #include "Smasher/Resources.h"
+#include "Smasher/Exceptions.h"
 #include "Manifest.h"
 
 class DummyLayer : public Smasher::Layer {
 public:
 	DummyLayer(Smasher::Engine& engine) : Smasher::Layer(engine) {}
 };
+
+namespace GameLogic {
+	struct Context {
+		Smasher::TransformSystem::Component& cameraTransform;
+	};
+
+	Smasher::ErrorCode Initialize(entt::registry& registry, Smasher::TransformSystem::Component& cameraTransform) {
+		if (registry.ctx().contains<Context>()) {
+			return ERROR_SystemAlreadyInitialized;
+		}
+
+		registry.ctx().emplace<Context>(cameraTransform);
+	}
+
+	Smasher::ErrorCode Update(entt::registry& registry) {
+		auto& ctx = registry.ctx().get<Context>();
+		Smasher::Engine& engine = registry.ctx().get<Smasher::EngineSystem::Context>().engineRef;
+		Smasher::EventManager& eventManager = engine.GetEventManager();
+
+
+		float speed = 0.01f;
+		glm::vec3 pos = Smasher::TransformSystem::GetPosition(ctx.cameraTransform);
+		int numkeys = 0;
+		const bool* state = SDL_GetKeyboardState(&numkeys);
+		if (state[SDL_SCANCODE_W]) {
+			pos.z -= speed;
+			Smasher::TransformSystem::SetPosition(ctx.cameraTransform, pos);
+		}
+		if (state[SDL_SCANCODE_A]) {
+			pos.x -= speed;
+			Smasher::TransformSystem::SetPosition(ctx.cameraTransform, pos);
+		}
+		if (state[SDL_SCANCODE_S]) {
+			pos.z += speed;
+			Smasher::TransformSystem::SetPosition(ctx.cameraTransform, pos);
+		}
+		if (state[SDL_SCANCODE_D]) {
+			pos.x += speed;
+			Smasher::TransformSystem::SetPosition(ctx.cameraTransform, pos);
+		}
+		std::cout << "Z Pos: " << pos.z << std::endl;
+
+		return ERROR_NoError;
+	}
+}
 
 
 entt::entity SpawnBouncingBall(entt::registry& registry, glm::vec2 position) {
@@ -97,6 +144,9 @@ int main() {
 	Smasher::CameraSystem::ComputeProjectionMatrix(cameraComponent);
 	Smasher::CameraSystem::ComputeViewMatrix(cameraComponent, Smasher::TransformSystem::GetTransform(cameraTransform));
 
+
+	GameLogic::Initialize(registry, cameraTransform);
+
 	std::cout << "Projection Matrix" << glm::to_string(cameraComponent._projectionMatrix) << std::endl;
 	std::cout << "Camera Transform" << glm::to_string(Smasher::TransformSystem::GetTransform(cameraTransform)) << std::endl;
 	std::cout << "View Matrix" << glm::to_string(cameraComponent._viewMatrix) << std::endl;
@@ -113,22 +163,27 @@ int main() {
 		entt::registry& registry = engine.GetRegistry();
 		auto& engine = registry.ctx().get<Smasher::EngineSystem::Context>().engineRef.get();
 
-		Smasher::Job& transformLogicJob = jobManager.AddSyncJob(std::bind(Smasher::TransformSystem::Update, std::ref(registry)),
-			{}).Get();
+		Smasher::Job& gameLogicUpdate = jobManager.AddSyncJob(std::bind(GameLogic::Update, std::ref(registry)),
+			{ }).Get();
+		Smasher::Job& cameraUpdate = jobManager.AddSyncJob(std::bind(Smasher::CameraSystem::Update, std::ref(registry)),
+			{ gameLogicUpdate }).Get();
 
 		if (engine.IsRenderTick()) {
 			auto& sdlSpriteSystemCtx = registry.ctx().get<Smasher::SDLSpriteSystem::Context>();
 			auto& pbrSystemCtx = registry.ctx().get<Smasher::PBRSystem::Context>();
 			SDL_GPUDevice* device = sdlSystemCtx.pGpu->Get();
 			Smasher::Job& sdlModelDepthPrePass = jobManager.AddSyncJob(std::bind(Smasher::PBRSystem::DepthPrePass, pbrSystemCtx, device, cameraComponent),
-				{ }).Get();
+				{ cameraUpdate }).Get();
 			Smasher::Job& sdlDrawTriangleJob = jobManager.AddSyncJob(std::bind(Smasher::SDLSpriteSystem::DrawTriangle, sdlSpriteSystemCtx),
 				{ sdlModelDepthPrePass }).Get();
 			Smasher::Job& sdlCompositionJob = jobManager.AddSyncJob(std::bind(Smasher::SDLSystem::CompositionPass, sdlSystemCtx, std::vector<Smasher::SDLSystem::RenderTexture>{ Smasher::SDLSystem::RenderTexture{ sdlSpriteSystemCtx.renderTexture, sdlSpriteSystemCtx.depthTexture } }),
 				{ sdlDrawTriangleJob }).Get();
-			Smasher::Job& sdlCopyToWindowJob = jobManager.AddSyncJob(std::bind(Smasher::SDLSystem::CopyToWindow, sdlSystemCtx, sdlSystemCtx.gColorTexture),
+			Smasher::Job& sdlCopyToWindowJob = jobManager.AddSyncJob(std::bind(Smasher::SDLSystem::CopyToWindow, sdlSystemCtx, pbrSystemCtx.gNormals),
 				{ sdlCompositionJob }).Get();
 		}
+
+		Smasher::Job& transformLogicJob = jobManager.AddSyncJob(std::bind(Smasher::TransformSystem::Update, std::ref(registry)),
+			{ gameLogicUpdate }).Get();
 		});
 
 	layer.Activate();
