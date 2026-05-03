@@ -1,6 +1,12 @@
+#define GLM_ENABLE_EXPERIMENTAL
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/gtx/string_cast.hpp>
+#include <iostream>
 #include "Smasher/ComponentSystems/CameraSystem.h"
 #include "Smasher/ComponentSystems/TransformSystem.h"
 #include "Smasher/ErrorCodes.h"
+
+
 
 namespace Smasher {
 	namespace CameraSystem {
@@ -30,8 +36,10 @@ namespace Smasher {
 
 			auto view = registry.view<TransformSystem::Component, Component>();
 			for (auto [entity, cameraTransform, cameraComp] : view.each()) {
-				if (TransformSystem::HasChanged(cameraTransform)) {
+				if (TransformSystem::HasTransformChanged(cameraTransform)) {
 					ComputeViewMatrix(cameraComp, TransformSystem::GetTransform(cameraTransform));
+					const glm::mat4& matrix = GetViewMatrix(cameraComp);
+					//std::cout << "View Matrix" << glm::to_string(TransformSystem::GetTransform(cameraTransform)) << std::endl;
 				}
 			}
 
@@ -96,22 +104,31 @@ namespace Smasher {
 		// https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/building-basic-perspective-projection-matrix.html
 		// https://johannesugb.github.io/gpu-programming/setting-up-a-proper-vulkan-projection-matrix/
 		void ComputeProjectionMatrix(Component& component) {
-			component._projectionMatrix = glm::perspective(component._fov, component._aspectRatio, component._nearClipPlane, component._farClipPlane);
+			constexpr glm::mat4 reverseZ {
+				1.f,	0.f,	0.f,	0.f,
+				0.f,	1.f,	0.f,	0.f,
+				0.f,	0.f,   -1.f,	0.f,
+				0.f,	0.f,	1.f,	1.f,
+			};
+			//component._projectionMatrix = reverseZ * glm::perspective(component._fov, component._aspectRatio, component._nearClipPlane, component._farClipPlane);
+			component._projectionMatrix = glm::perspectiveRH_ZO(glm::radians(component._fov), component._aspectRatio, component._nearClipPlane, component._farClipPlane);
+			//component._projectionMatrix = reverseZ * glm::infinitePerspectiveRH_ZO(component._fov, component._aspectRatio, component._nearClipPlane);
 
 			//float aspect = component._aspectRatio;
 			//float scaleFactor = 1 / (glm::tan(glm::radians(component._fov / 2.f)));
 			//float near = component._nearClipPlane;
 			//float far = component._farClipPlane;
-			//float mult = (component._farClipPlane) / (far - near);
+			//float mult = (far) / (near - far);
 			//
-			//float fact1 = -(far + near) / (far - near);
-			//float fact2 = -2 * (far * near) / (far - near);
-			//component._projectionMatrix = glm::mat4(
-			//scaleFactor * (1.f/aspect),         0.f,       0.f,			  0.f,
-			//	                   0.f, scaleFactor,	   0.f,			  0.f,
-			//	                   0.f,		    0.f,	  mult,	   -near*mult,
-			//	                   0.f,		    0.f,	   1.f,			  0.f
-			//);
+			//float fact1 = -(far - near) / (near - far);
+			//float fact2 = 2 * (far * near) / (near - far);
+			//// Column-Major Order
+			//component._projectionMatrix = glm::transpose(glm::mat4(
+			//	(1.f / aspect) * scaleFactor,           0.f,       0.f,			  0.f,
+			//							 0.f,   scaleFactor,	   0.f,			  0.f,
+			//							 0.f,		    0.f,	-fact1,			fact2,
+			//							 0.f,		    0.f,	   1.f,			  0.f
+			//));
 		}
 
 		void ComputeViewMatrix(Component& component, const glm::mat4& transform) {

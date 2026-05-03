@@ -45,6 +45,7 @@
 
 // ==== OPENGL EXCEPTIONS ====
 #define ERROR_GLEWInitFailed 800
+#define ERROR_GPUBlockPoolFull 801
 
 // ==== JOBS EXCEPTIONS ====
 #define ERROR_NotEnoughThreads 900

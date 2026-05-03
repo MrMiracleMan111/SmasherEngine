@@ -18,7 +18,7 @@ namespace Smasher {
 			auto view = registry.view<TransformSystem::Component, Component>();
 			for (auto [entity, textTransform, textImage] : view.each()) {
 				if (textImage.fontLoaded) {
-					if (TransformSystem::HasChanged(textTransform)) {
+					if (TransformSystem::HasTransformChanged(textTransform)) {
 						textImage.text.setPosition({ textTransform._position.x, textTransform._position.y });
 					}
 					window.draw(textImage.text);

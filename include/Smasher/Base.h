@@ -3,6 +3,7 @@
 #include <chrono>
 #include <sstream>
 #include <numbers>
+#include <entt/core/hashed_string.hpp>
 #include <filesystem>
 #include <SDL3/SDL.h>
 #include <SFML/System.hpp>
@@ -13,6 +14,9 @@
 #include "Smasher/ISerializeable.h"
 
 #define GLM_ENABLE_EXPERIMENTAL 
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+
+#include <glm/glm.hpp>
 
 #define SMASHER_API SMASHERENGINE_EXPORT
 
@@ -35,7 +39,9 @@ constexpr uint64_t hash_str(const char *str) {
 	return hash;
 }
 
-/// Namespace for Smasher Game Engine
+using namespace entt::literals;
+
+// Namespace for Smasher Game Engine
 namespace Smasher {
 	class Layer;
 	class IComponent;
@@ -118,6 +124,10 @@ namespace Smasher {
 		t.Update(arg);
 	};
 
+	struct SMASHER_API MaterialHandle {
+		int id = -1; // interal for PBRSystem (-1 is the initial invalid state)
+	};
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief Struct defining extra texture settings such as transluscency.
 /// 
@@ -134,6 +144,7 @@ namespace Smasher {
 		SHADER,
 		FILE,
 		STATIC_MESH,
+		MATERIAL,
 		INVALID
 	};
 

@@ -28,45 +28,91 @@ public:
 
 namespace GameLogic {
 	struct Context {
-		Smasher::TransformSystem::Component& cameraTransform;
+		entt::entity camera;
+		entt::entity model;
 	};
 
-	Smasher::ErrorCode Initialize(entt::registry& registry, Smasher::TransformSystem::Component& cameraTransform) {
+	struct Component {
+		char padding;
+	};
+
+	Smasher::ErrorCode Initialize(entt::registry& registry, entt::entity camera, entt::entity model) {
 		if (registry.ctx().contains<Context>()) {
 			return ERROR_SystemAlreadyInitialized;
 		}
 
-		registry.ctx().emplace<Context>(cameraTransform);
+		registry.ctx().emplace<Context>(camera, model);
+		return ERROR_NoError;
 	}
 
-	Smasher::ErrorCode Update(entt::registry& registry) {
+	Smasher::Expected<std::reference_wrapper<Component>> AddComponent(entt::registry& registry, entt::entity entity) {
+		assert(registry.all_of<Smasher::TransformSystem::Component>(entity) && "StaticMeshSystem::Component requires TransformSystem::Component");
+
+		if (!registry.ctx().contains<Context>()) {
+			return Smasher::Expected<std::reference_wrapper<Component>>::Error(ERROR_SystemNotInitialized);
+		}
+
+		Component& component = registry.emplace<Component>(entity);
+		return std::ref(component);
+	}
+
+	Smasher::ErrorCode Update(entt::registry& registry, Smasher::Millisecond ms) {
+		//Smasher::Engine& engine = registry.ctx().get<Smasher::EngineSystem::Context>().engineRef;
+		//Smasher::EventManager& eventManager = engine.GetEventManager();
 		auto& ctx = registry.ctx().get<Context>();
-		Smasher::Engine& engine = registry.ctx().get<Smasher::EngineSystem::Context>().engineRef;
-		Smasher::EventManager& eventManager = engine.GetEventManager();
+		auto& transform = registry.get<Smasher::TransformSystem::Component>(ctx.model);
 
-
-		float speed = 0.01f;
-		glm::vec3 pos = Smasher::TransformSystem::GetPosition(ctx.cameraTransform);
+		float delta = ms.count() / 1000.f;
+		float speed = 1.0f * delta;
+		float rotationSpeed = 40.0f * delta;
+		glm::vec3 pos = Smasher::TransformSystem::GetPosition(transform);
+		glm::vec3 euler = Smasher::TransformSystem::GetEulerDeg(transform);
 		int numkeys = 0;
 		const bool* state = SDL_GetKeyboardState(&numkeys);
+		bool pressedKey = false;
 		if (state[SDL_SCANCODE_W]) {
 			pos.z -= speed;
-			Smasher::TransformSystem::SetPosition(ctx.cameraTransform, pos);
+			Smasher::TransformSystem::SetPosition(transform, pos);
+			pressedKey = true;
 		}
 		if (state[SDL_SCANCODE_A]) {
 			pos.x -= speed;
-			Smasher::TransformSystem::SetPosition(ctx.cameraTransform, pos);
+			Smasher::TransformSystem::SetPosition(transform, pos);
+			pressedKey = true;
 		}
 		if (state[SDL_SCANCODE_S]) {
 			pos.z += speed;
-			Smasher::TransformSystem::SetPosition(ctx.cameraTransform, pos);
+			Smasher::TransformSystem::SetPosition(transform, pos);
+			pressedKey = true;
 		}
 		if (state[SDL_SCANCODE_D]) {
 			pos.x += speed;
-			Smasher::TransformSystem::SetPosition(ctx.cameraTransform, pos);
+			Smasher::TransformSystem::SetPosition(transform, pos);
+			pressedKey = true;
 		}
-		std::cout << "Z Pos: " << pos.z << std::endl;
+		if (state[SDL_SCANCODE_Q]) {
+			euler.y -= rotationSpeed;
+			Smasher::TransformSystem::RotateEulerDeg(transform, 0.f, -rotationSpeed, 0.f, true);
+			pressedKey = true;
+		}
+		if (state[SDL_SCANCODE_E]) {
+			euler.y += rotationSpeed;
+			Smasher::TransformSystem::RotateEulerDeg(transform, 0.f, rotationSpeed, 0.f, true);
+			pressedKey = true;
+		}
 
+		if (pressedKey) {
+			Smasher::TransformSystem::MarkDirty(registry, ctx.model);
+			Smasher::TransformSystem::MarkDirty(registry, ctx.camera);
+		}
+
+		float radians = glm::radians(rotationSpeed);
+		auto view = registry.view<Smasher::TransformSystem::Component, Component>();
+		glm::quat rotation = glm::angleAxis(radians, glm::vec3(0, 1, 0));
+		for (auto [entity, transform, logic] : view.each()) {
+			Smasher::TransformSystem::Rotate(transform, rotation, true);
+			Smasher::TransformSystem::MarkDirty(registry, entity);
+		}
 		return ERROR_NoError;
 	}
 }
@@ -123,47 +169,59 @@ int main() {
 	Smasher::PBRSystem::Initialize(registry, sdlSystemCtx.pGpu);
 	Smasher::SDLSpriteSystem::Initialize(registry, sdlSystemCtx.pGpu, fragShader, vertShader, sdlSystemCtx.window);
 
+	auto& staticMeshSystemCtx = registry.ctx().get<Smasher::StaticMeshSystem::Context>();
+	auto& pbrSystemCtx = registry.ctx().get<Smasher::PBRSystem::Context>();
+
 	// Add entities
 	glm::uvec2 bounds{ 640u, 420u };
 	for (size_t i = 0; i < 10; ++i) {
 		glm::vec2 position{ rand() % bounds.x, rand() % bounds.y };
-		entt::entity entity = registry.create();
-		entt::entity ball = SpawnBouncingBall(engine.GetRegistry(), position);
+		//entt::entity entity = registry.create();
+		//entt::entity ball = SpawnBouncingBall(engine.GetRegistry(), position);
 	}
 	// Add Camera
 	int width, height;
 	SDL_GetWindowSizeInPixels(sdlSystemCtx.window, &width, &height);
 	entt::entity camera = registry.create();
 	auto& cameraTransform = Smasher::TransformSystem::AddComponent(registry, camera).Get().get();
-	Smasher::TransformSystem::SetPosition(cameraTransform, 0.f, 0.f, 5.f);
+	Smasher::TransformSystem::SetPosition(cameraTransform, 0.f, 0.f, 6.f);
+	Smasher::TransformSystem::MarkDirty(registry, camera);
 	auto& cameraComponent = Smasher::CameraSystem::AddComponent(registry, camera).Get().get();
 	Smasher::CameraSystem::SetFOV(cameraComponent, 90.f);
-	Smasher::CameraSystem::SetNearClipPlane(cameraComponent, 1.f);
-	Smasher::CameraSystem::SetFarClipPlane(cameraComponent, 1000.f);
-	Smasher::CameraSystem::SetAspectRatio(cameraComponent, width / height);
+	Smasher::CameraSystem::SetNearClipPlane(cameraComponent, 0.1f);
+	Smasher::CameraSystem::SetFarClipPlane(cameraComponent, 100.f);
+	Smasher::CameraSystem::SetAspectRatio(cameraComponent, (float)width / (float)height);
 	Smasher::CameraSystem::ComputeProjectionMatrix(cameraComponent);
 	Smasher::CameraSystem::ComputeViewMatrix(cameraComponent, Smasher::TransformSystem::GetTransform(cameraTransform));
-
-
-	GameLogic::Initialize(registry, cameraTransform);
-
-	std::cout << "Projection Matrix" << glm::to_string(cameraComponent._projectionMatrix) << std::endl;
-	std::cout << "Camera Transform" << glm::to_string(Smasher::TransformSystem::GetTransform(cameraTransform)) << std::endl;
-	std::cout << "View Matrix" << glm::to_string(cameraComponent._viewMatrix) << std::endl;
-
 
 	// Add Teapot Model
 	entt::entity teapot = registry.create();
 	auto& teapotTransform = Smasher::TransformSystem::AddComponent(registry, teapot).Get().get();
-	Smasher::TransformSystem::SetPosition(teapotTransform, 0.f, 0.f, 0.f);
+	Smasher::TransformSystem::SetPosition(teapotTransform, 0.f, 0.f, 4.f);
 	Smasher::TransformSystem::SetScale(teapotTransform, 0.1f, 0.1f, 0.1f);
-	auto& teapotMesh = Smasher::StaticMeshSystem::AddComponent(registry, teapot, teapotMeshResource).Get().get();
+	auto& teapotMesh = Smasher::StaticMeshSystem::AddComponent(registry, teapot, teapotMeshResource, pbrSystemCtx.staticMeshBatchPool).Get().get();
+
+	GameLogic::Initialize(registry, camera, teapot);
+
+	int dimension = 50;
+	for (int i = 0; i < dimension; i++) {
+		for (int j = 0; j < dimension; j++) {
+			const float inc = 0.1f;
+			const float offset = (dimension/2) * inc;
+			entt::entity tmp = registry.create();
+			auto& tmpTransform = Smasher::TransformSystem::AddComponent(registry, tmp).Get().get();
+			Smasher::TransformSystem::SetPosition(tmpTransform, i * inc - offset, j * inc - offset, 3.f);
+			Smasher::TransformSystem::SetScale(tmpTransform, 0.1f, 0.1f, 0.1f);
+			auto& tmpMesh = Smasher::StaticMeshSystem::AddComponent(registry, tmp, teapotMeshResource, pbrSystemCtx.staticMeshBatchPool).Get().get();
+			GameLogic::AddComponent(registry, tmp);
+		}
+	}
 
 	jobManager.SetTickJobProducer([&]() {
 		entt::registry& registry = engine.GetRegistry();
 		auto& engine = registry.ctx().get<Smasher::EngineSystem::Context>().engineRef.get();
-
-		Smasher::Job& gameLogicUpdate = jobManager.AddSyncJob(std::bind(GameLogic::Update, std::ref(registry)),
+		auto delta = std::chrono::duration_cast<std::chrono::milliseconds>(engine.GetTickDelta());
+		Smasher::Job& gameLogicUpdate = jobManager.AddSyncJob(std::bind(GameLogic::Update, std::ref(registry), delta),
 			{ }).Get();
 		Smasher::Job& cameraUpdate = jobManager.AddSyncJob(std::bind(Smasher::CameraSystem::Update, std::ref(registry)),
 			{ gameLogicUpdate }).Get();
@@ -171,18 +229,25 @@ int main() {
 		if (engine.IsRenderTick()) {
 			auto& sdlSpriteSystemCtx = registry.ctx().get<Smasher::SDLSpriteSystem::Context>();
 			auto& pbrSystemCtx = registry.ctx().get<Smasher::PBRSystem::Context>();
+			auto& staticMeshSystemCtx = registry.ctx().get<Smasher::StaticMeshSystem::Context>();
+
 			SDL_GPUDevice* device = sdlSystemCtx.pGpu->Get();
-			Smasher::Job& sdlModelDepthPrePass = jobManager.AddSyncJob(std::bind(Smasher::PBRSystem::DepthPrePass, pbrSystemCtx, device, cameraComponent),
+			Smasher::Job& syncModelTransformsJob = jobManager.AddSyncJob(std::bind(Smasher::StaticMeshSystem::SyncStaticMeshTransforms, std::ref(registry), std::ref(staticMeshSystemCtx)),
 				{ cameraUpdate }).Get();
-			Smasher::Job& sdlDrawTriangleJob = jobManager.AddSyncJob(std::bind(Smasher::SDLSpriteSystem::DrawTriangle, sdlSpriteSystemCtx),
+
+			Smasher::Job& sdlModelDepthPrePass = jobManager.AddSyncJob(std::bind(Smasher::PBRSystem::DepthPrePass, std::ref(pbrSystemCtx), std::ref(staticMeshSystemCtx), std::ref(resourceManager), cameraComponent),
+				{ syncModelTransformsJob }).Get();
+			//Smasher::Job& sdlDrawTriangleJob = jobManager.AddSyncJob(std::bind(Smasher::SDLSpriteSystem::DrawTriangle, std::ref(sdlSpriteSystemCtx)),
+			//	{ sdlModelDepthPrePass }).Get();
+			//Smasher::Job& sdlCompositionJob = jobManager.AddSyncJob(std::bind(Smasher::SDLSystem::CompositionPass, std::ref(sdlSystemCtx), std::vector<Smasher::SDLSystem::RenderTexture>{ Smasher::SDLSystem::RenderTexture{ sdlSpriteSystemCtx.renderTexture, sdlSpriteSystemCtx.depthTexture } }),
+			//	{ sdlDrawTriangleJob }).Get();
+			Smasher::Job& sdlCompositionJob = jobManager.AddSyncJob(std::bind(Smasher::SDLSystem::CompositionPass, std::ref(sdlSystemCtx), std::vector<Smasher::SDLSystem::RenderTexture>{ Smasher::SDLSystem::RenderTexture{ pbrSystemCtx.gNormals, sdlSpriteSystemCtx.depthTexture } }),
 				{ sdlModelDepthPrePass }).Get();
-			Smasher::Job& sdlCompositionJob = jobManager.AddSyncJob(std::bind(Smasher::SDLSystem::CompositionPass, sdlSystemCtx, std::vector<Smasher::SDLSystem::RenderTexture>{ Smasher::SDLSystem::RenderTexture{ sdlSpriteSystemCtx.renderTexture, sdlSpriteSystemCtx.depthTexture } }),
-				{ sdlDrawTriangleJob }).Get();
-			Smasher::Job& sdlCopyToWindowJob = jobManager.AddSyncJob(std::bind(Smasher::SDLSystem::CopyToWindow, sdlSystemCtx, pbrSystemCtx.gNormals),
+			Smasher::Job& sdlCopyToWindowJob = jobManager.AddSyncJob(std::bind(Smasher::SDLSystem::CopyToWindow, std::ref(sdlSystemCtx), pbrSystemCtx.gNormals),
 				{ sdlCompositionJob }).Get();
 		}
 
-		Smasher::Job& transformLogicJob = jobManager.AddSyncJob(std::bind(Smasher::TransformSystem::Update, std::ref(registry)),
+		Smasher::Job& transformLogicJob = jobManager.AddSyncJob(std::bind(Smasher::TransformSystem::ClearDirty, std::ref(registry)),
 			{ gameLogicUpdate }).Get();
 		});
 

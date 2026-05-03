@@ -1,13 +1,16 @@
 #pragma once
+#include "Smasher/ComponentSystems/StaticMeshSystem.h"
+#include <entt/entt.hpp>
 #include <glm/glm.hpp>
 #include <SDL3/SDL.h>
+#include <queue>
 #include "Smasher/Base.h"
 #include "Smasher/Resources.h"
 #include "Smasher/ErrorCodes.h"
 #include "Smasher/Exceptions.h"
+#include "Smasher/Util/GraphicsUtil.h"
 #include "Smasher/ComponentSystems/CameraSystem.h"
 #include "Smasher/ComponentSystems/SDLSystem.h"
-#include "Smasher/ComponentSystems/StaticMeshSystem.h"
 
 // Physical Based Rendering System
 // From this guide: https://www.3dgep.com/forward-plus/#Deferred_Shading
@@ -33,10 +36,20 @@
 //
 namespace Smasher {
 	namespace PBRSystem {
+		static const int MAX_STATIC_MESH_MATERIALS = 128;
+		static const int MAX_STATIC_MESH_INSTANCE_COUNT = 1024 * 128;
+		SDL_GPUTextureFormat ALBEDO_TEX_FORMAT = SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM;
 		SDL_GPUTextureFormat NORMALS_TEX_FORMAT = SDL_GPU_TEXTUREFORMAT_R32G32B32A32_FLOAT;
 		SDL_GPUTextureFormat UV_TEX_FORMAT = SDL_GPU_TEXTUREFORMAT_R32G32_FLOAT;// SDL_GPU_TEXTUREFORMAT_R16G16_FLOAT;
 
 		struct Context {
+			GPUBlockPool<StaticMeshSystem::StaticMeshData> staticMeshBatchPool;
+			SDL_GPUTransferBuffer *staticMeshTransferBuffer;
+
+			// Static Mesh Materials Texture Array of 512 x 512 textures
+			// 256 materials
+			SDL_GPUTexture* staticMeshAlbedos512; 
+
 			// G-Buffer Objects
 			SDL_GPUTexture *gDepthPrePass;
 			SDL_GPUTexture *gNormals;
@@ -54,12 +67,15 @@ namespace Smasher {
 
 			SDL_GPUGraphicsPipeline *depthPassPipeline;
 
+			std::shared_ptr<SDL_GPUDeviceWrapper> gpu;
 			std::shared_ptr<SDLGraphicShaderResource> depthPassFragShader;
 			std::shared_ptr<SDLGraphicShaderResource> depthPassVertShader;
 
 			SDL_GPUBuffer *testInstanceBuffer;
 			StaticMeshSystem::Component testTeapot;
 			std::shared_ptr<StaticMeshResource> testTeapotMeshResource;
+
+			int _staticMeshSlot = 0;
 		};
 
 		enum class LightType {
@@ -77,10 +93,12 @@ namespace Smasher {
 
 		SMASHER_API ErrorCode Initialize(entt::registry& registry, std::shared_ptr<SDL_GPUDeviceWrapper> gpu);
 		SMASHER_API ErrorCode Teardown(entt::registry& registry);
-		SMASHER_API ErrorCode OnWindowResize(Context& ctx, SDL_GPUDevice* device);
-		SMASHER_API ErrorCode DepthPrePass(Context& ctx, SDL_GPUDevice* device, const CameraSystem::Component& camera);
-		SMASHER_API ErrorCode LightingPass(Context& ctx, SDL_GPUDevice* device);
-		SMASHER_API ErrorCode ShadowPass(Context& ctx, SDL_GPUDevice* device, const CameraSystem::Component& camera);
-		SMASHER_API ErrorCode MaterialsPass(Context& ctx, SDL_GPUDevice* device);
+		SMASHER_API ErrorCode OnWindowResize(Context& ctx);
+		SMASHER_API ErrorCode DepthPrePass(Context& ctx, const StaticMeshSystem::Context& staticMeshCtx, ResourceManager& resourceManager, const CameraSystem::Component& camera);
+		SMASHER_API ErrorCode LightingPass(Context& ctx);
+		SMASHER_API ErrorCode ShadowPass(Context& ctx, const CameraSystem::Component& camera);
+		SMASHER_API ErrorCode MaterialsPass(Context& ctx);
+
+		SMASHER_API MaterialHandle RegisterMaterial(Context& ctx, std::shared_ptr<MaterialResource> material);
 	}
 }

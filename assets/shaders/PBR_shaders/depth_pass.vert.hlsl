@@ -1,7 +1,7 @@
 // Vertex Shader Output / Pixel Shader Input
 struct VSInput
 {
-    [[vk::location(0)]] column_major float4x4 model : MODEL;
+    [[vk::location(0)]] float4x4 model : MODEL;
     [[vk::location(4)]] float3 position : POSITION;
     [[vk::location(5)]] float3 normal : NORMAL;
     [[vk::location(6)]] float2 uv : TEXCOORD0;
@@ -9,8 +9,12 @@ struct VSInput
 
 cbuffer UBO : register(b0, space1)
 {
-    column_major float4x4 ProjectionMatrix;
-    column_major float4x4 ViewMatrix;
+    row_major float4x4 ProjectionMatrix;
+    row_major float4x4 ViewMatrix;
+    row_major float4x4 CameraMatrix;
+    // column_major float4x4 ProjectionMatrix;
+    // column_major float4x4 ViewMatrix;
+    // column_major float4x4 CameraMatrix;
 };
 
 
@@ -27,8 +31,13 @@ struct PSInput
 PSInput VSMain(VSInput input, out float4 position : SV_POSITION)
 {
     PSInput fragInput;
-    column_major float4x4 MVP = mul(ProjectionMatrix, mul(ViewMatrix, input.model));
-    position = mul(MVP, float4(input.position, 1.f));
+    row_major float4x4 instanceModel = input.model;
+    row_major float4x4 MVP = mul(mul(instanceModel, ViewMatrix), ProjectionMatrix);
+    position = mul(float4(input.position, 1.f), MVP);
+    
+    // column_major float4x4 instanceModel = input.model;
+    // column_major float4x4 MVP = mul(ProjectionMatrix, mul(ViewMatrix, instanceModel));
+    // position = mul(float4(input.position, 1.f), MVP);
     
     fragInput.normal = input.normal;
     fragInput.uv = input.uv;

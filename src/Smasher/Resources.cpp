@@ -9,7 +9,7 @@ namespace Smasher {
 	static const char* ENTRY_POINT_FRAG = "PSMain";
 	static const char* ENTRY_POINT_COMP = "CSMain";
 
-	static SDL_GPUShader* LoadGPUShaderHLSL(SDL_GPUDevice* device, SDL_GPUShaderStage stage, const char* code) {
+	static SDL_GPUShader* LoadGPUShaderHLSL(SDL_GPUDevice* device, SDL_GPUShaderStage stage, const char* code, const char *debugName) {
 		SDL_ShaderCross_ShaderStage shaderCrossStage;
 		const char* entryPoint;
 		switch (stage) {
@@ -26,6 +26,15 @@ namespace Smasher {
 				return NULL;
 		}
 
+
+		SDL_PropertiesID props = 0;
+		if (debugName != NULL) {
+			props = SDL_CreateProperties();
+			SDL_SetBooleanProperty(props, SDL_SHADERCROSS_PROP_SHADER_DEBUG_ENABLE_BOOLEAN, true);
+			SDL_SetStringProperty(props, SDL_SHADERCROSS_PROP_SHADER_DEBUG_NAME_STRING, debugName);
+		}
+
+
 		SDL_ShaderCross_HLSL_Info graphicShaderInfo
 		{
 			code,										/**< The HLSL source code for the shader. */
@@ -33,7 +42,7 @@ namespace Smasher {
 			NULL,									    /**< The include directory for shader code. Optional, can be NULL. */
 			NULL,									    /**< An array of defines. Optional, can be NULL. If not NULL, must be terminated with a fully NULL define struct. */
 			shaderCrossStage,							/**< The shader stage to compile the shader with. */
-			0						                    /**< A properties ID for extensions. Should be 0 if no extensions are needed. */
+			props						                /**< A properties ID for extensions. Should be 0 if no extensions are needed. */
 		};
 
 		size_t size;
@@ -116,7 +125,7 @@ namespace Smasher {
 		char* file = (char*)SDL_LoadFile(m_Paths[0].string().c_str(), &fileSize);
 		assert(file != NULL && "Error loading shader file, path may be invalid");
 			
-		m_ShaderPtr = LoadGPUShaderHLSL(m_GPUPtr->Get(), type, (const char*)(file));
+		m_ShaderPtr = LoadGPUShaderHLSL(m_GPUPtr->Get(), type, (const char*)(file), file);
 
 		SDL_free(file);
 
@@ -359,6 +368,7 @@ namespace Smasher {
 
 		SDL_GPUFence* fence = SDL_SubmitGPUCommandBufferAndAcquireFence(commandBuffer);
 		SDL_WaitForGPUFences(device, true, &fence, 1);
+		SDL_ReleaseGPUFence(device, fence);
 		SDL_ReleaseGPUTransferBuffer(device, transferPositionBuffer);
 		SDL_ReleaseGPUTransferBuffer(device, transferNormalBuffer);
 		SDL_ReleaseGPUTransferBuffer(device, transferUVBuffer);
@@ -413,9 +423,38 @@ namespace Smasher {
 
 	unsigned int StaticMeshResource::GetNumIndices() const {
 		return m_NumIndices;
-	}
+	};
+
 	unsigned int StaticMeshResource::GetNumVertices() const {
 		return m_NumVertices;
-	}
+	};
+
+	MaterialResource::MaterialResource(ResourceId id,
+		const ResourcePath* const relativePaths, const std::size_t numPaths,
+		const ResourcePath& resourcesDirectory, std::shared_ptr<SDL_GPUDeviceWrapper> gpu) :
+		Resource(id, relativePaths, numPaths, resourcesDirectory)
+	{
+
+	};
+
+	MaterialResource::~MaterialResource() {
+
+	};
+
+	glm::uvec2 MaterialResource::GetDimensions() {
+		return glm::uvec2{1, 1};
+	};
+
+	void* MaterialResource::GetAlbedo() {
+		return nullptr;
+	};
+
+	void* MaterialResource::GetSpecular() {
+		return nullptr;
+	};
+
+	void* MaterialResource::GetNormals() {
+		return nullptr;
+	};
 
 }

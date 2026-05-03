@@ -221,6 +221,7 @@ namespace Smasher {
 
 				SDL_GPUFence *fence = SDL_SubmitGPUCommandBufferAndAcquireFence(commandBuffer);
 				SDL_WaitForGPUFences(device, true, &fence, 1);
+				SDL_ReleaseGPUFence(device, fence);
 			}
 
 			// Create Composite pipeline
@@ -401,6 +402,7 @@ namespace Smasher {
 
 			SDL_GPUFence* fence = SDL_SubmitGPUCommandBufferAndAcquireFence(commandBuffer);
 			SDL_WaitForGPUFences(device, true, &fence, 1);
+			SDL_ReleaseGPUFence(device, fence);
 		}
 
 		ErrorCode CompositionPass(Context &ctx, const std::vector<RenderTexture> &sources) {
@@ -526,6 +528,7 @@ namespace Smasher {
 
 			SDL_GPUFence* fence = SDL_SubmitGPUCommandBufferAndAcquireFence(commandBuffer);
 			SDL_WaitForGPUFences(device, true, &fence, 1);
+			SDL_ReleaseGPUFence(device, fence);
 			return ERROR_NoError;
 		}
 	}

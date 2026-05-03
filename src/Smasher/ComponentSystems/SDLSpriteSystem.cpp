@@ -206,6 +206,7 @@ namespace Smasher {
 
 			SDL_GPUFence* fence = SDL_SubmitGPUCommandBufferAndAcquireFence(commandBuffer);
 			SDL_WaitForGPUFences(device, true, &fence, 1);
+			SDL_ReleaseGPUFence(device, fence);
 
 			return ERROR_NoError;
 		}

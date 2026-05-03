@@ -378,7 +378,7 @@ namespace Smasher {
 
 			auto view = registry.view<Component, TransformSystem::Component>();
 			for (auto [entity, drawable, transform] : view.each()) {
-				if (!TransformSystem::HasChanged(transform) && !drawable._changed)
+				if (!TransformSystem::HasTransformChanged(transform) && !drawable._changed)
 					continue;
 				UpdateBatchData(drawable, transform);
 			}

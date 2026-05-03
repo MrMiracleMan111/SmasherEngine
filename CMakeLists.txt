@@ -290,6 +290,7 @@ add_library(SmasherEngine SHARED
 "include/Smasher/Components/DrawableComponent.h"
 "src/Smasher/Components/DrawableComponent.cpp"
 "include/Smasher/Resources.h"
+"src/Smasher/Resources.cpp"
 "include/Smasher/Components/TextComponent.h"
 "src/Smasher/Components/TextComponent.cpp"
 "include/Smasher/ComponentManagers/DrawableComponentManager.h"
@@ -332,6 +333,8 @@ add_library(SmasherEngine SHARED
 "src/Smasher/JobManager/JobRunner.cpp"
 "include/Smasher/JobManager/JobPool.h"
 "src/Smasher/JobManager/JobPool.cpp"
+"include/Smasher/Util/GraphicsUtil.h"
+"include/Smasher/Util/GraphicsUtil.inl"
 
  "include/Smasher/ECS.h"
 "include/Smasher/ComponentSystems/TransformSystem.h"
@@ -344,7 +347,15 @@ add_library(SmasherEngine SHARED
 "include/Smasher/ComponentSystems/TextSystem.h"
 "src/Smasher/ComponentSystems/TextSystem.cpp"
 "src/Smasher/ComponentSystems/EngineSystem.cpp"
-"include/Smasher/ComponentSystems/StaticMeshSystem.h" "include/Smasher/ComponentSystems/SDLSystem.h" "src/Smasher/ComponentSystems/SDLSystem.cpp" "src/Smasher/Resources.cpp" "include/Smasher/ComponentSystems/SDLSpriteSystem.h" "src/Smasher/ComponentSystems/SDLSpriteSystem.cpp" "src/Smasher/ComponentSystems/StaticMeshSystem.cpp" "src/Smasher/ComponentSystems/PBRSystem.cpp")
+"include/Smasher/ComponentSystems/StaticMeshSystem.h"
+"src/Smasher/ComponentSystems/StaticMeshSystem.cpp"
+"include/Smasher/ComponentSystems/SDLSystem.h"
+"src/Smasher/ComponentSystems/SDLSystem.cpp"
+"include/Smasher/ComponentSystems/SDLSpriteSystem.h"
+"src/Smasher/ComponentSystems/SDLSpriteSystem.cpp"
+"include/Smasher/ComponentSystems/PBRSystem.h"
+"src/Smasher/ComponentSystems/PBRSystem.cpp"
+)
 
 # Try to include machine-specific config if it exists
 if(EXISTS "${CMAKE_SOURCE_DIR}/local.cmake")

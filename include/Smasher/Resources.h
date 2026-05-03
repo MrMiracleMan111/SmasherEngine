@@ -150,7 +150,7 @@ namespace Smasher {
 		sf::Shader::Type m_ShaderType = sf::Shader::Type::Fragment;
 	};
 
-	SDL_GPUShader *LoadGPUShaderHLSL(SDL_GPUDevice *device, SDL_GPUShaderStage stage, const char* code);
+	SDL_GPUShader *LoadGPUShaderHLSL(SDL_GPUDevice *device, SDL_GPUShaderStage stage, const char* code, const char* debugName = NULL);
 	SDL_GPUComputePipeline* LoadComputePipelineHLSL(SDL_GPUDevice* device, const char* code);
 
 	class SMASHER_API SDLGraphicShaderResource : public Resource {
@@ -212,7 +212,6 @@ namespace Smasher {
 		std::fstream m_File;
 	};
 
-
 	class SMASHER_API StaticMeshResource : public Resource {
 	public:
 		SMASHER_RESOURCE_TYPE(ResourceType::STATIC_MESH)
@@ -237,5 +236,27 @@ namespace Smasher {
 		unsigned int m_NumIndices = 0;
 		unsigned int m_NumVertices = 0;
 		std::shared_ptr<SDL_GPUDeviceWrapper> m_GPUPtr;
+	};
+
+	class SMASHER_API MaterialResource : public Resource {
+	public:
+		SMASHER_RESOURCE_TYPE(ResourceType::MATERIAL)
+			MaterialResource() = delete;
+		MaterialResource(ResourceId id,
+			const ResourcePath* const relativePaths, const std::size_t numPaths,
+			const ResourcePath& resourcesDirectory, std::shared_ptr<SDL_GPUDeviceWrapper> gpu);
+		~MaterialResource();
+
+		glm::uvec2 GetDimensions();
+		void *GetAlbedo();
+		void *GetSpecular();
+		void *GetNormals();
+
+	private:
+		SDL_GPUTexture* m_UVTexture;
+		SDL_GPUTexture* m_NormalTexture;
+		SDL_GPUTexture* m_AlbedoTexture;
+		std::shared_ptr<SDL_GPUDeviceWrapper> m_GPUPtr;
+		glm::uvec2 dimensions;
 	};
 }

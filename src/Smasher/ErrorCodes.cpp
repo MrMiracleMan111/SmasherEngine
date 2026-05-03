@@ -44,6 +44,7 @@ namespace Smasher {
 
 			// ==== OPENGL EXCEPTIONS ====
 		case ERROR_GLEWInitFailed: return "GLEWInit failed";
+		case ERROR_GPUBlockPoolFull: return "GPUBlockPool full";
 
 			// ==== JOBS EXCEPTIONS ====
 		case ERROR_NotEnoughThreads: return "Could not create enough threads, check MIN_THREAD_COUNT in EngineConfig.h";
