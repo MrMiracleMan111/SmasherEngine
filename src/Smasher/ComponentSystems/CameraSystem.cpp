@@ -10,12 +10,30 @@
 
 namespace Smasher {
 	namespace CameraSystem {
+
+		static void DirtyMeshCallback(DirtyCameraStorage& storage, const entt::registry& registry, const entt::entity entity) {
+			bool hasComponents = registry.all_of<TransformSystem::Component, Component>(entity);
+			bool hasEntity = storage.contains(entity);
+			if (hasEntity && !hasComponents) {
+				storage.remove(entity);
+			}
+			else if (!hasEntity && hasComponents) {
+				storage.emplace(entity);
+			}
+		}
+
 		ErrorCode Initialize(entt::registry& registry) {
 			if (registry.ctx().contains<Context>()) {
 				return ERROR_SystemAlreadyInitialized;
 			}
 
-			registry.ctx().emplace<Context>();
+			auto &ctx = registry.ctx().emplace<Context>();
+
+			ctx.dirtyCameras.bind(registry);
+			// Observer changes to object transform or static mesh component
+			ctx.dirtyCameras.on_update<TransformSystem::Component, &DirtyMeshCallback>()
+				.on_update<Component, &DirtyMeshCallback>();
+
 
 			return ERROR_NoError;
 		}
@@ -56,6 +74,16 @@ namespace Smasher {
 			Context& ctx = registry.ctx().get<Context>();
 			Component& component = registry.emplace<Component>(entity);
 			return std::ref(component);
+		}
+
+		ErrorCode SyncCameraViewProjection(entt::registry& registry, Context& ctx) {
+			auto& changedTransforms = TransformSystem::GetDirty(registry);
+			for (auto [entity, transform, camera] : ctx.dirtyCameras.view<TransformSystem::Component, Component>().each()) {
+				ComputeProjectionMatrix(camera);
+				ComputeViewMatrix(camera, TransformSystem::GetTransform(transform));
+			}
+			ctx.dirtyCameras.clear();
+			return ERROR_NoError;
 		}
 
 

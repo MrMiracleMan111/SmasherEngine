@@ -5,7 +5,10 @@
 
 namespace Smasher {
 	namespace CameraSystem {
+		using DirtyCameraStorage = entt::reactive_mixin<entt::storage<void>>;
+
 		struct SMASHER_API Context {
+			DirtyCameraStorage dirtyCameras; // Cameras that have modified transforms
 		};
 
 		struct SMASHER_API Component {
@@ -22,6 +25,9 @@ namespace Smasher {
 		SMASHER_API	ErrorCode Update(entt::registry& registry);
 
 		SMASHER_API Expected<std::reference_wrapper<Component>> AddComponent(entt::registry& registry, entt::entity entity);
+
+		SMASHER_API ErrorCode SyncCameraViewProjection(entt::registry& registry, Context& ctx);
+
 
 		SMASHER_API	float GetFOV(const Component& component);
 		SMASHER_API	float GetNearClipPlane(const Component& component);

@@ -15,6 +15,10 @@
   "Fonts": {
     "arial": "assets/fonts/arial.ttf"
   },
+  "Materials": {
+    "wall": "assets/materials/wall/wall.mtl",
+    "cottage": "assets/materials/cottage/cottage.mtl"
+  },
   "Shaders": {
     "basic_ui_shader": [ "assets/shaders/basic_ui_shader/basic_ui_vertex_shader.glsl", "assets/shaders/basic_ui_shader/basic_ui_fragment_shader.glsl" ],
     "basic_texture_shader": [ "assets/shaders/basic_texture_shader/basic_texture_vertex_shader.glsl", "assets/shaders/basic_texture_shader/basic_texture_fragment_shader.glsl" ],
@@ -26,13 +30,15 @@
     "composition_copy_vert_shader": "assets/shaders/test_shaders/compositionCopy.vert.hlsl",
     "copy_depth_frag_shader": "assets/shaders/test_shaders/copyDepth.frag.hlsl",
     "copy_depth_vert_shader": "assets/shaders/test_shaders/copyDepth.vert.hlsl",
-    "composition_comp_shader": "assets/shaders/test_shaders/composition.comp.hlsl",
     "depth_pass_frag_shader": "assets/shaders/PBR_shaders/depth_pass.frag.hlsl",
-    "depth_pass_vert_shader": "assets/shaders/PBR_shaders/depth_pass.vert.hlsl"
+    "depth_pass_vert_shader": "assets/shaders/PBR_shaders/depth_pass.vert.hlsl",
+    "material_pass_frag_shader": "assets/shaders/PBR_shaders/material_pass.frag.hlsl",
+    "material_pass_vert_shader": "assets/shaders/PBR_shaders/material_pass.vert.hlsl"
 
   },
   "Models": {
     "suzanne": "assets/static_models/suzanne/suzanne.obj",
-    "teapot": "assets/static_models/teapot/teapot.obj"
+    "teapot": "assets/static_models/teapot/teapot.obj",
+    "cottage": "assets/static_models/cottage/cottage.obj"
   }
 }

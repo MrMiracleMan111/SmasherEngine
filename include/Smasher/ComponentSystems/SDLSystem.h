@@ -18,7 +18,7 @@ namespace Smasher {
 		};
 
 		// Fullscreen quad
-		static QuadVertex SCREEN_QUAD[]
+		static const QuadVertex SCREEN_QUAD[]
 		{
 			{-1.0f,	-1.0f, 0.0f,		0.0f, 1.0f},    // top left vertex
 			{-1.0f,  1.0f, 0.0f,		0.0f, 0.0f},	// bottom left vertex

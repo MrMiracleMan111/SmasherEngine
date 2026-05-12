@@ -124,8 +124,9 @@ namespace Smasher {
 		t.Update(arg);
 	};
 
-	struct SMASHER_API MaterialHandle {
-		int id = -1; // interal for PBRSystem (-1 is the initial invalid state)
+	struct SMASHER_API MaterialBinding {
+		ResourceId materialId;
+		uint32_t index;
 	};
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -133,7 +134,7 @@ namespace Smasher {
 /// 
 /// 
 //////////////////////////////////////////////////////////////////////////////////////////////////
-	struct TextureOptions {
+	struct SMASHER_API TextureOptions {
 		bool transluscent = false; ///< Is the texture transluscent (ex. a window pane)
 	};
 

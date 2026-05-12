@@ -21,7 +21,7 @@ namespace Smasher {
 
 		// Add job and return reference to that job
 		// @precondition m_PoolStateMutex must be locked by calling function
-		Expected<std::reference_wrapper<Job>> AddJob(std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies);
+		Expected<std::reference_wrapper<Job>> AddJob(std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies, const char *jobName);
 
 		// Add job to Available Jobs list
 		void AddAvailableJob(Job& job) { m_AvailableJobs.push_back(job); };

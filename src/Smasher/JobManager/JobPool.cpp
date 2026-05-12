@@ -35,8 +35,8 @@ namespace Smasher {
 	}
 
 
-	Expected<std::reference_wrapper<Job>> JobPool::AddJob(std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies) {
-		Job& job = *m_AllJobs.emplace(m_AllJobs.end(), std::ref(*this), callback, dependencies);
+	Expected<std::reference_wrapper<Job>> JobPool::AddJob(std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies, const char *jobName) {
+		Job& job = *m_AllJobs.emplace(m_AllJobs.end(), std::ref(*this), callback, dependencies, jobName);
 		job.SetItr(--(m_AllJobs.end()));
 		if (dependencies.size() == 0) {
 			m_AvailableJobs.push_back(job);

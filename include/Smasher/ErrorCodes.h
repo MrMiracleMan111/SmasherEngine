@@ -38,6 +38,9 @@
 #define ERROR_ResourceNotLoaded 601
 #define ERROR_ResourceAlreadyExists 602
 #define ERROR_ResourceInvalidNumPaths 603
+#define ERROR_MaterialHasNoAlbedo 604
+#define ERROR_MaterialHasNoNormals 605
+#define ERROR_MaterialHasNoSpecular 606
 
 // ==== PHYSICS EXCEPTIONS ====
 #define ERROR_Box2DWorldAlreadyCreated 700
@@ -46,6 +49,7 @@
 // ==== OPENGL EXCEPTIONS ====
 #define ERROR_GLEWInitFailed 800
 #define ERROR_GPUBlockPoolFull 801
+#define ERROR_MaxMaterialBindings 802
 
 // ==== JOBS EXCEPTIONS ====
 #define ERROR_NotEnoughThreads 900

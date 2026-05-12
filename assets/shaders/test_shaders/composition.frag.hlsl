@@ -1,21 +1,13 @@
-//[[vk::combinedImageSampler]][[vk::binding(0, 2)]]
 Texture2D<float4> sourceColorImage : register(t0, space2);
-//[[vk::combinedImageSampler]][[vk::binding(0, 2)]]
 SamplerState sourceColorSampler : register(s0, space2);
 
-//[[vk::combinedImageSampler]][[vk::binding(1, 2)]]
 Texture2D<float> sourceDepthImage : register(t1, space2);
-//[[vk::combinedImageSampler]][[vk::binding(1, 2)]]
 SamplerState sourceDepthSampler : register(s1, space2);
 
-//[[vk::combinedImageSampler]][[vk::binding(2, 2)]]
 Texture2D<float4> gColorImage : register(t2, space2);
-//[[vk::combinedImageSampler]][[vk::binding(2, 2)]]
 SamplerState gColorSampler : register(s2, space2);
 
-//[[vk::combinedImageSampler]][[vk::binding(3, 2)]]
 Texture2D<float> gDepthImage : register(t3, space2);
-//[[vk::combinedImageSampler]][[vk::binding(3, 2)]]
 SamplerState gDepthSampler : register(s3, space2);
 
 // Vertex Shader Output / Pixel Shader Input

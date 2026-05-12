@@ -212,6 +212,13 @@ namespace Smasher {
 		std::fstream m_File;
 	};
 
+	struct VertexData {
+		float
+			px, py, pz, // Position
+			nx, ny, nz, // Normal
+			u, v;		// UV 
+	};
+
 	class SMASHER_API StaticMeshResource : public Resource {
 	public:
 		SMASHER_RESOURCE_TYPE(ResourceType::STATIC_MESH)
@@ -221,20 +228,18 @@ namespace Smasher {
 			const ResourcePath& resourcesDirectory, std::shared_ptr<SDL_GPUDeviceWrapper> gpu);
 		~StaticMeshResource();
 
-		SDL_GPUBuffer *GetVertexPositionBuffer() const;
-		SDL_GPUBuffer *GetVertexNormalBuffer() const;
-		SDL_GPUBuffer *GetVertexUVBuffer() const;
+		SDL_GPUBuffer *GetVertexBuffer() const;
 		SDL_GPUBuffer *GetIndexBuffer() const;
 		unsigned int GetNumIndices() const;
 		unsigned int GetNumVertices() const;
 
 	private:
-		SDL_GPUBuffer *m_VertexPositionBuffer;
-		SDL_GPUBuffer* m_VertexNormalBuffer;
-		SDL_GPUBuffer* m_VertexUVBuffer;
+		SDL_GPUBuffer *m_VertexBuffer;
 		SDL_GPUBuffer *m_IndexBuffer;
 		unsigned int m_NumIndices = 0;
 		unsigned int m_NumVertices = 0;
+		std::vector<VertexData> m_Vertices;
+		std::vector<uint32_t> m_Indices;
 		std::shared_ptr<SDL_GPUDeviceWrapper> m_GPUPtr;
 	};
 
@@ -248,15 +253,17 @@ namespace Smasher {
 		~MaterialResource();
 
 		glm::uvec2 GetDimensions();
-		void *GetAlbedo();
-		void *GetSpecular();
-		void *GetNormals();
+		Expected<void *> GetAlbedo();
+		Expected<void *> GetSpecular();
+		Expected<void *> GetNormals();
 
 	private:
+		tinyobj::material_t m_Material;
 		SDL_GPUTexture* m_UVTexture;
 		SDL_GPUTexture* m_NormalTexture;
 		SDL_GPUTexture* m_AlbedoTexture;
+		SDL_Surface *m_AlbedoSurface = nullptr;
 		std::shared_ptr<SDL_GPUDeviceWrapper> m_GPUPtr;
-		glm::uvec2 dimensions;
+		glm::uvec2 m_Dimensions;
 	};
 }

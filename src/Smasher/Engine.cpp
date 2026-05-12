@@ -10,6 +10,8 @@
 #include <OpenGL/gl.h>
 #endif
 
+#include <tracy/Tracy.hpp>
+#include <tracy/TracyC.h>
 #include <format>
 #include <exception>
 #include <stdexcept>
@@ -227,7 +229,13 @@ namespace Smasher {
 				Millisecond sleepTime = std::max(minInterval - currentTickTime, std::chrono::milliseconds::zero());
 
 				m_IsRenderTick = false;
+				
+				TracyCZone(tracyZoneCtx, true);
+				TracyCZoneName(tracyZoneCtx, "Engine Frame Sleep", strlen("Engine Frame Sleep"));
+				TracyCZoneColor(tracyZoneCtx, 0xFFA500);
 				PrecisionSleep(sleepTime);
+				TracyCZoneEnd(tracyZoneCtx);
+				FrameMark;
 			}
 			Shutdown();
 		}

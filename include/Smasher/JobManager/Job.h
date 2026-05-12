@@ -23,7 +23,7 @@ namespace Smasher {
 		Job() = delete;
 		Job(std::reference_wrapper<JobPool> pool,
 			std::function<ErrorCode(void)> callback,
-			std::initializer_list<std::reference_wrapper<Job>> dependencies); // Called by JobManager
+			std::initializer_list<std::reference_wrapper<Job>> dependencies, const char* jobName); // Called by JobManager
 		~Job();
 		Job(const Job&) = delete;
 		Job(Job&& other) noexcept;
@@ -59,6 +59,7 @@ namespace Smasher {
 
 		std::reference_wrapper<JobPool> m_JobPoolRef; // Job pool that owns this job
 		int m_JobId;
+		std::string m_JobName;
 		std::mutex m_StateMutex;
 		unsigned int m_NumParents = 0; // Number of jobs this one waits on
 		JobStatus m_Status;

@@ -28,13 +28,13 @@ namespace Smasher {
 		// points to a valid Job. In the time between
 		// constructing the refernce and copy assigning it,
 		// the job could have been taken, completed, and removed
-		Expected<std::reference_wrapper<Job>> AddAsyncJob(std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies = {});
+		Expected<std::reference_wrapper<Job>> AddAsyncJob(std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies = {}, const char * jobName = "");
 
 		// Creates a synchronous job, specify which jobs the new job is 
 		// dependent on. This is Primarily for Render jobs.
 		// Synchronous jobs CAN be dependant on asynchronous jobs
 		// Synchronous jobs must NEVER be dependant on other synchronous jobs
-		Expected<std::reference_wrapper<Job>> AddSyncJob(std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies = {});
+		Expected<std::reference_wrapper<Job>> AddSyncJob(std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies = {}, const char* jobName = "");
 
 
 		// Launches runners, puts thread to sleep

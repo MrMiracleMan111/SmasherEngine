@@ -1,8 +1,10 @@
+#include <functional>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_stdinc.h>
 #include <SDL3_shadercross/SDL_shadercross.h>
 #include <tiny_obj_loader.h>
 #include "Smasher/Resources.h"
+#include "Smasher/ErrorCodes.h"
 
 namespace Smasher {
 	static const char* ENTRY_POINT_VERT = "VSMain";
@@ -31,7 +33,7 @@ namespace Smasher {
 		if (debugName != NULL) {
 			props = SDL_CreateProperties();
 			SDL_SetBooleanProperty(props, SDL_SHADERCROSS_PROP_SHADER_DEBUG_ENABLE_BOOLEAN, true);
-			SDL_SetStringProperty(props, SDL_SHADERCROSS_PROP_SHADER_DEBUG_NAME_STRING, debugName);
+			//SDL_SetStringProperty(props, SDL_SHADERCROSS_PROP_SHADER_DEBUG_NAME_STRING, "TEST");
 		}
 
 
@@ -46,7 +48,9 @@ namespace Smasher {
 		};
 
 		size_t size;
-		Uint8* shaderBytecode = (Uint8*)SDL_ShaderCross_CompileSPIRVFromHLSL(&graphicShaderInfo, &size);
+		Uint8* shaderBytecode = nullptr;
+		
+		shaderBytecode = (Uint8*)SDL_ShaderCross_CompileSPIRVFromHLSL(&graphicShaderInfo, &size);
 
 		if (shaderBytecode == NULL) {
 			std::cerr << "Error compiling SPIRV from HLSL: " << SDL_GetError() << std::endl;
@@ -65,6 +69,7 @@ namespace Smasher {
 		SDL_ShaderCross_GraphicsShaderMetadata* shaderMetadata = SDL_ShaderCross_ReflectGraphicsSPIRV(shaderBytecode, size, 0);
 
 		assert(shaderMetadata != NULL);
+
 
 		SDL_GPUShader *pShader = SDL_ShaderCross_CompileGraphicsShaderFromSPIRV(device, &shaderSPIRVInfo, &shaderMetadata->resource_info, 0);
 
@@ -125,7 +130,8 @@ namespace Smasher {
 		char* file = (char*)SDL_LoadFile(m_Paths[0].string().c_str(), &fileSize);
 		assert(file != NULL && "Error loading shader file, path may be invalid");
 			
-		m_ShaderPtr = LoadGPUShaderHLSL(m_GPUPtr->Get(), type, (const char*)(file), file);
+		std::string debugName = std::move(m_Paths[0].filename().generic_string());
+		m_ShaderPtr = LoadGPUShaderHLSL(m_GPUPtr->Get(), type, (const char*)(file), "test");
 
 		SDL_free(file);
 
@@ -172,21 +178,33 @@ namespace Smasher {
 
 	struct LoadOBJMeshInfo {
 		std::string filepath;
-		SDL_GPUBuffer **pVertexPositionBuffer;
-		SDL_GPUBuffer **pVertexNormalBuffer;
-		SDL_GPUBuffer **pVertexUVBuffer;
-		SDL_GPUBuffer **pIndexBuffer;
 		unsigned int *pNumIndices;
 		unsigned int *pNumVertices;
+		SDL_GPUBuffer** pVertexBuffer;
+		std::vector<VertexData>* pVertexData;
+		std::vector<uint32_t>* pIndices;
 	};
 
-	static void LoadOBJMesh(SDL_GPUDevice *device, const LoadOBJMeshInfo &info) {
+	static struct IndexTupleHasher {
+		size_t operator()(const std::tuple<int, int, int>& indices) const {
+			int posIndex = std::get<0>(indices);
+			int normIndex = std::get<1>(indices);
+			int uvIndex = std::get<2>(indices);
+			return std::hash<int>()(posIndex) ^ std::hash<int>()(normIndex) ^ std::hash<int>()(uvIndex);
+		}
+	};
+
+	static void LoadOBJMesh(
+	std::string filepath,
+	std::vector<VertexData>* pVertices,
+	std::vector<uint32_t>* pIndices
+	) {
 		tinyobj::ObjReaderConfig readerConfig;
 		tinyobj::ObjReader reader;
 		readerConfig.mtl_search_path = "./";
 		readerConfig.triangulate = true;
 
-		if (!reader.ParseFromFile(info.filepath, readerConfig)) {
+		if (!reader.ParseFromFile(filepath, readerConfig)) {
 			// Error loading mesh
 			std::cerr << "Something went wrong while parsing obj file\n";
 
@@ -199,71 +217,72 @@ namespace Smasher {
 		if (!reader.Warning().empty()) {
 			std::cerr << "TinyObjReader Warning: " << reader.Warning() << std::endl;
 		}
-
-		SDL_GPUCommandBuffer* commandBuffer = SDL_AcquireGPUCommandBuffer(device);
-
 		auto& attrib = reader.GetAttrib();
 		auto& shapes = reader.GetShapes();
 		auto& materials = reader.GetMaterials();
 
-		size_t VERT_POS_BUFFER_SIZE = attrib.vertices.size() * sizeof(tinyobj::real_t);
-		size_t VERT_NORM_BUFFER_SIZE = attrib.normals.size() * sizeof(tinyobj::real_t);
-		size_t VERT_UV_BUFFER_SIZE = attrib.texcoords.size() * sizeof(tinyobj::real_t);
-		size_t INDEX_BUFFER_SIZE = 0;
+		std::unordered_map<std::tuple<int, int, int>, uint32_t, IndexTupleHasher> indexMap;
 		unsigned int indexCount = 0;
 		for (auto& shape : shapes) {
-			indexCount += shape.mesh.indices.size();
-			INDEX_BUFFER_SIZE += shape.mesh.indices.size() * sizeof(tinyobj::index_t);
+			for (auto& idx : shape.mesh.indices) {
+				auto key = std::make_tuple(idx.normal_index, idx.texcoord_index, idx.vertex_index);
+				if (!indexMap.contains(key)) {
+					indexMap[key] = pVertices->size();
+					VertexData data = { 0, 0, 0, 0, 0, 0, 0, 0 };
+					if (idx.vertex_index != -1) {
+						data.px = attrib.vertices[3 * idx.vertex_index + 0]; // px
+						data.py = attrib.vertices[3 * idx.vertex_index + 1]; // py
+						data.pz = attrib.vertices[3 * idx.vertex_index + 2]; // pz
+					}
+					if (idx.normal_index != -1) {
+						data.nx = attrib.normals[3 * idx.normal_index + 0]; // px
+						data.ny = attrib.normals[3 * idx.normal_index + 1]; // py
+						data.nz = attrib.normals[3 * idx.normal_index + 2]; // pz
+					}
+					if (idx.texcoord_index != -1) {
+						data.u = attrib.texcoords[2 * idx.texcoord_index + 0];		  // u
+						data.v = 1.0f - attrib.texcoords[2 * idx.texcoord_index + 1]; // v
+					}
+					pVertices->emplace_back(data);
+				}
+				pIndices->push_back(indexMap[key]);
+			}
 		}
-		*info.pNumIndices = indexCount;
-		*info.pNumVertices = attrib.vertices.size();
+	}
 
-		size_t MAX_BUFFER_SIZE = std::max({ VERT_POS_BUFFER_SIZE, VERT_NORM_BUFFER_SIZE, INDEX_BUFFER_SIZE });
+	static void UploadOBJMeshToGPU(SDL_GPUDevice* device,
+		const std::vector<VertexData>& vertices,
+		const std::vector<uint32_t>& indices,
+		SDL_GPUBuffer** pVertexBuffer,
+		SDL_GPUBuffer** pIndexBuffer) {
 
-		SDL_GPUTransferBuffer* transferPositionBuffer = NULL;
-		SDL_GPUTransferBuffer* transferNormalBuffer = NULL;
-		SDL_GPUTransferBuffer* transferUVBuffer = NULL;
+		SDL_GPUCommandBuffer* commandBuffer = SDL_AcquireGPUCommandBuffer(device);
+
+		const size_t VERTEX_BUFFER_SIZE = vertices.size() * sizeof(VertexData);
+		const size_t INDEX_BUFFER_SIZE = indices.size() * sizeof(uint32_t);
+
+		SDL_GPUTransferBuffer* transferVertexBuffer = NULL;
 		SDL_GPUTransferBuffer* transferIndexBuffer = NULL;
 
-		// Create Vertex Position + Vertex Normals + Index Buffer
+		// Create Vertex and Index Buffers
 		{
-			SDL_GPUBufferCreateInfo vertexPositionBufferInfo{};
-			vertexPositionBufferInfo.size = VERT_POS_BUFFER_SIZE;
-			vertexPositionBufferInfo.usage = SDL_GPU_BUFFERUSAGE_VERTEX;
-			*info.pVertexPositionBuffer = SDL_CreateGPUBuffer(device, &vertexPositionBufferInfo);
-			
-			SDL_GPUBufferCreateInfo vertexNormalBufferInfo{};
-			vertexNormalBufferInfo.size = VERT_NORM_BUFFER_SIZE;
-			vertexNormalBufferInfo.usage = SDL_GPU_BUFFERUSAGE_VERTEX;
-			*info.pVertexNormalBuffer = SDL_CreateGPUBuffer(device, &vertexNormalBufferInfo);
-			
-			SDL_GPUBufferCreateInfo vertexUVBufferInfo{};
-			vertexUVBufferInfo.size = VERT_NORM_BUFFER_SIZE;
-			vertexUVBufferInfo.usage = SDL_GPU_BUFFERUSAGE_VERTEX;
-			*info.pVertexUVBuffer = SDL_CreateGPUBuffer(device, &vertexUVBufferInfo);
-			
-			SDL_GPUBufferCreateInfo indexBufferInfo{};
-			indexBufferInfo.size = INDEX_BUFFER_SIZE;
-			indexBufferInfo.usage = SDL_GPU_BUFFERUSAGE_INDEX;
-			*info.pIndexBuffer = SDL_CreateGPUBuffer(device, &indexBufferInfo);
-			
+			SDL_GPUBufferCreateInfo vertexBufferInfo{};
+			vertexBufferInfo.size = vertices.size() * sizeof(VertexData);
+			vertexBufferInfo.usage = SDL_GPU_BUFFERUSAGE_VERTEX;
+			*pVertexBuffer = SDL_CreateGPUBuffer(device, &vertexBufferInfo);
 
+			SDL_GPUBufferCreateInfo indexBufferInfo{};
+			indexBufferInfo.size = indices.size() * sizeof(uint32_t);
+			indexBufferInfo.usage = SDL_GPU_BUFFERUSAGE_INDEX;
+			*pIndexBuffer = SDL_CreateGPUBuffer(device, &indexBufferInfo);
 		}
 
 		// Create Transfer Buffer, upload to vertex buffers and index buffer
 		{
-			SDL_GPUTransferBufferCreateInfo transferPositionBufferInfo {};
-			transferPositionBufferInfo.size = VERT_POS_BUFFER_SIZE;
-			transferPositionBufferInfo.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
-			transferPositionBuffer = SDL_CreateGPUTransferBuffer(device, &transferPositionBufferInfo);
-			SDL_GPUTransferBufferCreateInfo transferNormalBufferInfo{};
-			transferNormalBufferInfo.size = VERT_NORM_BUFFER_SIZE;
-			transferNormalBufferInfo.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
-			transferNormalBuffer = SDL_CreateGPUTransferBuffer(device, &transferNormalBufferInfo);
-			SDL_GPUTransferBufferCreateInfo transferUVBufferInfo{};
-			transferUVBufferInfo.size = VERT_UV_BUFFER_SIZE;
-			transferUVBufferInfo.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
-			transferUVBuffer = SDL_CreateGPUTransferBuffer(device, &transferUVBufferInfo);
+			SDL_GPUTransferBufferCreateInfo transferVertexBufferInfo{};
+			transferVertexBufferInfo.size = VERTEX_BUFFER_SIZE;
+			transferVertexBufferInfo.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+			transferVertexBuffer = SDL_CreateGPUTransferBuffer(device, &transferVertexBufferInfo);
 			SDL_GPUTransferBufferCreateInfo transferIndexBufferInfo{};
 			transferIndexBufferInfo.size = INDEX_BUFFER_SIZE;
 			transferIndexBufferInfo.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
@@ -272,81 +291,28 @@ namespace Smasher {
 			SDL_GPUCopyPass* copyPass = SDL_BeginGPUCopyPass(commandBuffer);
 
 
-			// Upload Vertex Positions to Transfer Buffer
+			// Upload Vertex (position, normal, uv) to Transfer Buffer
 			{
-				void* data = SDL_MapGPUTransferBuffer(device, transferPositionBuffer, false);
-				SDL_memcpy(data, attrib.vertices.data(), VERT_POS_BUFFER_SIZE);
+				void* data = SDL_MapGPUTransferBuffer(device, transferVertexBuffer, false);
+				SDL_memcpy(data, vertices.data(), VERTEX_BUFFER_SIZE);
 
 				SDL_GPUTransferBufferLocation location{};
-				location.transfer_buffer = transferPositionBuffer;
+				location.transfer_buffer = transferVertexBuffer;
 				location.offset = 0;
 
 				SDL_GPUBufferRegion region{};
-				region.buffer = *info.pVertexPositionBuffer;
-				region.size = VERT_POS_BUFFER_SIZE;
+				region.buffer = *pVertexBuffer;
+				region.size = VERTEX_BUFFER_SIZE;
 				region.offset = 0;
 
-				SDL_UnmapGPUTransferBuffer(device, transferPositionBuffer);
+				SDL_UnmapGPUTransferBuffer(device, transferVertexBuffer);
 				SDL_UploadToGPUBuffer(copyPass, &location, &region, true);
 			}
-			
-			// Upload Vertex Normals to Transfer Buffer
-			{
-				void* data = SDL_MapGPUTransferBuffer(device, transferNormalBuffer, false);
-				SDL_memcpy(data, attrib.normals.data(), VERT_NORM_BUFFER_SIZE);
-
-				SDL_GPUTransferBufferLocation location{};
-				location.transfer_buffer = transferNormalBuffer;
-				location.offset = 0;
-
-				SDL_GPUBufferRegion region{};
-				region.buffer = *info.pVertexNormalBuffer;
-				region.size = VERT_NORM_BUFFER_SIZE;
-				region.offset = 0;
-
-				SDL_UnmapGPUTransferBuffer(device, transferNormalBuffer);
-				SDL_UploadToGPUBuffer(copyPass, &location, &region, true);
-			}
-
-
-			// Upload Vertex UV to Transfer Buffer
-			{
-				void* data = SDL_MapGPUTransferBuffer(device, transferUVBuffer, false);
-				SDL_memcpy(data, attrib.texcoords.data(), VERT_UV_BUFFER_SIZE);
-
-				SDL_GPUTransferBufferLocation location{};
-				location.transfer_buffer = transferUVBuffer;
-				location.offset = 0;
-
-				SDL_GPUBufferRegion region{};
-				region.buffer = *info.pVertexUVBuffer;
-				region.size = VERT_UV_BUFFER_SIZE;
-				region.offset = 0;
-
-				SDL_UnmapGPUTransferBuffer(device, transferUVBuffer);
-				SDL_UploadToGPUBuffer(copyPass, &location, &region, true);
-			}
-
 
 			// Upload index data from all shapes to Index Buffer
 			{
 				void* data = SDL_MapGPUTransferBuffer(device, transferIndexBuffer, false);
-
-				unsigned int indexCount = 0;
-				for (auto& shape : shapes) {
-					indexCount += shape.mesh.indices.size();
-				}
-
-				// Create tightly packed array of position indices
-				std::vector<Uint32> positionIndices;
-				positionIndices.resize(indexCount);
-				std::vector<Uint32>::iterator itr = positionIndices.begin();
-				for (auto& shape : shapes) {
-					itr = std::transform(shape.mesh.indices.begin(), shape.mesh.indices.end(), positionIndices.begin(), [](const tinyobj::index_t& index) {
-						return index.vertex_index;
-					});
-				};
-				SDL_memcpy(data, positionIndices.data(), indexCount * sizeof(Uint32));
+				SDL_memcpy(data, indices.data(), INDEX_BUFFER_SIZE);
 
 
 				SDL_GPUTransferBufferLocation location{};
@@ -354,7 +320,7 @@ namespace Smasher {
 				location.offset = 0;
 
 				SDL_GPUBufferRegion region{};
-				region.buffer = *info.pIndexBuffer;
+				region.buffer = *pIndexBuffer;
 				region.size = INDEX_BUFFER_SIZE;
 				region.offset = 0;
 
@@ -369,52 +335,35 @@ namespace Smasher {
 		SDL_GPUFence* fence = SDL_SubmitGPUCommandBufferAndAcquireFence(commandBuffer);
 		SDL_WaitForGPUFences(device, true, &fence, 1);
 		SDL_ReleaseGPUFence(device, fence);
-		SDL_ReleaseGPUTransferBuffer(device, transferPositionBuffer);
-		SDL_ReleaseGPUTransferBuffer(device, transferNormalBuffer);
-		SDL_ReleaseGPUTransferBuffer(device, transferUVBuffer);
+		SDL_ReleaseGPUTransferBuffer(device, transferVertexBuffer);
 		SDL_ReleaseGPUTransferBuffer(device, transferIndexBuffer);
 	}
-
+	
 	StaticMeshResource::StaticMeshResource(ResourceId id,
 		const ResourcePath* const relativePaths, const std::size_t numPaths,
 		const ResourcePath& resourcesDirectory, std::shared_ptr<SDL_GPUDeviceWrapper> gpu) :
 		Resource(id, relativePaths, numPaths, resourcesDirectory),
-		m_VertexPositionBuffer(NULL),
-		m_VertexNormalBuffer(NULL),
+		m_VertexBuffer(NULL),
 		m_IndexBuffer(NULL),
 		m_GPUPtr(gpu)
 	{
 		assert(m_Paths.size() == 1 && "Static mesh can only have one path");
-		LoadOBJMeshInfo info = {
-			.filepath = m_Paths.front().generic_string(),
-			.pVertexPositionBuffer = &m_VertexPositionBuffer,
-			.pVertexNormalBuffer = &m_VertexNormalBuffer,
-			.pVertexUVBuffer = &m_VertexUVBuffer,
-			.pIndexBuffer = &m_IndexBuffer,
-			.pNumIndices = &m_NumIndices,
-			.pNumVertices = &m_NumVertices
-		};
-		LoadOBJMesh(*gpu.get(), info);
+		std::vector<VertexData> vertices;
+		std::vector<uint32_t> indices;
+		LoadOBJMesh(m_Paths.front().generic_string(), &vertices, &indices);
+		m_NumIndices = indices.size();
+		m_NumVertices = vertices.size();
+		UploadOBJMeshToGPU(gpu->Get(), vertices, indices, &m_VertexBuffer, &m_IndexBuffer);
 		m_Loaded = true;
 	}
 
 	StaticMeshResource::~StaticMeshResource() {
-		SDL_ReleaseGPUBuffer(*m_GPUPtr, m_VertexPositionBuffer);
-		SDL_ReleaseGPUBuffer(*m_GPUPtr, m_VertexNormalBuffer);
-		SDL_ReleaseGPUBuffer(*m_GPUPtr, m_VertexUVBuffer);
+		SDL_ReleaseGPUBuffer(*m_GPUPtr, m_VertexBuffer);
 		SDL_ReleaseGPUBuffer(*m_GPUPtr, m_IndexBuffer);
 	};
 
-	SDL_GPUBuffer* StaticMeshResource::GetVertexPositionBuffer() const {
-		return m_VertexPositionBuffer;
-	};
-
-	SDL_GPUBuffer* StaticMeshResource::GetVertexNormalBuffer() const {
-		return m_VertexNormalBuffer;
-	};
-
-	SDL_GPUBuffer* StaticMeshResource::GetVertexUVBuffer() const {
-		return m_VertexUVBuffer;
+	SDL_GPUBuffer* StaticMeshResource::GetVertexBuffer() const {
+		return m_VertexBuffer;
 	}
 
 	SDL_GPUBuffer* StaticMeshResource::GetIndexBuffer() const {
@@ -434,26 +383,48 @@ namespace Smasher {
 		const ResourcePath& resourcesDirectory, std::shared_ptr<SDL_GPUDeviceWrapper> gpu) :
 		Resource(id, relativePaths, numPaths, resourcesDirectory)
 	{
+		assert(m_Paths.size() == 1 && "Static mesh can only have one path");
+		std::map<std::string, int> _{};
+		std::vector<tinyobj::material_t> __{};
+		std::ifstream stream{ m_Paths.front() };
+		std::string warning, error;
+		tinyobj::LoadMtl(&_, &__, &stream, &warning, &error);
+		std::cerr << warning << std::endl;
+		std::cerr << error << std::endl;
+		m_Material = std::move(__.front());
 
+		if (!m_Material.diffuse_texname.empty()) {
+			std::filesystem::path tmp = m_Paths.front().parent_path();
+			tmp.append(m_Material.diffuse_texname);
+			m_AlbedoSurface = SDL_LoadPNG(tmp.generic_string().c_str());
+			if (m_AlbedoSurface == nullptr) {
+				std::cerr << "Error Loading PNG: " << tmp.generic_string().c_str() << "\n" << SDL_GetError() << std::endl;
+			}
+			m_Dimensions.x = static_cast<uint32_t>(m_AlbedoSurface->w);
+			m_Dimensions.y = static_cast<uint32_t>(m_AlbedoSurface->h);
+		}
 	};
 
 	MaterialResource::~MaterialResource() {
-
+		SDL_DestroySurface(m_AlbedoSurface);
 	};
 
 	glm::uvec2 MaterialResource::GetDimensions() {
-		return glm::uvec2{1, 1};
+		return m_Dimensions;
 	};
 
-	void* MaterialResource::GetAlbedo() {
+	Expected<void*> MaterialResource::GetAlbedo() {
+		if (m_AlbedoSurface == nullptr) {
+			return Expected<void*>::Error(ERROR_MaterialHasNoAlbedo);
+		}
+		return m_AlbedoSurface->pixels;
+	};
+
+	Expected<void*> MaterialResource::GetSpecular() {
 		return nullptr;
 	};
 
-	void* MaterialResource::GetSpecular() {
-		return nullptr;
-	};
-
-	void* MaterialResource::GetNormals() {
+	Expected<void*> MaterialResource::GetNormals() {
 		return nullptr;
 	};
 

@@ -37,6 +37,9 @@ namespace Smasher {
 		case ERROR_ResourceNotLoaded: return "Resource is not loaded";
 		case ERROR_ResourceAlreadyExists: return "Resource with ID already exists";
 		case ERROR_ResourceInvalidNumPaths: return "Resource has an invalid number of paths";
+		case ERROR_MaterialHasNoAlbedo: return "Attempt to access Material Resource Albedo when Material has no Albedo";
+		case ERROR_MaterialHasNoNormals: return "Attempt to access Material Resource Normals when Material has no Normals";
+		case ERROR_MaterialHasNoSpecular: return "Attempt to access Material Resource Specular when Material has no Specular";
 
 			// ==== PHYSICS EXCEPTIONS ====
 		case ERROR_Box2DWorldAlreadyCreated: return "Box2D world was already created";
@@ -45,6 +48,7 @@ namespace Smasher {
 			// ==== OPENGL EXCEPTIONS ====
 		case ERROR_GLEWInitFailed: return "GLEWInit failed";
 		case ERROR_GPUBlockPoolFull: return "GPUBlockPool full";
+		case ERROR_MaxMaterialBindings: return "Maximum number of Materials are bound, no more bindings available";
 
 			// ==== JOBS EXCEPTIONS ====
 		case ERROR_NotEnoughThreads: return "Could not create enough threads, check MIN_THREAD_COUNT in EngineConfig.h";

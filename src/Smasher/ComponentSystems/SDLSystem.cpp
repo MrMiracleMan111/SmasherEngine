@@ -68,7 +68,6 @@ namespace Smasher {
 				ctx.compositeVertShader = resourceManager.GetOrLoadResource<Manifest::Shaders::composition_vert_shader, Smasher::SDLGraphicShaderResource>(ctx.pGpu, SDL_GPUShaderStage::SDL_GPU_SHADERSTAGE_VERTEX);
 				ctx.compositeCopyFragShader = resourceManager.GetOrLoadResource<Manifest::Shaders::composition_copy_frag_shader, Smasher::SDLGraphicShaderResource>(ctx.pGpu, SDL_GPUShaderStage::SDL_GPU_SHADERSTAGE_FRAGMENT);
 				ctx.compositeCopyVertShader = resourceManager.GetOrLoadResource<Manifest::Shaders::composition_copy_vert_shader, Smasher::SDLGraphicShaderResource>(ctx.pGpu, SDL_GPUShaderStage::SDL_GPU_SHADERSTAGE_VERTEX);
-				//ctx.compositeCompShader = resourceManager.GetOrLoadResource<Manifest::Shaders::composition_comp_shader, Smasher::SDLComputeShaderResource>(ctx.pGpu);
 			}
 
 			// Create Vertex Buffer

@@ -1,3 +1,4 @@
+#include <tracy/Tracy.hpp>
 #include <mutex>
 #include <iostream>
 #include "Smasher/JobManager/Job.h"
@@ -9,11 +10,12 @@ namespace Smasher {
 	Job::~Job() {
 	}
 
-	Job::Job(std::reference_wrapper<JobPool> pool, std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies) :
+	Job::Job(std::reference_wrapper<JobPool> pool, std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies, const char* jobName) :
 		m_Callback(callback),
 		m_JobId(Job::s_JobCount),
 		m_JobPoolRef(pool),
-		m_Valid(true)
+		m_Valid(true),
+		m_JobName(jobName)
 	{
 		Job::s_JobCount++;
 		std::scoped_lock lock1(m_StateMutex);
@@ -33,6 +35,7 @@ namespace Smasher {
 		m_Callback(std::move(other.m_Callback)),
 		m_Status(std::move(other.m_Status)),
 		m_JobPoolRef(std::move(other.m_JobPoolRef)),
+		m_JobName(std::move(other.m_JobName)),
 		m_JobId(other.m_JobId),
 		m_Valid(other.m_Valid)
 	{
@@ -58,6 +61,7 @@ namespace Smasher {
 			m_Callback = std::move(other.m_Callback);
 			m_Status = std::move(other.m_Status);
 			m_JobPoolRef = std::move(other.m_JobPoolRef);
+			m_JobName = std::move(other.m_JobName);
 			m_JobId = other.m_JobId;
 			other.m_Valid = false;
 		}
@@ -70,6 +74,8 @@ namespace Smasher {
 	}
 
 	ErrorCode Job::Run() {
+		ZoneScoped;
+		ZoneName(m_JobName.c_str(), m_JobName.size());
 		m_Status = JobStatus::RUNNING;
 		ErrorCode code = m_Callback();
 		m_Status = JobStatus::DONE;

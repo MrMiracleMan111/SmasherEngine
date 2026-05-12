@@ -65,16 +65,16 @@ namespace Smasher {
 		m_Runners.emplace_front(m_SyncJobPool, m_RunnersStateCV, *this, true);
 	}
 
-	Expected<std::reference_wrapper<Job>> JobManager::AddAsyncJob(std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies) {
+	Expected<std::reference_wrapper<Job>> JobManager::AddAsyncJob(std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies, const char* jobName) {
 		//std::scoped_lock lock(m_AsyncJobPool.GetMutex());
 		std::scoped_lock lock(m_AsyncJobPool.GetCVMutex());
-		return m_AsyncJobPool.AddJob(callback, dependencies);
+		return m_AsyncJobPool.AddJob(callback, dependencies, jobName);
 	}
 
-	Expected<std::reference_wrapper<Job>> JobManager::AddSyncJob(std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies) {
+	Expected<std::reference_wrapper<Job>> JobManager::AddSyncJob(std::function<ErrorCode(void)> callback, std::initializer_list<std::reference_wrapper<Job>> dependencies, const char* jobName) {
 		//std::scoped_lock lock(m_SyncJobPool.GetMutex());
 		std::scoped_lock lock(m_SyncJobPool.GetCVMutex());
-		return m_SyncJobPool.AddJob(callback, dependencies);
+		return m_SyncJobPool.AddJob(callback, dependencies, jobName);
 	}
 
 	void JobManager::FinishJob(Job& job) {

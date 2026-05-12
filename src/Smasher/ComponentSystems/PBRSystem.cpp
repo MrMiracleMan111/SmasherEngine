@@ -1,5 +1,6 @@
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
-
+#include <tracy/Tracy.hpp>
+#include <tracy/TracyC.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <SDL3/SDL.h>
@@ -15,6 +16,7 @@
 namespace Smasher {
 	namespace PBRSystem {
 		ErrorCode Initialize(entt::registry& registry, std::shared_ptr<SDL_GPUDeviceWrapper> gpu) {
+			ZoneScoped;
 			if (registry.ctx().contains<Context>()) {
 				return ERROR_SystemAlreadyInitialized;
 			}
@@ -24,7 +26,10 @@ namespace Smasher {
 
 			auto &ctx = registry.ctx().emplace<Context>();
 			auto &sdlSystemCtx = registry.ctx().get<SDLSystem::Context>();
+
 			ctx.gpu = gpu;
+
+			ctx.viewSize = sdlSystemCtx.windowSize;
 
 			// Pool with 512 batches (MAX)
 			ctx.staticMeshBatchPool = GPUBlockPool<Smasher::StaticMeshSystem::StaticMeshData>(gpu, Smasher::StaticMeshSystem::StaticMeshBatch::MAX_MODEL_COUNT, 512);
@@ -32,17 +37,12 @@ namespace Smasher {
 			// TODO: Save composition shader code to EngineConfig.h
 			{
 				auto& resourceManager = registry.ctx().get<EngineSystem::Context>().engineRef.get().GetResourceManager();
+				ctx.materialPassFragShader = resourceManager.GetOrLoadResource<Manifest::Shaders::material_pass_frag_shader, Smasher::SDLGraphicShaderResource>(gpu, SDL_GPUShaderStage::SDL_GPU_SHADERSTAGE_FRAGMENT);
+				ctx.materialPassVertShader = resourceManager.GetOrLoadResource<Manifest::Shaders::material_pass_vert_shader, Smasher::SDLGraphicShaderResource>(gpu, SDL_GPUShaderStage::SDL_GPU_SHADERSTAGE_VERTEX);
 				ctx.depthPassFragShader = resourceManager.GetOrLoadResource<Manifest::Shaders::depth_pass_frag_shader, Smasher::SDLGraphicShaderResource>(gpu, SDL_GPUShaderStage::SDL_GPU_SHADERSTAGE_FRAGMENT);
 				ctx.depthPassVertShader = resourceManager.GetOrLoadResource<Manifest::Shaders::depth_pass_vert_shader, Smasher::SDLGraphicShaderResource>(gpu, SDL_GPUShaderStage::SDL_GPU_SHADERSTAGE_VERTEX);
 				ctx.testTeapotMeshResource = resourceManager.GetOrLoadResource<Manifest::Models::suzanne, Smasher::StaticMeshResource>(gpu);
 			}
-
-			//StaticMeshInstance teapotInstances[3] = {
-			//	glm::mat4(1.0f),
-			//	glm::mat4(1.0f),
-			//	glm::mat4(1.0f),
-			//};
-			//teapotInstances[0].transform = glm::translate(glm::mat4(0.3f), glm::vec3(0.f, 0.f, 0.4f));
 
 			// Create 512 x 512 Texture array for static meshes
 			{
@@ -64,6 +64,41 @@ namespace Smasher {
 
 			SDL_GPUCommandBuffer* commandBuffer = SDL_AcquireGPUCommandBuffer(ctx.gpu->Get());
 			SDL_GPUTransferBuffer* transferBuffer = NULL;
+
+			// Create Screen Quad
+			{
+				SDL_GPUBufferCreateInfo screenQuadBufferInfo{};
+				screenQuadBufferInfo.size = sizeof(PBRSystem::SCREEN_QUAD);
+				screenQuadBufferInfo.usage = SDL_GPU_BUFFERUSAGE_VERTEX;
+				ctx.screenQuadBuffer = SDL_CreateGPUBuffer(ctx.gpu->Get(), &screenQuadBufferInfo);
+
+				SDL_GPUTransferBufferCreateInfo transferBufferInfo{};
+				transferBufferInfo.size = sizeof(PBRSystem::SCREEN_QUAD);
+				transferBufferInfo.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+				SDL_GPUTransferBuffer* transferBuffer = SDL_CreateGPUTransferBuffer(ctx.gpu->Get(), &transferBufferInfo);
+
+				SDL_GPUCommandBuffer* commandBuffer = SDL_AcquireGPUCommandBuffer(ctx.gpu->Get());
+				SDL_GPUCopyPass* copyPass = SDL_BeginGPUCopyPass(commandBuffer);
+
+				QuadVertex* data = (QuadVertex*)SDL_MapGPUTransferBuffer(ctx.gpu->Get(), transferBuffer, false);
+				SDL_memcpy(data, PBRSystem::SCREEN_QUAD, sizeof(PBRSystem::SCREEN_QUAD));
+				SDL_UnmapGPUTransferBuffer(ctx.gpu->Get(), transferBuffer);
+
+				SDL_GPUTransferBufferLocation source{};
+				source.offset = 0;
+				source.transfer_buffer = transferBuffer;
+
+				SDL_GPUBufferRegion region{};
+				region.buffer = ctx.screenQuadBuffer;
+				region.offset = 0;
+				region.size = sizeof(PBRSystem::SCREEN_QUAD);
+				SDL_UploadToGPUBuffer(copyPass, &source, &region, false);
+
+				SDL_EndGPUCopyPass(copyPass);
+				SDL_GPUFence* fence = SDL_SubmitGPUCommandBufferAndAcquireFence(commandBuffer);
+				SDL_WaitForGPUFences(ctx.gpu->Get(), true, &fence, 1);
+				SDL_ReleaseGPUTransferBuffer(ctx.gpu->Get(), transferBuffer);
+			}
 
 			// Create Static Mesh Transfer Buffer
 			{
@@ -89,6 +124,21 @@ namespace Smasher {
 				SDL_SetGPUTextureName(ctx.gpu->Get(), ctx.gDepthPrePass, "Depth Pre Pass Texture");
 			}
 
+			// Create Material Ids buffer
+			{
+				SDL_GPUTextureCreateInfo materialIdsTextureInfo{};
+				materialIdsTextureInfo.format = MATERIAL_IDS_TEX_FORMAT;
+				materialIdsTextureInfo.height = height;
+				materialIdsTextureInfo.width = width;
+				materialIdsTextureInfo.layer_count_or_depth = 1;
+				materialIdsTextureInfo.num_levels = 1;
+				materialIdsTextureInfo.sample_count = SDL_GPU_SAMPLECOUNT_1;
+				materialIdsTextureInfo.type = SDL_GPU_TEXTURETYPE_2D;
+				materialIdsTextureInfo.usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET | SDL_GPU_TEXTUREUSAGE_GRAPHICS_STORAGE_READ;
+				ctx.gMaterialIds = SDL_CreateGPUTexture(ctx.gpu->Get(), &materialIdsTextureInfo);
+				SDL_SetGPUTextureName(ctx.gpu->Get(), ctx.gMaterialIds, "Material IDs Texture");
+			}
+
 			// Create Normals Buffer
 			{
 				SDL_GPUTextureCreateInfo normalsTextureInfo{};
@@ -100,8 +150,25 @@ namespace Smasher {
 				normalsTextureInfo.sample_count = SDL_GPU_SAMPLECOUNT_1;
 				normalsTextureInfo.type = SDL_GPU_TEXTURETYPE_2D;
 				normalsTextureInfo.usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER;
-				ctx.gNormals = SDL_CreateGPUTexture(ctx.gpu->Get(), &normalsTextureInfo);
-				SDL_SetGPUTextureName(ctx.gpu->Get(), ctx.gNormals, "Normals Texture");
+				ctx.gTriangleNormals = SDL_CreateGPUTexture(ctx.gpu->Get(), &normalsTextureInfo);
+				ctx.gComputedNormals = SDL_CreateGPUTexture(ctx.gpu->Get(), &normalsTextureInfo);
+				SDL_SetGPUTextureName(ctx.gpu->Get(), ctx.gTriangleNormals, "Triangle Normals Texture");
+				SDL_SetGPUTextureName(ctx.gpu->Get(), ctx.gComputedNormals, "Computed Normals Texture");
+			}
+
+			// Create Albedos Buffer
+			{
+				SDL_GPUTextureCreateInfo normalsTextureInfo{};
+				normalsTextureInfo.format = ALBEDO_TEX_FORMAT;
+				normalsTextureInfo.height = height;
+				normalsTextureInfo.width = width;
+				normalsTextureInfo.layer_count_or_depth = 1;
+				normalsTextureInfo.num_levels = 1;
+				normalsTextureInfo.sample_count = SDL_GPU_SAMPLECOUNT_1;
+				normalsTextureInfo.type = SDL_GPU_TEXTURETYPE_2D;
+				normalsTextureInfo.usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER;
+				ctx.gAlbedo = SDL_CreateGPUTexture(ctx.gpu->Get(), &normalsTextureInfo);
+				SDL_SetGPUTextureName(ctx.gpu->Get(), ctx.gAlbedo, "Albedo Texture");
 			}
 
 			// Create UV Buffer
@@ -119,7 +186,7 @@ namespace Smasher {
 				SDL_SetGPUTextureName(ctx.gpu->Get(), ctx.gUV, "UV Texture");
 			}
 
-			// Create Samplers
+			// Create Basic Samplers
 			{
 				SDL_GPUSamplerCreateInfo samplerInfo{};
 				samplerInfo.min_filter = SDL_GPU_FILTER_LINEAR;                 /**< The minification filter to apply to lookups. */
@@ -143,42 +210,6 @@ namespace Smasher {
 				ctx.gLightingSampler = SDL_CreateGPUSampler(ctx.gpu->Get(), &samplerInfo);
 			}
 
-			// Create Instance buffer
-			/* {
-				size_t NUM_INSTANCES = 1;
-				SDL_GPUBufferCreateInfo instanceDataInfo = {};
-				instanceDataInfo.size = (Uint32)(NUM_INSTANCES * (Uint32)sizeof(StaticMeshInstance));
-				instanceDataInfo.usage = SDL_GPU_BUFFERUSAGE_VERTEX;
-				ctx.testInstanceBuffer = SDL_CreateGPUBuffer(ctx.gpu->Get(), &instanceDataInfo);
-
-				SDL_GPUTransferBufferCreateInfo transferBufferInfo{};
-				transferBufferInfo.size = (Uint32)(NUM_INSTANCES * sizeof(StaticMeshInstance));
-				transferBufferInfo.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
-				transferBuffer = SDL_CreateGPUTransferBuffer(ctx.gpu->Get(), &transferBufferInfo);
-
-				SDL_GPUCopyPass* copyPass = SDL_BeginGPUCopyPass(commandBuffer);
-
-				void* data = SDL_MapGPUTransferBuffer(ctx.gpu->Get(), transferBuffer, false);
-
-				// Upload Vertex Positions to Transfer Buffer
-				SDL_memcpy(data, teapotInstances, NUM_INSTANCES * sizeof(StaticMeshInstance));
-
-				SDL_GPUTransferBufferLocation location{};
-				location.transfer_buffer = transferBuffer;
-				location.offset = 0;
-
-				SDL_GPUBufferRegion region{};
-				region.buffer = ctx.testInstanceBuffer;
-				region.size = (Uint32)(NUM_INSTANCES * sizeof(StaticMeshInstance));
-				region.offset = 0;
-
-				SDL_UploadToGPUBuffer(copyPass, &location, &region, true);
-				SDL_UnmapGPUTransferBuffer(ctx.gpu->Get(), transferBuffer);
-
-				SDL_EndGPUCopyPass(copyPass);
-
-			}
-			*/
 			SDL_GPUFence* fence = SDL_SubmitGPUCommandBufferAndAcquireFence(commandBuffer);
 			SDL_WaitForGPUFences(ctx.gpu->Get(), true, &fence, 1);
 			SDL_ReleaseGPUFence(ctx.gpu->Get(), fence);
@@ -188,7 +219,7 @@ namespace Smasher {
 			{
 				SDL_GPUGraphicsPipelineCreateInfo depthPassPipelineInfo{};
 
-				SDL_GPUColorTargetDescription gTargetDescriptions[2];
+				SDL_GPUColorTargetDescription gTargetDescriptions[3];
 				// G-Buffer Depth target
 				gTargetDescriptions[0] = {};
 				gTargetDescriptions[0].blend_state.enable_blend = false;
@@ -210,6 +241,16 @@ namespace Smasher {
 				gTargetDescriptions[1].blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
 				gTargetDescriptions[1].format = UV_TEX_FORMAT;
 
+				gTargetDescriptions[2] = {};
+				gTargetDescriptions[2].blend_state.enable_blend = false;
+				gTargetDescriptions[2].blend_state.color_blend_op = SDL_GPU_BLENDOP_ADD;
+				gTargetDescriptions[2].blend_state.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
+				gTargetDescriptions[2].blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
+				gTargetDescriptions[2].blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+				gTargetDescriptions[2].blend_state.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
+				gTargetDescriptions[2].blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+				gTargetDescriptions[2].format = MATERIAL_IDS_TEX_FORMAT;
+
 				// Vertex Buffers
 				// Instance Data Buffer (slot 0)
 				//		model matrix location(0-3)
@@ -217,7 +258,7 @@ namespace Smasher {
 				// Normal	(slot 2, location 5)
 				// UV Coord (slot 3, location 6)
 
-				SDL_GPUVertexBufferDescription vertexBufferDesc[4];
+				SDL_GPUVertexBufferDescription vertexBufferDesc[2];
 				// Instance Buffer
 				vertexBufferDesc[0] = {};
 				vertexBufferDesc[0].input_rate = SDL_GPU_VERTEXINPUTRATE_INSTANCE;
@@ -225,29 +266,14 @@ namespace Smasher {
 				vertexBufferDesc[0].pitch = sizeof(StaticMeshSystem::StaticMeshData);
 				vertexBufferDesc[0].instance_step_rate = 0;
 
-				// Vertex Position Buffer
+				// Vertex Buffer
 				vertexBufferDesc[1] = {};
 				vertexBufferDesc[1].input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
 				vertexBufferDesc[1].slot = 1;
-				vertexBufferDesc[1].pitch = sizeof(float) * 3;
+				vertexBufferDesc[1].pitch = sizeof(VertexData);
 				vertexBufferDesc[1].instance_step_rate = 0;
 
-				// Vertex Normal Buffer
-				vertexBufferDesc[2] = {};
-				vertexBufferDesc[2].input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
-				vertexBufferDesc[2].slot = 2;
-				vertexBufferDesc[2].pitch = sizeof(float) * 3;
-				vertexBufferDesc[2].instance_step_rate = 0;
-
-				// Vertex UV Buffer
-				vertexBufferDesc[3] = {};
-				vertexBufferDesc[3].input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
-				vertexBufferDesc[3].slot = 3;
-				vertexBufferDesc[3].pitch = sizeof(float) * 2;
-				vertexBufferDesc[3].instance_step_rate = 0;
-
-
-				SDL_GPUVertexAttribute vertexAttributes[7];
+				SDL_GPUVertexAttribute vertexAttributes[8];
 				// Model Transform
 				vertexAttributes[0].buffer_slot = 0;
 				vertexAttributes[0].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4;
@@ -273,27 +299,33 @@ namespace Smasher {
 				vertexAttributes[4].offset = 0;
 
 				// Vertex Normal
-				vertexAttributes[5].buffer_slot = 2;
+				vertexAttributes[5].buffer_slot = 1;
 				vertexAttributes[5].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3;
 				vertexAttributes[5].location = 5;
-				vertexAttributes[5].offset = 0;
+				vertexAttributes[5].offset = sizeof(float) * 3;
 
 				// Vertex UV
-				vertexAttributes[6].buffer_slot = 3;
+				vertexAttributes[6].buffer_slot = 1;
 				vertexAttributes[6].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2;
 				vertexAttributes[6].location = 6;
-				vertexAttributes[6].offset = 0;
+				vertexAttributes[6].offset = sizeof(float) * 3 + sizeof(float) * 3;
+
+				// Instance Material ID
+				vertexAttributes[7].buffer_slot = 0;
+				vertexAttributes[7].format = SDL_GPU_VERTEXELEMENTFORMAT_INT;
+				vertexAttributes[7].location = 7;
+				vertexAttributes[7].offset = sizeof(StaticMeshSystem::StaticMeshData::transform);
 
 				depthPassPipelineInfo.fragment_shader = ctx.depthPassFragShader->GetShader();
 				depthPassPipelineInfo.vertex_shader = ctx.depthPassVertShader->GetShader();
 				depthPassPipelineInfo.target_info.color_target_descriptions = gTargetDescriptions;
-				depthPassPipelineInfo.target_info.num_color_targets = 2;
+				depthPassPipelineInfo.target_info.num_color_targets = 3;
 				depthPassPipelineInfo.target_info.has_depth_stencil_target = true;
 				depthPassPipelineInfo.target_info.depth_stencil_format = SDLSystem::GetGPUDepthStencilFormat(ctx.gpu->Get());
 				depthPassPipelineInfo.vertex_input_state.vertex_attributes = vertexAttributes;
-				depthPassPipelineInfo.vertex_input_state.num_vertex_attributes = 7;
+				depthPassPipelineInfo.vertex_input_state.num_vertex_attributes = 8;
 				depthPassPipelineInfo.vertex_input_state.vertex_buffer_descriptions = vertexBufferDesc;
-				depthPassPipelineInfo.vertex_input_state.num_vertex_buffers = 4;
+				depthPassPipelineInfo.vertex_input_state.num_vertex_buffers = 2;
 				depthPassPipelineInfo.depth_stencil_state.enable_depth_test = true;
 				depthPassPipelineInfo.depth_stencil_state.enable_depth_write = true;
 				depthPassPipelineInfo.depth_stencil_state.enable_stencil_test = true;
@@ -316,6 +348,77 @@ namespace Smasher {
 				ctx.depthPassPipeline = SDL_CreateGPUGraphicsPipeline(ctx.gpu->Get(), &depthPassPipelineInfo);
 			}
 
+			// Create material pass pipeline
+			{
+				SDL_GPUGraphicsPipelineCreateInfo materialPassPipelineInfo{};
+				SDL_GPUColorTargetDescription gTargetDescriptions[2];
+				// normals target
+				gTargetDescriptions[0] = {};
+				gTargetDescriptions[0].blend_state.enable_blend = false;
+				gTargetDescriptions[0].blend_state.color_blend_op = SDL_GPU_BLENDOP_ADD;
+				gTargetDescriptions[0].blend_state.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
+				gTargetDescriptions[0].blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
+				gTargetDescriptions[0].blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+				gTargetDescriptions[0].blend_state.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
+				gTargetDescriptions[0].blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+				gTargetDescriptions[0].format = NORMALS_TEX_FORMAT;
+
+				// albedos target
+				gTargetDescriptions[1] = {};
+				gTargetDescriptions[1].blend_state.enable_blend = false;
+				gTargetDescriptions[1].blend_state.color_blend_op = SDL_GPU_BLENDOP_ADD;
+				gTargetDescriptions[1].blend_state.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
+				gTargetDescriptions[1].blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
+				gTargetDescriptions[1].blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+				gTargetDescriptions[1].blend_state.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
+				gTargetDescriptions[1].blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+				gTargetDescriptions[1].format = ALBEDO_TEX_FORMAT;
+
+				// Vertex Buffers
+				// Position (slot 0, location 0)
+
+				SDL_GPUVertexBufferDescription vertexBufferDesc[1];
+				// Vertex Position Buffer
+				vertexBufferDesc[0] = {};
+				vertexBufferDesc[0].input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
+				vertexBufferDesc[0].slot = 0;
+				vertexBufferDesc[0].pitch = sizeof(QuadVertex);
+				vertexBufferDesc[0].instance_step_rate = 0;
+
+				SDL_GPUVertexAttribute vertexAttributes[2];
+				// Vertex Position
+				vertexAttributes[0].buffer_slot = 0;
+				vertexAttributes[0].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3;
+				vertexAttributes[0].location = 0;
+				vertexAttributes[0].offset = 0;
+
+				// Vertex UV
+				vertexAttributes[1].buffer_slot = 0;
+				vertexAttributes[1].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2;
+				vertexAttributes[1].location = 1;
+				vertexAttributes[1].offset = sizeof(float) * 3;
+
+				materialPassPipelineInfo.fragment_shader = ctx.materialPassFragShader->GetShader();
+				materialPassPipelineInfo.vertex_shader = ctx.materialPassVertShader->GetShader();
+				materialPassPipelineInfo.target_info.color_target_descriptions = gTargetDescriptions;
+				materialPassPipelineInfo.target_info.num_color_targets = 2;
+				materialPassPipelineInfo.target_info.has_depth_stencil_target = false;
+				materialPassPipelineInfo.vertex_input_state.vertex_attributes = vertexAttributes;
+				materialPassPipelineInfo.vertex_input_state.num_vertex_attributes = 2;
+				materialPassPipelineInfo.vertex_input_state.vertex_buffer_descriptions = vertexBufferDesc;
+				materialPassPipelineInfo.vertex_input_state.num_vertex_buffers = 1;
+				materialPassPipelineInfo.depth_stencil_state.enable_depth_test = false;
+				materialPassPipelineInfo.depth_stencil_state.enable_depth_write = false;
+				materialPassPipelineInfo.depth_stencil_state.enable_stencil_test = false;
+				materialPassPipelineInfo.rasterizer_state.enable_depth_clip = false;
+				materialPassPipelineInfo.rasterizer_state.enable_depth_bias = false;
+				materialPassPipelineInfo.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
+				materialPassPipelineInfo.rasterizer_state.front_face = SDL_GPU_FRONTFACE_COUNTER_CLOCKWISE;
+
+
+				ctx.materialPassPipeline = SDL_CreateGPUGraphicsPipeline(ctx.gpu->Get(), &materialPassPipelineInfo);
+			}
+
 			return ERROR_NoError;
 		};
 
@@ -326,6 +429,7 @@ namespace Smasher {
 
 			auto& ctx = registry.ctx().get<Context>();
 			SDL_ReleaseGPUTransferBuffer(ctx.gpu->Get(), ctx.staticMeshTransferBuffer);
+			SDL_ReleaseGPUBuffer(ctx.gpu->Get(), ctx.screenQuadBuffer);
 			return ERROR_NoError;
 		};
 
@@ -341,7 +445,22 @@ namespace Smasher {
 			uint8_t a;
 		};
 
-		MaterialHandle RegisterMaterial(Context& ctx, std::shared_ptr<MaterialResource> material) {
+		Expected<MaterialBinding> BindMaterial(Context& ctx, std::shared_ptr<MaterialResource> material) {
+			// Search for empty slot
+			int slot = -1;
+			for (int i = 0; i < ctx.staticMeshMaterialBindings.size(); i++) {
+				if (!ctx.staticMeshMaterialBindings[i]) {
+					slot = i;
+					break;
+				}
+			}
+			if (slot == -1) {
+				return Expected<MaterialBinding>::Error(ERROR_MaxMaterialBindings);
+			}
+
+			ctx.staticMeshMaterialBindings[slot] = material;
+			MaterialBinding binding { material->GetId(), static_cast<uint32_t>(slot) };
+
 			// Upload Material to slot
 			SDL_GPUCommandBuffer* commandBuffer = SDL_AcquireGPUCommandBuffer(ctx.gpu->Get());
 			SDL_GPUCopyPass* copyPass = SDL_BeginGPUCopyPass(commandBuffer);
@@ -357,7 +476,7 @@ namespace Smasher {
 
 			// Upload to Albedo Texture Transfer Buffer
 			AlbedoPixel* data = (AlbedoPixel*)SDL_MapGPUTransferBuffer(ctx.gpu->Get(), transferBuffer, false);
-			SDL_memcpy(data, material->GetAlbedo(), textureSizeBytes);
+			SDL_memcpy(data, material->GetAlbedo().Get(), textureSizeBytes);
 			SDL_UnmapGPUTransferBuffer(ctx.gpu->Get(), transferBuffer);
 
 			// Copy from transfer buffer to internal texture
@@ -368,35 +487,38 @@ namespace Smasher {
 			textureTransferInfo.offset = 0;
 
 			SDL_GPUTextureRegion textureRegion{};
-			textureRegion.layer = ctx._staticMeshSlot;
+			textureRegion.layer = slot;
 			textureRegion.texture = ctx.staticMeshAlbedos512;
+			textureRegion.w = material->GetDimensions().x;
+			textureRegion.h = material->GetDimensions().y;
+			textureRegion.d = 1;
 
 			SDL_UploadToGPUTexture(copyPass, &textureTransferInfo, &textureRegion, false);
 
 			SDL_EndGPUCopyPass(copyPass);
+			SDL_GPUFence* fence = SDL_SubmitGPUCommandBufferAndAcquireFence(commandBuffer);
+			SDL_WaitForGPUFences(ctx.gpu->Get(), true, &fence, 1);
 			SDL_ReleaseGPUTransferBuffer(ctx.gpu->Get(), transferBuffer);
-			MaterialHandle handle = {
-				.id = ctx._staticMeshSlot
-			};
-			ctx._staticMeshSlot++;
-			return handle;
+			return binding;
 		}
 
-		struct DepthPassUBO
+		struct CameraInfoUBO
 		{
 			glm::mat4 projectionMatrix;
 			glm::mat4 viewMatrix;
 			glm::mat4 cameraMatrix;
+			glm::uvec2 viewSize;
 		};
 
 		ErrorCode DepthPrePass(Context& ctx, const Smasher::StaticMeshSystem::Context& staticMeshCtx, ResourceManager &resourceManager, const CameraSystem::Component& camera) {
-			SDL_GPUColorTargetInfo gTargetInfos[2];
+			ZoneScoped;
+			SDL_GPUColorTargetInfo gTargetInfos[3];
 			// Normals
 			gTargetInfos[0] = {};
 			gTargetInfos[0].clear_color = { 0 / 255.f, 0 / 255.f, 0 / 255.f, 0.f / 255.f };
 			gTargetInfos[0].load_op = SDL_GPU_LOADOP_CLEAR;
 			gTargetInfos[0].store_op = SDL_GPU_STOREOP_STORE;
-			gTargetInfos[0].texture = ctx.gNormals;
+			gTargetInfos[0].texture = ctx.gTriangleNormals;
 			gTargetInfos[0].resolve_texture = NULL;
 			gTargetInfos[0].cycle = true;
 			gTargetInfos[0].mip_level = 0;
@@ -415,6 +537,18 @@ namespace Smasher {
 			gTargetInfos[1].layer_or_depth_plane = 0;
 			gTargetInfos[1].cycle_resolve_texture = false;
 
+			// Material IDs
+			gTargetInfos[2] = {};
+			gTargetInfos[2].clear_color = { 0 / 255.f };
+			gTargetInfos[2].load_op = SDL_GPU_LOADOP_CLEAR;
+			gTargetInfos[2].store_op = SDL_GPU_STOREOP_STORE;
+			gTargetInfos[2].texture = ctx.gMaterialIds;
+			gTargetInfos[2].resolve_texture = NULL;
+			gTargetInfos[2].cycle = true;
+			gTargetInfos[2].mip_level = 0;
+			gTargetInfos[2].layer_or_depth_plane = 0;
+			gTargetInfos[2].cycle_resolve_texture = false;
+
 			SDL_GPUDepthStencilTargetInfo depthStencilTargetInfo = {};
 			depthStencilTargetInfo.clear_depth = 1.f;
 			depthStencilTargetInfo.clear_stencil = 0;
@@ -431,13 +565,14 @@ namespace Smasher {
 			{
 				SDL_GPUCommandBuffer* commandBuffer = SDL_AcquireGPUCommandBuffer(ctx.gpu->Get());
 				SDL_GPUCopyPass* copyPass = SDL_BeginGPUCopyPass(commandBuffer);
+				int count = 0;
 				for (const auto& itr : staticMeshCtx.batches) {
-					for (const auto& batch : itr.second) {
+					for (const auto& batch : itr.second.batchList) {
 						static const size_t BLOCK_SIZE_BYTES = sizeof(StaticMeshSystem::StaticMeshData) * StaticMeshSystem::StaticMeshBatch::MAX_MODEL_COUNT;
 						// Update batch
 						if (batch.dirty) {
 							void* dst = SDL_MapGPUTransferBuffer(ctx.gpu->Get(), ctx.staticMeshTransferBuffer, true);
-							SDL_memcpy(dst, batch.models.data(), BLOCK_SIZE_BYTES);
+							SDL_memcpy(dst, batch.instances.data(), BLOCK_SIZE_BYTES);
 							SDL_UnmapGPUTransferBuffer(ctx.gpu->Get(), ctx.staticMeshTransferBuffer);
 
 
@@ -461,17 +596,18 @@ namespace Smasher {
 			}
 
 			glm::mat4 viewMatrix = CameraSystem::GetViewMatrix(camera);
-			DepthPassUBO ubo = {
+			CameraInfoUBO ubo = {
 				.projectionMatrix = CameraSystem::GetProjectionMatrix(camera),
 				.viewMatrix = viewMatrix,
-				.cameraMatrix = glm::inverse(viewMatrix)
+				.cameraMatrix = glm::inverse(viewMatrix),
+				.viewSize = ctx.viewSize
 			};
 
 			Uint8 materialID = 1;
 			// Render Static Meshes
 			{
 				SDL_GPUCommandBuffer* commandBuffer = SDL_AcquireGPUCommandBuffer(ctx.gpu->Get());
-				SDL_GPURenderPass* renderPass = SDL_BeginGPURenderPass(commandBuffer, gTargetInfos, 2, &depthStencilTargetInfo);
+				SDL_GPURenderPass* renderPass = SDL_BeginGPURenderPass(commandBuffer, gTargetInfos, 3, &depthStencilTargetInfo);
 				SDL_BindGPUGraphicsPipeline(renderPass, ctx.depthPassPipeline);
 				SDL_SetGPUStencilReference(renderPass, 64);
 				SDL_PushGPUVertexUniformData(commandBuffer, 0, &ubo, sizeof(ubo));
@@ -484,31 +620,37 @@ namespace Smasher {
 					indexBuffer.buffer = meshResource->GetIndexBuffer();
 					indexBuffer.offset = 0;
 
-					SDL_GPUBufferBinding vertexBuffers[4];
+					SDL_GPUBufferBinding vertexBuffers[2];
 					vertexBuffers[0].buffer = instanceBuffer;
 					vertexBuffers[0].offset = 0;
-					vertexBuffers[1].buffer = meshResource->GetVertexPositionBuffer();
+					vertexBuffers[1].buffer = meshResource->GetVertexBuffer();
 					vertexBuffers[1].offset = 0;
-					vertexBuffers[2].buffer = meshResource->GetVertexNormalBuffer();
-					vertexBuffers[2].offset = 0;
-					vertexBuffers[3].buffer = meshResource->GetVertexUVBuffer();
-					vertexBuffers[3].offset = 0;
 
 					Uint32 numIndices = meshResource->GetNumIndices();
 					Uint32 numInstances = 1;
 					SDL_BindGPUIndexBuffer(renderPass, &indexBuffer, SDL_GPUIndexElementSize::SDL_GPU_INDEXELEMENTSIZE_32BIT);
-					SDL_BindGPUVertexBuffers(renderPass, 0, vertexBuffers, 4);
+					SDL_BindGPUVertexBuffers(renderPass, 0, vertexBuffers, 2);
 
-					for (const auto& batch : itr.second) {
+					for (const auto& batch : itr.second.batchList) {
 						// Render batch
 						int instanceOffset = batch.block.index * StaticMeshSystem::StaticMeshBatch::MAX_MODEL_COUNT;
 						SDL_DrawGPUIndexedPrimitives(renderPass, numIndices, batch.modelCount, 0, 0, instanceOffset);
 					}
+
+					//for (const auto& range : itr.second.gpuBlockRanges) {
+					//	ZoneScoped;
+					//	// Render batch
+					//	int instanceOffset = range.first.index * StaticMeshSystem::StaticMeshBatch::MAX_MODEL_COUNT;
+					//	SDL_DrawGPUIndexedPrimitives(renderPass, numIndices, range.second * 48, 0, 0, instanceOffset);
+					//}
 				}
 				SDL_EndGPURenderPass(renderPass);
+				TracyCZone(tracyZoneCtx, true);
+				TracyCZoneName(tracyZoneCtx, "Depth Pre Pass Wait for Fence", strlen("Depth Pre Pass Wait for Fence"));
 				SDL_GPUFence* fence = SDL_SubmitGPUCommandBufferAndAcquireFence(commandBuffer);
 				SDL_WaitForGPUFences(ctx.gpu->Get(), true, &fence, 1);
 				SDL_ReleaseGPUFence(ctx.gpu->Get(), fence);
+				TracyCZoneEnd(tracyZoneCtx);
 			}
 
 			return ERROR_NoError;
@@ -524,7 +666,79 @@ namespace Smasher {
 			return ERROR_NoError;
 		};
 
-		ErrorCode MaterialsPass(Context& ctx) {
+		ErrorCode MaterialsPass(Context& ctx, const CameraSystem::Component& camera) {
+			ZoneScoped;
+
+			glm::mat4 viewMatrix = CameraSystem::GetViewMatrix(camera);
+			CameraInfoUBO ubo = {
+				.projectionMatrix = CameraSystem::GetProjectionMatrix(camera),
+				.viewMatrix = viewMatrix,
+				.cameraMatrix = glm::inverse(viewMatrix),
+				.viewSize = ctx.viewSize
+			};
+
+			SDL_GPUColorTargetInfo gTargetInfos[2];
+			// Normals
+			gTargetInfos[0] = {};
+			gTargetInfos[0].clear_color = { 0 / 255.f, 0 / 255.f, 0 / 255.f, 0.f / 255.f };
+			gTargetInfos[0].load_op = SDL_GPU_LOADOP_CLEAR;
+			gTargetInfos[0].store_op = SDL_GPU_STOREOP_STORE;
+			gTargetInfos[0].texture = ctx.gComputedNormals;
+			gTargetInfos[0].resolve_texture = NULL;
+			gTargetInfos[0].cycle = true;
+			gTargetInfos[0].mip_level = 0;
+			gTargetInfos[0].layer_or_depth_plane = 0;
+			gTargetInfos[0].cycle_resolve_texture = false;
+
+			// albedo
+			gTargetInfos[1] = {};
+			gTargetInfos[1].clear_color = { 0 / 255.f, 0 / 255.f, 0 / 255.f, 0.f / 255.f };
+			gTargetInfos[1].load_op = SDL_GPU_LOADOP_CLEAR;
+			gTargetInfos[1].store_op = SDL_GPU_STOREOP_STORE;
+			gTargetInfos[1].texture = ctx.gAlbedo;
+			gTargetInfos[1].resolve_texture = NULL;
+			gTargetInfos[1].cycle = true;
+			gTargetInfos[1].mip_level = 0;
+			gTargetInfos[1].layer_or_depth_plane = 0;
+			gTargetInfos[1].cycle_resolve_texture = false;
+
+			// Render Pass
+			{
+				SDL_GPUCommandBuffer* commandBuffer = SDL_AcquireGPUCommandBuffer(ctx.gpu->Get());
+				SDL_GPURenderPass* renderPass = SDL_BeginGPURenderPass(commandBuffer, gTargetInfos, 2, NULL);
+				SDL_BindGPUGraphicsPipeline(renderPass, ctx.materialPassPipeline);
+				SDL_GPUTextureSamplerBinding samplerBindings[3];
+				// Albedos 
+				samplerBindings[0] = {};
+				samplerBindings[0].texture = ctx.staticMeshAlbedos512;
+				samplerBindings[0].sampler = ctx.gAlbedoSampler;
+
+				// Global Buffer Normals
+				samplerBindings[1] = {};
+				samplerBindings[1].texture = ctx.gTriangleNormals;
+				samplerBindings[1].sampler = ctx.gNormalsSampler;
+
+				// Global Buffer UVs
+				samplerBindings[2] = {};
+				samplerBindings[2].texture = ctx.gUV;
+				samplerBindings[2].sampler = ctx.gUVSampler;
+
+				SDL_GPUBufferBinding vertexBuffer[1];
+				vertexBuffer[0].buffer = ctx.screenQuadBuffer;
+				vertexBuffer[0].offset = 0;
+
+				SDL_BindGPUFragmentSamplers(renderPass, 0, samplerBindings, 3);
+				SDL_BindGPUVertexBuffers(renderPass, 0, vertexBuffer, 1);
+				SDL_BindGPUFragmentStorageTextures(renderPass, 0, &ctx.gMaterialIds, 1);
+				SDL_PushGPUFragmentUniformData(commandBuffer, 0, &ubo, sizeof(ubo));
+
+				SDL_DrawGPUPrimitives(renderPass, 6, 1, 0, 0);
+
+				SDL_EndGPURenderPass(renderPass);
+				SDL_GPUFence* fence = SDL_SubmitGPUCommandBufferAndAcquireFence(commandBuffer);
+				SDL_WaitForGPUFences(ctx.gpu->Get(), true, &fence, 1);
+				SDL_ReleaseGPUFence(ctx.gpu->Get(), fence);
+			}
 
 			return ERROR_NoError;
 		};
