@@ -62,6 +62,28 @@ if(SMASHER_TESTS)
     include(GoogleTest)
 endif()
 
+# Tracy
+find_package(Tracy REQUIRED COMPONENTS Tracy::TracyClient)
+if(Tracy_FOUND)
+    message(STATUS "Found local tracy installation")
+    get_target_property(TRACY_LIB_LOCATION Tracy::TracyClient LOCATION)
+    get_target_property(TRACY_TYPE Tracy::TracyClient TYPE)
+    if(TRACY_TYPE STREQUAL "SHARED_LIBRARY")
+        message(STATUS "Tracy Lib is a shared library")
+    endif()
+    message(STATUS "Tracy LIB location: ${TRACY_LIB_LOCATION}")
+else()
+    message(STATUS "Could NOT find local tracy installation")
+    FetchContent_Declare (
+        Tracy
+        GIT_REPOSITORY https://github.com/wolfpld/tracy.git
+        GIT_TAG master
+        GIT_SHALLOW TRUE
+        GIT_PROGRESS TRUE
+    )
+    FetchContent_MakeAvailable (Tracy)
+endif()
+
 # SDL3 3.4.2
 find_package(SDL3 3.4 CONFIG OPTIONAL COMPONENTS SDL3-static)
 if(SDL3_FOUND)
@@ -458,6 +480,7 @@ tinyobjloader
 message(STATUS "Tinyobjloader source dir ${tinyobjloader_SOURCE_DIR}")
 
 target_link_libraries(SmasherEngine PUBLIC
+Tracy::TracyClient
 SFML::Audio
 SFML::Window
 SFML::Graphics
@@ -487,6 +510,14 @@ endif()
 add_custom_command(TARGET SmasherEngine POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         $<TARGET_FILE:SDL3::SDL3-shared>
+        $<TARGET_FILE_DIR:SmasherEngine>
+    COMMAND_EXPAND_LISTS
+)
+
+# Copy all necessary DLLs to build directory
+add_custom_command(TARGET SmasherEngine POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:Tracy::TracyClient>
         $<TARGET_FILE_DIR:SmasherEngine>
     COMMAND_EXPAND_LISTS
 )
