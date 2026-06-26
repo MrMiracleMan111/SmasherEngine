@@ -33,8 +33,22 @@
     "depth_pass_frag_shader": "assets/shaders/PBR_shaders/depth_pass.frag.hlsl",
     "depth_pass_vert_shader": "assets/shaders/PBR_shaders/depth_pass.vert.hlsl",
     "material_pass_frag_shader": "assets/shaders/PBR_shaders/material_pass.frag.hlsl",
-    "material_pass_vert_shader": "assets/shaders/PBR_shaders/material_pass.vert.hlsl"
-
+    "material_pass_vert_shader": "assets/shaders/PBR_shaders/material_pass.vert.hlsl",
+    "lighting_pass_shader": "assets/shaders/PBR_shaders/lighting_pass.comp.hlsl",
+    "shadow_pass_vert_shader": "assets/shaders/PBR_shaders/shadow_pass.vert.hlsl",
+    "shadow_pass_frag_shader": "assets/shaders/PBR_shaders/shadow_pass.frag.hlsl",
+    "GPUSort": {
+      "radix_morton_code_shader": "assets/shaders/GPUSort_shaders/radix_morton_code.comp.hlsl",
+      "radix_count_shader": "assets/shaders/GPUSort_shaders/radix_count.comp.hlsl",
+      "radix_prefix_sum_shader": "assets/shaders/GPUSort_shaders/radix_prefix_sum.comp.hlsl",
+      "radix_reorder_shader": "assets/shaders/GPUSort_shaders/radix_reorder.comp.hlsl",
+      "initialize_bvh_shader": "assets/shaders/GPUSort_shaders/initialize_bvh.comp.hlsl",
+      "construct_bvh_shader": "assets/shaders/GPUSort_shaders/construct_bvh.comp.hlsl"
+    },
+    "Debug": {
+      "debug_bvh_frag_shader": "assets/shaders/debug_shaders/debug_bvh.frag.hlsl",
+      "debug_bvh_vert_shader": "assets/shaders/debug_shaders/debug_bvh.vert.hlsl"
+    }
   },
   "Models": {
     "suzanne": "assets/static_models/suzanne/suzanne.obj",

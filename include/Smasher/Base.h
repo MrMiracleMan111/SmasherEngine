@@ -124,10 +124,6 @@ namespace Smasher {
 		t.Update(arg);
 	};
 
-	struct SMASHER_API MaterialBinding {
-		ResourceId materialId;
-		uint32_t index;
-	};
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 /// @brief Struct defining extra texture settings such as transluscency.

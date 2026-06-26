@@ -84,14 +84,23 @@ else()
     FetchContent_MakeAvailable (Tracy)
 endif()
 
+find_package(Vulkan 1.3)
+if (Vulkan_FOUND)
+    message(STATUS "Found Vulkan installation")
+else()
+    message(FATAL_ERROR "Could not find Vulkan locally, try installing Vulkan SDK")
+endif()
+
 # SDL3 3.4.2
-find_package(SDL3 3.4 CONFIG OPTIONAL COMPONENTS SDL3-static)
+find_package(SDL3 3.4 CONFIG OPTIONAL COMPONENTS SDL3-static SDL3-shared)
 if(SDL3_FOUND)
     message(STATUS "Found local SDL3 v3.4 installation")
 else()
     message(STATUS "Could not find SDL3 locally, fetching from git...")
     set(TMP_BUILD_SHARED_LIBS BUILD_SHARED_LIBS)
+    set(TMP_CMAKE_BUILD_TYPE CMAKE_BUILD_TYPE)
     set(BUILD_SHARED_LIBS OFF)
+    set(CMAKE_BUILD_TYPE "Debug")
     set(SDL_SHARED OFF)
     set(SDL_STATIC ON)
     set(SDL_VERSION "release-3.4.2")
@@ -101,6 +110,7 @@ else()
         GIT_TAG "${SDL_VERSION}" 
     )
     FetchContent_MakeAvailable(SDL3)
+    set(CMAKE_BUILD_TYPE TMP_CMAKE_BUILD_TYPE)
     set(BUILD_SHARED_LIBS TMP_BUILD_SHARED_LIBS)
 
     message(STATUS "Fetched SDL3 Successfully")
@@ -377,7 +387,7 @@ add_library(SmasherEngine SHARED
 "src/Smasher/ComponentSystems/SDLSpriteSystem.cpp"
 "include/Smasher/ComponentSystems/PBRSystem.h"
 "src/Smasher/ComponentSystems/PBRSystem.cpp"
-)
+ "src/Smasher/Util/GraphicsUtil.cpp" "include/Smasher/Util/GPUBVHTree.h" "src/Smasher/Util/GPUBVHTree.cpp")
 
 # Try to include machine-specific config if it exists
 if(EXISTS "${CMAKE_SOURCE_DIR}/local.cmake")
@@ -493,7 +503,9 @@ box2d::box2d
 EnTT::EnTT
 glm::glm
 SDL3::SDL3-shared
-SDL3_shadercross::SDL3_shadercross-static)
+SDL3_shadercross::SDL3_shadercross
+Vulkan::Vulkan
+Vulkan::Headers)
 
 if(WIN32)
     target_link_libraries(SmasherEngine PRIVATE winmm)

@@ -25,6 +25,8 @@ cbuffer UBO : register(b0, space1)
     row_major float4x4 ViewMatrix;
     row_major float4x4 CameraMatrix;
     float2 WindowSize;
+    int padding0;
+    int padding1;
 };
 
 

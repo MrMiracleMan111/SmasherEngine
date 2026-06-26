@@ -3,9 +3,6 @@ struct VSInput
 {
     [[vk::location(0)]] float4x4 model : MODEL;
     [[vk::location(4)]] float3 position : POSITION;
-    [[vk::location(5)]] float3 normal : NORMAL;
-    [[vk::location(6)]] float2 uv : TEXCOORD0;
-    [[vk::location(7)]] int materialID : MATERIALID;
 };
 
 cbuffer UBO : register(b0, space1)
@@ -25,10 +22,7 @@ cbuffer UBO : register(b0, space1)
 // Vertex Shader Output / Pixel Shader Input
 struct PSInput
 {
-    [[vk::location(0)]] float3 normal : NORMAL;
-    [[vk::location(1)]] float4 position : POSITION;
-    [[vk::location(2)]] float2 uv : TEXCOORD0;
-    [[vk::location(3)]] int materialID : MATERIALID;
+    [[vk::location(0)]] float4 position : POSITION;
 };
 
 // -----------------------------------------------
@@ -44,10 +38,6 @@ PSInput VSMain(VSInput input, out float4 position : SV_POSITION)
     // column_major float4x4 instanceModel = input.model;
     // column_major float4x4 MVP = mul(ProjectionMatrix, mul(ViewMatrix, instanceModel));
     // position = mul(float4(input.position, 1.f), MVP);
-    
-    fragInput.normal = input.normal;
-    fragInput.uv = input.uv;
-    fragInput.materialID = input.materialID & 0x0000FFFF;
     fragInput.position = position;
     
     return fragInput;

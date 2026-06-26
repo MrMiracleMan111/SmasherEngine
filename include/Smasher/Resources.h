@@ -150,8 +150,8 @@ namespace Smasher {
 		sf::Shader::Type m_ShaderType = sf::Shader::Type::Fragment;
 	};
 
-	SDL_GPUShader *LoadGPUShaderHLSL(SDL_GPUDevice *device, SDL_GPUShaderStage stage, const char* code, const char* debugName = NULL);
-	SDL_GPUComputePipeline* LoadComputePipelineHLSL(SDL_GPUDevice* device, const char* code);
+	SDL_GPUShader *LoadGPUShaderHLSL(SDL_GPUDevice *device, SDL_GPUShaderStage stage, const char* code, const char* includeDir = NULL, const char* debugName = NULL);
+	SDL_GPUComputePipeline* LoadComputePipelineHLSL(SDL_GPUDevice* device, const char* code, const char* includeDir = NULL, const char *debugName = NULL);
 
 	class SMASHER_API SDLGraphicShaderResource : public Resource {
 	public:
@@ -161,6 +161,9 @@ namespace Smasher {
 		SDLGraphicShaderResource(ResourceId id,
 			const ResourcePath* const relativePaths, const std::size_t numPaths,
 			const ResourcePath& resourcesDirectory, std::shared_ptr<SDL_GPUDeviceWrapper> gpu, SDL_GPUShaderStage type);
+
+		SDLGraphicShaderResource(ResourceId id, const char* code, std::optional<ResourcePath> includePath, std::shared_ptr<SDL_GPUDeviceWrapper> gpu, SDL_GPUShaderStage type, const char* debugName = NULL);
+
 
 		SDL_GPUShader* GetShader();
 
@@ -180,6 +183,9 @@ namespace Smasher {
 		SDLComputeShaderResource(ResourceId id,
 			const ResourcePath* const relativePaths, const std::size_t numPaths,
 			const ResourcePath& resourcesDirectory, std::shared_ptr<SDL_GPUDeviceWrapper> gpu);
+
+		SDLComputeShaderResource(ResourceId id, const char *code, std::optional<ResourcePath> includePath, std::shared_ptr<SDL_GPUDeviceWrapper> gpu, const char *debugName = NULL);
+
 
 		SDL_GPUComputePipeline* GetShader();
 
@@ -232,6 +238,8 @@ namespace Smasher {
 		SDL_GPUBuffer *GetIndexBuffer() const;
 		unsigned int GetNumIndices() const;
 		unsigned int GetNumVertices() const;
+		glm::vec3 GetMinAABB() const;
+		glm::vec3 GetMaxAABB() const;
 
 	private:
 		SDL_GPUBuffer *m_VertexBuffer;
@@ -241,6 +249,8 @@ namespace Smasher {
 		std::vector<VertexData> m_Vertices;
 		std::vector<uint32_t> m_Indices;
 		std::shared_ptr<SDL_GPUDeviceWrapper> m_GPUPtr;
+		glm::vec3 m_MinAABB;
+		glm::vec3 m_MaxAABB;
 	};
 
 	class SMASHER_API MaterialResource : public Resource {
@@ -253,9 +263,12 @@ namespace Smasher {
 		~MaterialResource();
 
 		glm::uvec2 GetDimensions();
-		Expected<void *> GetAlbedo();
-		Expected<void *> GetSpecular();
-		Expected<void *> GetNormals();
+		Expected<void *> GetAlbedoTexture();
+		Expected<void *> GetSpecularTexture();
+		Expected<void *> GetNormalsTexture();
+
+		glm::vec3 GetBaseAlbedo();
+		glm::vec3 GetBaseSpecular();
 
 	private:
 		tinyobj::material_t m_Material;
@@ -265,5 +278,17 @@ namespace Smasher {
 		SDL_Surface *m_AlbedoSurface = nullptr;
 		std::shared_ptr<SDL_GPUDeviceWrapper> m_GPUPtr;
 		glm::uvec2 m_Dimensions;
+	};
+
+	struct SMASHER_API MaterialBinding {
+		const std::shared_ptr<MaterialResource> resource;
+		const ResourceId materialId;
+		const uint32_t index;
+	};
+
+	struct SMASHER_API StaticMeshBinding {
+		const std::shared_ptr<StaticMeshResource> resource;
+		const ResourceId meshId;
+		const uint32_t index;
 	};
 }

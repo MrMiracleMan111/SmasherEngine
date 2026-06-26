@@ -1,5 +1,7 @@
 #include <iostream>
 #include <SDL3/SDL.h>
+#include <vulkan/vulkan.h>
+#include <vulkan/vk_enum_string_helper.h>
 #include "Smasher/ComponentSystems/SDLSystem.h"
 #include "Smasher/ComponentSystems/EngineSystem.h"
 #include "Smasher/Engine.h"
@@ -9,6 +11,10 @@
 
 namespace Smasher {
 	namespace SDLSystem {
+
+		SDL_GPUTextureFormat GetGPURGBAFormat(SDL_GPUDevice* device) {
+			return SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
+		}
 
 		SDL_GPUTextureFormat GetGPUDepthFormat(SDL_GPUDevice* device) {
 			// Create depth texture
@@ -46,8 +52,118 @@ namespace Smasher {
 			}
 
 			Context &ctx = registry.ctx().emplace<Context>();
-			SDL_GPUDevice* device = SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV, true, NULL);
-			
+
+			SDL_PropertiesID gpuProps = SDL_CreateProperties();
+
+			/**
+			 * 
+			 *	VkStructureType             sType;
+			 *	const void*                 pNext;
+			 *	VkInstanceCreateFlags       flags;
+			 *	const VkApplicationInfo*    pApplicationInfo;
+			 *	uint32_t                    enabledLayerCount;
+			 *	const char* const*          ppEnabledLayerNames;
+			 *	uint32_t                    enabledExtensionCount;
+			 *	const char* const*          ppEnabledExtensionNames;
+			 * .
+			 */
+
+
+			VkInstance instance; 
+			const VkApplicationInfo appInfo{
+				.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
+				.pNext = NULL,
+				.pApplicationName = "",
+				.applicationVersion = 0,
+				.pEngineName = "",
+				.engineVersion = 0,
+				.apiVersion = VK_API_VERSION_1_3
+			};
+			const VkInstanceCreateInfo instanceInfo{
+				.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
+				.pNext = NULL,
+				.flags = VkInstanceCreateFlagBits::VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR,
+				.pApplicationInfo = &appInfo,
+				.enabledLayerCount = 0,
+				.ppEnabledLayerNames = NULL,
+				.enabledExtensionCount = 0,
+				.ppEnabledExtensionNames = NULL
+			};
+			VkResult result = vkCreateInstance(&instanceInfo, NULL, &instance);
+			std::cout << "Create Instance Result: " << string_VkResult(result) << std::endl;
+			VkPhysicalDevice vkDevice;
+			uint32_t vkDeviceCount;
+
+			result = vkEnumeratePhysicalDevices(instance, &vkDeviceCount, &vkDevice);
+
+			VkPhysicalDeviceFeatures features10{}; // features of versions = Vulkan 1.0
+			VkPhysicalDeviceFeatures2 features11_2_3{}; // features of versions >= Vulkan 1.1
+			VkPhysicalDeviceVulkan11Features vulk11Features{};
+			VkPhysicalDeviceVulkan12Features vulk12Features{};
+			VkPhysicalDeviceVulkan13Features vulk13Features{};
+
+			vulk11Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
+			vulk12Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
+			vulk13Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
+			vulk11Features.pNext = &vulk12Features;
+			vulk12Features.pNext = &vulk13Features;
+			vulk13Features.pNext = NULL;
+
+			features11_2_3.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+			features11_2_3.pNext = &vulk11Features;
+
+			vkGetPhysicalDeviceFeatures(vkDevice, &features10);
+			vkGetPhysicalDeviceFeatures2(vkDevice, &features11_2_3);
+
+			uint32_t numInstanceExtension = 0;
+			uint32_t numDeviceExtension = 0;
+			std::vector<const char *> instanceExtNames;
+			std::vector<const char *> deviceExtNames;
+
+			result = vkEnumerateInstanceExtensionProperties(NULL, &numInstanceExtension, NULL);
+			std::vector<VkExtensionProperties> instanceExtensions(numInstanceExtension);
+			result = vkEnumerateInstanceExtensionProperties(NULL, &numInstanceExtension, instanceExtensions.data());
+
+			for (const auto& itr : instanceExtensions) {
+				instanceExtNames.push_back(itr.extensionName);
+			}
+
+			vkEnumerateDeviceExtensionProperties(vkDevice, NULL, &numDeviceExtension, NULL);
+			std::vector<VkExtensionProperties> deviceExtensions(numDeviceExtension);
+			vkEnumerateDeviceExtensionProperties(vkDevice, NULL, &numDeviceExtension, deviceExtensions.data());
+
+			for (const auto& itr : deviceExtensions) {
+				deviceExtNames.push_back(itr.extensionName);
+			}
+
+			SDL_GPUVulkanOptions vulkanOpts
+			{
+				.vulkan_api_version = VK_API_VERSION_1_3, /**< The Vulkan API version to request for the instance. Use Vulkan's VK_MAKE_VERSION or VK_MAKE_API_VERSION. */
+				.feature_list = &features11_2_3, /**< Pointer to the first element of a chain of Vulkan feature structs. (Requires API version 1.1 or higher.)*/
+				.vulkan_10_physical_device_features = &features10, /**< Pointer to a VkPhysicalDeviceFeatures struct to enable additional Vulkan 1.0 features. */
+				.device_extension_count = numDeviceExtension, /**< Number of additional device extensions to require. */
+				.device_extension_names = deviceExtNames.data(), /**< Pointer to a list of additional device extensions to require. */
+				.instance_extension_count = numInstanceExtension, /**< Number of additional instance extensions to require. */
+				.instance_extension_names = instanceExtNames.data() /**< Pointer to a list of additional instance extensions to require. */
+			};
+
+
+			SDL_SetPointerProperty(gpuProps, SDL_PROP_GPU_DEVICE_CREATE_VULKAN_OPTIONS_POINTER, &vulkanOpts);
+			SDL_SetBooleanProperty(gpuProps, SDL_PROP_GPU_DEVICE_CREATE_DEBUGMODE_BOOLEAN, true);
+			SDL_SetBooleanProperty(gpuProps, SDL_PROP_GPU_DEVICE_CREATE_SHADERS_SPIRV_BOOLEAN, true);
+			SDL_SetBooleanProperty(gpuProps, SDL_PROP_GPU_DEVICE_CREATE_SHADERS_DXIL_BOOLEAN, false);
+			SDL_SetBooleanProperty(gpuProps, SDL_PROP_GPU_DEVICE_CREATE_SHADERS_DXBC_BOOLEAN, false);
+			SDL_SetBooleanProperty(gpuProps, SDL_PROP_GPU_DEVICE_CREATE_FEATURE_CLIP_DISTANCE_BOOLEAN, true);
+			SDL_SetBooleanProperty(gpuProps, SDL_PROP_GPU_DEVICE_CREATE_FEATURE_DEPTH_CLAMPING_BOOLEAN, true);
+			SDL_SetBooleanProperty(gpuProps, SDL_PROP_GPU_DEVICE_CREATE_FEATURE_INDIRECT_DRAW_FIRST_INSTANCE_BOOLEAN, true);
+			SDL_SetBooleanProperty(gpuProps, SDL_PROP_GPU_DEVICE_CREATE_FEATURE_ANISOTROPY_BOOLEAN, true);
+			SDL_SetBooleanProperty(gpuProps, SDL_PROP_GPU_DEVICE_CREATE_VULKAN_REQUIRE_HARDWARE_ACCELERATION_BOOLEAN, true);
+
+			SDL_SetLogPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_VERBOSE);
+			SDL_GPUDevice* device = SDL_CreateGPUDeviceWithProperties(gpuProps);
+			vkDestroyInstance(instance, NULL);
+			//SDL_GPUDevice* device = SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV, true, NULL);
+
 			if (device == NULL) {
 				std::cerr << "Error Creating GPU: " << SDL_GetError() << std::endl;
 				return ERROR_EngineFailedtoInitializeGPU;
@@ -402,6 +518,8 @@ namespace Smasher {
 			SDL_GPUFence* fence = SDL_SubmitGPUCommandBufferAndAcquireFence(commandBuffer);
 			SDL_WaitForGPUFences(device, true, &fence, 1);
 			SDL_ReleaseGPUFence(device, fence);
+
+			return ERROR_NoError;
 		}
 
 		ErrorCode CompositionPass(Context &ctx, const std::vector<RenderTexture> &sources) {

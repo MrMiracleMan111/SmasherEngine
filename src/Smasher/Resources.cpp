@@ -1,5 +1,6 @@
 #include <functional>
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_gpu.h>
 #include <SDL3/SDL_stdinc.h>
 #include <SDL3_shadercross/SDL_shadercross.h>
 #include <tiny_obj_loader.h>
@@ -11,7 +12,7 @@ namespace Smasher {
 	static const char* ENTRY_POINT_FRAG = "PSMain";
 	static const char* ENTRY_POINT_COMP = "CSMain";
 
-	static SDL_GPUShader* LoadGPUShaderHLSL(SDL_GPUDevice* device, SDL_GPUShaderStage stage, const char* code, const char *debugName) {
+	static SDL_GPUShader* LoadGPUShaderHLSL(SDL_GPUDevice* device, SDL_GPUShaderStage stage, const char* code, const char *includeDir, const char *debugName) {
 		SDL_ShaderCross_ShaderStage shaderCrossStage;
 		const char* entryPoint;
 		switch (stage) {
@@ -33,7 +34,7 @@ namespace Smasher {
 		if (debugName != NULL) {
 			props = SDL_CreateProperties();
 			SDL_SetBooleanProperty(props, SDL_SHADERCROSS_PROP_SHADER_DEBUG_ENABLE_BOOLEAN, true);
-			//SDL_SetStringProperty(props, SDL_SHADERCROSS_PROP_SHADER_DEBUG_NAME_STRING, "TEST");
+			SDL_SetStringProperty(props, SDL_SHADERCROSS_PROP_SHADER_DEBUG_NAME_STRING, debugName);
 		}
 
 
@@ -41,7 +42,7 @@ namespace Smasher {
 		{
 			code,										/**< The HLSL source code for the shader. */
 			entryPoint,									/**< The entry point function name for the shader in UTF-8. */
-			NULL,									    /**< The include directory for shader code. Optional, can be NULL. */
+			includeDir,									    /**< The include directory for shader code. Optional, can be NULL. */
 			NULL,									    /**< An array of defines. Optional, can be NULL. If not NULL, must be terminated with a fully NULL define struct. */
 			shaderCrossStage,							/**< The shader stage to compile the shader with. */
 			props						                /**< A properties ID for extensions. Should be 0 if no extensions are needed. */
@@ -79,16 +80,24 @@ namespace Smasher {
 		return pShader;
 	}
 
-	static SDL_GPUComputePipeline* LoadComputePipelineHLSL(SDL_GPUDevice* device, const char* code) {
+	static SDL_GPUComputePipeline* LoadComputePipelineHLSL(SDL_GPUDevice* device, const char* code, const char* includeDir, const char *debugName) {
+		SDL_PropertiesID props = 0;
+		if (debugName != NULL) {
+			props = SDL_CreateProperties();
+			SDL_SetBooleanProperty(props, SDL_SHADERCROSS_PROP_SHADER_DEBUG_ENABLE_BOOLEAN, true);
+			SDL_SetStringProperty(props, SDL_SHADERCROSS_PROP_SHADER_DEBUG_NAME_STRING, debugName);
+		}
+
 		SDL_ShaderCross_HLSL_Info graphicShaderInfo
 		{
 			code,										/**< The HLSL source code for the shader. */
-			ENTRY_POINT_COMP,									/**< The entry point function name for the shader in UTF-8. */
-			NULL,									    /**< The include directory for shader code. Optional, can be NULL. */
+			ENTRY_POINT_COMP,							/**< The entry point function name for the shader in UTF-8. */
+			includeDir,									/**< The include directory for shader code. Optional, can be NULL. */
 			NULL,									    /**< An array of defines. Optional, can be NULL. If not NULL, must be terminated with a fully NULL define struct. */
 			SDL_SHADERCROSS_SHADERSTAGE_COMPUTE,		/**< The shader stage to compile the shader with. */
-			0						                    /**< A properties ID for extensions. Should be 0 if no extensions are needed. */
+			props						                    /**< A properties ID for extensions. Should be 0 if no extensions are needed. */
 		};
+
 		size_t size;
 		Uint8* shaderBytecode = (Uint8*)SDL_ShaderCross_CompileSPIRVFromHLSL(&graphicShaderInfo, &size);
 
@@ -129,9 +138,10 @@ namespace Smasher {
 		size_t fileSize = 0;
 		char* file = (char*)SDL_LoadFile(m_Paths[0].string().c_str(), &fileSize);
 		assert(file != NULL && "Error loading shader file, path may be invalid");
-			
+		
+		std::string directory = m_Paths[0].parent_path().generic_string();
 		std::string debugName = std::move(m_Paths[0].filename().generic_string());
-		m_ShaderPtr = LoadGPUShaderHLSL(m_GPUPtr->Get(), type, (const char*)(file), "test");
+		m_ShaderPtr = LoadGPUShaderHLSL(m_GPUPtr->Get(), type, (const char*)(file), directory.c_str(), debugName.c_str());
 
 		SDL_free(file);
 
@@ -139,6 +149,27 @@ namespace Smasher {
 		if (!m_Loaded) {
 			std::cerr << "Error Loading Graphics Shader SDL Error: " << SDL_GetError() << "\n";
 			throw Exceptions::ResourceFailedToLoad(std::format("Failed to load Shader {}", m_Paths[0].string()));
+		}
+	}
+
+	SDLGraphicShaderResource::SDLGraphicShaderResource(ResourceId id, const char* code, std::optional<ResourcePath> includePath, std::shared_ptr<SDL_GPUDeviceWrapper> gpu, SDL_GPUShaderStage type, const char* debugName) :
+		Resource{ id },
+		m_GPUPtr{ gpu },
+		m_ShaderType{ type }
+	{
+		std::string includePathStr;
+		const char* includePathStrPtr = NULL;
+		if (includePath) {
+			includePathStr = includePath.value().string();
+			includePathStrPtr = includePathStr.c_str();
+		}
+
+		m_ShaderPtr = LoadGPUShaderHLSL(m_GPUPtr->Get(), type, code, includePathStrPtr, debugName);
+
+		m_Loaded = (m_ShaderPtr != NULL);
+		if (!m_Loaded) {
+			std::cerr << "Error Loading Graphics Shader SDL Error: " << SDL_GetError() << "\n";
+			throw Exceptions::ResourceFailedToLoad(std::format("Failed to load Shader from string {}", code));
 		}
 	}
 
@@ -160,13 +191,35 @@ namespace Smasher {
 
 		size_t fileSize = 0;
 		char* file = (char*)SDL_LoadFile(m_Paths[0].string().c_str(), &fileSize);
-		m_ShaderPtr = LoadComputePipelineHLSL(m_GPUPtr->Get(), file);
+		std::string directory = m_Paths[0].parent_path().generic_string();
+		std::string debugName = std::move(m_Paths[0].filename().generic_string());
+		m_ShaderPtr = LoadComputePipelineHLSL(m_GPUPtr->Get(), file, directory.c_str(), debugName.c_str());
 		m_Loaded = (m_ShaderPtr != NULL);
 
 		SDL_free(file);
 		if (!m_Loaded) {
 			std::cerr << "Error Loading Compute Shader SDL Error: " << SDL_GetError() << "\n";
 			throw Exceptions::ResourceFailedToLoad(std::format("Failed to load Shader {}", m_Paths[0].string()));
+		}
+	}
+
+	SDLComputeShaderResource::SDLComputeShaderResource(ResourceId id, const char* code, std::optional<ResourcePath> includePath, std::shared_ptr<SDL_GPUDeviceWrapper> gpu, const char* debugName) :
+		Resource{ id },
+		m_GPUPtr{ gpu }
+	{
+		std::string includePathStr;
+		const char* includePathStrPtr = NULL;
+		if (includePath) {
+			includePathStr = includePath.value().string();
+			includePathStrPtr = includePathStr.c_str();
+		}
+
+		m_ShaderPtr = LoadComputePipelineHLSL(m_GPUPtr->Get(), code, includePathStrPtr, debugName);
+		m_Loaded = (m_ShaderPtr != NULL);
+
+		if (!m_Loaded) {
+			std::cerr << "Error Loading Compute Shader SDL Error: " << SDL_GetError() << "\n";
+			throw Exceptions::ResourceFailedToLoad(std::format("Failed to load Shader code {}", code));
 		}
 	}
 
@@ -183,9 +236,10 @@ namespace Smasher {
 		SDL_GPUBuffer** pVertexBuffer;
 		std::vector<VertexData>* pVertexData;
 		std::vector<uint32_t>* pIndices;
+
 	};
 
-	static struct IndexTupleHasher {
+	struct IndexTupleHasher {
 		size_t operator()(const std::tuple<int, int, int>& indices) const {
 			int posIndex = std::get<0>(indices);
 			int normIndex = std::get<1>(indices);
@@ -197,7 +251,9 @@ namespace Smasher {
 	static void LoadOBJMesh(
 	std::string filepath,
 	std::vector<VertexData>* pVertices,
-	std::vector<uint32_t>* pIndices
+	std::vector<uint32_t>* pIndices,
+	glm::vec3 *pMinAABB,
+	glm::vec3 *pMaxAABB
 	) {
 		tinyobj::ObjReaderConfig readerConfig;
 		tinyobj::ObjReader reader;
@@ -221,8 +277,10 @@ namespace Smasher {
 		auto& shapes = reader.GetShapes();
 		auto& materials = reader.GetMaterials();
 
-		std::unordered_map<std::tuple<int, int, int>, uint32_t, IndexTupleHasher> indexMap;
+		glm::vec3 minAABB, maxAABB;
+		std::unordered_map<std::tuple<int, int, int>, int, IndexTupleHasher> indexMap;
 		unsigned int indexCount = 0;
+		bool first = true;
 		for (auto& shape : shapes) {
 			for (auto& idx : shape.mesh.indices) {
 				auto key = std::make_tuple(idx.normal_index, idx.texcoord_index, idx.vertex_index);
@@ -233,6 +291,15 @@ namespace Smasher {
 						data.px = attrib.vertices[3 * idx.vertex_index + 0]; // px
 						data.py = attrib.vertices[3 * idx.vertex_index + 1]; // py
 						data.pz = attrib.vertices[3 * idx.vertex_index + 2]; // pz
+
+						if (first) {
+							minAABB = glm::vec3(data.px, data.py, data.pz);
+							maxAABB = glm::vec3(data.px, data.py, data.pz);
+						}
+						minAABB = glm::min(glm::vec3(data.px, data.py, data.pz), minAABB);
+						maxAABB = glm::max(glm::vec3(data.px, data.py, data.pz), maxAABB);
+
+						first = false;
 					}
 					if (idx.normal_index != -1) {
 						data.nx = attrib.normals[3 * idx.normal_index + 0]; // px
@@ -248,13 +315,18 @@ namespace Smasher {
 				pIndices->push_back(indexMap[key]);
 			}
 		}
+
+		*pMinAABB = minAABB;
+		*pMaxAABB = maxAABB;
 	}
 
 	static void UploadOBJMeshToGPU(SDL_GPUDevice* device,
 		const std::vector<VertexData>& vertices,
 		const std::vector<uint32_t>& indices,
 		SDL_GPUBuffer** pVertexBuffer,
-		SDL_GPUBuffer** pIndexBuffer) {
+		SDL_GPUBuffer** pIndexBuffer,
+		glm::vec3 minAABB,
+		glm::vec3 maxAABB) {
 
 		SDL_GPUCommandBuffer* commandBuffer = SDL_AcquireGPUCommandBuffer(device);
 
@@ -350,10 +422,10 @@ namespace Smasher {
 		assert(m_Paths.size() == 1 && "Static mesh can only have one path");
 		std::vector<VertexData> vertices;
 		std::vector<uint32_t> indices;
-		LoadOBJMesh(m_Paths.front().generic_string(), &vertices, &indices);
+		LoadOBJMesh(m_Paths.front().generic_string(), &vertices, &indices, &m_MinAABB, &m_MaxAABB);
 		m_NumIndices = indices.size();
 		m_NumVertices = vertices.size();
-		UploadOBJMeshToGPU(gpu->Get(), vertices, indices, &m_VertexBuffer, &m_IndexBuffer);
+		UploadOBJMeshToGPU(gpu->Get(), vertices, indices, &m_VertexBuffer, &m_IndexBuffer, m_MinAABB, m_MaxAABB);
 		m_Loaded = true;
 	}
 
@@ -377,6 +449,14 @@ namespace Smasher {
 	unsigned int StaticMeshResource::GetNumVertices() const {
 		return m_NumVertices;
 	};
+
+	glm::vec3 StaticMeshResource::GetMinAABB() const {
+		return m_MinAABB;
+	}
+
+	glm::vec3 StaticMeshResource::GetMaxAABB() const {
+		return m_MaxAABB;
+	}
 
 	MaterialResource::MaterialResource(ResourceId id,
 		const ResourcePath* const relativePaths, const std::size_t numPaths,
@@ -413,19 +493,27 @@ namespace Smasher {
 		return m_Dimensions;
 	};
 
-	Expected<void*> MaterialResource::GetAlbedo() {
+	Expected<void*> MaterialResource::GetAlbedoTexture() {
 		if (m_AlbedoSurface == nullptr) {
 			return Expected<void*>::Error(ERROR_MaterialHasNoAlbedo);
 		}
 		return m_AlbedoSurface->pixels;
 	};
 
-	Expected<void*> MaterialResource::GetSpecular() {
+	Expected<void*> MaterialResource::GetSpecularTexture() {
 		return nullptr;
 	};
 
-	Expected<void*> MaterialResource::GetNormals() {
+	Expected<void*> MaterialResource::GetNormalsTexture() {
 		return nullptr;
 	};
+
+	glm::vec3 MaterialResource::GetBaseAlbedo() {
+		return glm::vec3{ m_Material.diffuse[0], m_Material.diffuse[1], m_Material.diffuse[2] };
+	}
+
+	glm::vec3 MaterialResource::GetBaseSpecular() {
+		return glm::vec3{ m_Material.specular[0], m_Material.specular[1], m_Material.specular[2] };
+	}
 
 }

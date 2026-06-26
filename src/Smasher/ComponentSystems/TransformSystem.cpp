@@ -139,9 +139,9 @@ namespace Smasher {
 		void ComputeGlobalMatrix(Component& component) {
 			component._globalMatrix =
 				glm::translate(glm::mat4(1.f), component._position) *
-				glm::scale(glm::mat4(1.f), component._scale) * glm::mat4(1.f) *
-				glm::toMat4(component._rotation);
-			component._dirty = true;
+				glm::scale(glm::mat4(1.f), component._scale) *
+				glm::mat4(1.f) * glm::toMat4(component._rotation);
+			component._dirty = false;
 		}
 
 		const glm::mat4& GetTransform(Component& component) {

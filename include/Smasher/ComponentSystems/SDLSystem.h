@@ -62,6 +62,8 @@ namespace Smasher {
 
 		SMASHER_API ErrorCode OnWindowResize(SDLSystem::Context& ctx);
 		
+		SMASHER_API SDL_GPUTextureFormat GetGPURGBAFormat(SDL_GPUDevice* device);
+
 		SMASHER_API SDL_GPUTextureFormat GetGPUDepthStencilFormat(SDL_GPUDevice* device);
 
 		SMASHER_API SDL_GPUTextureFormat GetGPUDepthFormat(SDL_GPUDevice *device);

@@ -2,13 +2,6 @@
 // -----------------------------------------------
 // Pixel (Fragment) Shader
 // -----------------------------------------------
-struct PSInput
-{
-    [[vk::location(0)]] float3 normal : NORMAL;
-    [[vk::location(1)]] float3 position : POSITION;
-    [[vk::location(2)]] float2 uv : TEXCOORD0;
-    [[vk::location(3)]] int materialID : MATERIALID;
-};
 
 cbuffer UBO : register(b0, space1)
 {
@@ -23,20 +16,26 @@ cbuffer UBO : register(b0, space1)
     // column_major float4x4 CameraMatrix;
 };
 
-struct PSOutput
+struct PSInput
 {
-    float4 gNormal : SV_Target0;
-    float2 gUV : SV_Target1;
-    int gMaterialIDs : SV_Target2;
+    bool isInternalNode : INTERNAL_NODE;
+    bool ignore : IGNORE;
+    float3 color : COLOR0;
 };
 
+struct PSOutput
+{
+    float4 color : SV_Target0;
+};
 
 PSOutput PSMain(PSInput input)
 {
     PSOutput output;
+    if (input.ignore)
+    {
+        discard;
+    }
     
-    output.gNormal = float4(input.normal, 1.f);
-    output.gUV = float2(input.uv);
-    output.gMaterialIDs = input.materialID;
+    output.color = float4(input.color.rgb, 1.f);
     return output;
 }
